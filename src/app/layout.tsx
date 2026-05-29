@@ -19,16 +19,20 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <RoleProvider>
           <Navbar />
           <main className="flex-1 flex flex-col">{children}</main>
-          <footer className="bg-[var(--color-primary)] text-white py-8">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <footer className="bg-[var(--color-primary-dark)] text-white mt-auto">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
               <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-                <div className="flex items-center gap-2">
-                  <div className="w-7 h-7 bg-white/20 rounded-lg flex items-center justify-center">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-8 h-8 bg-white/10 rounded-xl flex items-center justify-center">
                     <span className="text-white font-bold text-xs">P</span>
                   </div>
                   <span className="font-bold text-sm">PropEase</span>
                 </div>
-                <p className="text-xs text-white/60">© 2026 PropEase. Real estate for Kano.</p>
+                <div className="flex items-center gap-6 text-xs text-white/50">
+                  <span>© 2026 PropEase</span>
+                  <span className="w-px h-3 bg-white/10" />
+                  <span>Real estate for Kano</span>
+                </div>
               </div>
             </div>
           </footer>

@@ -32,47 +32,69 @@ export default function HomePage() {
 
   return (
     <div className="flex-1">
-      <section className="bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary-dark)] text-white py-16 md:py-24">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-3xl md:text-5xl font-bold leading-tight">
-            Find Your Next Property in <span className="text-[var(--color-accent)]">Kano</span>
-          </h1>
-          <p className="mt-4 text-base md:text-lg text-white/70 max-w-2xl mx-auto">
-            Browse verified listings across Kano Municipal, Fagge, Tarauni, and Nassarawa.
-            Rent or buy with confidence through PropEase.
-          </p>
-          <div className="mt-8 flex flex-wrap items-center justify-center gap-6 text-sm text-white/60">
-            <span>🏘️ {activeListings.length} properties</span>
-            <span>📍 {cities.length} cities</span>
-            <span>💰 From {formatNaira(Math.min(...activeListings.map(l => l.price)))}</span>
+      <section className="relative bg-gradient-to-br from-[var(--color-primary-dark)] via-[var(--color-primary)] to-[var(--color-primary-light)] overflow-hidden">
+        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wMyI+PHBhdGggZD0iTTM2IDM0djItSDI0di0yaDEyek0zNiAyNHYySDI0di0yaDEyeiIvPjwvZz48L2c+PC9zdmc+')] opacity-40" />
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24">
+          <div className="text-center max-w-3xl mx-auto">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 text-white/90 text-xs font-medium mb-6">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              Verified properties across Kano
+            </span>
+            <h1 className="text-4xl md:text-6xl font-bold leading-tight text-white">
+              Find Your Next Home in <span className="text-[var(--color-accent)]">Kano</span>
+            </h1>
+            <p className="mt-4 text-base md:text-lg text-white/70 max-w-xl mx-auto">
+              Browse verified listings across Kano Municipal, Fagge, Tarauni, and Nassarawa. Rent or buy with confidence.
+            </p>
+            <div className="mt-8 flex flex-wrap items-center justify-center gap-6 text-sm text-white/60">
+              <span className="flex items-center gap-1.5">
+                <svg className="w-4 h-4 text-white/40" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z" /><path strokeLinecap="round" strokeLinejoin="round" d="M17 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" /></svg>
+                {activeListings.length} properties
+              </span>
+              <span className="flex items-center gap-1.5">
+                <svg className="w-4 h-4 text-white/40" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                {cities.length} cities
+              </span>
+              <span className="flex items-center gap-1.5">
+                <svg className="w-4 h-4 text-white/40" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" /></svg>
+                From {formatNaira(Math.min(...activeListings.map(l => l.price)))}
+              </span>
+            </div>
           </div>
         </div>
       </section>
 
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <PropertyFilters onFilterChange={setFilters} />
-
-        <div className="mt-6">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-gray-900">
-              {filtered.length} {filtered.length === 1 ? "property" : "properties"} found
-            </h2>
-          </div>
-
-          {filtered.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-              {filtered.map((listing) => (
-                <PropertyCard key={listing.id} listing={listing} />
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-16">
-              <div className="text-5xl mb-4">🔍</div>
-              <h3 className="text-lg font-semibold text-gray-900">No properties match your filters</h3>
-              <p className="text-sm text-gray-500 mt-1">Try adjusting your search criteria</p>
-            </div>
-          )}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-6 relative z-10">
+        <div className="bg-white rounded-2xl border border-gray-200/60 p-5 shadow-lg">
+          <PropertyFilters onFilterChange={setFilters} />
         </div>
+      </section>
+
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-lg font-semibold text-gray-900">
+            Available Properties
+            <span className="text-sm font-normal text-gray-500 ml-2">({filtered.length} found)</span>
+          </h2>
+        </div>
+
+        {filtered.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+            {filtered.map((listing) => (
+              <div key={listing.id} className="animate-fade-in-up" style={{ animationDelay: `${parseInt(listing.id.replace("l", "")) * 50}ms` }}>
+                <PropertyCard listing={listing} />
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-20">
+            <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg className="w-7 h-7 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900">No properties match your filters</h3>
+            <p className="text-sm text-gray-500 mt-1">Try adjusting your search criteria</p>
+          </div>
+        )}
       </section>
     </div>
   );

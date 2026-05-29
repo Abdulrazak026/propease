@@ -24,7 +24,7 @@ export default function RentTierBreakdown({ listing }: RentTierBreakdownProps) {
   const total = breakdown.reduce((s, i) => s + i.amount, 0);
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">
+    <div className="bg-white rounded-2xl border border-gray-200/60 p-5 shadow-sm">
       <div className="flex items-center justify-between mb-4">
         <h3 className="font-semibold text-gray-900 text-sm">Payment Breakdown</h3>
         <Badge variant="info">{rentTierLabels[listing.rentTier]}</Badge>
@@ -32,11 +32,11 @@ export default function RentTierBreakdown({ listing }: RentTierBreakdownProps) {
 
       <div className="space-y-3">
         {breakdown.map((item, i) => (
-          <div key={i} className="flex items-center justify-between">
+          <div key={i} className="flex items-center justify-between py-1.5">
             <div>
               <span className="text-sm text-gray-700">{item.label}</span>
               {item.info && (
-                <span className="text-xs text-gray-400 ml-1">({item.info})</span>
+                <span className="text-xs text-gray-400 ml-1.5">({item.info})</span>
               )}
             </div>
             <span className="text-sm font-semibold text-gray-900">{formatNaira(item.amount)}</span>

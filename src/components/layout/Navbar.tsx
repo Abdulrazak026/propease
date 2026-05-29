@@ -19,66 +19,70 @@ export default function Navbar() {
     : null;
 
   return (
-    <header className="bg-white border-b border-gray-200 sticky top-0 z-40">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
-          <Link href="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-[var(--color-primary)] rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-sm">P</span>
-            </div>
-            <span className="text-lg font-bold text-[var(--color-primary)]">PropEase</span>
-          </Link>
-
-          <nav className="hidden md:flex items-center gap-6">
-            <Link href="/" className="text-sm text-gray-600 hover:text-[var(--color-primary)] transition">
-              Browse
-            </Link>
-            <Link href="/custom-order" className="text-sm text-gray-600 hover:text-[var(--color-primary)] transition">
-              Custom Order
-            </Link>
-            {isAuthenticated && dashboardLink && (
-              <Link
-                href={dashboardLink}
-                className="text-sm font-medium text-[var(--color-primary)] hover:text-[var(--color-primary-light)] transition"
-              >
-                Dashboard
-              </Link>
-            )}
-          </nav>
-
-          <div className="flex items-center gap-3">
-            {isAuthenticated ? (
-              <div className="flex items-center gap-3">
-                <span className="text-sm text-gray-500 hidden sm:block">{currentUser!.name}</span>
-                <span className="text-xs bg-[var(--color-primary)]/10 text-[var(--color-primary)] px-2 py-0.5 rounded-full font-medium capitalize">
-                  {currentUser!.role}
-                </span>
-                <Button size="sm" variant="ghost" onClick={handleLogout}>
-                  Logout
-                </Button>
+    <header className="sticky top-0 z-50">
+      <div className="glass border-b border-white/20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            <Link href="/" className="flex items-center gap-2.5 group">
+              <div className="w-9 h-9 bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary-light)] rounded-xl flex items-center justify-center shadow-sm group-hover:shadow-md transition-shadow">
+                <span className="text-white font-bold text-sm">P</span>
               </div>
-            ) : (
-              <Link href="/login">
-                <Button size="sm">Login</Button>
-              </Link>
-            )}
-          </div>
-        </div>
+              <span className="text-lg font-bold text-[var(--color-primary)]">PropEase</span>
+            </Link>
 
-        {!isAuthenticated && (
-          <div className="border-t border-gray-100 py-2 flex items-center gap-2 overflow-x-auto scrollbar-hide">
-            <span className="text-xs text-gray-400 font-medium whitespace-nowrap">Demo: </span>
-            {users.map((u) => (
-              <button
-                key={u.id}
-                onClick={() => handleDemoLogin(u.id)}
-                className="text-xs px-2.5 py-1 rounded-md bg-gray-50 hover:bg-[var(--color-primary)] hover:text-white border border-gray-200 transition whitespace-nowrap"
-              >
-                {u.name} ({u.role})
-              </button>
-            ))}
+            <nav className="hidden md:flex items-center gap-1">
+              <Link href="/" className="px-4 py-2 text-sm text-gray-600 hover:text-[var(--color-primary)] hover:bg-gray-100/50 rounded-lg transition-all">
+                Browse
+              </Link>
+              <Link href="/custom-order" className="px-4 py-2 text-sm text-gray-600 hover:text-[var(--color-primary)] hover:bg-gray-100/50 rounded-lg transition-all">
+                Custom Order
+              </Link>
+              {isAuthenticated && dashboardLink && (
+                <Link href={dashboardLink} className="px-4 py-2 text-sm font-medium text-[var(--color-primary)] hover:bg-gray-100/50 rounded-lg transition-all">
+                  Dashboard
+                </Link>
+              )}
+            </nav>
+
+            <div className="flex items-center gap-3">
+              {isAuthenticated ? (
+                <div className="flex items-center gap-3">
+                  <div className="hidden sm:flex items-center gap-2.5">
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary-light)] flex items-center justify-center text-white text-xs font-bold shadow-sm">
+                      {currentUser!.name.split(" ").map(n => n[0]).join("").slice(0, 2)}
+                    </div>
+                    <div className="text-right">
+                      <p className="text-sm font-medium text-gray-900 leading-tight">{currentUser!.name}</p>
+                      <p className="text-[11px] text-gray-500 capitalize leading-tight">{currentUser!.role}</p>
+                    </div>
+                  </div>
+                  <Button size="sm" variant="ghost" onClick={handleLogout}>
+                    Logout
+                  </Button>
+                </div>
+              ) : (
+                <Link href="/login">
+                  <Button size="sm">Sign In</Button>
+                </Link>
+              )}
+            </div>
           </div>
-        )}
+
+          {!isAuthenticated && (
+            <div className="border-t border-white/10 py-2.5 flex items-center gap-2 overflow-x-auto scrollbar-hide">
+              <span className="text-xs text-gray-400 font-medium whitespace-nowrap">Demo:</span>
+              {users.map((u) => (
+                <button
+                  key={u.id}
+                  onClick={() => handleDemoLogin(u.id)}
+                  className="text-xs px-3 py-1 rounded-full bg-white/60 hover:bg-white hover:text-[var(--color-primary)] border border-gray-200/60 transition-all whitespace-nowrap"
+                >
+                  {u.name} ({u.role})
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </header>
   );

@@ -8,11 +8,11 @@ interface TaskBoardProps {
   onStatusChange: (taskId: string, status: TaskStatus) => void;
 }
 
-const columns: { status: TaskStatus; label: string; color: string }[] = [
-  { status: "open", label: "Open", color: "bg-blue-50 border-blue-200" },
-  { status: "in_progress", label: "In Progress", color: "bg-amber-50 border-amber-200" },
-  { status: "fulfilled", label: "Fulfilled", color: "bg-emerald-50 border-emerald-200" },
-  { status: "closed", label: "Closed", color: "bg-gray-50 border-gray-200" },
+const columns: { status: TaskStatus; label: string; accent: string; bg: string }[] = [
+  { status: "open", label: "Open", accent: "bg-blue-500", bg: "bg-blue-50/50" },
+  { status: "in_progress", label: "In Progress", accent: "bg-amber-500", bg: "bg-amber-50/50" },
+  { status: "fulfilled", label: "Fulfilled", accent: "bg-emerald-500", bg: "bg-emerald-50/50" },
+  { status: "closed", label: "Closed", accent: "bg-gray-400", bg: "bg-gray-50/50" },
 ];
 
 export default function TaskBoard({ tasks, onStatusChange }: TaskBoardProps) {
@@ -38,11 +38,14 @@ export default function TaskBoard({ tasks, onStatusChange }: TaskBoardProps) {
             key={col.status}
             onDragOver={handleDragOver}
             onDrop={() => handleDrop(col.status)}
-            className={`rounded-xl border-2 p-3 min-h-[200px] ${col.color}`}
+            className={`rounded-xl border border-gray-200/60 p-3 min-h-[200px] transition-colors ${draggedId ? col.bg : ""}`}
           >
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="text-sm font-semibold text-gray-700">{col.label}</h3>
-              <span className="text-xs bg-white px-2 py-0.5 rounded-full font-medium text-gray-500">
+            <div className="flex items-center justify-between mb-3 px-1">
+              <div className="flex items-center gap-2">
+                <span className={`w-2 h-2 rounded-full ${col.accent}`} />
+                <h3 className="text-sm font-semibold text-gray-700">{col.label}</h3>
+              </div>
+              <span className="text-xs bg-white border border-gray-200 px-2 py-0.5 rounded-full font-medium text-gray-500">
                 {colTasks.length}
               </span>
             </div>
