@@ -3,6 +3,7 @@ import { useRole } from "@/context/RoleContext";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import OnboardingModal from "@/components/onboarding/OnboardingModal";
 
 export default function AgentLayout({ children }: { children: React.ReactNode }) {
   const { role, isAuthenticated } = useRole();
@@ -16,5 +17,10 @@ export default function AgentLayout({ children }: { children: React.ReactNode })
 
   if (!isAuthenticated) return null;
 
-  return <DashboardLayout>{children}</DashboardLayout>;
+  return (
+    <>
+      <OnboardingModal role={role} />
+      <DashboardLayout>{children}</DashboardLayout>
+    </>
+  );
 }

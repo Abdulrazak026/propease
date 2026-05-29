@@ -2,36 +2,46 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useRole } from "@/context/RoleContext";
+import { inquiries, tasks, withdrawals } from "@/lib/mock-data";
 
-const navItems: Record<string, { label: string; href: string; icon: string }[]> = {
+const navItems: Record<string, { label: string; href: string; icon: string; badge?: "inquiries" | "tasks" | "withdrawals" }[]> = {
   admin: [
     { label: "Dashboard", href: "/admin", icon: "📊" },
     { label: "Users", href: "/admin/users", icon: "👥" },
     { label: "Commissions", href: "/admin/commissions", icon: "💰" },
     { label: "Settings", href: "/admin/settings", icon: "⚙️" },
-    { label: "Audit Log", href: "/admin/audit", icon: "📋" },
+    { label: "Audit Log", href: "/admin/audit", icon: "📋", badge: "withdrawals" },
   ],
   agent: [
-    { label: "Task Board", href: "/agent", icon: "📋" },
-    { label: "Performance", href: "/agent", icon: "📈" },
-    { label: "Inquiries", href: "/agent/inquiries", icon: "💬" },
+    { label: "Task Board", href: "/agent", icon: "📋", badge: "tasks" },
+    { label: "Inquiries", href: "/agent/inquiries", icon: "💬", badge: "inquiries" },
     { label: "Commissions", href: "/agent/commissions", icon: "💰" },
+    { label: "Wallet", href: "/wallet", icon: "👛" },
   ],
   ambassador: [
     { label: "City Overview", href: "/ambassador", icon: "🏙️" },
     { label: "Post Listing", href: "/ambassador/listings/new", icon: "➕" },
     { label: "Create Task", href: "/ambassador/tasks", icon: "📌" },
     { label: "Commissions", href: "/ambassador/commissions", icon: "💰" },
+    { label: "Wallet", href: "/wallet", icon: "👛" },
     { label: "Settings", href: "/ambassador/settings", icon: "⚙️" },
   ],
 };
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
-  const { role } = useRole();
+  const { role, currentUser } = useRole();
   const pathname = usePathname();
 
   const resolvedRole = role === "head" ? "admin" : role;
   const items = resolvedRole ? navItems[resolvedRole] : [];
+
+  const badgeCount = (badge: string | undefined): number => {
+    if (!badge || !currentUser) return 0;
+    if (badge === "inquiries") return inquiries.filter((i) => i.assignedAgent?.id === currentUser.id && i.status === "new").length;
+    if (badge === "tasks") return tasks.filter((t) => t.assignedTo.id === currentUser.id && (t.status === "open" || t.status === "in_progress")).length;
+    if (badge === "withdrawals") return withdrawals.filter((w) => w.status === "pending").length;
+    return 0;
+  };
 
   return (
     <div className="flex flex-1">
@@ -39,6 +49,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         <nav className="p-3 space-y-1 flex-1">
           {items.map((item) => {
             const active = pathname === item.href || pathname.startsWith(item.href + "/");
+            const count = badgeCount(item.badge);
             return (
               <Link
                 key={item.href}
@@ -50,9 +61,16 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 }`}
               >
                 <span className="text-lg">{item.icon}</span>
-                <span>{item.label}</span>
-                {active && (
-                  <span className="ml-auto w-1.5 h-1.5 rounded-full bg-white/60" />
+                <span className="flex-1">{item.label}</span>
+                {count > 0 && (
+                  <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-bold ${
+                    active ? "bg-white/20 text-white" : "bg-red-100 text-red-600"
+                  }`}>
+                    {count > 9 ? "9+" : count}
+                  </span>
+                )}
+                {active && count === 0 && (
+                  <span className="w-1.5 h-1.5 rounded-full bg-white/60" />
                 )}
               </Link>
             );

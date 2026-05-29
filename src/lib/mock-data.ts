@@ -329,6 +329,24 @@ export const withdrawals = [
   { id: "w2", userId: "u9", userName: "Maryam Yusuf", amount: 200_000, bankName: "Access Bank", accountNumber: "0987654321", status: "pending" as const, requestedAt: "2026-06-03" },
 ];
 
+export const transactions = [
+  { id: "tx1", userId: "u4", type: "commission_payout", amount: 120_000, reference: "CM-2026-002", method: "wallet", status: "completed", createdAt: "2026-05-10" },
+  { id: "tx2", userId: "u4", type: "top_up", amount: 50_000, reference: "TU-2026-001", method: "card", status: "completed", createdAt: "2026-05-12" },
+  { id: "tx3", userId: "u4", type: "payment", amount: 600_000, reference: "RNT-2026-001", method: "wallet", status: "completed", createdAt: "2026-05-15" },
+  { id: "tx4", userId: "u4", type: "withdrawal", amount: 80_000, reference: "WD-2026-001", method: "transfer", status: "pending", createdAt: "2026-06-02" },
+  { id: "tx5", userId: "u4", type: "commission_payout", amount: 36_000, reference: "CM-2026-003", method: "wallet", status: "completed", createdAt: "2026-05-22" },
+  { id: "tx6", userId: "u5", type: "commission_payout", amount: 212_500, reference: "CM-2026-003", method: "wallet", status: "completed", createdAt: "2026-05-22" },
+  { id: "tx7", userId: "u5", type: "top_up", amount: 100_000, reference: "TU-2026-002", method: "transfer", status: "completed", createdAt: "2026-05-25" },
+  { id: "tx8", userId: "u6", type: "commission_payout", amount: 120_000, reference: "CM-2026-001", method: "wallet", status: "completed", createdAt: "2026-04-20" },
+  { id: "tx9", userId: "u6", type: "payment", amount: 350_000, reference: "RNT-2026-002", method: "card", status: "completed", createdAt: "2026-05-01" },
+  { id: "tx10", userId: "u6", type: "top_up", amount: 200_000, reference: "TU-2026-003", method: "card", status: "completed", createdAt: "2026-05-28" },
+  { id: "tx11", userId: "u7", type: "commission_payout", amount: 175_000, reference: "CM-2026-004", method: "wallet", status: "completed", createdAt: "2026-05-28" },
+  { id: "tx12", userId: "u8", type: "commission_payout", amount: 36_000, reference: "CM-2026-002", method: "wallet", status: "completed", createdAt: "2026-05-10" },
+  { id: "tx13", userId: "u8", type: "top_up", amount: 20_000, reference: "TU-2026-004", method: "card", status: "failed", createdAt: "2026-06-01" },
+  { id: "tx14", userId: "u9", type: "withdrawal", amount: 200_000, reference: "WD-2026-002", method: "transfer", status: "pending", createdAt: "2026-06-03" },
+  { id: "tx15", userId: "u10", type: "commission_payout", amount: 0, reference: "CM-2026-005", method: "wallet", status: "pending", createdAt: "2026-06-05" },
+];
+
 export const auditLogs = [
   { id: "a1", action: "User Created", user: users[0], target: users[9].name, details: "Created ambassador account for Tarauni", createdAt: "2026-05-20" },
   { id: "a2", action: "Listing Approved", user: users[1], target: "4-Bedroom Duplex — Kano Municipal", details: "Approved listing for publication", createdAt: "2026-05-15" },

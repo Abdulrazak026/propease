@@ -4,6 +4,7 @@ import { listings, tasks, users } from "@/lib/mock-data";
 import { formatNaira } from "@/lib/utils";
 import Button from "@/components/ui/Button";
 import Link from "next/link";
+import Badge from "@/components/ui/Badge";
 
 export default function AmbassadorOverview() {
   const { currentUser } = useRole();
@@ -77,19 +78,20 @@ export default function AmbassadorOverview() {
           {myAgents.length > 0 ? (
             <div className="space-y-1">
               {myAgents.map((a) => (
-                <div key={a.id} className="flex items-center gap-3 py-2.5 px-3 rounded-lg hover:bg-gray-50 transition-colors">
+                <Link key={a.id} href={`/agents/${a.id}`} className="flex items-center gap-3 py-2.5 px-3 rounded-lg hover:bg-gray-50 transition-colors group">
                   <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[var(--color-primary)]/10 to-[var(--color-primary-light)]/10 flex items-center justify-center">
                     <span className="text-xs font-medium text-[var(--color-primary)]">
                       {a.name.split(" ").map(n => n[0]).join("").slice(0, 2)}
                     </span>
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-gray-900">{a.name}</p>
+                    <p className="text-sm font-medium text-gray-900 group-hover:text-[var(--color-primary)] transition-colors">{a.name}</p>
                     <p className="text-xs text-gray-400">
                       Wallet: {formatNaira(a.walletBalance)} • {listings.filter((l) => l.assignedAgent?.id === a.id).length} listings
                     </p>
                   </div>
-                </div>
+                  <svg className="w-4 h-4 text-gray-300 group-hover:text-[var(--color-primary)] transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" /></svg>
+                </Link>
               ))}
             </div>
           ) : (
