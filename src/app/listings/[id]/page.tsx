@@ -21,6 +21,8 @@ export default function ListingDetailPage() {
   const [inquireMsg, setInquireMsg] = useState("");
   const [reserveStep, setReserveStep] = useState<"confirm" | "pay" | "done">("confirm");
   const [bookingSuccess, setBookingSuccess] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   if (!listing) {
     return (
@@ -85,7 +87,7 @@ export default function ListingDetailPage() {
             )}
 
             <div className="bg-white rounded-2xl border border-gray-200/60 p-6 shadow-sm">
-              <div className="flex flex-wrap items-start justify-between gap-3">
+              <div className="flex items-start justify-between gap-3">
                 <div>
                   <h1 className="text-2xl font-bold text-gray-900">{listing.title}</h1>
                   <p className="text-sm text-gray-500 mt-1.5 flex items-center gap-1">
@@ -94,6 +96,10 @@ export default function ListingDetailPage() {
                   </p>
                   <p className="text-xs text-gray-400 mt-1">Posted {formatDate(listing.createdAt)} by {listing.postedBy.name}</p>
                 </div>
+                <button onClick={() => setShowShareModal(true)} className="shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium text-gray-500 hover:text-[var(--color-primary)] hover:bg-gray-50 border border-gray-200 transition-all">
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" /></svg>
+                  Share
+                </button>
               </div>
 
               <div className="flex flex-wrap gap-2 mt-5">
@@ -252,6 +258,31 @@ export default function ListingDetailPage() {
                 </div>
               </div>
             )}
+          </div>
+        </div>
+      )}
+
+      {showShareModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" onClick={() => { setShowShareModal(false); setCopied(false); }}>
+          <div className="bg-white rounded-2xl p-6 max-w-sm w-full mx-4 shadow-xl animate-fade-in-up" onClick={(e) => e.stopPropagation()}>
+            <h3 className="text-base font-semibold text-gray-900 mb-2">Share this Property</h3>
+            <div className="flex items-center gap-2 bg-gray-50 rounded-xl p-3 border border-gray-200 mb-4">
+              <input readOnly value={`https://propease-demo.vercel.app/listings/${listing.id}`} className="flex-1 bg-transparent text-xs font-mono text-gray-600 outline-none" />
+              <button onClick={() => { navigator.clipboard.writeText(`https://propease-demo.vercel.app/listings/${listing.id}`); setCopied(true); setTimeout(() => setCopied(false), 2000); }}
+                className="shrink-0 px-3 py-1.5 rounded-lg text-xs font-medium bg-[var(--color-primary)] text-white hover:bg-[var(--color-primary-light)] transition-all"
+              >{copied ? "Copied!" : "Copy"}</button>
+            </div>
+            <div className="flex gap-2">
+              {[
+                { name: "WhatsApp", color: "bg-green-500", url: `https://wa.me/?text=${encodeURIComponent(`Check out this property on PropEase: ${listing.title}`)}` },
+                { name: "Twitter", color: "bg-blue-500", url: `https://twitter.com/intent/tweet?text=${encodeURIComponent(`Check out this property on PropEase: ${listing.title}`)}` },
+                { name: "Email", color: "bg-gray-600", url: `mailto:?subject=${encodeURIComponent(`Property: ${listing.title}`)}&body=${encodeURIComponent(`Check out this listing on PropEase: https://propease-demo.vercel.app/listings/${listing.id}`)}` },
+              ].map((s) => (
+                <a key={s.name} href={s.url} target="_blank" rel="noopener noreferrer" className={`${s.color} text-white text-xs font-medium px-4 py-2 rounded-lg hover:opacity-90 transition-all text-center flex-1`}>
+                  {s.name}
+                </a>
+              ))}
+            </div>
           </div>
         </div>
       )}

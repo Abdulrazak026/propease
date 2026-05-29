@@ -2,6 +2,25 @@
 import { users, listings, tasks, commissions, platformStats, withdrawals } from "@/lib/mock-data";
 import { formatNaira } from "@/lib/utils";
 import Link from "next/link";
+import BarChart from "@/components/charts/BarChart";
+
+const monthlyRevenue = [
+  { label: "Apr", value: 2_400_000 },
+  { label: "May", value: 9_700_000 },
+  { label: "Jun", value: 8_500_000 },
+];
+
+const taskDist = [
+  { label: "Open", value: tasks.filter((t) => t.status === "open").length, color: "#3b82f6" },
+  { label: "In Prog", value: tasks.filter((t) => t.status === "in_progress").length, color: "#f59e0b" },
+  { label: "Fulfilled", value: tasks.filter((t) => t.status === "fulfilled").length, color: "#10b981" },
+];
+
+const commissionBreakdown = [
+  { label: "Company", value: commissions.reduce((s, c) => s + c.companyCut, 0), color: "#0d9488" },
+  { label: "Ambassador", value: commissions.reduce((s, c) => s + c.ambassadorCut, 0), color: "#f59e0b" },
+  { label: "Agent", value: commissions.reduce((s, c) => s + c.agentCut, 0), color: "#8b5cf6" },
+];
 
 export default function AdminOverview() {
   const totalRevenue = platformStats.totalRevenue;
@@ -55,6 +74,21 @@ export default function AdminOverview() {
             </div>
           </div>
         ))}
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <div className="bg-white rounded-2xl border border-gray-200/60 p-5 shadow-sm">
+          <h2 className="text-sm font-semibold text-gray-900 mb-4">Monthly Revenue</h2>
+          <BarChart data={monthlyRevenue} height={180} format={(v) => `₦${(v / 1_000_000).toFixed(1)}M`} />
+        </div>
+        <div className="bg-white rounded-2xl border border-gray-200/60 p-5 shadow-sm">
+          <h2 className="text-sm font-semibold text-gray-900 mb-4">Task Status</h2>
+          <BarChart data={taskDist} height={180} format={(v) => `${v}`} />
+        </div>
+        <div className="bg-white rounded-2xl border border-gray-200/60 p-5 shadow-sm">
+          <h2 className="text-sm font-semibold text-gray-900 mb-4">Commission Splits</h2>
+          <BarChart data={commissionBreakdown} height={180} format={(v) => `₦${(v / 1_000_000).toFixed(1)}M`} />
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">

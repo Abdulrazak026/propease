@@ -46,6 +46,9 @@ export default function Navbar() {
               <Link href="/contact" className="px-4 py-2 text-sm text-gray-600 hover:text-[var(--color-primary)] hover:bg-gray-100/50 rounded-lg transition-all">
                 Contact
               </Link>
+              <Link href="/saved" className="px-4 py-2 text-sm text-gray-600 hover:text-[var(--color-primary)] hover:bg-gray-100/50 rounded-lg transition-all">
+                Saved
+              </Link>
               {isAuthenticated && dashboardLink && (
                 <Link href={dashboardLink} className="px-4 py-2 text-sm font-medium text-[var(--color-primary)] hover:bg-gray-100/50 rounded-lg transition-all">
                   Dashboard

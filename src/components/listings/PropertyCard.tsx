@@ -1,8 +1,10 @@
 "use client";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Badge from "@/components/ui/Badge";
 import { Listing } from "@/lib/types";
 import { formatNaira, propertyTypeLabels } from "@/lib/utils";
+import { isFavorite, toggleFavorite } from "@/lib/favorites";
 
 interface PropertyCardProps {
   listing: Listing;
@@ -10,6 +12,16 @@ interface PropertyCardProps {
 
 export default function PropertyCard({ listing }: PropertyCardProps) {
   const hasPhoto = listing.photos.length > 0;
+  const [fav, setFav] = useState(false);
+
+  useEffect(() => { setFav(isFavorite(listing.id)); }, [listing.id]);
+
+  const handleFav = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const now = toggleFavorite(listing.id);
+    setFav(now);
+  };
 
   return (
     <Link
@@ -18,16 +30,9 @@ export default function PropertyCard({ listing }: PropertyCardProps) {
     >
       <div className="image-zoom relative h-52 bg-gradient-to-br from-gray-100 to-gray-200">
         {hasPhoto ? (
-          <img
-            src={listing.photos[0].url}
-            alt={listing.photos[0].alt}
-            className="w-full h-full object-cover zoom-content"
-            loading="lazy"
-          />
+          <img src={listing.photos[0].url} alt={listing.photos[0].alt} className="w-full h-full object-cover zoom-content" loading="lazy" />
         ) : (
-          <div className="absolute inset-0 flex items-center justify-center">
-            <span className="text-4xl">🏠</span>
-          </div>
+          <div className="absolute inset-0 flex items-center justify-center"><span className="text-4xl">🏠</span></div>
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
 
@@ -35,16 +40,18 @@ export default function PropertyCard({ listing }: PropertyCardProps) {
           <Badge variant={listing.status === "available" ? "success" : listing.status === "reserved" ? "warning" : "default"}>
             {listing.status}
           </Badge>
-          {listing.category === "partnership" && (
-            <Badge variant="info">Partner</Badge>
-          )}
+          {listing.category === "partnership" && <Badge variant="info">Partner</Badge>}
         </div>
+
+        <button onClick={handleFav} className="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/80 backdrop-blur-sm flex items-center justify-center hover:bg-white transition-all shadow-sm">
+          <svg className={`w-4 h-4 transition-colors ${fav ? "text-red-500 fill-red-500" : "text-gray-600"}`} viewBox="0 0 24 24" fill={fav ? "currentColor" : "none"} stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+          </svg>
+        </button>
 
         <div className="absolute bottom-3 left-3 right-3">
           <p className="text-white font-bold text-lg drop-shadow-sm">{formatNaira(listing.price)}</p>
-          {listing.listingType === "rent" && (
-            <p className="text-white/80 text-xs">per year</p>
-          )}
+          {listing.listingType === "rent" && <p className="text-white/80 text-xs">per year</p>}
         </div>
       </div>
 
