@@ -1,6 +1,7 @@
 "use client";
 import { useParams } from "next/navigation";
 import Link from "next/link";
+import { useState } from "react";
 import { listings } from "@/lib/mock-data";
 import Badge from "@/components/ui/Badge";
 import Button from "@/components/ui/Button";
@@ -8,18 +9,10 @@ import RentTierBreakdown from "@/components/listings/RentTierBreakdown";
 import MapPlaceholder from "@/components/ui/MapPlaceholder";
 import { formatNaira, formatDate, propertyTypeLabels } from "@/lib/utils";
 
-const COLORS = [
-  "from-blue-400/20 to-blue-600/30",
-  "from-amber-400/20 to-amber-600/30",
-  "from-emerald-400/20 to-emerald-600/30",
-  "from-rose-400/20 to-rose-600/30",
-  "from-violet-400/20 to-violet-600/30",
-  "from-cyan-400/20 to-cyan-600/30",
-];
-
 export default function ListingDetailPage() {
   const { id } = useParams();
   const listing = listings.find((l) => l.id === id);
+  const [selectedPhoto, setSelectedPhoto] = useState(0);
 
   if (!listing) {
     return (
@@ -29,15 +22,11 @@ export default function ListingDetailPage() {
             <svg className="w-7 h-7 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
           </div>
           <h2 className="text-xl font-semibold text-gray-900">Property not found</h2>
-          <Link href="/" className="text-sm text-[var(--color-primary)] hover:underline mt-2 inline-block">
-            ← Back to listings
-          </Link>
+          <Link href="/" className="text-sm text-[var(--color-primary)] hover:underline mt-2 inline-block">← Back to listings</Link>
         </div>
       </div>
     );
   }
-
-  const idx = parseInt(listing.id.replace("l", "")) % COLORS.length;
 
   return (
     <div className="flex-1">
@@ -49,34 +38,43 @@ export default function ListingDetailPage() {
 
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
           <div className="lg:col-span-3 space-y-5">
-            <div className="image-zoom relative h-72 md:h-96 bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl overflow-hidden">
-              <div className={`absolute inset-0 bg-gradient-to-br ${COLORS[idx]} flex items-center justify-center zoom-content`}>
-                <div className="text-center">
-                  <div className="text-7xl mb-2">
-                    {listing.propertyType === "house" ? "🏠" :
-                     listing.propertyType === "land" ? "🌍" :
-                     listing.propertyType === "flat" ? "🏢" :
-                     listing.propertyType === "commercial" ? "🏪" : "📍"}
-                  </div>
-                  <p className="text-sm text-gray-500 font-medium">{listing.photos.length} photo{listing.photos.length > 1 ? "s" : ""}</p>
-                </div>
-              </div>
-              <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
+            <div className="relative h-72 md:h-96 bg-gray-100 rounded-2xl overflow-hidden">
+              {listing.photos.length > 0 ? (
+                <img
+                  src={listing.photos[selectedPhoto]?.url}
+                  alt={listing.photos[selectedPhoto]?.alt}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="absolute inset-0 flex items-center justify-center"><span className="text-6xl">🏠</span></div>
+              )}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent" />
               <div className="absolute top-4 left-4 flex gap-1.5">
-                <Badge variant={listing.status === "available" ? "success" : listing.status === "reserved" ? "warning" : "default"}>
-                  {listing.status}
-                </Badge>
+                <Badge variant={listing.status === "available" ? "success" : listing.status === "reserved" ? "warning" : "default"}>{listing.status}</Badge>
                 {listing.category === "partnership" && <Badge variant="info">{listing.partnerCompany}</Badge>}
               </div>
+              {listing.photos.length > 1 && (
+                <div className="absolute bottom-4 right-4 bg-black/60 text-white text-xs px-2.5 py-1 rounded-lg">
+                  {selectedPhoto + 1} / {listing.photos.length}
+                </div>
+              )}
             </div>
 
-            <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1">
-              {listing.photos.map((photo) => (
-                <div key={photo.id} className={`w-20 h-16 shrink-0 bg-gradient-to-br ${COLORS[(idx + parseInt(photo.id.slice(-1))) % COLORS.length]} rounded-lg flex items-center justify-center border-2 border-transparent hover:border-[var(--color-primary)] cursor-pointer transition-all`}>
-                  <span className="text-xs text-gray-400">📷</span>
-                </div>
-              ))}
-            </div>
+            {listing.photos.length > 1 && (
+              <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1">
+                {listing.photos.map((photo, i) => (
+                  <button
+                    key={photo.id}
+                    onClick={() => setSelectedPhoto(i)}
+                    className={`w-20 h-16 shrink-0 rounded-lg overflow-hidden border-2 transition-all ${
+                      i === selectedPhoto ? "border-[var(--color-primary)] ring-1 ring-[var(--color-primary)]" : "border-transparent hover:border-gray-300"
+                    }`}
+                  >
+                    <img src={photo.url} alt={photo.alt} className="w-full h-full object-cover" loading="lazy" />
+                  </button>
+                ))}
+              </div>
+            )}
 
             <div className="bg-white rounded-2xl border border-gray-200/60 p-6 shadow-sm">
               <div className="flex flex-wrap items-start justify-between gap-3">
@@ -130,12 +128,8 @@ export default function ListingDetailPage() {
                 <p className="text-xs text-gray-500 uppercase tracking-wider font-medium">
                   {listing.listingType === "rent" ? "Yearly Rent" : "Sale Price"}
                 </p>
-                <p className="text-3xl font-bold text-[var(--color-primary)] mt-1">
-                  {formatNaira(listing.price)}
-                </p>
-                {listing.listingType === "rent" && (
-                  <p className="text-xs text-gray-400 mt-1">Due upfront on signing</p>
-                )}
+                <p className="text-3xl font-bold text-[var(--color-primary)] mt-1">{formatNaira(listing.price)}</p>
+                {listing.listingType === "rent" && <p className="text-xs text-gray-400 mt-1">Due upfront on signing</p>}
               </div>
 
               {listing.listingType === "rent" && listing.assignedAgent && (
@@ -177,9 +171,7 @@ export default function ListingDetailPage() {
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
                   Partnership Listing
                 </h4>
-                <p className="text-xs text-amber-700 mt-2">
-                  Listed on behalf of <strong>{listing.partnerCompany}</strong>. Commission applies.
-                </p>
+                <p className="text-xs text-amber-700 mt-2">Listed on behalf of <strong>{listing.partnerCompany}</strong>. Commission applies.</p>
               </div>
             )}
           </div>

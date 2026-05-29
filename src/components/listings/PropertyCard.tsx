@@ -8,21 +8,8 @@ interface PropertyCardProps {
   listing: Listing;
 }
 
-const COLORS = [
-  "from-blue-400/20 to-blue-600/30",
-  "from-amber-400/20 to-amber-600/30",
-  "from-emerald-400/20 to-emerald-600/30",
-  "from-rose-400/20 to-rose-600/30",
-  "from-violet-400/20 to-violet-600/30",
-  "from-cyan-400/20 to-cyan-600/30",
-];
-
-const ICONS: Record<string, string> = {
-  house: "🏠", land: "🌍", flat: "🏢", commercial: "🏪",
-};
-
 export default function PropertyCard({ listing }: PropertyCardProps) {
-  const idx = parseInt(listing.id.replace("l", "")) % COLORS.length;
+  const hasPhoto = listing.photos.length > 0;
 
   return (
     <Link
@@ -30,14 +17,19 @@ export default function PropertyCard({ listing }: PropertyCardProps) {
       className="group block bg-white rounded-xl border border-gray-200/60 overflow-hidden shadow-sm card-hover"
     >
       <div className="image-zoom relative h-52 bg-gradient-to-br from-gray-100 to-gray-200">
-        <div className={`absolute inset-0 bg-gradient-to-br ${COLORS[idx]} flex items-center justify-center zoom-content`}>
-          <div className="text-center">
-            <div className="text-5xl mb-1">{ICONS[listing.propertyType] || "📍"}</div>
-            <p className="text-xs text-gray-500 font-medium">{propertyTypeLabels[listing.propertyType]}</p>
+        {hasPhoto ? (
+          <img
+            src={listing.photos[0].url}
+            alt={listing.photos[0].alt}
+            className="w-full h-full object-cover zoom-content"
+            loading="lazy"
+          />
+        ) : (
+          <div className="absolute inset-0 flex items-center justify-center">
+            <span className="text-4xl">🏠</span>
           </div>
-        </div>
-
-        <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+        )}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
 
         <div className="absolute top-3 left-3 flex gap-1.5">
           <Badge variant={listing.status === "available" ? "success" : listing.status === "reserved" ? "warning" : "default"}>

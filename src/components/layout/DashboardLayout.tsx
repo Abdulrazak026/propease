@@ -4,6 +4,13 @@ import { usePathname } from "next/navigation";
 import { useRole } from "@/context/RoleContext";
 
 const navItems: Record<string, { label: string; href: string; icon: string }[]> = {
+  admin: [
+    { label: "Dashboard", href: "/admin", icon: "📊" },
+    { label: "Users", href: "/admin/users", icon: "👥" },
+    { label: "Commissions", href: "/admin/commissions", icon: "💰" },
+    { label: "Settings", href: "/admin/settings", icon: "⚙️" },
+    { label: "Audit Log", href: "/admin/audit", icon: "📋" },
+  ],
   agent: [
     { label: "Task Board", href: "/agent", icon: "📋" },
     { label: "Inquiries", href: "/agent/inquiries", icon: "💬" },
@@ -41,7 +48,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 href={item.href}
                 className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all ${
                   active
-                    ? "bg-[var(--color-primary)] text-white shadow-sm"
+                    ? role === "admin" ? "bg-violet-600 text-white shadow-sm" : "bg-[var(--color-primary)] text-white shadow-sm"
                     : "text-gray-600 hover:bg-gray-50 hover:text-[var(--color-primary)]"
                 }`}
               >

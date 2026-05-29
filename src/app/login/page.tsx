@@ -4,6 +4,14 @@ import { useRouter } from "next/navigation";
 import { useRole } from "@/context/RoleContext";
 import { users } from "@/lib/mock-data";
 import Button from "@/components/ui/Button";
+import Badge from "@/components/ui/Badge";
+
+const roleColors: Record<string, string> = {
+  admin: "bg-purple-100 text-purple-800",
+  head: "bg-blue-100 text-blue-800",
+  ambassador: "bg-amber-100 text-amber-800",
+  agent: "bg-emerald-100 text-emerald-800",
+};
 
 export default function LoginPage() {
   const [selectedUserId, setSelectedUserId] = useState("");
@@ -17,6 +25,13 @@ export default function LoginPage() {
       setCurrentUser(user);
       router.push(`/${user.role}`);
     }
+  };
+
+  const grouped = {
+    admin: users.filter((u) => u.role === "admin"),
+    head: users.filter((u) => u.role === "head"),
+    ambassador: users.filter((u) => u.role === "ambassador"),
+    agent: users.filter((u) => u.role === "agent"),
   };
 
   return (
@@ -53,30 +68,29 @@ export default function LoginPage() {
             </Button>
           </div>
 
-          <p className="text-xs text-gray-400 text-center mt-5">
-            Demo mode — no password required
-          </p>
+          <p className="text-xs text-gray-400 text-center mt-5">Demo mode — no password required</p>
         </div>
 
-        <div className="mt-6 bg-amber-50 border border-amber-200 rounded-xl p-5">
-          <h3 className="text-sm font-semibold text-amber-800 flex items-center gap-2">
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-            Quick Guide
-          </h3>
-          <ul className="text-xs text-amber-700 mt-3 space-y-2">
-            <li className="flex items-start gap-2">
-              <span className="text-amber-500 mt-0.5">•</span>
-              <span><strong>Head</strong>: Full system overview, user & commission management</span>
-            </li>
-            <li className="flex items-start gap-2">
-              <span className="text-amber-500 mt-0.5">•</span>
-              <span><strong>Ambassador</strong>: City management, listings, tasks, commissions</span>
-            </li>
-            <li className="flex items-start gap-2">
-              <span className="text-amber-500 mt-0.5">•</span>
-              <span><strong>Agent</strong>: Task board, inquiries, commission tracking</span>
-            </li>
-          </ul>
+        <div className="mt-6 space-y-2">
+          {(["admin", "head", "ambassador", "agent"] as const).map((role) => (
+            <div key={role} className="bg-white rounded-xl border border-gray-200/60 p-4 shadow-sm">
+              <div className="flex items-center gap-2 mb-2">
+                <Badge variant="default" className={roleColors[role]}>{role}</Badge>
+                <span className="text-xs text-gray-500">{grouped[role].length} user{grouped[role].length > 1 ? "s" : ""}</span>
+              </div>
+              <div className="flex flex-wrap gap-1.5">
+                {grouped[role].map((u) => (
+                  <button
+                    key={u.id}
+                    onClick={() => { setCurrentUser(u); router.push(`/${u.role}`); }}
+                    className="text-xs px-2.5 py-1 rounded-lg bg-gray-50 hover:bg-[var(--color-primary)] hover:text-white border border-gray-200 transition-all"
+                  >
+                    {u.name}
+                  </button>
+                ))}
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </div>
