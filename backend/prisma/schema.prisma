@@ -1,0 +1,398 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  head
+  ambassador
+  agent
+}
+
+enum ListingType {
+  sale
+  rent
+}
+
+enum RentTier {
+  normal
+  damages
+  full
+}
+
+enum ListingStatus {
+  available
+  reserved
+  taken
+}
+
+enum ListingCategory {
+  portfolio
+  partnership
+}
+
+enum PropertyType {
+  house
+  land
+  flat
+  commercial
+  other
+}
+
+enum TaskStatus {
+  open
+  in_progress
+  fulfilled
+  closed
+}
+
+enum TaskSource {
+  internal
+  client_request
+}
+
+enum TransactionType {
+  top_up
+  payment
+  commission_payout
+  withdrawal
+}
+
+enum TransactionMethod {
+  wallet
+  card
+  transfer
+}
+
+enum TransactionStatus {
+  pending
+  completed
+  failed
+}
+
+enum InquiryStatus {
+  new
+  read
+  responded
+}
+
+enum ReservationStatus {
+  pending
+  confirmed
+  expired
+}
+
+enum CustomOrderStatus {
+  pending
+  routed
+  fulfilled
+}
+
+enum WithdrawalStatus {
+  pending
+  approved
+  paid
+  rejected
+}
+
+model User {
+  id             String    @id @default(uuid())
+  name           String
+  email          String    @unique
+  password       String
+  role           UserRole
+  city           String?
+  walletBalance  Int       @default(0)
+  canCreateTasks Boolean   @default(false)
+  canCloseDeals  Boolean   @default(false)
+  isApproved     Boolean   @default(false)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  ambassadorId  String?
+  ambassador    User?     @relation("AmbassadorAgents", fields: [ambassadorId], references: [id])
+  agents        User[]    @relation("AmbassadorAgents")
+
+  cities        UserCity[]
+  listings      Listing[]         @relation("PostedListings")
+  assignedListings Listing[]      @relation("AssignedListings")
+  createdTasks  Task[]            @relation("CreatedTasks")
+  assignedTasks Task[]            @relation("AssignedTasks")
+  commissionsAsAmbassador Commission[] @relation("AmbassadorCommissions")
+  commissionsAsAgent      Commission[] @relation("AgentCommissions")
+  transactions  Transaction[]
+  inquiries     Inquiry[]
+  reservations  Reservation[]
+  withdrawals   Withdrawal[]
+  comments      TaskComment[]
+  auditLogs     AuditLog[]
+  tokens        RefreshToken[]
+
+  @@index([email])
+  @@index([role])
+  @@index([ambassadorId])
+}
+
+model RefreshToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([token])
+  @@index([userId])
+}
+
+model City {
+  id        String     @id @default(uuid())
+  name      String
+  state     String     @default("Kano")
+  cities    UserCity[]
+
+  @@unique([name, state])
+}
+
+model UserCity {
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  cityId String
+  city   City   @relation(fields: [cityId], references: [id], onDelete: Cascade)
+
+  @@id([userId, cityId])
+}
+
+model Listing {
+  id               String         @id @default(uuid())
+  title            String
+  description      String
+  propertyType     PropertyType
+  listingType      ListingType
+  rentTier         RentTier?
+  annualRent       Int?
+  damageDeposit    Int?
+  maintenanceCharge Int?
+  salePrice        Int?
+  status           ListingStatus  @default(available)
+  category         ListingCategory
+  partnerCompany   String?
+  lat              Float?
+  lng              Float?
+  address          String
+  city             String
+  bedrooms         Int?
+  bathrooms        Int?
+  sqft             Int?
+  price            Int            @default(0)
+  features         String[]
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+
+  postedById    String
+  postedBy      User     @relation("PostedListings", fields: [postedById], references: [id])
+
+  assignedAgentId String?
+  assignedAgent   User?   @relation("AssignedListings", fields: [assignedAgentId], references: [id])
+
+  photos       ListingPhoto[]
+  inquiries    Inquiry[]
+  reservations Reservation[]
+
+  @@index([status])
+  @@index([city])
+  @@index([propertyType])
+  @@index([listingType])
+  @@index([postedById])
+  @@index([assignedAgentId])
+}
+
+model ListingPhoto {
+  id        String  @id @default(uuid())
+  url       String
+  alt       String?
+  order     Int     @default(0)
+  listingId String
+  listing   Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+
+  @@index([listingId])
+}
+
+model Task {
+  id              String      @id @default(uuid())
+  title           String
+  description     String
+  propertyType    PropertyType
+  area            String
+  budget          Int
+  deadline        DateTime
+  notes           String?
+  status          TaskStatus  @default(open)
+  source          TaskSource  @default(internal)
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  createdById String
+  createdBy   User   @relation("CreatedTasks", fields: [createdById], references: [id])
+
+  assignedToId String
+  assignedTo   User   @relation("AssignedTasks", fields: [assignedToId], references: [id])
+
+  submittedListingId String?
+
+  comments   TaskComment[]
+  customOrder CustomOrder?
+
+  @@index([status])
+  @@index([assignedToId])
+  @@index([createdById])
+}
+
+model TaskComment {
+  id        String   @id @default(uuid())
+  text      String
+  createdAt DateTime @default(now())
+
+  authorId String
+  author   User   @relation(fields: [authorId], references: [id])
+
+  taskId String
+  task   Task   @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  @@index([taskId])
+}
+
+model CommissionRate {
+  id        String @id @default(uuid())
+  dealType  String @unique
+  totalRate Float
+  ambassadorRate Float
+  agentRate Float
+  updatedAt DateTime @updatedAt
+}
+
+model Commission {
+  id             String   @id @default(uuid())
+  dealId         String   @unique
+  dealTitle      String
+  dealType       String
+  totalAmount    Int
+  ambassadorRate Float
+  ambassadorCut  Int
+  agentRate      Float
+  agentCut       Int
+  companyCut     Int
+  paidAt         DateTime @default(now())
+
+  ambassadorId String
+  ambassador   User @relation("AmbassadorCommissions", fields: [ambassadorId], references: [id])
+
+  agentId String
+  agent   User @relation("AgentCommissions", fields: [agentId], references: [id])
+
+  @@index([ambassadorId])
+  @@index([agentId])
+}
+
+model Transaction {
+  id        String             @id @default(uuid())
+  type      TransactionType
+  amount    Int
+  reference String             @unique
+  method    TransactionMethod
+  status    TransactionStatus  @default(pending)
+  createdAt DateTime           @default(now())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([reference])
+}
+
+model Inquiry {
+  id            String        @id @default(uuid())
+  clientName    String
+  clientContact String
+  message       String
+  status        InquiryStatus @default(new)
+  createdAt     DateTime      @default(now())
+
+  listingId      String
+  listing        Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+
+  assignedAgentId String?
+  assignedAgent   User?   @relation(fields: [assignedAgentId], references: [id])
+
+  @@index([listingId])
+  @@index([assignedAgentId])
+}
+
+model Reservation {
+  id             String            @id @default(uuid())
+  clientName     String
+  holdingDeposit Int
+  status         ReservationStatus @default(pending)
+  expiresAt      DateTime
+  createdAt      DateTime          @default(now())
+
+  listingId String
+  listing   Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id])
+
+  @@index([listingId])
+}
+
+model CustomOrder {
+  id            String           @id @default(uuid())
+  propertyType  PropertyType
+  area          String
+  budget        Int
+  notes         String?
+  clientName    String
+  clientContact String
+  status        CustomOrderStatus @default(pending)
+  createdAt     DateTime         @default(now())
+
+  taskId String? @unique
+  task   Task?   @relation(fields: [taskId], references: [id])
+}
+
+model Withdrawal {
+  id          String            @id @default(uuid())
+  amount      Int
+  bankName    String
+  accountNumber String
+  accountName String
+  status      WithdrawalStatus  @default(pending)
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([status])
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  action    String
+  entity    String
+  entityId  String?
+  details   Json?
+  createdAt DateTime @default(now())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([action])
+  @@index([createdAt])
+}

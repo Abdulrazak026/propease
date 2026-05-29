@@ -1,0 +1,122 @@
+"use client";
+import { useState } from "react";
+import Button from "@/components/ui/Button";
+import Input from "@/components/ui/Input";
+
+const propertyTypes = [
+  { value: "house", label: "House" },
+  { value: "flat", label: "Flat" },
+  { value: "land", label: "Land" },
+  { value: "commercial", label: "Commercial" },
+  { value: "other", label: "Other" },
+];
+
+export default function CustomOrderPage() {
+  const [form, setForm] = useState({
+    clientName: "", clientContact: "",
+    propertyType: "house", area: "", budget: "",
+    purpose: "rent", notes: "",
+  });
+  const [submitted, setSubmitted] = useState(false);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setSubmitted(true);
+  };
+
+  if (submitted) {
+    return (
+      <div className="flex-1 flex items-center justify-center py-24 px-4">
+        <div className="text-center max-w-md">
+          <div className="text-6xl mb-4">✅</div>
+          <h1 className="text-2xl font-bold text-gray-900">Request Submitted!</h1>
+          <p className="text-sm text-gray-500 mt-2">
+            Your custom order has been received and will be routed to an ambassador in {form.area || "your area"}.
+            They will follow up within 48 hours.
+          </p>
+          <Button className="mt-6" onClick={() => { setSubmitted(false); setForm({ clientName: "", clientContact: "", propertyType: "house", area: "", budget: "", purpose: "rent", notes: "" }); }}>
+            Submit Another
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex-1 py-16 px-4">
+      <div className="max-w-xl mx-auto">
+        <div className="text-center mb-8">
+          <h1 className="text-2xl font-bold text-gray-900">Custom Property Request</h1>
+          <p className="text-sm text-gray-500 mt-1">
+            Tell us what you need and we&apos;ll find it for you
+          </p>
+        </div>
+
+        <form onSubmit={handleSubmit} className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm space-y-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <Input label="Your Name" value={form.clientName} onChange={(e) => setForm({ ...form, clientName: e.target.value })} required placeholder="e.g. Hadiza Mohammed" />
+            <Input label="Phone Number" type="tel" value={form.clientContact} onChange={(e) => setForm({ ...form, clientContact: e.target.value })} required placeholder="0803 XXX XXXX" />
+          </div>
+
+          <div className="space-y-1">
+            <label className="block text-sm font-medium text-gray-700">Property Type</label>
+            <div className="flex flex-wrap gap-2">
+              {propertyTypes.map((pt) => (
+                <button
+                  key={pt.value}
+                  type="button"
+                  onClick={() => setForm({ ...form, propertyType: pt.value })}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
+                    form.propertyType === pt.value
+                      ? "bg-[var(--color-primary)] text-white"
+                      : "bg-gray-50 text-gray-600 hover:bg-gray-100"
+                  }`}
+                >
+                  {pt.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <Input label="Area / Neighborhood" value={form.area} onChange={(e) => setForm({ ...form, area: e.target.value })} required placeholder="e.g. Kano Municipal, Tarauni" />
+            <Input label="Budget (₦)" type="number" value={form.budget} onChange={(e) => setForm({ ...form, budget: e.target.value })} required placeholder="e.g. 1500000" />
+          </div>
+
+          <div className="space-y-1">
+            <label className="block text-sm font-medium text-gray-700">Purpose</label>
+            <div className="flex gap-2">
+              {["rent", "sale"].map((p) => (
+                <button
+                  key={p}
+                  type="button"
+                  onClick={() => setForm({ ...form, purpose: p })}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium capitalize transition ${
+                    form.purpose === p
+                      ? "bg-[var(--color-accent)] text-white"
+                      : "bg-gray-50 text-gray-600 hover:bg-gray-100"
+                  }`}
+                >
+                  {p === "rent" ? "For Rent" : "For Sale"}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="space-y-1">
+            <label className="block text-sm font-medium text-gray-700">Special Requirements</label>
+            <textarea
+              value={form.notes}
+              onChange={(e) => setForm({ ...form, notes: e.target.value })}
+              rows={3}
+              placeholder="e.g. Must have borehole, gated compound, proximity to school..."
+              className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent resize-none"
+            />
+          </div>
+
+          <Button type="submit" className="w-full">Submit Request</Button>
+        </form>
+      </div>
+    </div>
+  );
+}
