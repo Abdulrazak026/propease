@@ -6,6 +6,7 @@ import { listings, cities } from "@/lib/mock-data";
 import { formatNaira } from "@/lib/utils";
 
 export default function HomePage() {
+  const [showFilters, setShowFilters] = useState(false);
   const [filters, setFilters] = useState<FilterState>({
     search: "", propertyType: "", listingType: "", rentTier: "",
     category: "", city: "", minPrice: "", maxPrice: "",
@@ -65,8 +66,30 @@ export default function HomePage() {
       </section>
 
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-6 relative z-10">
-        <div className="bg-white rounded-2xl border border-gray-200/60 p-5 shadow-lg">
-          <PropertyFilters onFilterChange={setFilters} />
+        <div className="bg-white rounded-2xl border border-gray-200/60 shadow-lg">
+          <button
+            onClick={() => setShowFilters(!showFilters)}
+            className="flex items-center justify-between w-full p-4 text-left"
+          >
+            <div className="flex items-center gap-2.5">
+              <svg className="w-5 h-5 text-[var(--color-primary)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+              <span className="text-sm font-medium text-gray-700">
+                {showFilters ? "Hide filters" : "Search properties"}
+              </span>
+            </div>
+            <svg className={`w-4 h-4 text-gray-400 transition-transform ${showFilters ? "rotate-180" : ""}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+          {showFilters && (
+            <div className="px-5 pb-5 animate-fade-in">
+              <div className="border-t border-gray-100 pt-4">
+                <PropertyFilters onFilterChange={setFilters} />
+              </div>
+            </div>
+          )}
         </div>
       </section>
 

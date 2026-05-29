@@ -13,6 +13,7 @@ const navItems: Record<string, { label: string; href: string; icon: string }[]> 
   ],
   agent: [
     { label: "Task Board", href: "/agent", icon: "📋" },
+    { label: "Performance", href: "/agent", icon: "📈" },
     { label: "Inquiries", href: "/agent/inquiries", icon: "💬" },
     { label: "Commissions", href: "/agent/commissions", icon: "💰" },
   ],
@@ -21,12 +22,7 @@ const navItems: Record<string, { label: string; href: string; icon: string }[]> 
     { label: "Post Listing", href: "/ambassador/listings/new", icon: "➕" },
     { label: "Create Task", href: "/ambassador/tasks", icon: "📌" },
     { label: "Commissions", href: "/ambassador/commissions", icon: "💰" },
-  ],
-  head: [
-    { label: "Overview", href: "/head", icon: "📊" },
-    { label: "Users", href: "/head/users", icon: "👥" },
-    { label: "Commissions", href: "/head/commissions", icon: "💰" },
-    { label: "Settings", href: "/head/settings", icon: "⚙️" },
+    { label: "Settings", href: "/ambassador/settings", icon: "⚙️" },
   ],
 };
 
@@ -34,7 +30,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const { role } = useRole();
   const pathname = usePathname();
 
-  const items = role ? navItems[role] : [];
+  const resolvedRole = role === "head" ? "admin" : role;
+  const items = resolvedRole ? navItems[resolvedRole] : [];
 
   return (
     <div className="flex flex-1">
@@ -48,7 +45,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 href={item.href}
                 className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all ${
                   active
-                    ? role === "admin" ? "bg-violet-600 text-white shadow-sm" : "bg-[var(--color-primary)] text-white shadow-sm"
+                    ? resolvedRole === "admin" ? "bg-violet-600 text-white shadow-sm" : "bg-[var(--color-primary)] text-white shadow-sm"
                     : "text-gray-600 hover:bg-gray-50 hover:text-[var(--color-primary)]"
                 }`}
               >

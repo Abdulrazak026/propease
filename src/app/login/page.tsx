@@ -23,7 +23,7 @@ export default function LoginPage() {
     const user = users.find((u) => u.id === selectedUserId);
     if (user) {
       setCurrentUser(user);
-      router.push(`/${user.role}`);
+      router.push(user.role === "head" ? "/admin" : `/${user.role}`);
     }
   };
 
@@ -82,7 +82,7 @@ export default function LoginPage() {
                 {grouped[role].map((u) => (
                   <button
                     key={u.id}
-                    onClick={() => { setCurrentUser(u); router.push(`/${u.role}`); }}
+                    onClick={() => { setCurrentUser(u); router.push(u.role === "head" ? "/admin" : `/${u.role}`); }}
                     className="text-xs px-2.5 py-1 rounded-lg bg-gray-50 hover:bg-[var(--color-primary)] hover:text-white border border-gray-200 transition-all"
                   >
                     {u.name}

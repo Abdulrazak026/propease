@@ -1,20 +1,16 @@
 "use client";
 import { useRole } from "@/context/RoleContext";
-import DashboardLayout from "@/components/layout/DashboardLayout";
-import { useRouter } from "next/navigation";
+import { redirect } from "next/navigation";
 import { useEffect } from "react";
 
-export default function HeadLayout({ children }: { children: React.ReactNode }) {
+export default function HeadRedirectLayout({ children }: { children: React.ReactNode }) {
   const { role, isAuthenticated } = useRole();
-  const router = useRouter();
 
   useEffect(() => {
-    if (isAuthenticated && role !== "head") {
-      router.push(`/${role}`);
+    if (isAuthenticated) {
+      redirect("/admin");
     }
-  }, [role, isAuthenticated, router]);
+  }, [role, isAuthenticated]);
 
-  if (!isAuthenticated) return null;
-
-  return <DashboardLayout>{children}</DashboardLayout>;
+  return null;
 }

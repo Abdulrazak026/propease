@@ -15,10 +15,10 @@ export default function Navbar() {
     if (user) router.push(`/${user.role}`);
   };
 
-  const handleLogout = () => setCurrentUser(null);
+  const handleLogout = () => { setCurrentUser(null); router.push("/"); };
 
   const dashboardLink = isAuthenticated
-    ? `/${currentUser!.role}`
+    ? (currentUser!.role === "head" ? "/admin" : `/${currentUser!.role}`)
     : null;
 
   return (
