@@ -1,15 +1,18 @@
 "use client";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useRole } from "@/context/RoleContext";
 import Button from "@/components/ui/Button";
 import { users } from "@/lib/mock-data";
 
 export default function Navbar() {
+  const router = useRouter();
   const { currentUser, setCurrentUser, isAuthenticated } = useRole();
 
   const handleDemoLogin = (userId: string) => {
     const user = users.find((u) => u.id === userId) || null;
     setCurrentUser(user);
+    if (user) router.push(`/${user.role}`);
   };
 
   const handleLogout = () => setCurrentUser(null);
