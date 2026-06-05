@@ -3654,7 +3654,7 @@
       "format": "cjs"
     },
     ".open-next/server-functions/default/node_modules/next/dist/server/load-manifest.external.js": {
-      "bytes": 415117,
+      "bytes": 432689,
       "imports": [
         {
           "path": "path",
@@ -3947,6 +3947,17 @@
       ],
       "format": "cjs"
     },
+    ".open-next/server-functions/default/.next/server/app/forgot-password/page.js": {
+      "bytes": 990,
+      "imports": [
+        {
+          "path": ".open-next/server-functions/default/.next/server/chunks/ssr/[turbopack]_runtime.js",
+          "kind": "require-call",
+          "original": "../../chunks/ssr/[turbopack]_runtime.js"
+        }
+      ],
+      "format": "cjs"
+    },
     ".open-next/server-functions/default/.next/server/app/admin/settings/page.js": {
       "bytes": 1054,
       "imports": [
@@ -3959,6 +3970,17 @@
       "format": "cjs"
     },
     ".open-next/server-functions/default/.next/server/app/apply-as-agent/page.js": {
+      "bytes": 988,
+      "imports": [
+        {
+          "path": ".open-next/server-functions/default/.next/server/chunks/ssr/[turbopack]_runtime.js",
+          "kind": "require-call",
+          "original": "../../chunks/ssr/[turbopack]_runtime.js"
+        }
+      ],
+      "format": "cjs"
+    },
+    ".open-next/server-functions/default/.next/server/app/reset-password/page.js": {
       "bytes": 988,
       "imports": [
         {
@@ -4366,7 +4388,7 @@
       "format": "cjs"
     },
     ".open-next/server-functions/default/node_modules/next/dist/server/require.js": {
-      "bytes": 16983,
+      "bytes": 17469,
       "imports": [
         {
           "path": "path",
@@ -4494,6 +4516,11 @@
           "original": "C:\\Users\\user\\Desktop\\NGO\\propease-demo\\.open-next\\server-functions\\default\\.next\\server\\app\\agreements\\[id]\\page.js"
         },
         {
+          "path": ".open-next/server-functions/default/.next/server/app/forgot-password/page.js",
+          "kind": "require-call",
+          "original": "C:\\Users\\user\\Desktop\\NGO\\propease-demo\\.open-next\\server-functions\\default\\.next\\server\\app\\forgot-password\\page.js"
+        },
+        {
           "path": ".open-next/server-functions/default/.next/server/app/admin/settings/page.js",
           "kind": "require-call",
           "original": "C:\\Users\\user\\Desktop\\NGO\\propease-demo\\.open-next\\server-functions\\default\\.next\\server\\app\\admin\\settings\\page.js"
@@ -4502,6 +4529,11 @@
           "path": ".open-next/server-functions/default/.next/server/app/apply-as-agent/page.js",
           "kind": "require-call",
           "original": "C:\\Users\\user\\Desktop\\NGO\\propease-demo\\.open-next\\server-functions\\default\\.next\\server\\app\\apply-as-agent\\page.js"
+        },
+        {
+          "path": ".open-next/server-functions/default/.next/server/app/reset-password/page.js",
+          "kind": "require-call",
+          "original": "C:\\Users\\user\\Desktop\\NGO\\propease-demo\\.open-next\\server-functions\\default\\.next\\server\\app\\reset-password\\page.js"
         },
         {
           "path": ".open-next/server-functions/default/.next/server/app/_global-error/page.js",
@@ -6264,7 +6296,7 @@
       "format": "esm"
     },
     ".open-next/server-functions/default/index.mjs": {
-      "bytes": 111767,
+      "bytes": 113003,
       "imports": [
         {
           "path": "node:module",
@@ -7445,7 +7477,7 @@
           "bytesInOutput": 481
         },
         ".open-next/server-functions/default/node_modules/next/dist/server/load-manifest.external.js": {
-          "bytesInOutput": 352670
+          "bytesInOutput": 367746
         },
         ".open-next/cloudflare-templates/shims/throw.js": {
           "bytesInOutput": 215
@@ -7504,10 +7536,16 @@
         ".open-next/server-functions/default/.next/server/app/agreements/[id]/page.js": {
           "bytesInOutput": 1109
         },
+        ".open-next/server-functions/default/.next/server/app/forgot-password/page.js": {
+          "bytesInOutput": 1109
+        },
         ".open-next/server-functions/default/.next/server/app/admin/settings/page.js": {
           "bytesInOutput": 1169
         },
         ".open-next/server-functions/default/.next/server/app/apply-as-agent/page.js": {
+          "bytesInOutput": 1106
+        },
+        ".open-next/server-functions/default/.next/server/app/reset-password/page.js": {
           "bytesInOutput": 1106
         },
         ".open-next/server-functions/default/.next/server/app/_global-error/page.js": {
@@ -7619,7 +7657,7 @@
           "bytesInOutput": 1061
         },
         ".open-next/server-functions/default/node_modules/next/dist/server/require.js": {
-          "bytesInOutput": 7817
+          "bytesInOutput": 8010
         },
         ".open-next/server-functions/default/node_modules/next/dist/lib/interop-default.js": {
           "bytesInOutput": 363
@@ -7826,10 +7864,10 @@
           "bytesInOutput": 5074
         },
         ".open-next/server-functions/default/index.mjs": {
-          "bytesInOutput": 82109
+          "bytesInOutput": 83197
         }
       },
-      "bytes": 2423447
+      "bytes": 2442019
     }
   }
 }
