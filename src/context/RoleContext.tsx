@@ -70,7 +70,7 @@ export function RoleProvider({ children }: { children: ReactNode }) {
       return error || "Network error. Check your connection.";
     }
     if (status !== 200 || !data) {
-      return data?.error || "Invalid email or password";
+      return "Invalid email or password";
     }
     setAccessToken(data.accessToken);
     const user = toUser(data.user);
