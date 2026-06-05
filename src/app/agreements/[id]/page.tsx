@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import { useParams, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import AgreementTemplate from "@/components/agreements/AgreementTemplate";
@@ -31,7 +31,7 @@ const mockAgreement = {
  createdDate: "2026-06-04",
 };
 
-export default function AgreementDetailPage() {
+function AgreementContent() {
  const { id } = useParams();
  const searchParams = useSearchParams();
  const signRole = searchParams.get("role") || null;
@@ -145,6 +145,14 @@ export default function AgreementDetailPage() {
  </p>
  </div>
  )}
- </div>
- );
+  </div>
+  );
+}
+
+export default function AgreementDetailPage() {
+  return (
+    <Suspense fallback={<div className="flex-1 flex items-center justify-center"><div className="animate-spin w-8 h-8 border-2 border-[var(--color-primary)] border-t-transparent rounded-full" /></div>}>
+      <AgreementContent />
+    </Suspense>
+  );
 }
