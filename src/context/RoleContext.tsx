@@ -9,103 +9,94 @@ interface RoleContextType {
   setCurrentUser: (user: User | null) => void;
   isAuthenticated: boolean;
   role: string | null;
-  loginRole: string | null;
   loading: boolean;
-  login: (email: string, password: string) => Promise<string | null>;
+  login: (email: string, password: string) => Promise<{ role: string } | string>;
   logout: () => Promise<void>;
 }
 
 const RoleContext = createContext<RoleContextType>({
- currentUser: null,
- setCurrentUser: () => {},
- isAuthenticated: false,
- role: null,
-  loginRole: null,
+  currentUser: null,
+  setCurrentUser: () => {},
+  isAuthenticated: false,
+  role: null,
   loading: true,
- login: async () => null,
- logout: async () => {},
+  login: async () => "Not initialized",
+  logout: async () => {},
 });
 
 function toUser(a: ApiUser): User {
- return {
- id: a.id,
- name: a.name,
- email: a.email,
- role: a.role,
- city: a.city || "",
- walletBalance: a.walletBalance,
- canCloseDeals: a.canCloseDeals,
- canCreateTasks: a.canCreateTasks,
- ambassadorId: a.ambassadorId ?? undefined,
- };
+  return {
+    id: a.id,
+    name: a.name,
+    email: a.email,
+    role: a.role,
+    city: a.city || "",
+    walletBalance: a.walletBalance,
+    canCloseDeals: a.canCloseDeals,
+    canCreateTasks: a.canCreateTasks,
+    ambassadorId: a.ambassadorId ?? undefined,
+  };
 }
 
 export function RoleProvider({ children }: { children: ReactNode }) {
   const [currentUser, setCurrentUserState] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const [loginRole, setLoginRoleState] = useState<string | null>(null);
 
   useEffect(() => {
-  (async () => {
-  try {
-    const { data } = await api.get<{ user: ApiUser }>("/api/auth/me");
-    if (data?.user) {
-    const u = toUser(data.user);
-    setCurrentUserState(u);
-    setLoginRoleState(u.role);
-    }
-  } catch {
-    // no backend available — stay logged out
-  }
-  setLoading(false);
-  })();
+    (async () => {
+      try {
+        const { data } = await api.get<{ user: ApiUser }>("/api/auth/me");
+        if (data?.user) {
+          setCurrentUserState(toUser(data.user));
+        }
+      } catch {
+        // no backend available — stay logged out
+      }
+      setLoading(false);
+    })();
   }, []);
 
   const setCurrentUser = useCallback((user: User | null) => {
-  setCurrentUserState(user);
-  if (!user) {
-  setAccessToken(null);
-  setLoginRoleState(null);
-  }
+    setCurrentUserState(user);
+    if (!user) {
+      setAccessToken(null);
+    }
   }, []);
 
-  const login = useCallback(async (email: string, password: string): Promise<string | null> => {
-  const { data, status } = await api.post<ApiAuthResponse>("/api/auth/login", { email, password });
-  if (status !== 200 || !data) {
-  return "Invalid email or password";
-  }
-  setAccessToken(data.accessToken);
-  const user = toUser(data.user);
-  setCurrentUserState(user);
-  setLoginRoleState(user.role);
-  return null;
+  const login = useCallback(async (email: string, password: string): Promise<{ role: string } | string> => {
+    const { data, status } = await api.post<ApiAuthResponse>("/api/auth/login", { email, password });
+    if (status !== 200 || !data) {
+      return "Invalid email or password";
+    }
+    setAccessToken(data.accessToken);
+    const user = toUser(data.user);
+    setCurrentUserState(user);
+    return { role: user.role };
   }, []);
 
   const logout = useCallback(async () => {
-  await api.post("/api/auth/logout");
-  setAccessToken(null);
-  setCurrentUserState(null);
-  setLoginRoleState(null);
+    await api.post("/api/auth/logout");
+    setAccessToken(null);
+    setCurrentUserState(null);
   }, []);
 
- return (
- <RoleContext.Provider
- value={{
- currentUser,
- setCurrentUser,
-  isAuthenticated: !!currentUser,
-  role: currentUser?.role ?? null,
-  loginRole,
-  loading,
- login,
- logout,
- }}
->
- {children}
- </RoleContext.Provider>
- );
+  return (
+    <RoleContext.Provider
+      value={{
+        currentUser,
+        setCurrentUser,
+        isAuthenticated: !!currentUser,
+        role: currentUser?.role ?? null,
+        loading,
+        login,
+        logout,
+      }}
+    >
+      {children}
+    </RoleContext.Provider>
+  );
 }
 
 export function useRole() {
- return useContext(RoleContext);
+  return useContext(RoleContext);
 }
