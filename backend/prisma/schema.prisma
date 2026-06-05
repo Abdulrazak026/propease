@@ -494,9 +494,9 @@ model RentAgreement {
   listingId             String?
   listing               Listing?  @relation(fields: [listingId], references: [id])
   tenantId              String?
-  tenant                User?     @relation(fields: [tenantId], references: [id])
+  tenant                User?     @relation("RentAgreementTenant", fields: [tenantId], references: [id])
   agentId               String?
-  agent                 User?     @relation(fields: [agentId], references: [id])
+  agent                 User?     @relation("RentAgreementAgent", fields: [agentId], references: [id])
   applicationId         String?
   application           TenantApplication? @relation(fields: [applicationId], references: [id])
 
