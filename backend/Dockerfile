@@ -1,10 +1,10 @@
 FROM node:22-alpine AS builder
 WORKDIR /app
-ARG CACHE_DATE=2026-06-05-v3
+ARG CACHE_DATE=2026-06-05-v4
 COPY package*.json ./
 RUN npm ci
 COPY . .
-RUN npx prisma generate && npm run build && echo "build-v3"
+RUN npx prisma generate && npm run build && echo "build-v4"
 
 FROM node:22-alpine AS runner
 WORKDIR /app
