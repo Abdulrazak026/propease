@@ -1,5 +1,6 @@
 FROM node:22-alpine AS builder
 WORKDIR /app
+ARG CACHE_DATE=2026-06-05-v3
 COPY package*.json ./
 RUN npm ci
 COPY . .
