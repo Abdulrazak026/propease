@@ -1,14 +1,20 @@
 "use client";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRole } from "@/context/RoleContext";
 import { listings } from "@/lib/mock-data";
 import Badge from "@/components/ui/Badge";
 import Button from "@/components/ui/Button";
+import VerifiedBadge from "@/components/ui/VerifiedBadge";
 import RentTierBreakdown from "@/components/listings/RentTierBreakdown";
+import ReviewSection from "@/components/listings/ReviewSection";
+import PriceHistory from "@/components/listings/PriceHistory";
+import ValuationEstimate from "@/components/listings/ValuationEstimate";
 import MapPlaceholder from "@/components/ui/MapPlaceholder";
-import { formatNaira, formatDate, propertyTypeLabels } from "@/lib/utils";
+import { isFavorite, toggleFavorite } from "@/lib/favorites";
+import PaystackButton from "@/components/payments/PaystackButton";
+import { formatNaira, formatDate, propertyTypeLabels, rentTierLabels } from "@/lib/utils";
 
 export default function ListingDetailPage() {
   const { id } = useParams();
@@ -17,12 +23,16 @@ export default function ListingDetailPage() {
   const listing = listings.find((l) => l.id === id);
   const [selectedPhoto, setSelectedPhoto] = useState(0);
   const [showReserveModal, setShowReserveModal] = useState(false);
-  const [showInquireModal, setShowInquireModal] = useState(false);
-  const [inquireMsg, setInquireMsg] = useState("");
   const [reserveStep, setReserveStep] = useState<"confirm" | "pay" | "done">("confirm");
   const [bookingSuccess, setBookingSuccess] = useState(false);
-  const [showShareModal, setShowShareModal] = useState(false);
-  const [copied, setCopied] = useState(false);
+  const [fav, setFav] = useState(false);
+
+  useEffect(() => { if (listing) setFav(isFavorite(listing.id)); }, [listing]);
+
+  const handleToggleFav = () => {
+    const now = toggleFavorite(listing!.id);
+    setFav(now);
+  };
 
   if (!listing) {
     return (
@@ -40,15 +50,15 @@ export default function ListingDetailPage() {
 
   return (
     <div className="flex-1">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <Link href="/" className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-[var(--color-primary)] transition mb-4">
+      <div className="px-4 sm:px-6 lg:px-8 py-6">
+        <Link href="/" className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-[var(--color-primary)] transition-colors mb-4">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M19 12H5M12 19l-7-7 7-7" /></svg>
           Back to listings
         </Link>
 
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-          <div className="lg:col-span-3 space-y-5">
-            <div className="relative h-72 md:h-96 bg-gray-100 rounded-2xl overflow-hidden">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2 space-y-5">
+            <div className="relative h-72 md:h-96 bg-gray-100 rounded-lg overflow-hidden">
               {listing.photos.length > 0 ? (
                 <img
                   src={listing.photos[selectedPhoto]?.url}
@@ -56,15 +66,14 @@ export default function ListingDetailPage() {
                   className="w-full h-full object-cover"
                 />
               ) : (
-                <div className="absolute inset-0 flex items-center justify-center"><span className="text-6xl">🏠</span></div>
+                <div className="absolute inset-0 flex items-center justify-center text-gray-300 text-6xl">🏠</div>
               )}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent" />
-              <div className="absolute top-4 left-4 flex gap-1.5">
+              <div className="absolute top-3 left-3 flex gap-1.5">
                 <Badge variant={listing.status === "available" ? "success" : listing.status === "reserved" ? "warning" : "default"}>{listing.status}</Badge>
                 {listing.category === "partnership" && <Badge variant="info">{listing.partnerCompany}</Badge>}
               </div>
               {listing.photos.length > 1 && (
-                <div className="absolute bottom-4 right-4 bg-black/60 text-white text-xs px-2.5 py-1 rounded-lg">
+                <div className="absolute bottom-3 right-3 bg-black/70 text-white text-[11px] px-2 py-1 rounded-md">
                   {selectedPhoto + 1} / {listing.photos.length}
                 </div>
               )}
@@ -76,8 +85,8 @@ export default function ListingDetailPage() {
                   <button
                     key={photo.id}
                     onClick={() => setSelectedPhoto(i)}
-                    className={`w-20 h-16 shrink-0 rounded-lg overflow-hidden border-2 transition-all ${
-                      i === selectedPhoto ? "border-[var(--color-primary)] ring-1 ring-[var(--color-primary)]" : "border-transparent hover:border-gray-300"
+                    className={`w-20 h-16 shrink-0 rounded-md overflow-hidden border-2 transition-colors ${
+                      i === selectedPhoto ? "border-[var(--color-primary)]" : "border-transparent hover:border-gray-300"
                     }`}
                   >
                     <img src={photo.url} alt={photo.alt} className="w-full h-full object-cover" loading="lazy" />
@@ -86,32 +95,26 @@ export default function ListingDetailPage() {
               </div>
             )}
 
-            <div className="bg-white rounded-2xl border border-gray-200/60 p-6 shadow-sm">
+            <div className="bg-white rounded-lg border border-gray-200 p-6">
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <h1 className="text-2xl font-bold text-gray-900">{listing.title}</h1>
+                  <h1 className="text-xl font-semibold text-gray-900">{listing.title}</h1>
                   <p className="text-sm text-gray-500 mt-1.5 flex items-center gap-1">
-                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                    <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
                     {listing.address}
                   </p>
-                  <p className="text-xs text-gray-400 mt-1">Posted {formatDate(listing.createdAt)} by {listing.postedBy.name}</p>
+                  <p className="text-xs text-gray-400 mt-1">Posted {formatDate(listing.createdAt)} by {listing.postedBy.name} {listing.postedBy?.isVerified && <VerifiedBadge />}</p>
                 </div>
-                <button onClick={() => setShowShareModal(true)} className="shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium text-gray-500 hover:text-[var(--color-primary)] hover:bg-gray-50 border border-gray-200 transition-all">
-                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" /></svg>
-                  Share
-                </button>
               </div>
 
               <div className="flex flex-wrap gap-2 mt-5">
-                <span className="text-xs bg-gray-50 border border-gray-200 px-3 py-1.5 rounded-lg text-gray-700">{propertyTypeLabels[listing.propertyType]}</span>
+                <span className="text-xs bg-gray-100 px-3 py-1.5 rounded-md text-gray-700">{propertyTypeLabels[listing.propertyType]}</span>
                 {listing.listingType === "rent" && listing.rentTier && (
-                  <span className="text-xs bg-gray-50 border border-gray-200 px-3 py-1.5 rounded-lg text-gray-700">
-                    {listing.rentTier === "normal" ? "Normal Rent" : listing.rentTier === "damages" ? "Rent + Damages" : "Full Package"}
-                  </span>
+                  <span className="text-xs bg-gray-100 px-3 py-1.5 rounded-md text-gray-700">{rentTierLabels[listing.rentTier]}</span>
                 )}
-                {listing.bedrooms && <span className="text-xs bg-gray-50 border border-gray-200 px-3 py-1.5 rounded-lg text-gray-700">{listing.bedrooms} Bedrooms</span>}
-                {listing.bathrooms && <span className="text-xs bg-gray-50 border border-gray-200 px-3 py-1.5 rounded-lg text-gray-700">{listing.bathrooms} Bathrooms</span>}
-                {listing.sqft && <span className="text-xs bg-gray-50 border border-gray-200 px-3 py-1.5 rounded-lg text-gray-700">{listing.sqft.toLocaleString()} sqft</span>}
+                {listing.bedrooms && <span className="text-xs bg-gray-100 px-3 py-1.5 rounded-md text-gray-700">{listing.bedrooms} Bedrooms</span>}
+                {listing.bathrooms && <span className="text-xs bg-gray-100 px-3 py-1.5 rounded-md text-gray-700">{listing.bathrooms} Bathrooms</span>}
+                {listing.sqft && <span className="text-xs bg-gray-100 px-3 py-1.5 rounded-md text-gray-700">{listing.sqft.toLocaleString()} sqft</span>}
               </div>
 
               <p className="text-sm text-gray-600 mt-5 leading-relaxed">{listing.description}</p>
@@ -121,67 +124,93 @@ export default function ListingDetailPage() {
                   <h3 className="text-sm font-semibold text-gray-900 mb-3">Features & Amenities</h3>
                   <div className="flex flex-wrap gap-2">
                     {listing.features.map((f, i) => (
-                      <span key={i} className="text-xs bg-[var(--color-primary)]/5 text-[var(--color-primary)] px-3 py-1.5 rounded-lg border border-[var(--color-primary)]/10">{f}</span>
+                      <span key={i} className="text-xs bg-gray-100 text-gray-700 px-3 py-1.5 rounded-md">{f}</span>
                     ))}
                   </div>
                 </div>
               )}
             </div>
 
-            <div className="bg-white rounded-2xl border border-gray-200/60 p-6 shadow-sm">
+            <div className="bg-white rounded-lg border border-gray-200 p-6">
               <h3 className="font-semibold text-gray-900 text-sm mb-3">Location</h3>
-              <div className="rounded-xl overflow-hidden border border-gray-100">
+              <div className="rounded-lg overflow-hidden border border-gray-200">
                 <MapPlaceholder lat={listing.lat} lng={listing.lng} label={listing.address} />
               </div>
             </div>
           </div>
 
-          <div className="lg:col-span-2 space-y-5">
-            <div className="bg-white rounded-2xl border border-gray-200/60 p-6 shadow-sm lg:sticky lg:top-24">
-              <div className="pb-5 border-b border-gray-100">
+          <div className="space-y-5">
+            <div className="bg-white rounded-lg border border-gray-200 p-6 lg:sticky lg:top-20">
+              <div className="pb-5 border-b border-gray-200">
                 <p className="text-xs text-gray-500 uppercase tracking-wider font-medium">
                   {listing.listingType === "rent" ? "Yearly Rent" : "Sale Price"}
                 </p>
-                <p className="text-3xl font-bold text-[var(--color-primary)] mt-1">{formatNaira(listing.price)}</p>
+                <div className="flex items-center justify-between mt-1">
+                  <p className="text-2xl font-bold text-[var(--color-primary)]">{formatNaira(listing.price)}</p>
+                  <button onClick={handleToggleFav} className="w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition-colors">
+                    <svg className={`w-5 h-5 ${fav ? "text-red-500 fill-red-500" : "text-gray-500"}`} viewBox="0 0 24 24" fill={fav ? "currentColor" : "none"} stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                    </svg>
+                  </button>
+                </div>
                 {listing.listingType === "rent" && <p className="text-xs text-gray-400 mt-1">Due upfront on signing</p>}
               </div>
 
               {listing.listingType === "rent" && listing.assignedAgent && (
-                <div className="py-4 border-b border-gray-100">
+                <div className="py-4 border-b border-gray-200">
                   <p className="text-xs text-gray-500 mb-2">Managed by</p>
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary-light)] flex items-center justify-center text-white text-sm font-bold">
+                    <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-600 text-sm font-bold">
                       {listing.assignedAgent.name.split(" ").map(n => n[0]).join("").slice(0, 2)}
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-gray-900">{listing.assignedAgent.name}</p>
+                      <p className="text-sm font-medium text-gray-900 flex items-center gap-1.5">{listing.assignedAgent.name} {listing.assignedAgent?.isVerified && <VerifiedBadge />}</p>
                       <p className="text-xs text-gray-400">Agent</p>
                     </div>
                   </div>
                 </div>
               )}
 
-              <div className="py-5 space-y-3">
-                <Button className="w-full" disabled={listing.status !== "available"} onClick={() => { if (!currentUser) { router.push("/login"); return; } setShowReserveModal(true); }}>
-                  {listing.status === "available" ? "Reserve This Property" : listing.status === "reserved" ? "Reserved" : "Already Taken"}
+              <div className="pt-5 space-y-3">
+                <Button className="w-full" disabled={listing.status !== "available"} onClick={() => setShowReserveModal(true)}>
+                  {listing.status === "available" ? "Reserve This Property" : "Already Reserved"}
                 </Button>
-                <Button variant="outline" className="w-full" onClick={() => { if (!currentUser) { router.push("/login"); return; } setShowInquireModal(true); }}>
+
+                <Link
+                  href={currentUser ? `/messages?id=new&listing=${listing.id}&agent=${listing.assignedAgent?.id || listing.postedBy?.id}` : `/login?redirect=${encodeURIComponent(`/messages?id=new&listing=${listing.id}&agent=${listing.assignedAgent?.id || listing.postedBy?.id}`)}`}
+                  className="inline-flex items-center justify-center gap-2 w-full px-4 py-2.5 rounded-lg text-sm font-medium text-white bg-[var(--color-primary)] hover:bg-[var(--color-primary-light)] transition-colors"
+                >
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>
-                  Inquire
-                </Button>
+                  Message Agent
+                </Link>
+
+                {listing.listingType === "rent" && (
+                  <Link
+                    href={`/apply?listing=${listing.id}`}
+                    className="inline-flex items-center justify-center gap-2 w-full px-4 py-2.5 rounded-lg text-sm font-medium text-white bg-blue-500 hover:bg-blue-600 transition-colors"
+                  >
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    Apply Now
+                  </Link>
+                )}
+
+                {listing.listingType !== "rent" && listing.assignedAgent && (
+                  <Link href={`/agents/${listing.assignedAgent.id}`} className="inline-flex items-center justify-center gap-2 w-full px-4 py-2.5 rounded-lg text-sm font-medium border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors">
+                    Contact Agent
+                  </Link>
+                )}
               </div>
 
               {bookingSuccess && (
-                <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4 mb-4 text-center">
-                  <div className="w-10 h-10 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-2">
-                    <svg className="w-5 h-5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
-                  </div>
-                  <p className="text-sm font-medium text-emerald-800">Reservation Confirmed!</p>
-                  <p className="text-xs text-emerald-600 mt-1">Holding deposit of ₦{(listing.listingType === "rent" ? (listing.damageDeposit || Math.round(listing.price * 0.1)) : Math.round((listing.salePrice || listing.price) * 0.05)).toLocaleString()} received. Expires in 48 hours.</p>
+                <div className="bg-green-50 border border-green-200 rounded-lg p-4 mt-4 text-center">
+                  <p className="text-sm font-medium text-green-800">Reservation Confirmed!</p>
+                  <p className="text-xs text-green-600 mt-1">Holding deposit received. Expires in 48 hours.</p>
                 </div>
               )}
 
-              <p className="text-xs text-gray-400 text-center flex items-center justify-center gap-1">
+              <p className="text-xs text-gray-400 text-center mt-4 flex items-center justify-center gap-1">
                 <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
                 Pay via wallet or card at checkout
               </p>
@@ -189,66 +218,71 @@ export default function ListingDetailPage() {
 
             {listing.listingType === "rent" && <RentTierBreakdown listing={listing} />}
 
-            {listing.category === "partnership" && listing.partnerCompany && (
-              <div className="bg-amber-50 border border-amber-200 rounded-2xl p-5">
-                <h4 className="text-sm font-semibold text-amber-800 flex items-center gap-2">
-                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
-                  Partnership Listing
-                </h4>
-                <p className="text-xs text-amber-700 mt-2">Listed on behalf of <strong>{listing.partnerCompany}</strong>. Commission applies.</p>
-              </div>
-            )}
+            <ValuationEstimate listing={listing} />
+
+            <PriceHistory
+              currentPrice={listing.price}
+              history={[
+                { date: listing.createdAt, price: listing.price, reason: "Initial listing" },
+              ]}
+              priceLabel={listing.priceLabel}
+            />
           </div>
+        </div>
+
+        <div className="max-w-3xl mt-8">
+          <ReviewSection
+            agentId={listing.assignedAgent?.id}
+            agentName={listing.assignedAgent?.name}
+            listingId={listing.id}
+            currentUserId={currentUser?.id}
+          />
         </div>
       </div>
 
       {showReserveModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" onClick={() => { if (reserveStep !== "done") setShowReserveModal(false); }}>
-          <div className="bg-white rounded-2xl p-6 max-w-md w-full mx-4 shadow-xl animate-fade-in-up" onClick={(e) => e.stopPropagation()}>
+          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4 shadow-xl" onClick={(e) => e.stopPropagation()}>
             {reserveStep === "confirm" && (
               <>
                 <h3 className="text-base font-semibold text-gray-900 mb-1">Confirm Reservation</h3>
                 <p className="text-xs text-gray-500 mb-4">Review the terms before proceeding.</p>
-                <div className="bg-gray-50 rounded-xl p-4 border border-gray-200 mb-4 space-y-2">
+                <div className="bg-gray-50 rounded-lg p-4 border border-gray-200 mb-4 space-y-2">
                   <div className="flex justify-between text-sm"><span className="text-gray-500">Property</span><span className="text-gray-900 font-medium">{listing.title}</span></div>
                   <div className="flex justify-between text-sm"><span className="text-gray-500">Price</span><span className="text-gray-900">{formatNaira(listing.price)}{listing.listingType === "rent" ? "/yr" : ""}</span></div>
                   <div className="flex justify-between text-sm"><span className="text-gray-500">Holding Deposit</span><span className="text-gray-900 font-medium">{formatNaira(listing.listingType === "rent" ? (listing.damageDeposit || Math.round(listing.price * 0.1)) : Math.round((listing.salePrice || listing.price) * 0.05))}</span></div>
                   <div className="flex justify-between text-sm"><span className="text-gray-500">Valid Until</span><span className="text-gray-900">48 hours</span></div>
                 </div>
-                <p className="text-xs text-gray-400 mb-4">The holding deposit secures the property and is deducted from your first payment. Refundable per cancellation policy.</p>
+                <p className="text-xs text-gray-400 mb-4">The holding deposit secures the property and is deducted from your first payment.</p>
                 <div className="flex gap-3">
                   <Button variant="outline" className="flex-1" onClick={() => setShowReserveModal(false)}>Cancel</Button>
-                  <Button className="flex-1" onClick={() => setReserveStep("pay")}>Continue to Pay</Button>
+                  <Button className="flex-1" onClick={() => { if (!currentUser) { router.push(`/login?redirect=${encodeURIComponent(window.location.pathname)}`); return; } setReserveStep("pay"); }}>Continue to Pay</Button>
                 </div>
               </>
             )}
             {reserveStep === "pay" && (
               <>
-                <h3 className="text-base font-semibold text-gray-900 mb-1">Payment Method</h3>
-                <p className="text-xs text-gray-500 mb-4">Choose how to pay the holding deposit.</p>
-                <div className="space-y-2 mb-4">
-                  <button onClick={() => setReserveStep("done")} className="w-full flex items-center gap-3 p-4 rounded-xl border border-gray-200 hover:border-[var(--color-primary)] hover:bg-[var(--color-primary)]/5 transition-all text-left">
-                    <div className="w-10 h-10 rounded-lg bg-[var(--color-primary)]/10 flex items-center justify-center">
-                      <svg className="w-5 h-5 text-[var(--color-primary)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" /></svg>
-                    </div>
-                    <div className="flex-1"><p className="text-sm font-medium text-gray-900">Pay with Card</p><p className="text-xs text-gray-500">Simulated Paystack checkout</p></div>
-                    <svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" /></svg>
-                  </button>
-                  <button onClick={() => setReserveStep("done")} className="w-full flex items-center gap-3 p-4 rounded-xl border border-gray-200 hover:border-[var(--color-primary)] hover:bg-[var(--color-primary)]/5 transition-all text-left">
-                    <div className="w-10 h-10 rounded-lg bg-emerald-100 flex items-center justify-center">
-                      <svg className="w-5 h-5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
-                    </div>
-                    <div className="flex-1"><p className="text-sm font-medium text-gray-900">Pay with Wallet</p><p className="text-xs text-gray-500">Balance: {formatNaira(currentUser?.walletBalance || 0)}</p></div>
-                    <svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" /></svg>
-                  </button>
+                <h3 className="text-base font-semibold text-gray-900 mb-1">Pay Holding Deposit</h3>
+                <p className="text-xs text-gray-500 mb-4">Secure this property with a deposit.</p>
+                <div className="bg-gray-50 rounded-lg p-4 border border-gray-200 mb-4 space-y-2">
+                  <div className="flex justify-between text-sm"><span className="text-gray-500">Property</span><span className="text-gray-900 font-medium">{listing.title}</span></div>
+                  <div className="flex justify-between text-sm"><span className="text-gray-500">Deposit</span><span className="text-gray-900 font-medium">{formatNaira(listing.listingType === "rent" ? (listing.damageDeposit || Math.round(listing.price * 0.1)) : Math.round((listing.salePrice || listing.price) * 0.05))}</span></div>
                 </div>
-                <Button variant="ghost" className="w-full" onClick={() => setReserveStep("confirm")}>← Back</Button>
+                <PaystackButton
+                  email={currentUser?.email || "user@example.com"}
+                  amount={listing.listingType === "rent" ? (listing.damageDeposit || Math.round(listing.price * 0.1)) : Math.round((listing.salePrice || listing.price) * 0.05)}
+                  label="Pay with Paystack"
+                  metadata={{ listingId: listing.id, userId: currentUser?.id, purpose: "reservation_deposit" }}
+                  onSuccess={() => setReserveStep("done")}
+                  className="w-full"
+                />
+                <Button variant="ghost" className="w-full mt-2" onClick={() => setReserveStep("confirm")}>← Back</Button>
               </>
             )}
             {reserveStep === "done" && (
               <div className="text-center py-4">
-                <div className="w-14 h-14 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <svg className="w-7 h-7 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
+                <div className="w-14 h-14 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <svg className="w-7 h-7 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
                 </div>
                 <h3 className="text-lg font-semibold text-gray-900 mb-1">Payment Successful!</h3>
                 <p className="text-sm text-gray-500 mb-1">Holding deposit paid. The property is reserved for 48 hours.</p>
@@ -258,58 +292,6 @@ export default function ListingDetailPage() {
                 </div>
               </div>
             )}
-          </div>
-        </div>
-      )}
-
-      {showShareModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" onClick={() => { setShowShareModal(false); setCopied(false); }}>
-          <div className="bg-white rounded-2xl p-6 max-w-sm w-full mx-4 shadow-xl animate-fade-in-up" onClick={(e) => e.stopPropagation()}>
-            <h3 className="text-base font-semibold text-gray-900 mb-2">Share this Property</h3>
-            <div className="flex items-center gap-2 bg-gray-50 rounded-xl p-3 border border-gray-200 mb-4">
-              <input readOnly value={`https://propease-demo.vercel.app/listings/${listing.id}`} className="flex-1 bg-transparent text-xs font-mono text-gray-600 outline-none" />
-              <button onClick={() => { navigator.clipboard.writeText(`https://propease-demo.vercel.app/listings/${listing.id}`); setCopied(true); setTimeout(() => setCopied(false), 2000); }}
-                className="shrink-0 px-3 py-1.5 rounded-lg text-xs font-medium bg-[var(--color-primary)] text-white hover:bg-[var(--color-primary-light)] transition-all"
-              >{copied ? "Copied!" : "Copy"}</button>
-            </div>
-            <div className="flex gap-2">
-              {[
-                { name: "WhatsApp", color: "bg-green-500", url: `https://wa.me/?text=${encodeURIComponent(`Check out this property on PropEase: ${listing.title}`)}` },
-                { name: "Twitter", color: "bg-blue-500", url: `https://twitter.com/intent/tweet?text=${encodeURIComponent(`Check out this property on PropEase: ${listing.title}`)}` },
-                { name: "Email", color: "bg-gray-600", url: `mailto:?subject=${encodeURIComponent(`Property: ${listing.title}`)}&body=${encodeURIComponent(`Check out this listing on PropEase: https://propease-demo.vercel.app/listings/${listing.id}`)}` },
-              ].map((s) => (
-                <a key={s.name} href={s.url} target="_blank" rel="noopener noreferrer" className={`${s.color} text-white text-xs font-medium px-4 py-2 rounded-lg hover:opacity-90 transition-all text-center flex-1`}>
-                  {s.name}
-                </a>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {showInquireModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" onClick={() => setShowInquireModal(false)}>
-          <div className="bg-white rounded-2xl p-6 max-w-md w-full mx-4 shadow-xl animate-fade-in-up" onClick={(e) => e.stopPropagation()}>
-            <h3 className="text-base font-semibold text-gray-900 mb-1">Send Inquiry</h3>
-            <p className="text-xs text-gray-500 mb-4">Ask about this property. The agent will respond shortly.</p>
-            <div className="space-y-3 mb-4">
-              <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1">Your Name</label>
-                <input defaultValue={currentUser?.name || ""} className="w-full rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm" />
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1">Contact</label>
-                <input defaultValue={currentUser?.email || ""} className="w-full rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm" />
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1">Message</label>
-                <textarea rows={3} value={inquireMsg} onChange={(e) => setInquireMsg(e.target.value)} placeholder="e.g. Is this still available? Can I schedule a viewing?" className="w-full rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm resize-none" />
-              </div>
-            </div>
-            <div className="flex gap-3">
-              <Button variant="outline" className="flex-1" onClick={() => setShowInquireModal(false)}>Cancel</Button>
-              <Button className="flex-1" onClick={() => { setShowInquireModal(false); setInquireMsg(""); }}>Send Inquiry</Button>
-            </div>
           </div>
         </div>
       )}

@@ -34,8 +34,8 @@ router.get("/", async (req, res: Response) => {
       where,
       include: {
         photos: { orderBy: { order: "asc" } },
-        postedBy: { select: { id: true, name: true, role: true } },
-        assignedAgent: { select: { id: true, name: true } },
+        postedBy: { select: { id: true, name: true, role: true, isVerified: true } },
+        assignedAgent: { select: { id: true, name: true, isVerified: true, whatsapp: true } },
       },
       orderBy: { createdAt: "desc" },
     });
@@ -54,8 +54,8 @@ router.get("/:id", async (req, res: Response) => {
       where: { id: listingId },
       include: {
         photos: { orderBy: { order: "asc" } },
-        postedBy: { select: { id: true, name: true, role: true } },
-        assignedAgent: { select: { id: true, name: true, email: true } },
+        postedBy: { select: { id: true, name: true, role: true, isVerified: true } },
+        assignedAgent: { select: { id: true, name: true, email: true, isVerified: true, whatsapp: true } },
       },
     });
 

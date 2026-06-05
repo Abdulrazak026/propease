@@ -1,73 +1,50 @@
-"use client";
-import { useState } from "react";
-import { useRole } from "@/context/RoleContext";
-import { tasks as allTasks, commissions, inquiries } from "@/lib/mock-data";
-import { TaskStatus } from "@/lib/types";
-import { formatNaira } from "@/lib/utils";
-import TaskBoard from "@/components/tasks/TaskBoard";
+import Link from "next/link";
+import Button from "@/components/ui/Button";
 
-export default function AgentTaskBoard() {
-  const { currentUser } = useRole();
-  const [tasks, setTasks] = useState(allTasks.filter((t) => t.assignedTo.id === currentUser?.id));
+const features = [
+  { icon: "📊", title: "Track Rent Payments", desc: "See who has paid and who hasn't. Get reminders for upcoming and overdue rent." },
+  { icon: "🔑", title: "Tenant Management", desc: "View tenant profiles, lease terms, and contact information in one place." },
+  { icon: "📝", title: "Digital Agreements", desc: "Create and manage tenancy agreements with e-signatures. No paper needed." },
+  { icon: "🔔", title: "Maintenance Requests", desc: "Tenants can send maintenance requests. Track progress and assign contractors." },
+];
 
-  const handleStatusChange = (taskId: string, newStatus: TaskStatus) => {
-    setTasks((prev) =>
-      prev.map((t) => (t.id === taskId ? { ...t, status: newStatus } : t))
-    );
-  };
-
-  const myCommissions = commissions.filter((c) => c.agent.id === currentUser?.id);
-  const myInquiries = inquiries.filter((i) => i.assignedAgent?.id === currentUser?.id);
-  const fulfilledTasks = tasks.filter((t) => t.status === "fulfilled");
-
-  const stats = {
-    total: tasks.length,
-    open: tasks.filter((t) => t.status === "open").length,
-    inProgress: tasks.filter((t) => t.status === "in_progress").length,
-    fulfilled: fulfilledTasks.length,
-  };
-
-  const metrics = [
-    { label: "Tasks Completed", value: fulfilledTasks.length, sub: `${stats.total} total assigned`, accent: "bg-emerald-100", color: "text-emerald-600" },
-    { label: "Commissions Earned", value: formatNaira(myCommissions.reduce((s, c) => s + c.agentCut, 0)), sub: `${myCommissions.length} deals`, accent: "bg-[var(--color-primary)]/10", color: "text-[var(--color-primary)]" },
-    { label: "Inquiries Received", value: myInquiries.length, sub: `${myInquiries.filter(i => i.status === "new").length} new`, accent: "bg-blue-100", color: "text-blue-600" },
-    { label: "Avg. Completion", value: stats.total > 0 ? Math.round((fulfilledTasks.length / stats.total) * 100) + "%" : "0%", sub: "of all tasks", accent: "bg-amber-100", color: "text-amber-600" },
-  ];
-
+export default function AgentPage() {
   return (
-    <div className="space-y-6 animate-fade-in-up">
-      <div>
-        <h1 className="text-xl font-bold text-gray-900">My Performance</h1>
-        <p className="text-sm text-gray-500 mt-0.5">Your activity and earnings overview</p>
-      </div>
+    <div className="flex-1">
+      <section className="relative bg-[var(--color-primary)] py-20 px-4 overflow-hidden">
+        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1556761175-b413da4baf72?w=1200&h=600&fit=crop')] bg-cover bg-center opacity-10" />
+        <div className="relative max-w-3xl mx-auto text-center">
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 text-white/90 text-xs font-medium mb-6">Manage Rentals</span>
+          <h1 className="text-4xl md:text-5xl font-bold text-white leading-tight">
+            Your Properties, <span className="text-[var(--color-accent)]">One Dashboard</span>
+          </h1>
+          <p className="mt-4 text-lg text-white/70 max-w-2xl mx-auto">
+            Manage all your rental properties from a single place. Track payments, communicate with tenants, and handle agreements.
+          </p>
+        </div>
+      </section>
 
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        {metrics.map((s) => (
-          <div key={s.label} className="bg-white rounded-xl border border-gray-200/60 p-4 shadow-sm card-hover">
-            <div className="flex items-center gap-3">
-              <div className={`w-10 h-10 ${s.accent} rounded-lg flex items-center justify-center`}>
-                <span className={`text-sm font-bold ${s.color}`}>{typeof s.value === "string" && s.value.startsWith("₦") ? "₦" : s.value.toString().replace("%", "")}</span>
-              </div>
-              <div className="min-w-0">
-                <p className="text-xs text-gray-500">{s.label}</p>
-                <p className={`text-sm font-bold ${s.color} mt-0.5`}>{s.value}</p>
-                <p className="text-[10px] text-gray-400">{s.sub}</p>
-              </div>
+      <div className="max-w-5xl mx-auto px-4 py-16">
+        <div className="grid sm:grid-cols-2 gap-5 mb-16">
+          {features.map((f) => (
+            <div key={f.title} className="bg-white rounded-lg border border-gray-200 p-6">
+              <span className="text-2xl mb-3 block">{f.icon}</span>
+              <h3 className="text-sm font-semibold text-gray-900 mb-1">{f.title}</h3>
+              <p className="text-xs text-gray-500 leading-relaxed">{f.desc}</p>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
 
-      <div>
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold text-gray-900">Task Board</h2>
-          <div className="flex items-center gap-3 text-xs text-gray-500">
-            <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-blue-500" /> Open: {stats.open}</span>
-            <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-amber-500" /> In Progress: {stats.inProgress}</span>
-            <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-emerald-500" /> Done: {stats.fulfilled}</span>
+        <div className="bg-gray-50 rounded-lg border border-gray-200 p-8 text-center">
+          <h2 className="text-lg font-bold text-gray-900 mb-2">Sign In to Access Your Dashboard</h2>
+          <p className="text-sm text-gray-500 max-w-md mx-auto mb-6">
+            Already have an account? Sign in to view your rental properties, track payments, and manage tenants.
+          </p>
+          <div className="flex items-center justify-center gap-4">
+            <Link href="/login"><Button size="lg">Sign In</Button></Link>
+            <Link href="/register"><Button variant="outline" size="lg">Create Account</Button></Link>
           </div>
         </div>
-        <TaskBoard tasks={tasks} onStatusChange={handleStatusChange} />
       </div>
     </div>
   );

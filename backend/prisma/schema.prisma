@@ -110,6 +110,10 @@ model User {
   canCreateTasks Boolean   @default(false)
   canCloseDeals  Boolean   @default(false)
   isApproved     Boolean   @default(false)
+  isVerified     Boolean   @default(false)
+  verifiedAt     DateTime?
+  verificationDoc String?
+  whatsapp       String?
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
 
@@ -349,6 +353,67 @@ model Reservation {
   @@index([listingId])
 }
 
+enum ApplicationStatus {
+  draft
+  submitted
+  under_review
+  approved
+  rejected
+}
+
+model TenantApplication {
+  id            String             @id @default(uuid())
+  status        ApplicationStatus  @default(draft)
+  createdAt     DateTime           @default(now())
+  updatedAt     DateTime           @updatedAt
+
+  // Step 1: Personal Info
+  fullName      String
+  email         String
+  phone         String
+  dateOfBirth   String?
+
+  // Step 2: Employment
+  employmentStatus String?
+  employer       String?
+  jobTitle       String?
+  workAddress    String?
+
+  // Step 3: Income
+  monthlyIncome  Int?
+  incomeCurrency String?            @default("NGN")
+  incomeDocument String?
+
+  // Step 4: ID Upload
+  idType        String?
+  idNumber      String?
+  idDocument    String?
+
+  // Step 5: References
+  refName       String?
+  refPhone      String?
+  refEmail      String?
+  refRelation   String?
+
+  // Step 6: Next of Kin
+  nokName       String?
+  nokPhone      String?
+  nokEmail      String?
+  nokRelation   String?
+
+  // Notes from agent
+  agentNotes    String?
+
+  listingId     String?
+  listing       Listing?  @relation(fields: [listingId], references: [id])
+  assignedAgentId String?
+  assignedAgent   User?     @relation(fields: [assignedAgentId], references: [id])
+
+  @@index([status])
+  @@index([email])
+  @@index([assignedAgentId])
+}
+
 model CustomOrder {
   id            String           @id @default(uuid())
   propertyType  PropertyType
@@ -379,6 +444,189 @@ model Withdrawal {
 
   @@index([userId])
   @@index([status])
+}
+
+enum AgreementStatus {
+  draft
+  pending_landlord
+  pending_tenant
+  completed
+  expired
+  terminated
+}
+
+model RentAgreement {
+  id                     String          @id @default(uuid())
+  status                 AgreementStatus @default(draft)
+  createdAt              DateTime        @default(now())
+  updatedAt              DateTime        @updatedAt
+
+  // Tenant info (denormalized from application)
+  tenantName             String
+  tenantEmail            String
+  tenantPhone            String
+  tenantSignature        String?
+  tenantSignedAt         DateTime?
+
+  // Landlord/Agent info
+  landlordName           String
+  landlordSignature      String?
+  landlordSignedAt       DateTime?
+
+  // Property info (from listing)
+  propertyTitle          String
+  propertyAddress        String
+  propertyCity           String
+  annualRent             Int
+  damageDeposit          Int?
+  serviceCharge          Int?
+
+  // Agreement terms
+  startDate              DateTime
+  endDate                DateTime
+  rentDueDay             Int              @default(1)
+  noticePeriodDays       Int              @default(30)
+  renewalType            String           @default("yearly")
+
+  // Document reference
+  documentUrl            String?
+
+  listingId             String?
+  listing               Listing?  @relation(fields: [listingId], references: [id])
+  tenantId              String?
+  tenant                User?     @relation(fields: [tenantId], references: [id])
+  agentId               String?
+  agent                 User?     @relation(fields: [agentId], references: [id])
+  applicationId         String?
+  application           TenantApplication? @relation(fields: [applicationId], references: [id])
+
+  @@index([status])
+  @@index([tenantId])
+  @@index([agentId])
+}
+
+enum ReviewStatus {
+  pending
+  approved
+  hidden
+}
+
+model PriceChange {
+  id        String   @id @default(uuid())
+  oldPrice  Int
+  newPrice  Int
+  reason    String?
+  createdAt DateTime @default(now())
+
+  listingId String
+  listing   Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  changedById String?
+  changedBy   User?    @relation(fields: [changedById], references: [id])
+
+  @@index([listingId])
+  @@index([createdAt])
+}
+
+model SavedSearch {
+  id           String   @id @default(uuid())
+  name         String?
+  searchParams Json
+  notifyEmail  Boolean  @default(true)
+  notifySms    Boolean  @default(false)
+  notifyPush   Boolean  @default(false)
+  lastNotifiedAt DateTime?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model Review {
+  id        String       @id @default(uuid())
+  rating    Int
+  comment   String?
+  status    ReviewStatus @default(pending)
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+
+  authorId  String
+  author    User         @relation(fields: [authorId], references: [id])
+
+  agentId   String
+  agent     User         @relation("AgentReviews", fields: [agentId], references: [id])
+
+  listingId String?
+  listing   Listing?     @relation(fields: [listingId], references: [id])
+
+  @@index([agentId])
+  @@index([status])
+  @@index([authorId])
+}
+
+enum NotificationType {
+  saved_search_match
+  review_response
+  agreement_signed
+  application_status
+  message_received
+  price_change
+}
+
+model Conversation {
+  id        String    @id @default(uuid())
+  subject   String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  participants ConversationParticipant[]
+  messages     Message[]
+  listingId    String?
+  listing      Listing?  @relation(fields: [listingId], references: [id])
+
+  @@index([updatedAt])
+}
+
+model ConversationParticipant {
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  userId         String
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([conversationId, userId])
+}
+
+model Message {
+  id        String   @id @default(uuid())
+  content   String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  senderId String
+  sender   User   @relation(fields: [senderId], references: [id])
+
+  @@index([conversationId, createdAt])
+}
+
+model Notification {
+  id        String           @id @default(uuid())
+  type      NotificationType
+  title     String
+  body      String
+  link      String?
+  read      Boolean          @default(false)
+  createdAt DateTime         @default(now())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, read])
+  @@index([createdAt])
 }
 
 model AuditLog {

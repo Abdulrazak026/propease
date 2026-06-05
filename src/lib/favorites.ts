@@ -1,4 +1,4 @@
-const STORAGE_KEY = "propease-favorites";
+const STORAGE_KEY = "mbpp-favorites";
 
 export function getFavorites(): string[] {
   if (typeof window === "undefined") return [];

@@ -16,16 +16,16 @@ export interface FilterState {
   city: string;
   minPrice: string;
   maxPrice: string;
+  paymentOption: string;
 }
 
 const cities = ["All Cities", "Kano Municipal", "Fagge", "Tarauni", "Nassarawa"];
-
 const propertyTypes = ["", "house", "flat", "land", "commercial"] as const;
 
 export default function PropertyFilters({ onFilterChange }: PropertyFiltersProps) {
   const [filters, setFilters] = useState<FilterState>({
     search: "", propertyType: "", listingType: "", rentTier: "",
-    category: "", city: "", minPrice: "", maxPrice: "",
+    category: "", city: "", minPrice: "", maxPrice: "", paymentOption: "",
   });
   const [showMore, setShowMore] = useState(false);
 
@@ -38,7 +38,7 @@ export default function PropertyFilters({ onFilterChange }: PropertyFiltersProps
   const reset = () => {
     const empty: FilterState = {
       search: "", propertyType: "", listingType: "", rentTier: "",
-      category: "", city: "", minPrice: "", maxPrice: "",
+      category: "", city: "", minPrice: "", maxPrice: "", paymentOption: "",
     };
     setFilters(empty);
     onFilterChange(empty);
@@ -58,7 +58,7 @@ export default function PropertyFilters({ onFilterChange }: PropertyFiltersProps
             placeholder="Search by title, location, or description..."
             value={filters.search}
             onChange={(e) => update("search", e.target.value)}
-            className="w-full rounded-xl border border-gray-200 bg-white pl-10 pr-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20 focus:border-[var(--color-primary)] transition-all"
+            className="w-full rounded-lg border border-gray-300 bg-white pl-10 pr-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)] focus:border-[var(--color-primary)] transition-colors"
           />
         </div>
       </div>
@@ -68,44 +68,54 @@ export default function PropertyFilters({ onFilterChange }: PropertyFiltersProps
           <button
             key={t}
             onClick={() => update("propertyType", t)}
-            className={`px-3.5 py-1.5 rounded-full text-xs font-medium transition-all ${
+            className={`px-3.5 py-1.5 rounded-lg text-xs font-medium transition-colors ${
               filters.propertyType === t
-                ? "bg-[var(--color-primary)] text-white shadow-sm"
-                : "bg-white border border-gray-200 text-gray-600 hover:border-gray-300 hover:text-gray-900"
+                ? "bg-[var(--color-primary)] text-white"
+                : "bg-white border border-gray-300 text-gray-600 hover:border-gray-400"
             }`}
           >
             {t === "" ? "All Types" : propertyTypeLabels[t]}
           </button>
         ))}
-        <span className="w-px h-5 bg-gray-200 mx-1 hidden sm:block" />
+        <span className="w-px h-5 bg-gray-300 mx-1 hidden sm:block" />
         <button
           onClick={() => update("listingType", filters.listingType === "rent" ? "" : "rent")}
-          className={`px-3.5 py-1.5 rounded-full text-xs font-medium transition-all ${
+          className={`px-3.5 py-1.5 rounded-lg text-xs font-medium transition-colors ${
             filters.listingType === "rent"
-              ? "bg-[var(--color-accent)] text-white shadow-sm"
-              : "bg-white border border-gray-200 text-gray-600 hover:border-gray-300 hover:text-gray-900"
+              ? "bg-[var(--color-accent)] text-white"
+              : "bg-white border border-gray-300 text-gray-600 hover:border-gray-400"
           }`}
         >
           For Rent
         </button>
         <button
           onClick={() => update("listingType", filters.listingType === "sale" ? "" : "sale")}
-          className={`px-3.5 py-1.5 rounded-full text-xs font-medium transition-all ${
+          className={`px-3.5 py-1.5 rounded-lg text-xs font-medium transition-colors ${
             filters.listingType === "sale"
-              ? "bg-[var(--color-accent)] text-white shadow-sm"
-              : "bg-white border border-gray-200 text-gray-600 hover:border-gray-300 hover:text-gray-900"
+              ? "bg-[var(--color-accent)] text-white"
+              : "bg-white border border-gray-300 text-gray-600 hover:border-gray-400"
           }`}
         >
           For Sale
         </button>
+        <button
+          onClick={() => update("listingType", filters.listingType === "outsourcing" ? "" : "outsourcing")}
+          className={`px-3.5 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+            filters.listingType === "outsourcing"
+              ? "bg-gray-700 text-white"
+              : "bg-white border border-gray-300 text-gray-600 hover:border-gray-400"
+          }`}
+        >
+          Outsourcing
+        </button>
       </div>
 
       {showMore && (
-        <div className="animate-fade-in grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
           <select
             value={filters.city}
             onChange={(e) => update("city", e.target.value)}
-            className="rounded-lg border border-gray-200 bg-white px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20 focus:border-[var(--color-primary)]"
+            className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)] focus:border-[var(--color-primary)]"
           >
             {cities.map((c) => (
               <option key={c} value={c === "All Cities" ? "" : c}>{c}</option>
@@ -114,24 +124,34 @@ export default function PropertyFilters({ onFilterChange }: PropertyFiltersProps
           <select
             value={filters.rentTier}
             onChange={(e) => update("rentTier", e.target.value)}
-            className="rounded-lg border border-gray-200 bg-white px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20 focus:border-[var(--color-primary)]"
+            className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)] focus:border-[var(--color-primary)]"
           >
-            <option value="">All Rent Tiers</option>
-            <option value="normal">{rentTierLabels.normal}</option>
-            <option value="damages">{rentTierLabels.damages}</option>
-            <option value="full">{rentTierLabels.full}</option>
+            <option value="">All Rent Options</option>
+            <option value="rent_only">{rentTierLabels.rent_only}</option>
+            <option value="rent_management">{rentTierLabels.rent_management}</option>
+            <option value="rent_full">{rentTierLabels.rent_full}</option>
+          </select>
+          <select
+            value={filters.paymentOption}
+            onChange={(e) => update("paymentOption", e.target.value)}
+            className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)] focus:border-[var(--color-primary)]"
+          >
+            <option value="">Payment</option>
+            <option value="reservation">Reservation</option>
+            <option value="instalment">Instalment</option>
+            <option value="full">Full Payment</option>
           </select>
           <input
             type="number" placeholder="Min ₦"
             value={filters.minPrice}
             onChange={(e) => update("minPrice", e.target.value)}
-            className="rounded-lg border border-gray-200 bg-white px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20 focus:border-[var(--color-primary)]"
+            className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)] focus:border-[var(--color-primary)]"
           />
           <input
             type="number" placeholder="Max ₦"
             value={filters.maxPrice}
             onChange={(e) => update("maxPrice", e.target.value)}
-            className="rounded-lg border border-gray-200 bg-white px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20 focus:border-[var(--color-primary)]"
+            className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)] focus:border-[var(--color-primary)]"
           />
         </div>
       )}

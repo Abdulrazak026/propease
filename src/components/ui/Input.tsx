@@ -27,9 +27,9 @@ export default function Input({
           </div>
         )}
         <input
-          className={`w-full rounded-xl border ${
-            error ? "border-red-400 focus:ring-red-500" : "border-gray-200 focus:ring-[var(--color-primary)]/20 focus:border-[var(--color-primary)]"
-          } bg-white px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 transition-all ${
+          className={`w-full rounded-lg border ${
+            error ? "border-red-400 focus:ring-red-500" : "border-gray-300 focus:border-[var(--color-primary)]"
+          } bg-white px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)] transition-all ${
             icon ? "pl-10" : ""
           } ${className}`}
           {...props}

@@ -11,13 +11,17 @@ export interface User {
   ambassadorId?: string;
   canCloseDeals?: boolean;
   canCreateTasks?: boolean;
+  isVerified?: boolean;
+  whatsapp?: string;
 }
 
 export type PropertyType = "house" | "land" | "flat" | "commercial" | "other";
-export type ListingType = "sale" | "rent";
-export type RentTier = "normal" | "damages" | "full";
-export type ListingStatus = "available" | "reserved" | "taken";
+export type ListingType = "sale" | "rent" | "outsourcing";
+export type RentTier = "rent_only" | "rent_management" | "rent_full";
+export type ListingStatus = "available" | "reserved" | "taken" | "ongoing";
 export type ListingCategory = "portfolio" | "partnership";
+export type PaymentOption = "reservation" | "instalment" | "full";
+export type DealStatus = "successful" | "unsuccessful" | "ongoing";
 
 export interface ListingPhoto {
   id: string;
@@ -33,14 +37,19 @@ export interface Listing {
   listingType: ListingType;
   rentTier?: RentTier;
   annualRent?: number;
+  managementFee?: number;
+  inspectionFee?: number;
   damageDeposit?: number;
   maintenanceCharge?: number;
   salePrice?: number;
   price: number;
+  paymentOption?: PaymentOption;
   priceLabel: string;
   status: ListingStatus;
+  dealStatus?: DealStatus;
   category: ListingCategory;
   partnerCompany?: string;
+  outsourcer?: User;
   photos: ListingPhoto[];
   lat: number;
   lng: number;

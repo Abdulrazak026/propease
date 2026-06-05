@@ -5,18 +5,20 @@ import DashboardLayout from "@/components/layout/DashboardLayout";
 import OnboardingModal from "@/components/onboarding/OnboardingModal";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
-  const { role } = useRole();
+ const { role } = useRole();
 
-  if (role && role !== "admin" && role !== "head") {
-    redirect(`/${role}`);
-  }
+ if (!role) {
+ return <div className="flex-1 flex items-center justify-center text-sm text-gray-400">Loading...</div>;
+ }
 
-  if (!role) return null;
+ if (role !== "admin" && role !== "head") {
+ redirect(`/${role}`);
+ }
 
-  return (
-    <>
-      <OnboardingModal role={role} />
-      <DashboardLayout>{children}</DashboardLayout>
-    </>
-  );
+ return (
+ <>
+ <OnboardingModal role={role} />
+ <DashboardLayout>{children}</DashboardLayout>
+ </>
+ );
 }

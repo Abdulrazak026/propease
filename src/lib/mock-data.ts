@@ -34,26 +34,26 @@ export const cities: City[] = [
 ];
 
 export const users: User[] = [
-  { id: "u0", name: "Dr. Khalid Suleiman", email: "khalid@propease.ng", role: "admin", city: "Kano Municipal", walletBalance: 0 },
-  { id: "u1", name: "Sani Abubakar", email: "sani@propease.ng", role: "head", city: "Kano Municipal", walletBalance: 0 },
-  { id: "u2", name: "Aisha Bello", email: "aisha@propease.ng", role: "ambassador", city: "Kano Municipal", walletBalance: 245000, canCreateTasks: true },
-  { id: "u3", name: "Musa Ibrahim", email: "musa@propease.ng", role: "ambassador", city: "Fagge", walletBalance: 182000, canCreateTasks: false },
-  { id: "u4", name: "Fatima Usman", email: "fatima@propease.ng", role: "agent", city: "Kano Municipal", walletBalance: 89000, ambassadorId: "u2" },
-  { id: "u5", name: "Zainab Adamu", email: "zainab@propease.ng", role: "agent", city: "Kano Municipal", walletBalance: 62000, ambassadorId: "u2", canCloseDeals: true },
-  { id: "u6", name: "Ahmad Suleiman", email: "ahmad@propease.ng", role: "agent", city: "Fagge", walletBalance: 45000, ambassadorId: "u3" },
-  { id: "u7", name: "Halima Garba", email: "halima@propease.ng", role: "agent", city: "Fagge", walletBalance: 31000, ambassadorId: "u3" },
-  { id: "u8", name: "Nura Muhd", email: "nura@propease.ng", role: "agent", city: "Kano Municipal", walletBalance: 120000, ambassadorId: "u2", canCloseDeals: true },
-  { id: "u9", name: "Maryam Yusuf", email: "maryam@propease.ng", role: "ambassador", city: "Tarauni", walletBalance: 310000, canCreateTasks: true },
-  { id: "u10", name: "Bashir Umar", email: "bashir@propease.ng", role: "agent", city: "Tarauni", walletBalance: 78000, ambassadorId: "u9" },
+  { id: "u0", name: "Dr. Khalid Suleiman", email: "khalid@mbpp.ng", role: "admin", city: "Kano Municipal", walletBalance: 0, isVerified: true },
+  { id: "u1", name: "Sani Abubakar", email: "sani@mbpp.ng", role: "head", city: "Kano Municipal", walletBalance: 0, isVerified: true },
+  { id: "u2", name: "Aisha Bello", email: "aisha@mbpp.ng", role: "ambassador", city: "Kano Municipal", walletBalance: 245000, canCreateTasks: true, isVerified: true, whatsapp: "2348021234567" },
+  { id: "u3", name: "Musa Ibrahim", email: "musa@mbpp.ng", role: "ambassador", city: "Fagge", walletBalance: 182000, canCreateTasks: false, isVerified: true },
+  { id: "u4", name: "Fatima Usman", email: "fatima@mbpp.ng", role: "agent", city: "Kano Municipal", walletBalance: 89000, ambassadorId: "u2", isVerified: true, whatsapp: "2348039876543" },
+  { id: "u5", name: "Zainab Adamu", email: "zainab@mbpp.ng", role: "agent", city: "Kano Municipal", walletBalance: 62000, ambassadorId: "u2", canCloseDeals: true, isVerified: true },
+  { id: "u6", name: "Ahmad Suleiman", email: "ahmad@mbpp.ng", role: "agent", city: "Fagge", walletBalance: 45000, ambassadorId: "u3", isVerified: false },
+  { id: "u7", name: "Halima Garba", email: "halima@mbpp.ng", role: "agent", city: "Fagge", walletBalance: 31000, ambassadorId: "u3", isVerified: false },
+  { id: "u8", name: "Nura Muhd", email: "nura@mbpp.ng", role: "agent", city: "Kano Municipal", walletBalance: 120000, ambassadorId: "u2", canCloseDeals: true, isVerified: true },
+  { id: "u9", name: "Maryam Yusuf", email: "maryam@mbpp.ng", role: "ambassador", city: "Tarauni", walletBalance: 310000, canCreateTasks: true, isVerified: true },
+  { id: "u10", name: "Bashir Umar", email: "bashir@mbpp.ng", role: "agent", city: "Tarauni", walletBalance: 78000, ambassadorId: "u9", isVerified: false },
 ];
 
 export const listings: Listing[] = [
   {
     id: "l1", title: "4-Bedroom Duplex — Kano Municipal",
     description: "A spacious 4-bedroom duplex in the heart of Kano Municipal. Modern kitchen, tiled floors, borehole water supply, and 24/7 security. Walking distance to Kano Line bus terminal and major markets.",
-    propertyType: "house", listingType: "rent", rentTier: "full",
-    annualRent: 1_800_000, damageDeposit: 200_000, maintenanceCharge: 100_000,
-    status: "available", category: "portfolio",
+    propertyType: "house", listingType: "rent", rentTier: "rent_full",
+    annualRent: 1_800_000, damageDeposit: 200_000, maintenanceCharge: 100_000, managementFee: 50_000, inspectionFee: 30_000,
+    status: "available", category: "portfolio", paymentOption: "instalment",
     photos: [{ id: "p1", url: U.house, alt: "Front view" }, { id: "p2", url: U.living, alt: "Living room" }, { id: "p3", url: U.kitchen, alt: "Kitchen" }],
     lat: 12.0010, lng: 8.5245, address: "No. 15 Sultan Road, Kano Municipal", city: "Kano Municipal",
     postedBy: users[1], assignedAgent: users[4], createdAt: "2026-05-15",
@@ -63,7 +63,7 @@ export const listings: Listing[] = [
   {
     id: "l2", title: "3-Bedroom Flat — Fagge",
     description: "Well-maintained 3-bedroom flat in Fagge LGA. Close to Murtala Muhammad Library and Fagge market. Quiet neighborhood with access to main roads and public transport.",
-    propertyType: "flat", listingType: "rent", rentTier: "damages",
+    propertyType: "flat", listingType: "rent", rentTier: "rent_management",
     annualRent: 1_200_000, damageDeposit: 150_000,
     status: "available", category: "portfolio",
     photos: [{ id: "p4", url: U.flat, alt: "Exterior" }, { id: "p5", url: U.bedroom, alt: "Bedroom" }],
@@ -74,7 +74,7 @@ export const listings: Listing[] = [
   {
     id: "l3", title: "Commercial Plaza — Fagge",
     description: "Prime commercial space in the bustling Fagge area. Ground floor shop with upper level office space. High foot traffic area near Kano's main transport interchange.",
-    propertyType: "commercial", listingType: "rent", rentTier: "normal",
+    propertyType: "commercial", listingType: "rent", rentTier: "rent_only",
     annualRent: 3_500_000,
     status: "available", category: "partnership", partnerCompany: "Alheri Properties Ltd",
     photos: [{ id: "p6", url: U.commercial, alt: "Front view" }],
@@ -93,7 +93,7 @@ export const listings: Listing[] = [
   {
     id: "l5", title: "Luxury 5-Bedroom Villa — Nassarawa",
     description: "Premium luxury villa in exclusive Nassarawa GRA. Italian marble flooring, central AC, private pool, and landscaped garden. Staff quarters and 3-car garage.",
-    propertyType: "house", listingType: "rent", rentTier: "full",
+    propertyType: "house", listingType: "rent", rentTier: "rent_full",
     annualRent: 5_000_000, damageDeposit: 500_000, maintenanceCharge: 250_000,
     status: "available", category: "portfolio",
     photos: [{ id: "p8", url: U.luxury, alt: "Exterior" }, { id: "p9", url: U.pool, alt: "Pool" }, { id: "p10", url: U.living, alt: "Living room" }],
@@ -105,7 +105,7 @@ export const listings: Listing[] = [
   {
     id: "l6", title: "2-Bedroom Self-Contain — Kano Municipal",
     description: "Affordable 2-bedroom self-contained apartment in Kano Municipal. Ideal for young professionals or small families. Tiled floors, modern bathroom, kitchenette.",
-    propertyType: "flat", listingType: "rent", rentTier: "damages",
+    propertyType: "flat", listingType: "rent", rentTier: "rent_management",
     annualRent: 600_000, damageDeposit: 80_000,
     status: "reserved", category: "portfolio",
     photos: [{ id: "p11", url: U.interior, alt: "Living area" }],
@@ -136,7 +136,7 @@ export const listings: Listing[] = [
   {
     id: "l9", title: "1-Bedroom Flat — Tarauni",
     description: "Cozy 1-bedroom flat near Bayero University. Suitable for students or single professionals. Close to Ahmadu Bello Way and local amenities.",
-    propertyType: "flat", listingType: "rent", rentTier: "normal",
+    propertyType: "flat", listingType: "rent", rentTier: "rent_only",
     annualRent: 350_000,
     status: "available", category: "portfolio",
     photos: [{ id: "p15", url: U.studio, alt: "Flat interior" }],
@@ -147,7 +147,7 @@ export const listings: Listing[] = [
   {
     id: "l10", title: "Warehouse Space — Fagge",
     description: "Large warehouse in the industrial area of Fagge. Ideal for storage, manufacturing, or logistics. 24/7 security and truck access.",
-    propertyType: "commercial", listingType: "rent", rentTier: "damages",
+    propertyType: "commercial", listingType: "rent", rentTier: "rent_management",
     annualRent: 2_400_000, damageDeposit: 300_000,
     status: "taken", category: "portfolio",
     photos: [{ id: "p16", url: U.warehouse, alt: "Warehouse interior" }],
@@ -157,7 +157,7 @@ export const listings: Listing[] = [
   {
     id: "l11", title: "Modern 3-Bedroom Apartment — Kano Municipal",
     description: "Brand new 3-bedroom apartment in a gated compound. Pop ceiling, tiled floors, modern kitchen with cabinets, and dedicated parking space. 24hr security.",
-    propertyType: "flat", listingType: "rent", rentTier: "full",
+    propertyType: "flat", listingType: "rent", rentTier: "rent_full",
     annualRent: 1_500_000, damageDeposit: 150_000, maintenanceCharge: 75_000,
     status: "available", category: "portfolio",
     photos: [{ id: "p17", url: U.flat, alt: "Building" }, { id: "p18", url: U.interior, alt: "Living room" }, { id: "p19", url: U.dining, alt: "Dining" }],
@@ -169,7 +169,7 @@ export const listings: Listing[] = [
   {
     id: "l12", title: "Executive Office Suite — Fagge",
     description: "Fully furnished executive office suite in a prime Fagge location. Reception area, 3 private offices, meeting room, and kitchenette. Ideal for professional services firm.",
-    propertyType: "commercial", listingType: "rent", rentTier: "normal",
+    propertyType: "commercial", listingType: "rent", rentTier: "rent_only",
     annualRent: 2_800_000,
     status: "available", category: "portfolio",
     photos: [{ id: "p20", url: U.office, alt: "Office" }, { id: "p21", url: U.lobby, alt: "Reception" }],
@@ -179,7 +179,7 @@ export const listings: Listing[] = [
   {
     id: "l13", title: "6-Bedroom Mansion — Nassarawa",
     description: "Magnificent 6-bedroom mansion in the heart of Nassarawa GRA. Two living rooms, cinema room, indoor gym, swimming pool, lush garden, and 4-car garage. Staff quarters included.",
-    propertyType: "house", listingType: "rent", rentTier: "full",
+    propertyType: "house", listingType: "rent", rentTier: "rent_full",
     annualRent: 8_500_000, damageDeposit: 1_000_000, maintenanceCharge: 400_000,
     status: "available", category: "partnership", partnerCompany: "Gidan Masa Realty",
     photos: [{ id: "p22", url: U.luxury, alt: "Mansion" }, { id: "p23", url: U.pool, alt: "Pool" }, { id: "p24", url: U.garden, alt: "Garden" }],
@@ -201,7 +201,7 @@ export const listings: Listing[] = [
   {
     id: "l15", title: "Shop Space — Kano Municipal",
     description: "Prime retail shop space on busy Ibrahim Taiwo Road. High foot traffic, visible signage, storage room included. Suitable for fashion, electronics, or food outlet.",
-    propertyType: "commercial", listingType: "rent", rentTier: "damages",
+    propertyType: "commercial", listingType: "rent", rentTier: "rent_management",
     annualRent: 1_200_000, damageDeposit: 150_000,
     status: "available", category: "portfolio",
     photos: [{ id: "p26", url: U.shop, alt: "Shop front" }],
@@ -212,7 +212,7 @@ export const listings: Listing[] = [
   {
     id: "l16", title: "4-Bedroom Terrace — Fagge New Layout",
     description: "Modern 4-bedroom terrace duplex in the new Fagge Layout. Rooftop terrace, modern finishes, central courtyard. Perfect for a growing family.",
-    propertyType: "house", listingType: "rent", rentTier: "damages",
+    propertyType: "house", listingType: "rent", rentTier: "rent_management",
     annualRent: 2_200_000, damageDeposit: 300_000,
     status: "available", category: "portfolio",
     photos: [{ id: "p27", url: U.rooftop, alt: "Rooftop" }, { id: "p28", url: U.living, alt: "Living room" }],
@@ -224,7 +224,7 @@ export const listings: Listing[] = [
   {
     id: "l17", title: "Penthouse Apartment — Kano Municipal",
     description: "Luxurious penthouse on the top floor of Kano's tallest residential building. Panoramic city views, open-plan living, premium finishes, and private rooftop access.",
-    propertyType: "flat", listingType: "rent", rentTier: "full",
+    propertyType: "flat", listingType: "rent", rentTier: "rent_full",
     annualRent: 4_500_000, damageDeposit: 500_000, maintenanceCharge: 200_000,
     status: "available", category: "portfolio",
     photos: [{ id: "p29", url: U.rooftop, alt: "View" }, { id: "p30", url: U.interior, alt: "Interior" }, { id: "p31", url: U.dining, alt: "Dining area" }],
@@ -256,7 +256,7 @@ export const listings: Listing[] = [
   {
     id: "l20", title: "Fully Furnished 2-Bedroom — Kano Municipal",
     description: "Move-in ready 2-bedroom flat fully furnished with modern amenities. WiFi, satellite TV, fully equipped kitchen. Short-term and long-term lease available.",
-    propertyType: "flat", listingType: "rent", rentTier: "full",
+    propertyType: "flat", listingType: "rent", rentTier: "rent_full",
     annualRent: 1_950_000, damageDeposit: 200_000, maintenanceCharge: 100_000,
     status: "available", category: "portfolio",
     photos: [{ id: "p35", url: U.bedroom, alt: "Bedroom" }, { id: "p36", url: U.kitchen, alt: "Kitchen" }, { id: "p37", url: U.living, alt: "Living room" }],

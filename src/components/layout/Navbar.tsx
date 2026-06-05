@@ -1,101 +1,65 @@
 "use client";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { useRole } from "@/context/RoleContext";
-import Button from "@/components/ui/Button";
-import { users } from "@/lib/mock-data";
 
 export default function Navbar() {
   const router = useRouter();
+  const pathname = usePathname();
   const { currentUser, setCurrentUser, isAuthenticated } = useRole();
-
-  const handleDemoLogin = (userId: string) => {
-    const user = users.find((u) => u.id === userId) || null;
-    setCurrentUser(user);
-    if (user) router.push(`/${user.role}`);
-  };
 
   const handleLogout = () => { setCurrentUser(null); router.push("/"); };
 
-  const dashboardLink = isAuthenticated
-    ? (currentUser!.role === "head" ? "/admin" : `/${currentUser!.role}`)
-    : null;
+  const isDashboard = pathname.startsWith("/admin") || pathname.startsWith("/agent") || pathname.startsWith("/ambassador") || pathname === "/wallet";
+
+  const NAV_LINKS = [
+    { label: "Buy", href: "/?type=buy" },
+    { label: "Rent", href: "/?type=rent" },
+    { label: "Sell", href: "/sell" },
+    { label: "Manage Rentals", href: "/agent" },
+    { label: "Advertise", href: "/list-property" },
+    { label: "About", href: "/about" },
+    { label: "Contact", href: "/contact" },
+    { label: "Get Help", href: "/help" },
+  ];
 
   return (
-    <header className="sticky top-0 z-50">
-      <div className="glass border-b border-white/20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <Link href="/" className="flex items-center gap-2.5 group">
-              <div className="w-9 h-9 bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary-light)] rounded-xl flex items-center justify-center shadow-sm group-hover:shadow-md transition-shadow">
-                <span className="text-white font-bold text-sm">P</span>
-              </div>
-              <span className="text-lg font-bold text-[var(--color-primary)]">PropEase</span>
-            </Link>
-
-            <nav className="hidden md:flex items-center gap-1">
-              <Link href="/" className="px-4 py-2 text-sm text-gray-600 hover:text-[var(--color-primary)] hover:bg-gray-100/50 rounded-lg transition-all">
-                Browse
-              </Link>
-              <Link href="/custom-order" className="px-4 py-2 text-sm text-gray-600 hover:text-[var(--color-primary)] hover:bg-gray-100/50 rounded-lg transition-all">
-                Custom Order
-              </Link>
-              <Link href="/about" className="px-4 py-2 text-sm text-gray-600 hover:text-[var(--color-primary)] hover:bg-gray-100/50 rounded-lg transition-all">
-                About
-              </Link>
-              <Link href="/contact" className="px-4 py-2 text-sm text-gray-600 hover:text-[var(--color-primary)] hover:bg-gray-100/50 rounded-lg transition-all">
-                Contact
-              </Link>
-              <Link href="/saved" className="px-4 py-2 text-sm text-gray-600 hover:text-[var(--color-primary)] hover:bg-gray-100/50 rounded-lg transition-all">
-                Saved
-              </Link>
-              {isAuthenticated && dashboardLink && (
-                <Link href={dashboardLink} className="px-4 py-2 text-sm font-medium text-[var(--color-primary)] hover:bg-gray-100/50 rounded-lg transition-all">
-                  Dashboard
-                </Link>
-              )}
-            </nav>
-
-            <div className="flex items-center gap-3">
-              {isAuthenticated ? (
-                <div className="flex items-center gap-3">
-                  <div className="hidden sm:flex items-center gap-2.5">
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary-light)] flex items-center justify-center text-white text-xs font-bold shadow-sm">
-                      {currentUser!.name.split(" ").map(n => n[0]).join("").slice(0, 2)}
-                    </div>
-                    <div className="text-right">
-                      <p className="text-sm font-medium text-gray-900 leading-tight">{currentUser!.name}</p>
-                      <p className="text-[11px] text-gray-500 capitalize leading-tight">{currentUser!.role}</p>
-                    </div>
-                  </div>
-                  <Button size="sm" variant="ghost" onClick={handleLogout}>
-                    Logout
-                  </Button>
-                </div>
-              ) : (
-                <Link href="/login">
-                  <Button size="sm">Sign In</Button>
-                </Link>
-              )}
-            </div>
-          </div>
-
-          {!isAuthenticated && (
-            <div className="border-t border-white/10 py-2.5 flex items-center gap-2 overflow-x-auto scrollbar-hide">
-              <span className="text-xs text-gray-400 font-medium whitespace-nowrap">Demo:</span>
-              {users.map((u) => (
-                <button
-                  key={u.id}
-                  onClick={() => handleDemoLogin(u.id)}
-                  className="text-xs px-3 py-1 rounded-full bg-white/60 hover:bg-white hover:text-[var(--color-primary)] border border-gray-200/60 transition-all whitespace-nowrap"
+    <>
+      {!isDashboard && (
+        <div className="hidden lg:flex items-center h-12 px-6 bg-white border-b border-gray-200">
+          <nav className="flex items-center gap-2 flex-1">
+            {NAV_LINKS.map((link) => {
+              const active = pathname === link.href;
+              return (
+                <Link
+                  key={link.label}
+                  href={link.href}
+                  className={`text-sm font-medium px-3 py-1.5 rounded-md transition-colors ${
+                    active ? "text-[var(--color-primary)] bg-[var(--color-primary)]/5" : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                  }`}
                 >
-                  {u.name} ({u.role})
-                </button>
-              ))}
-            </div>
-          )}
+                  {link.label}
+                </Link>
+              );
+            })}
+          </nav>
+          <div className="flex items-center gap-2">
+            {isAuthenticated ? (
+              <div className="flex items-center gap-2">
+                <div className="w-7 h-7 rounded-full bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary-light)] flex items-center justify-center text-white text-[10px] font-bold shadow-sm">
+                  {currentUser!.name.split(" ").map(n => n[0]).join("").slice(0, 2)}
+                </div>
+                <span className="text-xs text-gray-500 capitalize">{currentUser!.role === "head" ? "admin" : currentUser!.role}</span>
+                <button onClick={handleLogout} className="text-xs text-gray-400 hover:text-gray-600 ml-1">Logout</button>
+              </div>
+            ) : (
+              <Link href="/login" className="text-xs text-white bg-[var(--color-primary)] px-3 py-1.5 rounded-md hover:bg-[var(--color-primary-light)] transition-colors">
+                Sign In
+              </Link>
+            )}
+          </div>
         </div>
-      </div>
-    </header>
+      )}
+    </>
   );
 }

@@ -6,21 +6,23 @@ import { useEffect } from "react";
 import OnboardingModal from "@/components/onboarding/OnboardingModal";
 
 export default function AgentLayout({ children }: { children: React.ReactNode }) {
-  const { role, isAuthenticated } = useRole();
-  const router = useRouter();
+ const { role, isAuthenticated } = useRole();
+ const router = useRouter();
 
-  useEffect(() => {
-    if (isAuthenticated && role !== "agent") {
-      router.push(`/${role}`);
-    }
-  }, [role, isAuthenticated, router]);
+ useEffect(() => {
+ if (isAuthenticated && role !== "agent") {
+ router.push(`/${role}`);
+ }
+ }, [role, isAuthenticated, router]);
 
-  if (!isAuthenticated) return null;
+ if (!isAuthenticated) {
+ return <>{children}</>;
+ }
 
-  return (
-    <>
-      <OnboardingModal role={role} />
-      <DashboardLayout>{children}</DashboardLayout>
-    </>
-  );
+ return (
+ <>
+ <OnboardingModal role={role} />
+ <DashboardLayout>{children}</DashboardLayout>
+ </>
+ );
 }

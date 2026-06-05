@@ -1,0 +1,270 @@
+version: "2"
+type: frontend
+tech_stack:
+  - TypeScript
+  - Next.js 16 (App Router)
+  - React 19
+  - Tailwind CSS v4
+  - Node.js
+routes:
+  - path: /
+    file: src/app/page.tsx
+    auth_required: false
+    description: Homepage with property listings and search
+  - path: /about
+    file: src/app/about/page.tsx
+    auth_required: false
+    description: About page
+  - path: /contact
+    file: src/app/contact/page.tsx
+    auth_required: false
+    description: Contact page
+  - path: /login
+    file: src/app/login/page.tsx
+    auth_required: false
+    description: User login page
+  - path: /register
+    file: src/app/register/page.tsx
+    auth_required: false
+    description: User registration page
+  - path: /saved
+    file: src/app/saved/page.tsx
+    auth_required: true
+    description: Saved/favorited properties
+  - path: /wallet
+    file: src/app/wallet/page.tsx
+    auth_required: true
+    description: User wallet
+  - path: /listings/[id]
+    file: src/app/listings/[id]/page.tsx
+    auth_required: false
+    description: Property listing detail page
+  - path: /custom-order
+    file: src/app/custom-order/page.tsx
+    auth_required: false
+    description: Custom property order request
+  - path: /privacy
+    file: src/app/privacy/page.tsx
+    auth_required: false
+    description: Privacy policy
+  - path: /terms
+    file: src/app/terms/page.tsx
+    auth_required: false
+    description: Terms of service
+  - path: /agents/[id]
+    file: src/app/agents/[id]/page.tsx
+    auth_required: false
+    description: Agent profile page
+  - path: /admin
+    file: src/app/admin/page.tsx
+    auth_required: true
+    description: Admin dashboard
+  - path: /admin/users
+    file: src/app/admin/users/page.tsx
+    auth_required: true
+    description: Admin user management
+  - path: /admin/crm
+    file: src/app/admin/crm/page.tsx
+    auth_required: true
+    description: Admin CRM
+  - path: /admin/outsourcing
+    file: src/app/admin/outsourcing/page.tsx
+    auth_required: true
+    description: Admin outsourcing management
+  - path: /admin/agent-tracking
+    file: src/app/admin/agent-tracking/page.tsx
+    auth_required: true
+    description: Admin agent tracking
+  - path: /admin/commissions
+    file: src/app/admin/commissions/page.tsx
+    auth_required: true
+    description: Admin commission management
+  - path: /admin/deals
+    file: src/app/admin/deals/page.tsx
+    auth_required: true
+    description: Admin deal management
+  - path: /admin/settings
+    file: src/app/admin/settings/page.tsx
+    auth_required: true
+    description: Admin settings
+  - path: /admin/audit-log
+    file: src/app/admin/audit-log/page.tsx
+    auth_required: true
+    description: Admin audit log
+  - path: /agent
+    file: src/app/agent/page.tsx
+    auth_required: true
+    description: Agent dashboard
+  - path: /agent/task-board
+    file: src/app/agent/task-board/page.tsx
+    auth_required: true
+    description: Agent task board
+  - path: /agent/inquiries
+    file: src/app/agent/inquiries/page.tsx
+    auth_required: true
+    description: Agent inquiries
+  - path: /agent/commissions
+    file: src/app/agent/commissions/page.tsx
+    auth_required: true
+    description: Agent commissions
+  - path: /agent/wallet
+    file: src/app/agent/wallet/page.tsx
+    auth_required: true
+    description: Agent wallet
+  - path: /agent/settings
+    file: src/app/agent/settings/page.tsx
+    auth_required: true
+    description: Agent settings
+  - path: /ambassador
+    file: src/app/ambassador/page.tsx
+    auth_required: true
+    description: Ambassador dashboard
+  - path: /ambassador/post-listing
+    file: src/app/ambassador/post-listing/page.tsx
+    auth_required: true
+    description: Ambassador post listing
+  - path: /ambassador/create-task
+    file: src/app/ambassador/create-task/page.tsx
+    auth_required: true
+    description: Ambassador create task
+  - path: /ambassador/commissions
+    file: src/app/ambassador/commissions/page.tsx
+    auth_required: true
+    description: Ambassador commissions
+  - path: /ambassador/wallet
+    file: src/app/ambassador/wallet/page.tsx
+    auth_required: true
+    description: Ambassador wallet
+  - path: /ambassador/settings
+    file: src/app/ambassador/settings/page.tsx
+    auth_required: true
+    description: Ambassador settings
+features:
+  - name: Property Search & Browse
+    description: Browse and search property listings with filters
+    files:
+      - src/app/page.tsx
+      - src/components/listings/PropertyCard.tsx
+      - src/components/listings/PropertyFilters.tsx
+      - src/lib/mock-data.ts
+      - src/lib/types.ts
+    entry_route: /
+    user_interactions:
+      - View property cards on homepage
+      - Apply filters by location, price range, property type
+      - Scroll and click Show More for additional listings
+      - Click property card to view details
+    api_calls: []
+    auth_required: false
+  - name: Property Detail View
+    description: View detailed property information
+    files:
+      - src/app/listings/[id]/page.tsx
+      - src/lib/mock-data.ts
+      - src/lib/types.ts
+    entry_route: /listings/[id]
+    user_interactions:
+      - View property photos and details
+      - See rent tier breakdown for rentals
+      - View agent contact information
+    api_calls: []
+    auth_required: false
+  - name: User Authentication
+    description: User login and registration
+    files:
+      - src/app/login/page.tsx
+      - src/app/register/page.tsx
+      - src/context/RoleContext.tsx
+    entry_route: /login
+    user_interactions:
+      - Fill registration form with name, email, password
+      - Submit registration
+      - Login with email and password
+      - See dashboard after successful login
+      - Logout from navigation
+    api_calls: []
+    auth_required: false
+  - name: Save Favorites
+    description: Save and view favorite properties
+    files:
+      - src/app/saved/page.tsx
+      - src/lib/favorites.ts
+    entry_route: /saved
+    user_interactions:
+      - Click save/heart icon on property card
+      - Navigate to saved properties page
+      - View all saved listings
+      - Remove saved properties
+    api_calls: []
+    auth_required: false
+  - name: Admin Dashboard
+    description: Full admin management interface
+    files:
+      - src/app/admin/page.tsx
+      - src/app/admin/users/page.tsx
+      - src/app/admin/crm/page.tsx
+      - src/app/admin/outsourcing/page.tsx
+      - src/app/admin/agent-tracking/page.tsx
+      - src/app/admin/commissions/page.tsx
+      - src/app/admin/deals/page.tsx
+    entry_route: /admin
+    user_interactions:
+      - View admin overview stats
+      - Manage users (view, edit roles)
+      - View CRM data
+      - Track outsourcing requests
+      - Monitor agent performance
+      - Manage commissions and deals
+    api_calls: []
+    auth_required: true
+  - name: Agent Dashboard
+    description: Agent workflow management
+    files:
+      - src/app/agent/page.tsx
+      - src/app/agent/task-board/page.tsx
+      - src/app/agent/inquiries/page.tsx
+      - src/components/tasks/TaskBoard.tsx
+      - src/components/tasks/TaskCard.tsx
+    entry_route: /agent
+    user_interactions:
+      - View agent dashboard overview
+      - Manage task board
+      - Respond to inquiries
+      - View commission history
+      - Manage wallet
+    api_calls: []
+    auth_required: true
+  - name: Ambassador Dashboard
+    description: Ambassador property listing and task management
+    files:
+      - src/app/ambassador/page.tsx
+      - src/app/ambassador/post-listing/page.tsx
+      - src/app/ambassador/create-task/page.tsx
+    entry_route: /ambassador
+    user_interactions:
+      - View city overview
+      - Post new property listings
+      - Create tasks for agents
+      - View commissions and wallet
+    api_calls: []
+    auth_required: true
+  - name: Custom Order Request
+    description: Request custom property matching
+    files:
+      - src/app/custom-order/page.tsx
+    entry_route: /custom-order
+    user_interactions:
+      - Fill custom property requirements form
+      - Submit order request
+    api_calls: []
+    auth_required: false
+known_limitations:
+  - issue: All data is mocked - no real API integration on frontend
+    location: src/lib/mock-data.ts
+    impact: Properties, users, tasks use static mock data not persisted
+  - issue: Authentication is localStorage-based stub, not real auth
+    location: src/context/RoleContext.tsx
+    impact: Login/register only stores in localStorage, no JWT validation
+  - issue: Backend API exists but frontend does not consume it
+    location: backend/src/routes/
+    impact: Frontend uses mock data instead of real API calls

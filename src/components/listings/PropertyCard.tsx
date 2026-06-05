@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Badge from "@/components/ui/Badge";
+import VerifiedBadge from "@/components/ui/VerifiedBadge";
 import { Listing } from "@/lib/types";
 import { formatNaira, propertyTypeLabels } from "@/lib/utils";
 import { isFavorite, toggleFavorite } from "@/lib/favorites";
@@ -19,61 +20,62 @@ export default function PropertyCard({ listing }: PropertyCardProps) {
   const handleFav = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    const now = toggleFavorite(listing.id);
-    setFav(now);
+    setFav(toggleFavorite(listing.id));
   };
 
   return (
     <Link
       href={`/listings/${listing.id}`}
-      className="group block bg-white rounded-xl border border-gray-200/60 overflow-hidden shadow-sm card-hover"
+      className="group block bg-white rounded-lg border border-gray-200 overflow-hidden hover:border-gray-300 hover:shadow-sm transition-all"
     >
-      <div className="image-zoom relative h-52 bg-gradient-to-br from-gray-100 to-gray-200">
+      <div className="relative h-48 bg-gray-100">
         {hasPhoto ? (
-          <img src={listing.photos[0].url} alt={listing.photos[0].alt} className="w-full h-full object-cover zoom-content" loading="lazy" />
+          <img src={listing.photos[0].url} alt={listing.photos[0].alt} className="w-full h-full object-cover" loading="lazy" />
         ) : (
-          <div className="absolute inset-0 flex items-center justify-center"><span className="text-4xl">🏠</span></div>
+          <div className="absolute inset-0 flex items-center justify-center text-gray-300 text-3xl">🏠</div>
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
 
-        <div className="absolute top-3 left-3 flex gap-1.5">
+        <div className="absolute top-2 left-2 flex gap-1.5">
           <Badge variant={listing.status === "available" ? "success" : listing.status === "reserved" ? "warning" : "default"}>
             {listing.status}
           </Badge>
           {listing.category === "partnership" && <Badge variant="info">Partner</Badge>}
+          {listing.postedBy?.isVerified && <VerifiedBadge />}
         </div>
 
-        <button onClick={handleFav} className="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/80 backdrop-blur-sm flex items-center justify-center hover:bg-white transition-all shadow-sm">
-          <svg className={`w-4 h-4 transition-colors ${fav ? "text-red-500 fill-red-500" : "text-gray-600"}`} viewBox="0 0 24 24" fill={fav ? "currentColor" : "none"} stroke="currentColor" strokeWidth={2}>
+        <button onClick={handleFav} className="absolute top-2 right-2 w-8 h-8 rounded-full bg-white/80 flex items-center justify-center hover:bg-white transition-colors">
+          <svg className={`w-4 h-4 ${fav ? "text-red-500 fill-red-500" : "text-gray-600"}`} viewBox="0 0 24 24" fill={fav ? "currentColor" : "none"} stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
           </svg>
         </button>
 
-        <div className="absolute bottom-3 left-3 right-3">
-          <p className="text-white font-bold text-lg drop-shadow-sm">{formatNaira(listing.price)}</p>
-          {listing.listingType === "rent" && <p className="text-white/80 text-xs">per year</p>}
+        <div className="absolute bottom-2 left-3 backdrop-blur-sm bg-black/40 rounded-md px-1.5 py-0.5">
+          <p className="text-white font-bold text-base">{formatNaira(listing.price)}</p>
+          {listing.listingType === "rent" && <p className="text-white/70 text-[11px]">per year</p>}
         </div>
       </div>
 
-      <div className="p-4">
-        <div className="flex items-start justify-between gap-2">
-          <h3 className="font-semibold text-gray-900 text-sm leading-snug group-hover:text-[var(--color-primary)] transition line-clamp-1">
-            {listing.title}
-          </h3>
-          <span className="shrink-0 text-[10px] bg-gray-100 text-gray-600 px-2 py-0.5 rounded font-medium">
-            {listing.listingType === "rent" ? "Rent" : "Sale"}
-          </span>
-        </div>
+      <div className="p-3.5">
+        <h3 className="font-semibold text-gray-900 text-sm leading-snug group-hover:text-[var(--color-primary)] transition-colors line-clamp-2">
+          {listing.title}
+        </h3>
         <p className="text-xs text-gray-500 mt-1.5 flex items-center gap-1">
-          <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+          <svg className="w-3 h-3 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
           {listing.city}
         </p>
         <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-100">
-          <div className="flex items-center gap-2 text-xs text-gray-400">
+          <div className="flex items-center gap-2 text-[11px] text-gray-400">
             {listing.bedrooms && <span>{listing.bedrooms} bed</span>}
             {listing.bathrooms && <span>{listing.bathrooms} bath</span>}
             {listing.sqft && <span>{listing.sqft.toLocaleString()} sqft</span>}
           </div>
+          <span className="text-[11px] text-gray-400 font-medium">
+            {listing.listingType === "rent" ? "For Rent" : "For Sale"}
+          </span>
         </div>
       </div>
     </Link>

@@ -98,6 +98,8 @@ router.post("/login", validate(loginSchema), async (req, res: Response) => {
         walletBalance: user.walletBalance,
         canCreateTasks: user.canCreateTasks,
         canCloseDeals: user.canCloseDeals,
+        isVerified: user.isVerified,
+        whatsapp: user.whatsapp,
       },
     });
   } catch (error) {
@@ -160,6 +162,8 @@ router.get("/me", authenticate, async (req: AuthRequest, res: Response) => {
         canCreateTasks: true,
         canCloseDeals: true,
         ambassadorId: true,
+        isVerified: true,
+        whatsapp: true,
       },
     });
 

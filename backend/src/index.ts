@@ -19,6 +19,15 @@ import customOrderRoutes from "./routes/custom-orders";
 import headRoutes from "./routes/head";
 import ambassadorRoutes from "./routes/ambassadors";
 import agentRoutes from "./routes/agents";
+import verificationRoutes from "./routes/verification";
+import applicationRoutes from "./routes/applications";
+import agreementRoutes from "./routes/agreements";
+import reviewRoutes from "./routes/reviews";
+import priceHistoryRoutes from "./routes/price-history";
+import savedSearchesRoutes from "./routes/saved-searches";
+import notificationsRoutes from "./routes/notifications";
+import messagesRoutes from "./routes/messages";
+import paymentsRoutes from "./routes/payments";
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -72,6 +81,15 @@ app.use("/api/custom-orders", customOrderRoutes);
 app.use("/api/head", headRoutes);
 app.use("/api/ambassador", ambassadorRoutes);
 app.use("/api/agent", agentRoutes);
+app.use("/api/verification", verificationRoutes);
+app.use("/api/applications", applicationRoutes);
+app.use("/api/agreements", agreementRoutes);
+app.use("/api/reviews", reviewRoutes);
+app.use("/api/price-history", priceHistoryRoutes);
+app.use("/api/saved-searches", savedSearchesRoutes);
+app.use("/api/notifications", notificationsRoutes);
+app.use("/api/messages", messagesRoutes);
+app.use("/api/payments", paymentsRoutes);
 
 // 404 handler
 app.use((_req, res) => {
