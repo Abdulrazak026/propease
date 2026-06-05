@@ -12,6 +12,7 @@ export interface User {
   canCloseDeals?: boolean;
   canCreateTasks?: boolean;
   isVerified?: boolean;
+  isApproved?: boolean;
   whatsapp?: string;
 }
 

@@ -16,7 +16,7 @@ export default function AmbassadorTasks() {
  const myAgents = users.filter((u) => u.ambassadorId === currentUser?.id);
 
  return (
- <div className="space-y-6-up">
+ <div className="space-y-6">
  <div className="flex items-center justify-between">
  <div>
  <h1 className="text-xl font-bold text-gray-900">Task Management</h1>
@@ -43,7 +43,7 @@ export default function AmbassadorTasks() {
  )}
 
  {showForm && canCreate && (
- <div className="bg-white rounded-lg border border-gray-200 p-5 space-y-4-up">
+ <div className="bg-white rounded-lg border border-gray-200 p-5 space-y-4">
  <h2 className="text-sm font-semibold text-gray-900">Create New Task</h2>
  <div className="grid grid-cols-2 gap-4">
  <div className="col-span-2">

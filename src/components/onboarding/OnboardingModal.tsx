@@ -73,7 +73,7 @@ export default function OnboardingModal({ role }: OnboardingModalProps) {
 
  return (
  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" onClick={dismiss}>
- <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4 shadow-xl-up" onClick={(e) => e.stopPropagation()}>
+ <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4 shadow-xl" onClick={(e) => e.stopPropagation()}>
  <div className="flex items-center gap-3 mb-5">
  <div className="w-10 h-10 bg-[var(--color-primary)]/10 rounded-lg flex items-center justify-center">
  <span className="text-lg">👋</span>

@@ -34,7 +34,7 @@ export default function ContactPage() {
  <div className="grid md:grid-cols-2 gap-10">
  <div>
  {submitted ? (
- <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-8 text-center-up">
+ <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-8 text-center">
  <div className="w-14 h-14 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4">
  <svg className="w-7 h-7 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
  </div>

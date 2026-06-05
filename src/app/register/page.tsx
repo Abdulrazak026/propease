@@ -58,7 +58,7 @@ export default function RegisterPage() {
 
  return (
  <div className="flex-1 flex items-center justify-center py-16 px-4 bg-gray-50">
- <div className="w-full max-w-md-up">
+ <div className="w-full max-w-md">
  <div className="text-center mb-8">
  <div className="w-14 h-14 bg-[var(--color-primary)] rounded-lg flex items-center justify-center mx-auto mb-5 shadow-lg shadow-[var(--color-primary)]/20">
  <span className="text-white font-bold text-2xl">P</span>

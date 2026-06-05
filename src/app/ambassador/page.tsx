@@ -15,7 +15,7 @@ export default function AmbassadorOverview() {
  const myAgents = users.filter((u) => u.ambassadorId === currentUser?.id);
 
  return (
- <div className="space-y-6-up">
+ <div className="space-y-6">
  <div className="flex items-center justify-between">
  <div>
  <h1 className="text-xl font-bold text-gray-900">Ambassador Dashboard</h1>

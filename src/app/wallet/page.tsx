@@ -7,7 +7,7 @@ import Button from "@/components/ui/Button";
 import Badge from "@/components/ui/Badge";
 import PaystackButton from "@/components/payments/PaystackButton";
 
-type Tab = "overview" | "top-up" | "withdraw";
+type Tab = "overview" | "top" | "withdraw";
 
 export default function WalletPage() {
  const { currentUser, setCurrentUser } = useRole();
@@ -48,12 +48,12 @@ export default function WalletPage() {
 
  const tabs: { key: Tab; label: string }[] = [
  { key: "overview", label: "Transactions" },
- { key: "top-up", label: "Top Up" },
+ { key: "top", label: "Top Up" },
  { key: "withdraw", label: "Withdraw" },
  ];
 
  return (
- <div className="space-y-6-up">
+ <div className="space-y-6">
   <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
   <div>
   <h1 className="text-xl font-bold text-gray-900">Wallet</h1>
@@ -66,7 +66,7 @@ export default function WalletPage() {
  </div>
 
  {successMsg && (
- <div className="bg-emerald-50 border border-emerald-200 rounded-lg px-4 py-3 text-sm text-emerald-800-up">
+ <div className="bg-emerald-50 border border-emerald-200 rounded-lg px-4 py-3 text-sm text-emerald-800">
  {successMsg}
  </div>
  )}
@@ -122,7 +122,7 @@ export default function WalletPage() {
  </div>
  )}
 
- {tab === "top-up" && (
+ {tab === "top" && (
  <div className="bg-white rounded-lg border border-gray-200 p-6 max-w-md">
  <h2 className="text-sm font-semibold text-gray-900 mb-1">Add Funds</h2>
  <p className="text-xs text-gray-500 mb-4">Enter amount to add to your wallet. Card payment simulation.</p>

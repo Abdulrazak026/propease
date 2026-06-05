@@ -9,7 +9,7 @@ export default function AmbassadorCommissions() {
  const totalEarned = myCommissions.reduce((s, c) => s + c.ambassadorCut, 0);
 
  return (
- <div className="space-y-6-up">
+ <div className="space-y-6">
  <div>
  <h1 className="text-xl font-bold text-gray-900">Commission Ledger</h1>
  <p className="text-sm text-gray-500 mt-0.5">Your earnings from deals closed in your city</p>

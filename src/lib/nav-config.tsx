@@ -12,7 +12,7 @@ export const dashboardNav: Record<string, NavItem[]> = {
  { label: "Agreements", href: "/admin/agreements", icon: "agreements" },
  { label: "CRM Settings", href: "/admin/crm", icon: "settings" },
  { label: "Outsourcing", href: "/admin/outsourcing", icon: "users" },
- { label: "Agent Tracking", href: "/admin/agent-tracking", icon: "tasks" },
+  { label: "Staffs", href: "/admin/staffs", icon: "tasks" },
  { label: "Commissions", href: "/admin/commissions", icon: "commissions" },
  { label: "Deal Records", href: "/admin/deals", icon: "audit" },
  { label: "Settings", href: "/admin/settings", icon: "settings" },

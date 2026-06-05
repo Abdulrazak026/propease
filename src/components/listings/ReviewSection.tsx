@@ -107,7 +107,7 @@ export default function ReviewSection({ agentId, agentName, listingId, currentUs
  )}
 
  {showForm && (
- <div className="space-y-3-up">
+ <div className="space-y-3">
  <p className="text-sm font-medium text-gray-900">Rate your experience with {agentName}</p>
  <StarRating rating={newRating} onChange={setNewRating} size="md" interactive />
  <textarea

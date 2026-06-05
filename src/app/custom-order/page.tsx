@@ -27,7 +27,7 @@ export default function CustomOrderPage() {
  if (submitted) {
  return (
  <div className="flex-1 flex items-center justify-center py-24 px-4">
- <div className="text-center max-w-md-up">
+ <div className="text-center max-w-md">
  <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4">
  <svg className="w-8 h-8 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
  </div>
@@ -46,7 +46,7 @@ export default function CustomOrderPage() {
 
  return (
  <div className="flex-1 py-16 px-4 bg-gray-50">
- <div className="max-w-xl mx-auto-up">
+ <div className="max-w-xl mx-auto">
  <div className="text-center mb-8">
  <div className="w-14 h-14 bg-[var(--color-primary)] rounded-lg flex items-center justify-center mx-auto mb-5 shadow-lg shadow-[var(--color-primary)]/20">
  <svg className="w-7 h-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>
