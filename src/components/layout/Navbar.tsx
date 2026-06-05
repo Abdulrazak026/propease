@@ -2,11 +2,13 @@
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { useRole } from "@/context/RoleContext";
+import { useSettings } from "@/context/SettingsContext";
 
 export default function Navbar() {
   const router = useRouter();
   const pathname = usePathname();
   const { currentUser, setCurrentUser, isAuthenticated } = useRole();
+  const { get: getSetting } = useSettings();
 
   const handleLogout = () => { setCurrentUser(null); router.push("/"); };
 

@@ -14,6 +14,7 @@ const statusStyles: Record<string, string> = { closed: "bg-emerald-100 text-emer
 
 export default function DealsPage() {
   const [filter, setFilter] = useState("all");
+  const [selected, setSelected] = useState<(typeof deals)[0] | null>(null);
   const items = filter === "all" ? deals : deals.filter((d) => d.status === filter);
 
   const closedValue = deals.filter((d) => d.status === "closed").reduce((s, d) => s + d.amount, 0);
@@ -47,7 +48,7 @@ export default function DealsPage() {
             <thead><tr className="border-b border-gray-100 bg-gray-50 text-left"><th className="px-4 py-3 font-medium text-gray-600 text-xs">Property</th><th className="px-4 py-3 font-medium text-gray-600 text-xs">Type</th><th className="px-4 py-3 font-medium text-gray-600 text-xs">Client</th><th className="px-4 py-3 font-medium text-gray-600 text-xs">Agent</th><th className="px-4 py-3 font-medium text-gray-600 text-xs">Amount</th><th className="px-4 py-3 font-medium text-gray-600 text-xs">Status</th><th className="px-4 py-3 font-medium text-gray-600 text-xs">Date</th></tr></thead>
             <tbody>
               {items.map((d) => (
-                <tr key={d.id} className="border-b border-gray-50 hover:bg-gray-50/50">
+                <tr key={d.id} className="border-b border-gray-50 hover:bg-gray-50/50 cursor-pointer" onClick={() => setSelected(d)}>
                   <td className="px-4 py-3 text-xs font-medium text-gray-900 max-w-[180px] truncate">{d.property}</td>
                   <td className="px-4 py-3 text-xs text-gray-600 capitalize">{d.type}</td>
                   <td className="px-4 py-3 text-xs text-gray-600">{d.client}</td>
@@ -61,6 +62,23 @@ export default function DealsPage() {
           </table>
         </div>
       </div>
+
+      {selected && (
+        <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4" onClick={() => setSelected(null)}>
+          <div className="bg-white rounded-xl p-6 max-w-md w-full shadow-2xl" onClick={e => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-4"><h3 className="text-lg font-bold text-gray-900">{selected.property}</h3><button onClick={() => setSelected(null)} className="text-gray-400 hover:text-gray-600"><svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12"/></svg></button></div>
+            <div className="grid grid-cols-2 gap-4 text-sm">
+              <div><span className="text-gray-400 text-xs">Client</span><p className="font-medium">{selected.client}</p></div>
+              <div><span className="text-gray-400 text-xs">Agent</span><p className="font-medium">{selected.agent}</p></div>
+              <div><span className="text-gray-400 text-xs">Type</span><p className="font-medium capitalize">{selected.type}</p></div>
+              <div><span className="text-gray-400 text-xs">Amount</span><p className="font-medium text-emerald-600">₦{selected.amount.toLocaleString()}</p></div>
+              <div><span className="text-gray-400 text-xs">Status</span><span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${selected.status==="closed"?"bg-emerald-100 text-emerald-800":"bg-blue-100 text-blue-800"}`}>{selected.status.replace("_"," ")}</span></div>
+              <div><span className="text-gray-400 text-xs">Date</span><p className="font-medium">{selected.date}</p></div>
+            </div>
+            <div className="mt-4 pt-4 border-t border-gray-100"><h4 className="text-xs font-semibold text-gray-700 mb-2">Commission Breakdown</h4><div className="text-xs text-gray-400">Agent: 3% • Ambassador: 2% • Company: remainder</div></div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

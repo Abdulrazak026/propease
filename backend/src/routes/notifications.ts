@@ -3,6 +3,22 @@ import prisma from "../lib/prisma";
 
 const router = Router();
 
+router.post("/", async (req, res: Response) => {
+  try {
+    const { userId, type, title, body, link } = req.body;
+    if (!userId || !type || !title || !body) {
+      return res.status(400).json({ error: "Missing required fields: userId, type, title, body" });
+    }
+    const notification = await prisma.notification.create({
+      data: { userId, type, title, body, link },
+    });
+    res.status(201).json({ notification });
+  } catch (error) {
+    console.error("Create notification error:", error);
+    res.status(500).json({ error: "Failed to create notification" });
+  }
+});
+
 router.get("/", async (req, res: Response) => {
   try {
     const userId = req.headers["x-user-id"] as string;

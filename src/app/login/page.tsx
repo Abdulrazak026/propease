@@ -2,6 +2,7 @@
 import { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useRole } from "@/context/RoleContext";
+import { useSettings } from "@/context/SettingsContext";
 import Button from "@/components/ui/Button";
 
 const rolePath = (role: string) => role === "head" ? "/admin" : `/${role}`;
@@ -12,6 +13,7 @@ function LoginForm() {
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const { login } = useRole();
+  const { get: getSetting } = useSettings();
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirect = searchParams.get("redirect");
@@ -64,7 +66,7 @@ function LoginForm() {
             <div className="w-14 h-14 bg-[var(--color-primary)] rounded-2xl flex items-center justify-center mx-auto mb-4">
               <span className="text-white font-bold text-2xl">P</span>
             </div>
-            <h2 className="text-2xl font-bold text-gray-900">MBPP</h2>
+            <h2 className="text-2xl font-bold text-gray-900">{getSetting("site_name", "MBPP")}</h2>
           </div>
 
           <div className="mb-8">

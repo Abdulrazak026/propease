@@ -82,6 +82,16 @@ export default function CommissionsPage() {
                   </td>
                   <td className="px-4 py-3 text-xs font-medium text-gray-900">₦{c.companyCut.toLocaleString()}</td>
                   <td className="px-4 py-3"><Badge variant={c.status === "paid" ? "success" : "warning"}>{c.status}</Badge></td>
+                  <td className="px-4 py-3">
+                    {c.status === "pending" ? (
+                      <div className="flex gap-1">
+                        <button className="text-[10px] font-medium px-2 py-1 rounded bg-emerald-100 text-emerald-700 hover:bg-emerald-200">Approve</button>
+                        <button className="text-[10px] font-medium px-2 py-1 rounded bg-red-100 text-red-600 hover:bg-red-200">Reject</button>
+                      </div>
+                    ) : (
+                      <span className="text-[10px] text-gray-400">Completed</span>
+                    )}
+                  </td>
                 </tr>
               ))}
             </tbody>

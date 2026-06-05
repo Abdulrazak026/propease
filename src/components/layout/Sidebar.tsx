@@ -3,6 +3,7 @@ import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useRole } from "@/context/RoleContext";
+import { useSettings } from "@/context/SettingsContext";
 import { users } from "@/lib/mock-data";
 
 const NOTIFICATIONS_MOCK = [
@@ -114,6 +115,7 @@ export default function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
   const { currentUser, setCurrentUser, isAuthenticated } = useRole();
+  const { get: getSetting } = useSettings();
   const [collapsed, setCollapsed] = useState(false);
   const [moreOpen, setMoreOpen] = useState(false);
   const [demoOpen, setDemoOpen] = useState(false);
@@ -161,7 +163,7 @@ export default function Sidebar() {
               <div className="w-7 h-7 bg-[var(--color-primary)] rounded-lg flex items-center justify-center shrink-0 group-hover:shadow-md transition-shadow">
                 <span className="text-white font-bold text-[10px]">P</span>
               </div>
-              <span className="text-sm font-bold text-[var(--color-primary)]">MBPP</span>
+              <span className="text-sm font-bold text-[var(--color-primary)]">{getSetting("site_name", "MBPP")}</span>
             </Link>
           )}
         </div>

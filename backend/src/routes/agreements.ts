@@ -159,6 +159,28 @@ router.post("/:id/sign", async (req: AuthRequest, res: Response) => {
             details: { tenant: agreement.tenantName, property: agreement.propertyTitle },
           },
         });
+
+        await prisma.notification.create({
+          data: {
+            userId: agreement.agentId,
+            type: "agreement_signed",
+            title: "Agreement Completed",
+            body: `Rent agreement for ${agreement.propertyTitle} has been fully signed by both parties.`,
+            link: `/agent/agreements/${agId}`,
+          },
+        });
+      }
+
+      if (agreement.tenantId) {
+        await prisma.notification.create({
+          data: {
+            userId: agreement.tenantId,
+            type: "agreement_signed",
+            title: "Agreement Completed",
+            body: `Your rent agreement for ${agreement.propertyTitle} is now complete.`,
+            link: `/agreements/${agId}`,
+          },
+        });
       }
 
       return res.json({ agreement: updated });

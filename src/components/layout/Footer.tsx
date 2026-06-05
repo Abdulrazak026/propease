@@ -1,6 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import Link from "next/link";
+import { useSettings } from "@/context/SettingsContext";
 
 const SOCIALS = [
   { label: "Facebook", href: "#", icon: "facebook" },
@@ -24,45 +25,50 @@ const SOCIAL_ICONS: Record<string, React.ReactNode> = {
   ),
 };
 
-const LINK_COLS = [
-  {
-    title: "Real Estate",
-    links: [
-      { label: "Browse Homes", href: "/" },
-      { label: "Rentals", href: "/?type=rent" },
-      { label: "About MBPP", href: "/about" },
-      { label: "News", href: "/news" },
-      { label: "Research", href: "/research" },
-    ],
-  },
-  {
-    title: "For Professionals",
-    links: [
-      { label: "Advertise", href: "/list-property" },
-      { label: "Manage Rentals", href: "/agent" },
-    ],
-  },
-  {
-    title: "Learn & Support",
-    links: [
-      { label: "Help Center", href: "/help" },
-      { label: "Privacy Notice", href: "/privacy" },
-      { label: "Terms of Use", href: "/terms" },
-      { label: "Fair Housing Guide", href: "/fair-housing" },
-    ],
-  },
-  {
-    title: "More from MBPP",
-    links: [
-      { label: "Mobile Apps", href: "/mobile-apps" },
-      { label: "AI & Technology", href: "/about#technology" },
-      { label: "Zestimates", href: "/zestimates" },
-      { label: "Careers", href: "/careers" },
-    ],
-  },
-];
+function getLinkCols(brand: string) {
+  return [
+    {
+      title: "Real Estate",
+      links: [
+        { label: "Browse Homes", href: "/" },
+        { label: "Rentals", href: "/?type=rent" },
+        { label: `About ${brand}`, href: "/about" },
+        { label: "News", href: "/news" },
+        { label: "Research", href: "/research" },
+      ],
+    },
+    {
+      title: "For Professionals",
+      links: [
+        { label: "Advertise", href: "/list-property" },
+        { label: "Manage Rentals", href: "/agent" },
+      ],
+    },
+    {
+      title: "Learn & Support",
+      links: [
+        { label: "Help Center", href: "/help" },
+        { label: "Privacy Notice", href: "/privacy" },
+        { label: "Terms of Use", href: "/terms" },
+        { label: "Fair Housing Guide", href: "/fair-housing" },
+      ],
+    },
+    {
+      title: `More from ${brand}`,
+      links: [
+        { label: "Mobile Apps", href: "/mobile-apps" },
+        { label: "AI & Technology", href: "/about#technology" },
+        { label: "Zestimates", href: "/zestimates" },
+        { label: "Careers", href: "/careers" },
+      ],
+    },
+  ];
+}
 
 export default function Footer() {
+  const { get: getSetting } = useSettings();
+  const brand = getSetting("site_name", "MBPP");
+  const LINK_COLS = getLinkCols(brand);
   const [email, setEmail] = useState("");
   const [subscribed, setSubscribed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState<Record<string, boolean>>({});
@@ -81,7 +87,7 @@ export default function Footer() {
             <div className="w-9 h-9 bg-[var(--color-primary)] rounded-lg flex items-center justify-center group-hover:shadow-md transition-shadow">
               <span className="text-white font-bold text-sm">P</span>
             </div>
-            <span className="text-lg font-bold text-white">MBPP</span>
+            <span className="text-lg font-bold text-white">{brand}</span>
             <span className="text-sm text-gray-400 ml-2">&mdash; Kano&apos;s trusted real estate marketplace</span>
           </Link>
           <div className="flex items-center gap-2">
@@ -115,7 +121,7 @@ export default function Footer() {
             <div className="w-8 h-8 bg-[var(--color-primary)] rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-xs">P</span>
             </div>
-            <span className="text-base font-bold text-white">MBPP</span>
+            <span className="text-base font-bold text-white">{brand}</span>
           </Link>
           {LINK_COLS.map((col) => (
             <div key={col.title} className="border-b border-gray-800">
@@ -141,8 +147,8 @@ export default function Footer() {
 
         {/* Legal notice */}
         <div className="hidden lg:block border-t border-gray-800 py-6 text-xs text-gray-500 leading-relaxed space-y-2">
-          <p>MBPP is committed to ensuring digital accessibility for individuals with disabilities. We are continuously working to improve the accessibility of our web experience for everyone, and we welcome feedback and accommodation requests.</p>
-          <p>All information provided on this website is for informational purposes only. MBPP does not guarantee the accuracy of listings, pricing, or availability. Always verify with the property owner or agent.</p>
+          <p>{brand} is committed to ensuring digital accessibility for individuals with disabilities. We are continuously working to improve the accessibility of our web experience for everyone, and we welcome feedback and accommodation requests.</p>
+          <p>All information provided on this website is for informational purposes only. {brand} does not guarantee the accuracy of listings, pricing, or availability. Always verify with the property owner or agent.</p>
           <p className="flex items-center gap-2 mt-3">
             <span className="inline-block w-5 h-5 rounded-full border border-gray-600 flex items-center justify-center text-[9px] text-gray-500 font-bold">EO</span>
             <span>Equal Housing Opportunity. We do not discriminate on the basis of race, color, religion, sex, handicap, familial status, or national origin.</span>
@@ -152,7 +158,7 @@ export default function Footer() {
         {/* Bottom bar */}
         <div className="border-t border-gray-800 py-6 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex flex-col sm:flex-row items-center gap-3 text-xs text-gray-500">
-            <span>&copy; 2006&ndash;2026 MBPP. All rights reserved.</span>
+            <span>&copy; 2006&ndash;2026 {brand}. All rights reserved.</span>
             <span className="hidden sm:inline">&middot;</span>
             <Link href="/privacy" className="hover:text-gray-300 transition-colors">Privacy</Link>
             <span className="hidden sm:inline">&middot;</span>

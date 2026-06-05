@@ -3,6 +3,7 @@ import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useRole } from "@/context/RoleContext";
+import { useSettings } from "@/context/SettingsContext";
 import { inquiries, tasks, withdrawals } from "@/lib/mock-data";
 import { dashboardNav } from "@/lib/nav-config";
 
@@ -23,6 +24,7 @@ const icons: Record<string, React.ReactNode> = {
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const { role, currentUser } = useRole();
+  const { get: getSetting } = useSettings();
   const pathname = usePathname();
 
   const resolvedRole = role === "head" ? "admin" : role;

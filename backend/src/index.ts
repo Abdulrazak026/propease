@@ -29,6 +29,7 @@ import notificationsRoutes from "./routes/notifications";
 import messagesRoutes from "./routes/messages";
 import paymentsRoutes from "./routes/payments";
 import settingsRoutes from "./routes/settings";
+import publicSettingsRoutes from "./routes/public-settings";
 import crypto from "crypto";
 import bcrypt from "bcryptjs";
 import prisma from "./lib/prisma";
@@ -96,6 +97,7 @@ app.use("/api/notifications", notificationsRoutes);
 app.use("/api/messages", messagesRoutes);
 app.use("/api/payments", paymentsRoutes);
 app.use("/api/admin/settings", settingsRoutes);
+app.use("/api/settings", publicSettingsRoutes);
 
 // Auth helpers (mounted directly to bypass cache)
 app.post("/api/auth/forgot-password", async (req, res) => {

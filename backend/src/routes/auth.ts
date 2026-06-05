@@ -48,6 +48,23 @@ router.post("/register", validate(registerSchema), async (req, res: Response) =>
 
     res.status(201).json({ user, message: "Registration submitted for approval" });
 
+    const admins = await prisma.user.findMany({
+      where: { role: "head" },
+      select: { id: true },
+    });
+    const adminNotifications = admins.map((admin) =>
+      prisma.notification.create({
+        data: {
+          userId: admin.id,
+          type: "application_status",
+          title: "New User Registration",
+          body: `${name} (${email}) registered as ${role}. Pending approval.`,
+          link: "/admin/users",
+        },
+      })
+    );
+    Promise.all(adminNotifications).catch(() => {});
+
     emailService.welcome(email, name).catch(() => {});
   } catch (error) {
     console.error("Register error:", error);
