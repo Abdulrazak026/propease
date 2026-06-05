@@ -43,17 +43,21 @@ export function RoleProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let cancelled = false;
     (async () => {
       try {
         const { data } = await api.get<{ user: ApiUser }>("/api/auth/me");
-        if (data?.user) {
+        if (!cancelled && data?.user) {
           setCurrentUserState(toUser(data.user));
         }
       } catch {
         // no backend available — stay logged out
       }
-      setLoading(false);
+      if (!cancelled) setLoading(false);
     })();
+    // Hard timeout — never show loading for more than 5 seconds
+    const timer = setTimeout(() => { if (!cancelled) setLoading(false); }, 5000);
+    return () => { cancelled = true; clearTimeout(timer); };
   }, []);
 
   const setCurrentUser = useCallback((user: User | null) => {
