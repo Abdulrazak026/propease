@@ -8,4 +8,4 @@ dist/
 
 testsprite_tests\tmp\config.json
 .vercel/
-.n.open-next/
+.open-next/
