@@ -9,3 +9,4 @@ dist/
 testsprite_tests\tmp\config.json
 .vercel/
 .open-next/
+.wrangler/
