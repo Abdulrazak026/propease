@@ -18,7 +18,7 @@ const nextConfig: NextConfig = {
               "style-src 'self' 'unsafe-inline'",
               "img-src 'self' data: blob: https:",
               "font-src 'self' data:",
-              "connect-src 'self' https://*.paystack.com https://*.googleapis.com http://localhost:4000 https://backend.railway.app",
+              "connect-src 'self' https://*.paystack.com https://*.googleapis.com http://localhost:4000 https://*.up.railway.app https://*.railway.app",
               "frame-src 'self' https://*.paystack.com",
               "media-src 'self' https://*.r2.cloudflarestorage.com",
             ].join("; "),
