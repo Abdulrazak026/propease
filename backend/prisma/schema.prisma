@@ -660,3 +660,12 @@ model AuditLog {
   @@index([action])
   @@index([createdAt])
 }
+
+model SiteSettings {
+  id        String   @id @default(uuid())
+  key       String   @unique
+  value     String   @default("")
+  updatedAt DateTime @updatedAt
+
+  @@index([key])
+}

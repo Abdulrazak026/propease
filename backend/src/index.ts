@@ -28,6 +28,7 @@ import savedSearchesRoutes from "./routes/saved-searches";
 import notificationsRoutes from "./routes/notifications";
 import messagesRoutes from "./routes/messages";
 import paymentsRoutes from "./routes/payments";
+import settingsRoutes from "./routes/settings";
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -90,6 +91,7 @@ app.use("/api/saved-searches", savedSearchesRoutes);
 app.use("/api/notifications", notificationsRoutes);
 app.use("/api/messages", messagesRoutes);
 app.use("/api/payments", paymentsRoutes);
+app.use("/api/admin/settings", settingsRoutes);
 
 // 404 handler
 app.use((_req, res) => {
