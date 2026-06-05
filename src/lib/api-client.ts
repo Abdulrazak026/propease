@@ -44,7 +44,7 @@ export async function apiFetch<T>(
   }
 
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 3000);
+  const timeout = setTimeout(() => controller.abort(), 10000);
   let res = await fetch(`${BASE_URL}${path}`, {
     ...options,
     headers,

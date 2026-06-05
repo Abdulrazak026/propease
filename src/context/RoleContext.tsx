@@ -64,9 +64,13 @@ export function RoleProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const login = useCallback(async (email: string, password: string): Promise<{ role: string } | string> => {
-    const { data, status } = await api.post<ApiAuthResponse>("/api/auth/login", { email, password });
+    const { data, status, error } = await api.post<ApiAuthResponse>("/api/auth/login", { email, password });
+    if (status === 0 || error) {
+      console.warn("Login network error:", error);
+      return error || "Network error. Check your connection.";
+    }
     if (status !== 200 || !data) {
-      return "Invalid email or password";
+      return data?.error || "Invalid email or password";
     }
     setAccessToken(data.accessToken);
     const user = toUser(data.user);
