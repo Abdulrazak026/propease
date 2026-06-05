@@ -98,9 +98,9 @@ export default function AdminSettings() {
         <div className="bg-white rounded-lg border border-gray-200 p-5">
           <h2 className="text-sm font-semibold text-gray-900 mb-4">Commission Rates</h2>
           <p className="text-xs text-gray-400 mb-3">Default rates applied to new deals.</p>
-          <Button size="sm" variant="outline" asLink href="/admin/commissions">
+          <a href="/admin/commissions" className="inline-flex items-center px-3 py-1.5 text-xs font-medium rounded-lg border border-gray-200 text-gray-700 hover:bg-gray-50 transition-colors">
             Manage on Commissions Page
-          </Button>
+          </a>
         </div>
 
         <div className="bg-white rounded-lg border border-gray-200 p-5">
