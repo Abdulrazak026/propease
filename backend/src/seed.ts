@@ -4,13 +4,24 @@ import bcrypt from "bcryptjs";
 async function main() {
   console.log("Seeding database...");
 
-  // Create cities
-  const cities = await Promise.all([
-    prisma.city.create({ data: { name: "Kano Municipal", state: "Kano" } }),
-    prisma.city.create({ data: { name: "Fagge", state: "Kano" } }),
-    prisma.city.create({ data: { name: "Tarauni", state: "Kano" } }),
-    prisma.city.create({ data: { name: "Nassarawa", state: "Kano" } }),
-  ]);
+  // Skip if already seeded
+  const existing = await prisma.user.findFirst({ where: { email: "sani@propease.ng" } });
+  if (existing) {
+    console.log("Database already seeded. Skipping.");
+    return;
+  }
+
+  // Create cities (skip if already exist)
+  const cityData = [
+    { name: "Kano Municipal", state: "Kano" },
+    { name: "Fagge", state: "Kano" },
+    { name: "Tarauni", state: "Kano" },
+    { name: "Nassarawa", state: "Kano" },
+  ];
+  for (const c of cityData) {
+    await prisma.city.upsert({ where: { name_state: c }, update: {}, create: c });
+  }
+  const cities = await prisma.city.findMany({ orderBy: { name: "asc" } });
 
   const password = await bcrypt.hash("password123", 12);
 
