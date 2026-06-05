@@ -4,14 +4,26 @@ import Navbar from "@/components/layout/Navbar";
 import Sidebar from "@/components/layout/Sidebar";
 import BottomNav from "@/components/layout/BottomNav";
 
-const NO_SIDEBAR = ["/login", "/register", "/forgot-password", "/reset-password", "/admin", "/agent", "/ambassador"];
+const NO_SIDEBAR_PATHS = ["/login", "/register", "/forgot-password", "/reset-password"];
+const DASHBOARD_PATHS = ["/admin", "/agent", "/ambassador"];
 
 export default function LayoutShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const isAuth = NO_SIDEBAR.some((p) => pathname.startsWith(p));
+  const isAuth = NO_SIDEBAR_PATHS.some((p) => pathname.startsWith(p));
+  const isDashboard = DASHBOARD_PATHS.some((p) => pathname.startsWith(p));
 
   if (isAuth) {
     return <>{children}</>;
+  }
+
+  if (isDashboard) {
+    return (
+      <div className="flex h-full">
+        <div className="flex-1 min-w-0 flex flex-col">
+          <div className="flex-1 overflow-hidden">{children}</div>
+        </div>
+      </div>
+    );
   }
 
   return (

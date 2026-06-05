@@ -14,7 +14,7 @@ export const dashboardNav: Record<string, NavItem[]> = {
  { label: "Outsourcing", href: "/admin/outsourcing", icon: "users" },
   { label: "Staffs", href: "/admin/staffs", icon: "tasks" },
  { label: "Commissions", href: "/admin/commissions", icon: "commissions" },
- { label: "Deal Records", href: "/admin/deals", icon: "audit" },
+  { label: "Deals", href: "/admin/deals", icon: "audit" },
  { label: "Settings", href: "/admin/settings", icon: "settings" },
  { label: "Audit Log", href: "/admin/audit", icon: "audit", badge: "withdrawals" },
  ],

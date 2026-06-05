@@ -1,120 +1,93 @@
 "use client";
 import { useState } from "react";
-import { commissions, listings, platformStats } from "@/lib/mock-data";
-import { formatNaira, formatDate } from "@/lib/utils";
-import Button from "@/components/ui/Button";
+import Badge from "@/components/ui/Badge";
 
-export default function AdminCommissions() {
- const totalComms = commissions.reduce((s, c) => s + c.totalAmount, 0);
- const totalAmbassadorCuts = commissions.reduce((s, c) => s + c.ambassadorCut, 0);
- const totalAgentCuts = commissions.reduce((s, c) => s + c.agentCut, 0);
- const totalCompanyCuts = commissions.reduce((s, c) => s + c.companyCut, 0);
+const mockCommissions = [
+  { id: "c1", deal: "4-Bed Duplex — Kano Municipal", type: "rent_full", amount: 1_800_000, ambassadorCut: 108_000, agentCut: 72_000, companyCut: 1_620_000, ambassador: "Aisha Bello", agent: "Fatima Usman", date: "2026-06-01", status: "paid" },
+  { id: "c2", deal: "Warehouse — Fagge", type: "rent_damages", amount: 2_400_000, ambassadorCut: 192_000, agentCut: 120_000, companyCut: 2_088_000, ambassador: "Musa Ibrahim", agent: "Zainab Adamu", date: "2026-05-28", status: "paid" },
+  { id: "c3", deal: "5-Bed Villa — Nassarawa", type: "rent_full", amount: 5_000_000, ambassadorCut: 300_000, agentCut: 200_000, companyCut: 4_500_000, ambassador: "Musa Ibrahim", agent: "Ahmad Suleiman", date: "2026-06-03", status: "pending" },
+  { id: "c4", deal: "Shop — Kano Municipal", type: "sale", amount: 15_000_000, ambassadorCut: 525_000, agentCut: 375_000, companyCut: 14_100_000, ambassador: "Aisha Bello", agent: "Halima Garba", date: "2026-05-15", status: "paid" },
+];
 
- const [rates, setRates] = useState([
- { type: "Rent (Normal)", total: 5, ambassador: 3, agent: 2 },
- { type: "Rent (Standard)", total: 8, ambassador: 5, agent: 3 },
- { type: "Rent (Full Package)", total: 10, ambassador: 6, agent: 4 },
- { type: "For Sale", total: 6, ambassador: 3.5, agent: 2.5 },
- { type: "Partnership", total: 15, ambassador: 8, agent: 5 },
- ]);
+const typeLabels: Record<string, string> = { rent_normal: "Normal Rent", rent_damages: "Rent with Damages", rent_full: "Full Rent", sale: "Sale", partnership: "Partnership" };
 
- const [editing, setEditing] = useState<string | null>(null);
+export default function CommissionsPage() {
+  const [filter, setFilter] = useState("all");
+  const items = filter === "all" ? mockCommissions : mockCommissions.filter((c) => c.status === filter);
 
- return (
- <div className="space-y-6">
- <div className="flex items-center gap-3">
- <a href="/admin" className="text-gray-400 hover:text-[var(--color-primary)] transition-colors">
- <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
- </a>
- <div>
- <h1 className="text-xl font-bold text-gray-900">Commissions & Rates</h1>
- <p className="text-sm text-gray-500 mt-0.5">Configure commission splits and view earnings</p>
- </div>
- </div>
+  const totalPaid = mockCommissions.filter((c) => c.status === "paid").reduce((s, c) => s + c.companyCut, 0);
+  const totalPending = mockCommissions.filter((c) => c.status === "pending").reduce((s, c) => s + c.companyCut, 0);
 
- <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
- {[
- { label: "Total Deal Volume", value: formatNaira(totalComms), accent: "bg-gray-100", color: "text-gray-900" },
- { label: "Company Revenue", value: formatNaira(totalCompanyCuts), accent: "bg-[var(--color-primary)]/10", color: "text-[var(--color-primary)]" },
- { label: "To Ambassadors", value: formatNaira(totalAmbassadorCuts), accent: "bg-amber-100", color: "text-amber-600" },
- { label: "To Agents", value: formatNaira(totalAgentCuts), accent: "bg-emerald-100", color: "text-emerald-600" },
- ].map((s) => (
- <div key={s.label} className="bg-white rounded-lg border border-gray-200 p-4 card-hover">
- <div className="flex items-center gap-3">
- <div className={`w-10 h-10 ${s.accent} rounded-lg flex items-center justify-center`}>
- <span className={`text-sm font-bold ${s.color}`}>₦</span>
- </div>
- <div>
- <p className="text-xs text-gray-500">{s.label}</p>
- <p className={`text-sm font-bold ${s.color} mt-0.5`}>{s.value}</p>
- </div>
- </div>
- </div>
- ))}
- </div>
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center gap-3">
+        <a href="/admin" className="text-gray-400 hover:text-[var(--color-primary)]"><svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg></a>
+        <div>
+          <h1 className="text-xl font-bold text-gray-900">Commissions</h1>
+          <p className="text-xs text-gray-500">Track earnings across all deals</p>
+        </div>
+      </div>
 
- <div className="bg-white rounded-lg border border-gray-200 p-5">
- <div className="flex items-center justify-between mb-4">
- <h2 className="text-sm font-semibold text-gray-900">Commission Rate Config</h2>
- <Button size="sm" onClick={() => alert("Changes saved (Demo)")}>Save Changes</Button>
- </div>
- <div className="space-y-2">
- {rates.map((r) => (
- <div key={r.type} className="flex items-center justify-between py-2.5 px-3 rounded-lg hover:bg-gray-50 transition-colors">
- <p className="text-sm text-gray-700 font-medium">{r.type}</p>
- {editing === r.type ? (
- <div className="flex items-center gap-3">
- <label className="text-xs text-gray-500">Total <input className="w-14 rounded border border-gray-200 px-2 py-1 text-xs" value={r.total} onChange={(e) => {}} /></label>
- <label className="text-xs text-gray-500">Amb <input className="w-14 rounded border border-gray-200 px-2 py-1 text-xs" value={r.ambassador} onChange={(e) => {}} /></label>
- <label className="text-xs text-gray-500">Agent <input className="w-14 rounded border border-gray-200 px-2 py-1 text-xs" value={r.agent} onChange={(e) => {}} /></label>
- <button className="text-xs text-emerald-600 font-medium" onClick={() => setEditing(null)}>Done</button>
- </div>
- ) : (
- <div className="flex items-center gap-4 text-xs text-gray-500">
- <span>Total: <strong className="text-gray-900">{r.total}%</strong></span>
- <span>Ambassador: {r.ambassador}%</span>
- <span>Agent: {r.agent}%</span>
- <button className="text-[var(--color-primary)] hover:underline font-medium" onClick={() => setEditing(r.type)}>Edit</button>
- </div>
- )}
- </div>
- ))}
- </div>
- </div>
+      <div className="grid grid-cols-3 gap-4">
+        <div className="bg-white rounded-xl border border-gray-200 p-4">
+          <p className="text-xs text-gray-500 font-medium">Total Earned</p>
+          <p className="text-2xl font-bold text-gray-900 mt-1">₦{totalPaid.toLocaleString()}</p>
+          <p className="text-[10px] text-emerald-600 mt-1 flex items-center gap-1"><span>▲</span> from {mockCommissions.filter((c) => c.status === "paid").length} paid deals</p>
+        </div>
+        <div className="bg-white rounded-xl border border-gray-200 p-4">
+          <p className="text-xs text-gray-500 font-medium">Pending</p>
+          <p className="text-2xl font-bold text-gray-900 mt-1">₦{totalPending.toLocaleString()}</p>
+          <p className="text-[10px] text-amber-600 mt-1">{mockCommissions.filter((c) => c.status === "pending").length} pending</p>
+        </div>
+        <div className="bg-white rounded-xl border border-gray-200 p-4">
+          <p className="text-xs text-gray-500 font-medium">All Deals</p>
+          <p className="text-2xl font-bold text-gray-900 mt-1">{mockCommissions.length}</p>
+          <p className="text-[10px] text-gray-400 mt-1">Total deals recorded</p>
+        </div>
+      </div>
 
- <div className="bg-white rounded-lg border border-gray-200">
- <div className="px-5 pt-5 pb-2">
- <h2 className="text-sm font-semibold text-gray-900">Commission History</h2>
- </div>
- <div className="overflow-x-auto">
- <table className="w-full text-sm">
- <thead>
- <tr className="border-b border-gray-100 bg-gray-50/50">
- <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Deal</th>
- <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
- <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Ambassador</th>
- <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Agent</th>
- <th className="text-right px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
- <th className="text-right px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Company</th>
- <th className="text-right px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
- </tr>
- </thead>
- <tbody>
- {commissions.map((c) => (
- <tr key={c.id} className="border-b border-gray-50 hover:bg-gray-50/50 transition-colors">
- <td className="px-4 py-3.5 text-sm text-gray-900">{c.dealTitle}</td>
- <td className="px-4 py-3.5 text-xs text-gray-500">{c.dealType}</td>
- <td className="px-4 py-3.5 text-xs text-gray-500">{c.ambassador.name}</td>
- <td className="px-4 py-3.5 text-xs text-gray-500">{c.agent.name}</td>
- <td className="px-4 py-3.5 text-sm text-right text-gray-900">{formatNaira(c.totalAmount)}</td>
- <td className="px-4 py-3.5 text-sm text-right text-[var(--color-primary)] font-semibold">{formatNaira(c.companyCut)}</td>
- <td className="px-4 py-3.5 text-xs text-right text-gray-400">{formatDate(c.paidAt)}</td>
- </tr>
- ))}
- </tbody>
- </table>
- </div>
- </div>
- </div>
- );
+      <div className="flex gap-2">
+        {["all", "paid", "pending"].map((s) => (
+          <button key={s} onClick={() => setFilter(s)} className={`px-3 py-1.5 text-xs font-medium rounded-lg border capitalize transition-all ${filter === s ? "bg-[var(--color-primary)] text-white border-[var(--color-primary)]" : "bg-white text-gray-600 border-gray-200"}`}>{s}</button>
+        ))}
+      </div>
+
+      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-gray-100 bg-gray-50 text-left">
+                <th className="px-4 py-3 font-medium text-gray-600 text-xs">Deal</th>
+                <th className="px-4 py-3 font-medium text-gray-600 text-xs">Type</th>
+                <th className="px-4 py-3 font-medium text-gray-600 text-xs">Amount</th>
+                <th className="px-4 py-3 font-medium text-gray-600 text-xs">Ambassador</th>
+                <th className="px-4 py-3 font-medium text-gray-600 text-xs">Agent</th>
+                <th className="px-4 py-3 font-medium text-gray-600 text-xs">Company</th>
+                <th className="px-4 py-3 font-medium text-gray-600 text-xs">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {items.map((c) => (
+                <tr key={c.id} className="border-b border-gray-50 hover:bg-gray-50/50">
+                  <td className="px-4 py-3 font-medium text-gray-900 text-xs max-w-[180px] truncate">{c.deal}</td>
+                  <td className="px-4 py-3 text-xs text-gray-600">{typeLabels[c.type] || c.type}</td>
+                  <td className="px-4 py-3 text-xs font-medium text-gray-900">₦{c.amount.toLocaleString()}</td>
+                  <td className="px-4 py-3 text-xs">
+                    <span className="text-gray-600 text-[10px]">{c.ambassador}</span>
+                    <span className="block text-emerald-600 font-medium text-[10px]">₦{c.ambassadorCut.toLocaleString()}</span>
+                  </td>
+                  <td className="px-4 py-3 text-xs">
+                    <span className="text-gray-600 text-[10px]">{c.agent}</span>
+                    <span className="block text-blue-600 font-medium text-[10px]">₦{c.agentCut.toLocaleString()}</span>
+                  </td>
+                  <td className="px-4 py-3 text-xs font-medium text-gray-900">₦{c.companyCut.toLocaleString()}</td>
+                  <td className="px-4 py-3"><Badge variant={c.status === "paid" ? "success" : "warning"}>{c.status}</Badge></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  );
 }
