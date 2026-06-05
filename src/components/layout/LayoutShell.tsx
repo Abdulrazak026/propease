@@ -4,15 +4,11 @@ import Navbar from "@/components/layout/Navbar";
 import Sidebar from "@/components/layout/Sidebar";
 import BottomNav from "@/components/layout/BottomNav";
 
-export default function LayoutShell({
-  children,
-  authPages,
-}: {
-  children: React.ReactNode;
-  authPages: string[];
-}) {
+const NO_SIDEBAR = ["/login", "/register", "/forgot-password", "/reset-password", "/admin", "/agent", "/ambassador"];
+
+export default function LayoutShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const isAuth = authPages.some((p) => pathname.startsWith(p));
+  const isAuth = NO_SIDEBAR.some((p) => pathname.startsWith(p));
 
   if (isAuth) {
     return <>{children}</>;

@@ -37,65 +37,56 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
  return 0;
  };
 
- return (
- <div className="flex flex-1 min-h-0">
- <aside className="w-64 bg-[var(--color-primary-dark)] hidden md:flex md:flex-col shrink-0">
- <div className="p-5 border-b border-gray-800">
- <div className="flex items-center gap-3">
- <div className="w-10 h-10 rounded-lg bg-[var(--color-primary)] flex items-center justify-center text-white text-sm font-bold shadow-lg shadow-black/10 shrink-0">
- {currentUser?.name.split(" ").map(n => n[0]).join("").slice(0, 2) || "P"}
- </div>
- <div className="min-w-0">
- <p className="text-sm font-semibold text-white truncate capitalize">{resolvedRole}</p>
- <p className="text-[11px] text-white/40 capitalize truncate">{currentUser?.city || ""}</p>
- </div>
- </div>
- </div>
- <nav className="flex-1 p-3 space-y-0.5 overflow-y-auto">
- {items.map((item) => {
- const active = pathname === item.href || pathname.startsWith(item.href + "/");
- const count = badgeCount(item.badge);
- return (
- <Link
- key={item.href}
- href={item.href}
- className={`flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${
- active
- ? "bg-white/10 text-white"
- : "text-white/50 hover:bg-white/5 hover:text-white/80"
- }`}
->
- <span className="w-5 h-5 flex items-center justify-center shrink-0">
- {icons[item.icon] || null}
- </span>
- <span className="flex-1">{item.label}</span>
- {count> 0 && (
- <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] text-center bg-[var(--color-accent)] text-white">
- {count> 9 ? "9+" : count}
- </span>
- )}
- </Link>
- );
- })}
- </nav>
- <div className="p-3 border-t border-gray-800">
- <Link
- href="/"
- className="flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-sm text-white/40 hover:bg-white/5 hover:text-white/70 transition-all duration-200"
->
- <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
- <path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
- </svg>
- Back to Site
- </Link>
- </div>
- </aside>
+  return (
+  <div className="flex flex-1 min-h-0">
+  <aside className="w-44 bg-slate-900 hidden md:flex md:flex-col shrink-0">
+  <div className="p-4 border-b border-slate-700">
+  <div className="flex items-center gap-2">
+  <div className="w-8 h-8 rounded-lg bg-[var(--color-primary)] flex items-center justify-center text-white text-xs font-bold shrink-0">
+  {currentUser?.name.split(" ").map(n => n[0]).join("").slice(0, 2) || "P"}
+  </div>
+  <div className="min-w-0">
+  <p className="text-xs font-semibold text-white truncate capitalize">{resolvedRole}</p>
+  <p className="text-[10px] text-slate-400 capitalize truncate">{currentUser?.city || ""}</p>
+  </div>
+  </div>
+  </div>
+  <nav className="flex-1 p-2 space-y-0.5 overflow-y-auto">
+  {items.map((item) => {
+  const active = pathname === item.href || pathname.startsWith(item.href + "/");
+  const count = badgeCount(item.badge);
+  return (
+  <Link
+  key={item.href}
+  href={item.href}
+  className={`flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium transition-all ${
+  active
+  ? "bg-white/10 text-white"
+  : "text-slate-400 hover:bg-slate-800 hover:text-slate-200"
+  }`}
+ >
+  <span className="w-4 h-4 flex items-center justify-center shrink-0">{icons[item.icon] || null}</span>
+  <span className="flex-1 truncate">{item.label}</span>
+  {count > 0 && (
+  <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full min-w-[16px] text-center bg-[var(--color-accent)] text-white">{count > 9 ? "9+" : count}</span>
+  )}
+  </Link>
+  );
+  })}
+  </nav>
+  <div className="p-2 border-t border-slate-700">
+  <Link href="/" className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs text-slate-500 hover:bg-slate-800 hover:text-slate-300 transition-all">
+  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
+  Back to Site
+  </Link>
+  </div>
+  </aside>
 
- <div className="flex-1 min-w-0 bg-gray-50">
- <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
- {children}
- </div>
- </div>
- </div>
- );
+  <div className="flex-1 min-w-0 bg-gray-50">
+  <div className="px-4 sm:px-6 py-6">
+  {children}
+  </div>
+  </div>
+  </div>
+  );
 }

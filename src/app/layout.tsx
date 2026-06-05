@@ -16,15 +16,13 @@ export const metadata: Metadata = {
   other: { "theme-color": "#0D6B3D" },
 };
 
-const AUTH_PAGES = ["/login", "/register", "/forgot-password", "/reset-password"];
-
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
       <body className="h-screen overflow-hidden">
         <RoleProvider>
           <ErrorBoundary>
-            <LayoutShell authPages={AUTH_PAGES}>
+            <LayoutShell>
               <PwaRegister />
               {children}
             </LayoutShell>
