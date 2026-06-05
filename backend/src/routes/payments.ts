@@ -22,7 +22,7 @@ router.post("/initialize", async (req, res: Response) => {
         callback_url: `${req.headers.origin}/wallet?paystack_callback=1`,
       }),
     });
-    const data: { status: boolean; message: string; data: unknown } = await response.json();
+    const data = await response.json() as { status: boolean; message: string; data: unknown };
     if (!data.status) return res.status(400).json({ error: data.message });
     res.json(data.data);
   } catch (error) {
@@ -36,7 +36,7 @@ router.get("/verify/:reference", async (req, res: Response) => {
     const response = await fetch(`${PAYSTACK_API}/transaction/verify/${req.params.reference}`, {
       headers: { Authorization: `Bearer ${PAYSTACK_SECRET_KEY}` },
     });
-    const data: { status: boolean; message: string; data: unknown } = await response.json();
+    const data = await response.json() as { status: boolean; message: string; data: unknown };
     if (!data.status) return res.status(400).json({ error: data.message });
     res.json(data.data);
   } catch (error) {

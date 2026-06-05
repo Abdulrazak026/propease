@@ -149,15 +149,17 @@ router.post("/:id/sign", async (req: AuthRequest, res: Response) => {
         },
       });
 
-      await prisma.auditLog.create({
-        data: {
-          action: "COMPLETE_AGREEMENT",
-          entity: "RentAgreement",
-          entityId: agId,
-          userId: agreement.agentId,
-          details: { tenant: agreement.tenantName, property: agreement.propertyTitle },
-        },
-      });
+      if (agreement.agentId) {
+        await prisma.auditLog.create({
+          data: {
+            action: "COMPLETE_AGREEMENT",
+            entity: "RentAgreement",
+            entityId: agId,
+            userId: agreement.agentId,
+            details: { tenant: agreement.tenantName, property: agreement.propertyTitle },
+          },
+        });
+      }
 
       return res.json({ agreement: updated });
     }

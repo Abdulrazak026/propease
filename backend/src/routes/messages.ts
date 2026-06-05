@@ -11,7 +11,7 @@ router.get("/conversations", async (req, res: Response) => {
       where: { participants: { some: { userId } } },
       orderBy: { updatedAt: "desc" },
       include: {
-        participants: { include: { user: { select: { id: true, name: true, avatar: true } } } },
+        participants: { include: { user: { select: { id: true, name: true, email: true } } } },
         messages: { orderBy: { createdAt: "desc" }, take: 1 },
         listing: { select: { id: true, title: true } },
       },
@@ -27,7 +27,7 @@ router.get("/conversations/:id/messages", async (req, res: Response) => {
     const messages = await prisma.message.findMany({
       where: { conversationId: req.params.id },
       orderBy: { createdAt: "asc" },
-      include: { sender: { select: { id: true, name: true, avatar: true } } },
+      include: { sender: { select: { id: true, name: true, email: true } } },
     });
     await prisma.message.updateMany({
       where: { conversationId: req.params.id, senderId: { not: req.headers["x-user-id"] as string }, read: false },
@@ -46,7 +46,7 @@ router.post("/conversations/:id/messages", async (req, res: Response) => {
     const { content } = req.body;
     const message = await prisma.message.create({
       data: { content, conversationId: req.params.id, senderId },
-      include: { sender: { select: { id: true, name: true, avatar: true } } },
+      include: { sender: { select: { id: true, name: true, email: true } } },
     });
     await prisma.conversation.update({
       where: { id: req.params.id },
@@ -72,7 +72,7 @@ router.post("/conversations", async (req, res: Response) => {
     if (existing) {
       const message = await prisma.message.create({
         data: { content, conversationId: existing.id, senderId },
-        include: { sender: { select: { id: true, name: true, avatar: true } } },
+        include: { sender: { select: { id: true, name: true, email: true } } },
       });
       await prisma.conversation.update({ where: { id: existing.id }, data: { updatedAt: new Date() } });
       return res.status(201).json({ conversation: existing, message });
@@ -92,7 +92,7 @@ router.post("/conversations", async (req, res: Response) => {
         },
       },
       include: {
-        participants: { include: { user: { select: { id: true, name: true, avatar: true } } } },
+        participants: { include: { user: { select: { id: true, name: true, email: true } } } },
         listing: { select: { id: true, title: true } },
       },
     });

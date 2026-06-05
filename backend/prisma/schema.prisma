@@ -128,13 +128,23 @@ model User {
   assignedTasks Task[]            @relation("AssignedTasks")
   commissionsAsAmbassador Commission[] @relation("AmbassadorCommissions")
   commissionsAsAgent      Commission[] @relation("AgentCommissions")
+  tenantApplications  TenantApplication[]
+  assignedInquiries   Inquiry[]
   transactions  Transaction[]
-  inquiries     Inquiry[]
   reservations  Reservation[]
   withdrawals   Withdrawal[]
   comments      TaskComment[]
   auditLogs     AuditLog[]
   tokens        RefreshToken[]
+  rentAgreementsAsTenant  RentAgreement[] @relation("RentAgreementTenant")
+  rentAgreementsAsAgent   RentAgreement[] @relation("RentAgreementAgent")
+  priceChanges        PriceChange[]
+  savedSearches       SavedSearch[]
+  writtenReviews      Review[]
+  agentReviews        Review[]           @relation("AgentReviews")
+  conversationParticipants ConversationParticipant[]
+  sentMessages        Message[]
+  notifications       Notification[]
 
   @@index([email])
   @@index([role])
@@ -206,6 +216,11 @@ model Listing {
   photos       ListingPhoto[]
   inquiries    Inquiry[]
   reservations Reservation[]
+  tenantApplications TenantApplication[]
+  rentAgreements     RentAgreement[]
+  priceChanges       PriceChange[]
+  reviews            Review[]
+  conversations      Conversation[]
 
   @@index([status])
   @@index([city])
@@ -408,6 +423,7 @@ model TenantApplication {
   listing       Listing?  @relation(fields: [listingId], references: [id])
   assignedAgentId String?
   assignedAgent   User?     @relation(fields: [assignedAgentId], references: [id])
+  rentAgreements  RentAgreement[]
 
   @@index([status])
   @@index([email])
