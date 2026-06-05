@@ -8,7 +8,7 @@ import type { ApiUser } from "@/lib/api-types";
 
 export default function RegisterPage() {
  const router = useRouter();
- const [form, setForm] = useState({ name: "", email: "", phone: "", role: "agent" });
+  const [form, setForm] = useState({ name: "", email: "", password: "", role: "agent" });
  const [submitting, setSubmitting] = useState(false);
  const [error, setError] = useState<string | null>(null);
  const [success, setSuccess] = useState(false);
@@ -23,7 +23,7 @@ export default function RegisterPage() {
  {
  name: form.name,
  email: form.email,
- password: form.phone,
+  password: form.password,
  role: form.role,
  }
  );
@@ -70,7 +70,7 @@ export default function RegisterPage() {
  <form onSubmit={handleSubmit} className="bg-white rounded-lg border border-gray-200 p-6 shadow-lg space-y-4">
  <Input label="Full Name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required placeholder="e.g. Sadiq Abdullahi" />
  <Input label="Email Address" type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} required placeholder="you@email.com" />
- <Input label="Phone Number" type="tel" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} required placeholder="0803 XXX XXXX" />
+  <Input label="Password" type="password" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} required placeholder="Min. 8 characters" />
 
  <div className="space-y-1.5">
  <label className="block text-sm font-medium text-gray-700">I want to join as</label>

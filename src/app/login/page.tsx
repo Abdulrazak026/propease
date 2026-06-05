@@ -1,13 +1,13 @@
 "use client";
-import { useState, Suspense } from "react";
+import { useState, Suspense, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useRole } from "@/context/RoleContext";
 import Button from "@/components/ui/Button";
 
 const demoUsers = [
- { label: "Admin", role: "admin", city: "Kano Municipal", email: "sani@propease.ng" },
- { label: "Ambassador", role: "ambassador", city: "Kano Municipal", email: "aisha@propease.ng" },
- { label: "Agent", role: "agent", city: "Kano Municipal", email: "fatima@propease.ng" },
+ { label: "Admin", role: "admin", city: "Kano Municipal", email: "admin@mbpproperties.com" },
+ { label: "Ambassador", role: "ambassador", city: "Kano Municipal", email: "aisha@mbpproperties.com" },
+ { label: "Agent", role: "agent", city: "Kano Municipal", email: "fatima@mbpproperties.com" },
 ];
 
 function LoginForm() {
@@ -15,35 +15,41 @@ function LoginForm() {
  const [password, setPassword] = useState("");
  const [error, setError] = useState<string | null>(null);
  const [submitting, setSubmitting] = useState(false);
- const { login } = useRole();
- const router = useRouter();
- const searchParams = useSearchParams();
- const redirect = searchParams.get("redirect");
+  const { login, loginRole } = useRole();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirect = searchParams.get("redirect");
 
- const handleSubmit = async (e: React.FormEvent) => {
- e.preventDefault();
- setError(null);
- setSubmitting(true);
- const err = await login(email, password);
- setSubmitting(false);
- if (err) {
- setError(err);
- return;
- }
- router.push(redirect || "/");
- };
+  const roleRedirect = (role: string) => role === "head" ? "/admin" : `/${role}`;
 
- const handleDemoLogin = async (demo: typeof demoUsers[number]) => {
- setSubmitting(true);
- setError(null);
- const err = await login(demo.email, "password123");
- setSubmitting(false);
- if (err) {
- setError("Demo login failed. Is the backend running?");
- return;
- }
- router.push(redirect || `/${demo.role}`);
- };
+  useEffect(() => {
+    if (loginRole) {
+      router.push(redirect || roleRedirect(loginRole));
+    }
+  }, [loginRole]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  setError(null);
+  setSubmitting(true);
+  const err = await login(email, password);
+  setSubmitting(false);
+  if (err) {
+  setError(err);
+  }
+  };
+
+  const handleDemoLogin = async (demo: typeof demoUsers[number]) => {
+  setSubmitting(true);
+  setError(null);
+  const err = await login(demo.email, "password123");
+  setSubmitting(false);
+  if (err) {
+  setError("Demo login failed. Is the backend running?");
+  return;
+  }
+  router.push(redirect || `/${demo.role}`);
+  };
 
  return (
  <div className="flex-1 flex items-center justify-center py-16 px-4 bg-gray-50">

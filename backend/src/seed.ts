@@ -4,11 +4,19 @@ import bcrypt from "bcryptjs";
 async function main() {
   console.log("Seeding database...");
 
-  // Skip if already seeded
-  const existing = await prisma.user.findFirst({ where: { email: "sani@propease.ng" } });
+  // Skip if already seeded with new emails
+  const existing = await prisma.user.findFirst({ where: { email: "admin@mbpproperties.com" } });
   if (existing) {
     console.log("Database already seeded. Skipping.");
     return;
+  }
+
+  // Update any existing @propease.ng users to @mbpproperties.com
+  const oldUsers = await prisma.user.findMany({ where: { email: { contains: "@propease.ng" } } });
+  for (const u of oldUsers) {
+    const newEmail = u.email.replace("@propease.ng", "@mbpproperties.com").replace("sani@", "admin@");
+    await prisma.user.update({ where: { id: u.id }, data: { email: newEmail } });
+    console.log(`Updated ${u.email} → ${newEmail}`);
   }
 
   // Create cities (skip if already exist)
@@ -29,7 +37,7 @@ async function main() {
   const head = await prisma.user.create({
     data: {
       name: "Sani Abubakar",
-      email: "sani@propease.ng",
+      email: "admin@mbpproperties.com",
       password,
       role: "head",
       isApproved: true,
@@ -40,7 +48,7 @@ async function main() {
   const aisha = await prisma.user.create({
     data: {
       name: "Aisha Bello",
-      email: "aisha@propease.ng",
+      email: "aisha@mbpproperties.com",
       password,
       role: "ambassador",
       city: "Kano Municipal",
@@ -52,7 +60,7 @@ async function main() {
   const musa = await prisma.user.create({
     data: {
       name: "Musa Ibrahim",
-      email: "musa@propease.ng",
+      email: "musa@mbpproperties.com",
       password,
       role: "ambassador",
       city: "Fagge",
@@ -75,7 +83,7 @@ async function main() {
   const fatima = await prisma.user.create({
     data: {
       name: "Fatima Usman",
-      email: "fatima@propease.ng",
+      email: "fatima@mbpproperties.com",
       password,
       role: "agent",
       city: "Kano Municipal",
@@ -88,7 +96,7 @@ async function main() {
   const zainab = await prisma.user.create({
     data: {
       name: "Zainab Adamu",
-      email: "zainab@propease.ng",
+      email: "zainab@mbpproperties.com",
       password,
       role: "agent",
       city: "Kano Municipal",
@@ -102,7 +110,7 @@ async function main() {
   const ahmad = await prisma.user.create({
     data: {
       name: "Ahmad Suleiman",
-      email: "ahmad@propease.ng",
+      email: "ahmad@mbpproperties.com",
       password,
       role: "agent",
       city: "Fagge",
@@ -115,7 +123,7 @@ async function main() {
   const halima = await prisma.user.create({
     data: {
       name: "Halima Garba",
-      email: "halima@propease.ng",
+      email: "halima@mbpproperties.com",
       password,
       role: "agent",
       city: "Fagge",
@@ -242,10 +250,10 @@ async function main() {
 
   console.log("Seed complete!");
   console.log("Demo accounts (password: password123):");
-  console.log("  sani@propease.ng (head)");
-  console.log("  aisha@propease.ng (ambassador)");
-  console.log("  fatima@propease.ng (agent)");
-  console.log("  zainab@propease.ng (agent)");
+  console.log("  admin@mbpproperties.com (head)");
+  console.log("  aisha@mbpproperties.com (ambassador)");
+  console.log("  fatima@mbpproperties.com (agent)");
+  console.log("  zainab@mbpproperties.com (agent)");
 }
 
 main()
