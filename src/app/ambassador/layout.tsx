@@ -6,23 +6,23 @@ import { useEffect } from "react";
 import OnboardingModal from "@/components/onboarding/OnboardingModal";
 
 export default function AmbassadorLayout({ children }: { children: React.ReactNode }) {
- const { role, isAuthenticated } = useRole();
- const router = useRouter();
+  const { role, isAuthenticated } = useRole();
+  const router = useRouter();
 
- useEffect(() => {
- if (isAuthenticated && role !== "ambassador") {
- router.push(`/${role}`);
- }
- }, [role, isAuthenticated, router]);
+  useEffect(() => {
+    if (isAuthenticated && role !== "ambassador") {
+      router.push(`/${role}`);
+    }
+  }, [role, isAuthenticated, router]);
 
- if (!isAuthenticated) {
- return <div className="flex-1 flex items-center justify-center text-sm text-gray-400">Loading...</div>;
- }
+  if (!isAuthenticated) {
+    return <>{children}</>;
+  }
 
- return (
- <>
- <OnboardingModal role={role} />
- <DashboardLayout>{children}</DashboardLayout>
- </>
- );
+  return (
+    <>
+      <OnboardingModal role={role} />
+      <DashboardLayout>{children}</DashboardLayout>
+    </>
+  );
 }

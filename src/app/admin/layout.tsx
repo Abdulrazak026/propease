@@ -1,24 +1,24 @@
 "use client";
 import { useRole } from "@/context/RoleContext";
-import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import OnboardingModal from "@/components/onboarding/OnboardingModal";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
- const { role } = useRole();
+  const { role, isAuthenticated } = useRole();
+  const router = useRouter();
 
- if (!role) {
- return <div className="flex-1 flex items-center justify-center text-sm text-gray-400">Loading...</div>;
- }
+  useEffect(() => {
+    if (isAuthenticated && role !== "admin" && role !== "head") {
+      router.push(`/${role}`);
+    }
+  }, [role, isAuthenticated, router]);
 
- if (role !== "admin" && role !== "head") {
- redirect(`/${role}`);
- }
-
- return (
- <>
- <OnboardingModal role={role} />
- <DashboardLayout>{children}</DashboardLayout>
- </>
- );
+  return (
+    <>
+      <OnboardingModal role={role} />
+      <DashboardLayout>{children}</DashboardLayout>
+    </>
+  );
 }
