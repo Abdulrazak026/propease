@@ -2,6 +2,7 @@ import { Router, Response } from "express";
 import crypto from "crypto";
 import prisma from "../lib/prisma";
 import { logger } from "../lib/logger";
+import { emailService } from "../services/email";
 const router = Router();
 
 const PAYSTACK_SECRET_KEY = process.env.PAYSTACK_SECRET_KEY || "";
@@ -92,6 +93,8 @@ router.post("/webhook", async (req, res: Response) => {
             },
           });
         });
+        const user = await prisma.user.findUnique({ where: { id: userId }, select: { email: true, name: true } });
+        emailService.walletFunded(user?.email || "", user?.name || "", amount / 100, reference).catch(() => {});
       }
     }
 

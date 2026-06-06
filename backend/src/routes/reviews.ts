@@ -3,6 +3,7 @@ import prisma from "../lib/prisma";
 import { authenticate, AuthRequest } from "../middleware/auth";
 import { authorize } from "../middleware/rbac";
 import { logger } from "../lib/logger";
+import { emailService } from "../services/email";
 const router = Router();
 
 router.post("/", authenticate, async (req: AuthRequest, res: Response) => {
@@ -39,6 +40,8 @@ router.post("/", authenticate, async (req: AuthRequest, res: Response) => {
     });
 
     res.status(201).json({ review });
+    const agent = await prisma.user.findUnique({ where: { id: agentId }, select: { email: true, name: true } });
+    emailService.reviewSubmitted(agent?.email || "", agent?.name || "", rating, comment || "").catch(() => {});
   } catch (error) {
     logger.error({ err: error }, "Create review error:");
     res.status(500).json({ error: "Failed to submit review" });
@@ -126,6 +129,8 @@ router.patch("/:id/moderate", authenticate, authorize("head"), async (req: AuthR
     });
 
     res.json({ review });
+    const author = await prisma.user.findUnique({ where: { id: review.authorId }, select: { email: true } });
+    emailService.reviewModerated(author?.email || "", review.author.name, status).catch(() => {});
   } catch (error) {
     logger.error({ err: error }, "Moderate review error:");
     res.status(500).json({ error: "Failed to moderate review" });

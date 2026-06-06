@@ -164,11 +164,131 @@ export const templates = {
     );
   },
 
-  verificationSubmitted(name: string) {
+    verificationSubmitted(name: string) {
     return base("Verification Documents Received",
       `<p>Hello <strong>${name}</strong>,</p>
        <p>Your verification documents have been submitted. Our compliance team will review them within 48 hours. Once verified, your listings will display the <strong>Verified Agent</strong> badge.</p>`,
       ["Visit Dashboard", `${URL}/login`]
+    );
+  },
+
+  // --- NEW TEMPLATES ---
+
+  withdrawalRequested(name: string, amount: number) {
+    return base("Withdrawal Requested",
+      `<p>Hello <strong>${name}</strong>,</p>
+       <p>Your withdrawal request of <strong>\u20A6${amount.toLocaleString()}</strong> has been submitted and is pending admin approval.</p>
+       <p>Withdrawals are typically processed within 1\u20132 business days. You will receive another email once approved.</p>
+       <div class="detail-table"><table><tr><td>Amount</td><td>\u20A6${amount.toLocaleString()}</td></tr><tr><td>Status</td><td>Pending Approval</td></tr></table></div>`,
+      ["View Wallet", `${URL}/wallet`]
+    );
+  },
+  withdrawalApproved(name: string, amount: number) {
+    return base("Withdrawal Approved \u2705",
+      `<p>Hello <strong>${name}</strong>,</p>
+       <p>Great news! Your withdrawal of <strong>\u20A6${amount.toLocaleString()}</strong> has been approved and will reflect in your bank account within 24 hours.</p>
+       <div class="detail-table"><table><tr><td>Amount</td><td>\u20A6${amount.toLocaleString()}</td></tr><tr><td>Status</td><td>Approved</td></tr></table></div>`,
+      ["Go to Wallet", `${URL}/wallet`]
+    );
+  },
+  withdrawalRejected(name: string, amount: number, reason?: string) {
+    return base("Withdrawal Rejected",
+      `<p>Hello <strong>${name}</strong>,</p>
+       <p>Your withdrawal request of <strong>\u20A6${amount.toLocaleString()}</strong> was not approved.${reason ? ` Reason: ${reason}` : ""}</p>
+       <p>The funds have been returned to your wallet. Please contact support if you have questions.</p>`,
+      ["Contact Support", `mailto:support@mbpproperties.com`]
+    );
+  },
+  listingSubmittedForReview(name: string, title: string) {
+    return base("Listing Submitted for Review",
+      `<p>Hello <strong>${name}</strong>,</p>
+       <p>Your listing <strong>"${title}"</strong> has been submitted for admin review. It will be reviewed within 24 hours and published if it meets our quality standards.</p>
+       <p>You will receive another email once the listing is approved or if any changes are needed.</p>`,
+      ["View My Listings", `${URL}/ambassador`]
+    );
+  },
+  listingRejected(name: string, title: string) {
+    return base("Listing Needs Revision",
+      `<p>Hello <strong>${name}</strong>,</p>
+       <p>Your listing <strong>"${title}"</strong> was returned for revision. Please update the listing details and resubmit.</p>
+       <p>Common reasons for rejection include: incomplete description, no photos, incorrect pricing, or duplicate listing.</p>`,
+      ["Edit Listing", `${URL}/ambassador`]
+    );
+  },
+  commissionEarned(name: string, amount: number, dealTitle: string) {
+    return base("Commission Earned \uD83C\uDF89",
+      `<p>Hello <strong>${name}</strong>,</p>
+       <p>Commission of <strong>\u20A6${amount.toLocaleString()}</strong> has been credited to your wallet from the deal: <strong>"${dealTitle}"</strong>.</p>
+       <div class="detail-table"><table><tr><td>Deal</td><td>${dealTitle}</td></tr><tr><td>Commission</td><td>\u20A6${amount.toLocaleString()}</td></tr></table></div>`,
+      ["View Wallet", `${URL}/wallet`]
+    );
+  },
+  walletFunded(name: string, amount: number, reference: string) {
+    return base("Wallet Funded \u2705",
+      `<p>Hello <strong>${name}</strong>,</p>
+       <p>Your wallet has been credited with <strong>\u20A6${amount.toLocaleString()}</strong>. Your updated balance is now available for withdrawals and listing fees.</p>
+       <div class="detail-table"><table><tr><td>Amount</td><td>\u20A6${amount.toLocaleString()}</td></tr><tr><td>Reference</td><td>${reference}</td></tr></table></div>`,
+      ["Go to Wallet", `${URL}/wallet`]
+    );
+  },
+  taskAssigned(name: string, taskTitle: string, area: string) {
+    return base("New Task Assigned",
+      `<p>Hello <strong>${name}</strong>,</p>
+       <p>A new task has been assigned to you: <strong>"${taskTitle}"</strong> in <strong>${area}</strong>.</p>
+       <p>Review the task details on your dashboard and begin working on it as soon as possible.</p>`,
+      ["View Task", `${URL}/agent`]
+    );
+  },
+  taskStatusChanged(name: string, taskTitle: string, status: string) {
+    return base("Task Updated",
+      `<p>Hello <strong>${name}</strong>,</p>
+       <p>The status of task <strong>"${taskTitle}"</strong> has been updated to: <strong>${status.replace("_", " ").toUpperCase()}</strong>.</p>`,
+      ["View Task", `${URL}/agent`]
+    );
+  },
+  taskCommentAdded(name: string, taskTitle: string, authorName: string) {
+    return base("New Comment on Task",
+      `<p>Hello <strong>${name}</strong>,</p>
+       <p><strong>${authorName}</strong> added a new comment on task: <strong>"${taskTitle}"</strong>.</p>
+       <p>Log in to view the comment and respond.</p>`,
+      ["View Task", `${URL}/agent`]
+    );
+  },
+  reviewSubmitted(agentName: string, rating: number, comment: string) {
+    return base("New Review Received",
+      `<p>Hello <strong>${agentName}</strong>,</p>
+       <p>You received a new <strong>${rating}/5 star</strong> review${comment ? `: "${comment}"` : ""}.</p>
+       <p>Reviews help build trust with potential clients and increase your visibility on the platform.</p>`,
+      ["View Profile", `${URL}/agent`]
+    );
+  },
+  reviewModerated(name: string, status: string) {
+    return base(`Review ${status.charAt(0).toUpperCase() + status.slice(1)}`,
+      `<p>Hello <strong>${name}</strong>,</p>
+       <p>Your review has been <strong>${status}</strong> by our moderation team.</p>
+       <p>${status === "approved" ? "It is now visible on the agent's profile." : "It did not meet our community guidelines."}</p>`,
+      ["Visit Platform", `${URL}`]
+    );
+  },
+  agreementCancelled(name: string, propertyTitle: string) {
+    return base("Agreement Cancelled",
+      `<p>Hello <strong>${name}</strong>,</p>
+       <p>The tenancy agreement for <strong>"${propertyTitle}"</strong> has been cancelled.</p>
+       <p>If you have any questions or need to create a new agreement, please contact your agent or reach out to support.</p>`,
+      ["Contact Support", `mailto:support@mbpproperties.com`]
+    );
+  },
+  customOrderReceived(name: string, email: string, propertyType: string, area: string, budget: number) {
+    return base("New Custom Order",
+      `<h2>New Custom Property Request</h2>
+       <div class="detail-table"><table>
+       <tr><td>Client</td><td>${name} (${email})</td></tr>
+       <tr><td>Property Type</td><td>${propertyType}</td></tr>
+       <tr><td>Area</td><td>${area}</td></tr>
+       <tr><td>Budget</td><td>\u20A6${budget.toLocaleString()}</td></tr>
+       </table></div>
+       <p>A new custom property request has been submitted. Route to the appropriate ambassador in ${area}.</p>`,
+      ["View Dashboard", `${URL}/admin`]
     );
   },
 };

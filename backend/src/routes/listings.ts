@@ -7,6 +7,7 @@ import { validate } from "../middleware/validate";
 import { createListingSchema } from "../validators";
 import { logger } from "../lib/logger";
 import { invalidate } from "../lib/cache";
+import { emailService } from "../services/email";
 const router = Router();
 
 router.get("/", async (req, res: Response) => {
@@ -163,6 +164,8 @@ router.post("/:id/submit", authenticate, async (req: AuthRequest, res: Response)
     invalidate("listings:*");
     invalidate("dashboard:stats");
     res.json({ listing: updated });
+    const owner = await prisma.user.findUnique({ where: { id: listing.postedById }, select: { email: true, name: true } });
+    emailService.listingSubmittedForReview(owner?.email || "", owner?.name || "", updated.title).catch(() => {});
   } catch (error) {
     res.status(500).json({ error: "Failed to submit for review" });
   }
@@ -222,6 +225,8 @@ router.post("/:id/reject", authenticate, authorize("head"), async (req: AuthRequ
     invalidate("listings:*");
     invalidate("dashboard:stats");
     res.json({ listing: updated });
+    const owner = await prisma.user.findUnique({ where: { id: listing.postedById }, select: { email: true, name: true } });
+    emailService.listingRejected(owner?.email || "", owner?.name || "", updated.title).catch(() => {});
   } catch (error) {
     res.status(500).json({ error: "Failed to reject listing" });
   }

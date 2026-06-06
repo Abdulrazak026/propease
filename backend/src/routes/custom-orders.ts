@@ -4,6 +4,7 @@ import { authenticate, AuthRequest } from "../middleware/auth";
 import { validate } from "../middleware/validate";
 import { createCustomOrderSchema } from "../validators";
 import { logger } from "../lib/logger";
+import { emailService } from "../services/email";
 const router = Router();
 
 router.post("/", validate(createCustomOrderSchema), async (req, res: Response) => {
@@ -11,6 +12,8 @@ router.post("/", validate(createCustomOrderSchema), async (req, res: Response) =
     const customOrder = await prisma.customOrder.create({
       data: req.body,
     });
+
+    emailService.customOrderReceived(req.body.clientName, req.body.clientContact || "", req.body.propertyType, req.body.area, req.body.budget).catch(() => {});
 
     // Find an ambassador for the area and create a task
     const ambassador = await prisma.user.findFirst({

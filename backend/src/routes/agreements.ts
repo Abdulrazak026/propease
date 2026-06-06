@@ -4,6 +4,7 @@ import { authenticate, AuthRequest } from "../middleware/auth";
 import { authorize, requirePermission } from "../middleware/rbac";
 import { calculateAndDistributeCommission } from "./commissions";
 import { logger } from "../lib/logger";
+import { emailService } from "../services/email";
 
 const router = Router();
 
@@ -242,7 +243,16 @@ router.patch("/:id/status", authenticate, authorize("head", "ambassador", "agent
     const updated = await prisma.rentAgreement.update({
       where: { id: agId },
       data: { status },
+      include: {
+        tenant: { select: { email: true, name: true } },
+        agent: { select: { email: true, name: true } },
+      },
     });
+
+    if (status === "cancelled") {
+      if (updated.tenant) emailService.agreementCancelled(updated.tenant.email, updated.tenant.name, updated.propertyTitle).catch(() => {});
+      if (updated.agent) emailService.agreementCancelled(updated.agent.email, updated.agent.name, updated.propertyTitle).catch(() => {});
+    }
 
     res.json({ agreement: updated });
   } catch (error) {

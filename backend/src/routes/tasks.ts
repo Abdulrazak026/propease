@@ -5,6 +5,7 @@ import { authorize } from "../middleware/rbac";
 import { validate } from "../middleware/validate";
 import { createTaskSchema } from "../validators";
 import { logger } from "../lib/logger";
+import { emailService } from "../services/email";
 const router = Router();
 
 router.get("/my", authenticate, authorize("agent"), async (req: AuthRequest, res: Response) => {
@@ -132,6 +133,11 @@ router.post("/", authenticate, authorize("head", "ambassador"), validate(createT
       },
     });
 
+    if (req.body.assignedToId) {
+      const assignee = await prisma.user.findUnique({ where: { id: req.body.assignedToId }, select: { email: true, name: true } });
+      emailService.taskAssigned(assignee?.email || "", assignee?.name || "", task.title, task.area).catch(() => {});
+    }
+
     res.status(201).json({ task });
   } catch (error) {
     logger.error({ err: error }, "Create task error:");
@@ -169,6 +175,8 @@ router.patch("/:id/status", authenticate, async (req: AuthRequest, res: Response
     });
 
     res.json({ task: updated });
+    const assignee = await prisma.user.findUnique({ where: { id: task.assignedToId }, select: { email: true, name: true } });
+    emailService.taskStatusChanged(assignee?.email || "", assignee?.name || "", task.title, status).catch(() => {});
   } catch (error) {
     logger.error({ err: error }, "Update task status error:");
     res.status(500).json({ error: "Failed to update task status" });
@@ -200,6 +208,10 @@ router.post("/:id/comments", authenticate, async (req: AuthRequest, res: Respons
     });
 
     res.status(201).json({ comment });
+    if (task.assignedToId && task.assignedToId !== req.user!.id) {
+      const assignee = await prisma.user.findUnique({ where: { id: task.assignedToId }, select: { email: true, name: true } });
+      emailService.taskCommentAdded(assignee?.email || "", assignee?.name || "", task.title, comment.author.name).catch(() => {});
+    }
   } catch (error) {
     logger.error({ err: error }, "Create comment error:");
     res.status(500).json({ error: "Failed to create comment" });

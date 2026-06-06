@@ -2,6 +2,7 @@ import { Router, Response } from "express";
 import prisma from "../lib/prisma";
 import { authenticate, AuthRequest } from "../middleware/auth";
 import { authorize } from "../middleware/rbac";
+import { emailService } from "../services/email";
 
 const router = Router();
 
@@ -18,6 +19,7 @@ router.post("/withdraw", authenticate, async (req: AuthRequest, res: Response) =
     const withdrawal = await prisma.withdrawal.create({
       data: { amount, bankName, accountNumber, accountName, userId: uid },
     });
+    emailService.withdrawalRequested(user.email, user.name, amount).catch(() => {});
     res.status(201).json({ withdrawal, message: "Withdrawal request submitted" });
   } catch (error) {
     res.status(500).json({ error: "Failed to request withdrawal" });
@@ -70,7 +72,6 @@ router.post("/withdrawals/:id/approve", authenticate, authorize("head"), async (
       if (!withdrawal) throw new Error("NOT_FOUND");
       if (withdrawal.status !== "pending") throw new Error("ALREADY_PROCESSED");
 
-      // Re-check balance at approval time — prevents race condition
       const user = await tx.user.findUnique({ where: { id: withdrawal.userId } });
       if (!user || user.walletBalance < withdrawal.amount) throw new Error("INSUFFICIENT_BALANCE");
 
@@ -82,8 +83,11 @@ router.post("/withdrawals/:id/approve", authenticate, authorize("head"), async (
       await tx.auditLog.create({
         data: { action: "APPROVE_WITHDRAWAL", entity: "Withdrawal", entityId: wid, userId: req.user!.id as string, details: { amount: withdrawal.amount } },
       });
-      return withdrawal;
+      return { withdrawal, user };
     });
+
+    const user = (result as any).user;
+    emailService.withdrawalApproved(user.email, user.name, (result as any).withdrawal.amount).catch(() => {});
 
     res.json({ success: true, message: "Withdrawal approved" });
   } catch (error: any) {
@@ -98,9 +102,10 @@ router.post("/withdrawals/:id/approve", authenticate, authorize("head"), async (
 router.post("/withdrawals/:id/reject", authenticate, authorize("head"), async (req: AuthRequest, res: Response) => {
   try {
     const wid = req.params.id as string;
-    const withdrawal = await prisma.withdrawal.findUnique({ where: { id: wid } });
+    const withdrawal = await prisma.withdrawal.findUnique({ where: { id: wid }, include: { user: { select: { email: true, name: true } } } });
     if (!withdrawal) return res.status(404).json({ error: "Withdrawal not found" });
     await prisma.withdrawal.update({ where: { id: wid }, data: { status: "rejected" } });
+    emailService.withdrawalRejected(withdrawal.user.email, withdrawal.user.name, withdrawal.amount, (req.body as any).reason).catch(() => {});
     res.json({ success: true, message: "Withdrawal rejected" });
   } catch (error) {
     res.status(500).json({ error: "Failed to reject withdrawal" });

@@ -127,6 +127,66 @@ export const emailService = {
         <p style="white-space:pre-wrap;margin:0">${data.message}</p>
       </div>
     </div>`;
-    return send(supportEmail, `[Contact] ${data.subject} — from ${data.name}`, html);
+    return send(supportEmail, `[Contact] ${data.subject} \u2014 from ${data.name}`, html);
+  },
+
+  // --- NEW TRIGGERS ---
+
+  async withdrawalRequested(email: string, name: string, amount: number) {
+    const html = defaultTemplates.withdrawalRequested(name, amount);
+    return send(email, `Withdrawal request submitted \u2014 \u20A6${amount.toLocaleString()}`, html);
+  },
+  async withdrawalApproved(email: string, name: string, amount: number) {
+    const html = defaultTemplates.withdrawalApproved(name, amount);
+    return send(email, `Withdrawal approved \u2014 \u20A6${amount.toLocaleString()}`, html);
+  },
+  async withdrawalRejected(email: string, name: string, amount: number, reason?: string) {
+    const html = defaultTemplates.withdrawalRejected(name, amount, reason);
+    return send(email, `Withdrawal rejected \u2014 \u20A6${amount.toLocaleString()}`, html);
+  },
+  async listingSubmittedForReview(email: string, name: string, title: string) {
+    const html = defaultTemplates.listingSubmittedForReview(name, title);
+    return send(email, `Listing submitted for review: ${title}`, html);
+  },
+  async listingRejected(email: string, name: string, title: string) {
+    const html = defaultTemplates.listingRejected(name, title);
+    return send(email, `Listing needs revision: ${title}`, html);
+  },
+  async commissionEarned(email: string, name: string, amount: number, dealTitle: string) {
+    const html = defaultTemplates.commissionEarned(name, amount, dealTitle);
+    return send(email, `Commission earned: \u20A6${amount.toLocaleString()} from ${dealTitle}`, html);
+  },
+  async walletFunded(email: string, name: string, amount: number, reference: string) {
+    const html = defaultTemplates.walletFunded(name, amount, reference);
+    return send(email, `Wallet funded \u2014 \u20A6${amount.toLocaleString()}`, html);
+  },
+  async taskAssigned(email: string, name: string, taskTitle: string, area: string) {
+    const html = defaultTemplates.taskAssigned(name, taskTitle, area);
+    return send(email, `New task assigned: ${taskTitle}`, html);
+  },
+  async taskStatusChanged(email: string, name: string, taskTitle: string, status: string) {
+    const html = defaultTemplates.taskStatusChanged(name, taskTitle, status);
+    return send(email, `Task updated: ${taskTitle}`, html);
+  },
+  async taskCommentAdded(email: string, name: string, taskTitle: string, authorName: string) {
+    const html = defaultTemplates.taskCommentAdded(name, taskTitle, authorName);
+    return send(email, `New comment on: ${taskTitle}`, html);
+  },
+  async reviewSubmitted(agentEmail: string, agentName: string, rating: number, comment: string) {
+    const html = defaultTemplates.reviewSubmitted(agentName, rating, comment);
+    return send(agentEmail, `New review: ${rating}/5 stars`, html);
+  },
+  async reviewModerated(email: string, name: string, status: string) {
+    const html = defaultTemplates.reviewModerated(name, status);
+    return send(email, `Review ${status}`, html);
+  },
+  async agreementCancelled(email: string, name: string, propertyTitle: string) {
+    const html = defaultTemplates.agreementCancelled(name, propertyTitle);
+    return send(email, `Agreement cancelled: ${propertyTitle}`, html);
+  },
+  async customOrderReceived(name: string, email: string, propertyType: string, area: string, budget: number) {
+    const supportEmail = process.env.SUPPORT_EMAIL || "support@mbpproperties.com";
+    const html = defaultTemplates.customOrderReceived(name, email, propertyType, area, budget);
+    return send(supportEmail, `New custom order \u2014 ${propertyType} in ${area}`, html);
   },
 };

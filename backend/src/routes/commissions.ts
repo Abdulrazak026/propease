@@ -5,6 +5,7 @@ import { authorize } from "../middleware/rbac";
 import { validate } from "../middleware/validate";
 import { setCommissionRateSchema } from "../validators";
 import { logger } from "../lib/logger";
+import { emailService } from "../services/email";
 const router = Router();
 
 router.get("/rates", authenticate, authorize("head"), async (req: AuthRequest, res: Response) => {
@@ -183,6 +184,11 @@ export async function calculateAndDistributeCommission(
       data: { commissionPaid: true, commissionPaidAt: new Date() },
     }),
   ]);
+
+  const agent = await prisma.user.findUnique({ where: { id: agentId }, select: { email: true, name: true } });
+  const ambassador = await prisma.user.findUnique({ where: { id: ambassadorId }, select: { email: true, name: true } });
+  emailService.commissionEarned(agent?.email || "", agent?.name || "", agentCut, dealTitle).catch(() => {});
+  emailService.commissionEarned(ambassador?.email || "", ambassador?.name || "", ambassadorCut, dealTitle).catch(() => {});
 
   return { ambassadorCut, agentCut, companyCut };
 }
