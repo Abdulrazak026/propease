@@ -17,6 +17,18 @@ router.get("/", async (_req, res: Response) => {
   } catch { res.status(500).json({ error: "Failed to fetch posts" }); }
 });
 
+// Public: get single post by slug
+router.get("/:slug", async (req, res: Response) => {
+  try {
+    const post = await prisma.blogPost.findUnique({
+      where: { slug: req.params.slug as string },
+      include: { author: { select: { name: true } } },
+    });
+    if (!post || !post.published) return res.status(404).json({ error: "Post not found" });
+    res.json({ post });
+  } catch { res.status(500).json({ error: "Failed to fetch post" }); }
+});
+
 // Admin: list all posts
 router.get("/all", authenticate, authorize("head"), async (_req: AuthRequest, res: Response) => {
   try {

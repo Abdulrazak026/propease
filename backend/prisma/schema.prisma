@@ -65,6 +65,7 @@ enum TransactionType {
   payment
   commission_payout
   withdrawal
+  listing_fee
 }
 
 enum TransactionMethod {
@@ -159,10 +160,12 @@ model User {
 }
 
 model RefreshToken {
-  id        String   @id @default(uuid())
+  id        String   @id @default(cuid())
   token     String   @unique
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  used      Boolean  @default(false)
+  revoked   Boolean  @default(false)
   expiresAt DateTime
   createdAt DateTime @default(now())
 
@@ -517,6 +520,10 @@ model RentAgreement {
   noticePeriodDays       Int              @default(30)
   renewalType            String           @default("yearly")
 
+  // Commission tracking
+  commissionPaid       Boolean          @default(false)
+  commissionPaidAt     DateTime?
+
   // Document reference
   documentUrl            String?
 
@@ -720,4 +727,20 @@ model Faq {
   order     Int      @default(0)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model PaymentEvent {
+  id          String   @id @default(cuid())
+  provider    String
+  eventType   String
+  reference   String?
+  amount      Decimal?
+  currency    String   @default("NGN")
+  status      String?
+  payload     Json
+  processedAt DateTime
+  createdAt   DateTime @default(now())
+
+  @@index([reference])
+  @@index([eventType])
 }

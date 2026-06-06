@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 
-interface Post { id: string; title: string; excerpt: string | null; content: string; coverImage: string | null; publishedAt: string | null; author?: { name: string } | null; }
+interface Post { id: string; slug: string; title: string; excerpt: string | null; content: string; coverImage: string | null; publishedAt: string | null; author?: { name: string } | null; }
 
 export default function NewsPage() {
   const [posts, setPosts] = useState<Post[]>([]);
@@ -40,7 +40,7 @@ export default function NewsPage() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {posts.map((p) => (
-            <Link key={p.id} href={`/news`} className="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-md transition-shadow group">
+            <Link key={p.id} href={`/news/${p.slug}`} className="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-md transition-shadow group">
               {p.coverImage && <img src={p.coverImage} alt={p.title} className="w-full h-48 object-cover" />}
               <div className="p-5">
                 <span className="text-[10px] font-medium text-[var(--color-primary)] uppercase">News</span>

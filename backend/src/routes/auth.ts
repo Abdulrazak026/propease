@@ -13,7 +13,7 @@ const router = Router();
 
 function generateAccessToken(user: { id: string; email: string; role: string; city?: string | null }) {
   return jwt.sign(
-    { id: user.id, email: user.email, role: user.role, city: user.city },
+    { id: user.id, email: user.email, role: user.role, city: user.city, jti: uuidv4() },
     process.env.JWT_SECRET!,
     { expiresIn: "15m" }
   );
@@ -52,7 +52,7 @@ router.post("/register", validate(registerSchema), async (req, res: Response) =>
     const accessToken = generateAccessToken(user);
     const refreshTokenValue = generateRefreshToken();
     await prisma.refreshToken.create({
-      data: { token: refreshTokenValue, userId: user.id, expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) },
+      data: { token: refreshTokenValue, userId: user.id, used: false, revoked: false, expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) },
     });
     res.cookie("refreshToken", refreshTokenValue, { httpOnly: true, secure: true, sameSite: "none", path: "/", maxAge: 7 * 24 * 60 * 60 * 1000 });
     res.status(201).json({ accessToken, user, message: "Registration successful" });
@@ -105,6 +105,8 @@ router.post("/login", validate(loginSchema), async (req, res: Response) => {
       data: {
         token: refreshTokenValue,
         userId: user.id,
+        used: false,
+        revoked: false,
         expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
       },
     });
@@ -145,16 +147,61 @@ router.post("/refresh", async (req, res: Response) => {
       return res.status(401).json({ error: "Refresh token required" });
     }
 
-    const savedToken = await prisma.refreshToken.findUnique({
+    const stored = await prisma.refreshToken.findUnique({
       where: { token },
       include: { user: true },
     });
 
-    if (!savedToken || savedToken.expiresAt < new Date()) {
-      return res.status(401).json({ error: "Invalid or expired refresh token" });
+    if (!stored) {
+      return res.status(401).json({ error: "Invalid token" });
     }
 
-    const accessToken = generateAccessToken(savedToken.user);
+    // Token already used (rotated out) — THEFT DETECTED
+    // Revoke ALL tokens for this user
+    if (stored.used) {
+      await prisma.refreshToken.updateMany({
+        where: { userId: stored.userId },
+        data: { revoked: true },
+      });
+      logger.warn({ userId: stored.userId }, "Refresh token reuse detected — all tokens revoked");
+      return res.status(401).json({ error: "Token reuse detected. Please log in again." });
+    }
+
+    if (stored.expiresAt < new Date()) {
+      return res.status(401).json({ error: "Refresh token expired" });
+    }
+
+    if (stored.revoked) {
+      return res.status(401).json({ error: "Token revoked" });
+    }
+
+    // Mark old token as used (rotated out)
+    await prisma.refreshToken.update({
+      where: { id: stored.id },
+      data: { used: true },
+    });
+
+    // Issue new access token + new refresh token
+    const accessToken = generateAccessToken(stored.user);
+    const newRefreshTokenValue = generateRefreshToken();
+
+    await prisma.refreshToken.create({
+      data: {
+        token: newRefreshTokenValue,
+        userId: stored.userId,
+        used: false,
+        revoked: false,
+        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+      },
+    });
+
+    res.cookie("refreshToken", newRefreshTokenValue, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "none",
+      path: "/",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
 
     res.json({ accessToken });
   } catch (error) {

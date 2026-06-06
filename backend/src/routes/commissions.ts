@@ -106,6 +106,24 @@ export async function calculateAndDistributeCommission(
   ambassadorId: string,
   agentId: string
 ) {
+  // Idempotency guard — check if commission already exists for this deal
+  const existing = await prisma.commission.findUnique({ where: { dealId } });
+  if (existing) {
+    logger.warn({ dealId }, "Commission already distributed — skipping duplicate");
+    return { ambassadorCut: existing.ambassadorCut, agentCut: existing.agentCut, companyCut: existing.companyCut };
+  }
+
+  // Check agreement commission flag
+  const agreement = await prisma.rentAgreement.findUnique({
+    where: { id: dealId },
+    select: { commissionPaid: true },
+  });
+  if (agreement?.commissionPaid) {
+    logger.warn({ dealId }, "Agreement commission already marked paid — skipping");
+    const existingCommission = await prisma.commission.findUnique({ where: { dealId } });
+    if (existingCommission) return existingCommission;
+  }
+
   const rate = await prisma.commissionRate.findUnique({ where: { dealType } });
   if (!rate) {
     logger.error(`No commission rate found for deal type: ${dealType}`);
@@ -159,6 +177,10 @@ export async function calculateAndDistributeCommission(
         status: "completed",
         userId: agentId,
       },
+    }),
+    prisma.rentAgreement.update({
+      where: { id: dealId },
+      data: { commissionPaid: true, commissionPaidAt: new Date() },
     }),
   ]);
 

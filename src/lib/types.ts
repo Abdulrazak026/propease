@@ -17,9 +17,9 @@ export interface User {
 }
 
 export type PropertyType = "house" | "land" | "flat" | "commercial" | "other";
-export type ListingType = "sale" | "rent" | "outsourcing";
+export type ListingType = "sale" | "rent";
 export type RentTier = "rent_only" | "rent_management" | "rent_full";
-export type ListingStatus = "available" | "reserved" | "taken" | "ongoing";
+export type ListingStatus = "draft" | "review" | "approved" | "available" | "reserved" | "sold" | "rented";
 export type ListingCategory = "portfolio" | "partnership";
 export type PaymentOption = "reservation" | "instalment" | "full";
 export type DealStatus = "successful" | "unsuccessful" | "ongoing";

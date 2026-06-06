@@ -7,7 +7,6 @@ import { useListings } from "@/hooks/useListings";
 import { EmptyState } from "@/components/ui/Skeleton";
 import Footer from "@/components/layout/Footer";
 import { useSettings } from "@/context/SettingsContext";
-import { api } from "@/lib/api-client";
 
 interface City { id: string; name: string; }
 
@@ -26,16 +25,14 @@ export default function HomePage() {
   const { listings, loading, filters, setFilters } = useListings();
 
   useEffect(() => {
-    api.get<City[]>("/api/listings").then(r => {
-      if (r.data) {
-        const unique = new Map<string, City>();
-        (Array.isArray(r.data) ? r.data : []).forEach(l => {
-          if ((l as any).city) unique.set((l as any).city, { id: (l as any).city, name: (l as any).city });
-        });
-        setCities(Array.from(unique.values()));
-      }
-    }).catch(() => {});
-  }, []);
+    if (listings.length > 0) {
+      const unique = new Map<string, City>();
+      listings.forEach(l => {
+        if (l.city) unique.set(l.city, { id: l.city, name: l.city });
+      });
+      setCities(Array.from(unique.values()));
+    }
+     }, [listings]);
 
   const handleFilterChange = (next: FilterState) => {
     setFilters({

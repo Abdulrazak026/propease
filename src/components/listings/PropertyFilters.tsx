@@ -98,16 +98,6 @@ export default function PropertyFilters({ onFilterChange }: PropertyFiltersProps
         >
           For Sale
         </button>
-        <button
-          onClick={() => update("listingType", filters.listingType === "outsourcing" ? "" : "outsourcing")}
-          className={`px-3.5 py-1.5 rounded-lg text-xs font-medium transition-colors ${
-            filters.listingType === "outsourcing"
-              ? "bg-gray-700 text-white"
-              : "bg-white border border-gray-300 text-gray-600 hover:border-gray-400"
-          }`}
-        >
-          Outsourcing
-        </button>
       </div>
 
       {showMore && (
