@@ -92,7 +92,8 @@ export default function NewAgreementPage() {
 
  if (created) {
   const signingUrl = agreementId ? `https://mbpproperties.com/agreements/${agreementId}?role=landlord` : "";
-  const copyLink = () => { navigator.clipboard.writeText(signingUrl); alert("Link copied!"); };
+  const [copied, setCopied] = useState(false);
+  const copyLink = () => { navigator.clipboard.writeText(signingUrl); setCopied(true); setTimeout(() => setCopied(false), 2000); };
  return (
  <div className="flex-1 max-w-2xl mx-auto px-4 py-8">
  <div className="bg-white rounded-lg border border-gray-200 p-8 text-center">
@@ -110,7 +111,7 @@ export default function NewAgreementPage() {
  <div className="flex items-center justify-center gap-3 flex-wrap">
    {signingUrl && (
      <>
-       <Button size="sm" variant="outline" onClick={copyLink}>Copy Link</Button>
+         <Button size="sm" variant="outline" onClick={copyLink}>{copied ? "Copied!" : "Copy Link"}</Button>
        <a href={`https://wa.me/?text=${encodeURIComponent(`Please sign the tenancy agreement: ${signingUrl}`)}`} target="_blank" rel="noopener noreferrer">
          <Button size="sm" variant="outline">Share via WhatsApp</Button>
        </a>

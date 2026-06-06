@@ -2,6 +2,7 @@ import { Router, Response } from "express";
 import prisma from "../lib/prisma";
 import { authenticate, AuthRequest } from "../middleware/auth";
 import { authorize, requirePermission } from "../middleware/rbac";
+import { logger } from "../lib/logger";
 
 const router = Router();
 
@@ -10,7 +11,7 @@ router.get("/", async (_req, res: Response) => {
   try {
     const faqs = await prisma.faq.findMany({ orderBy: { order: "asc" } });
     res.json({ faqs });
-  } catch { res.status(500).json({ error: "Failed to fetch FAQs" }); }
+  } catch (error) { logger.error({ err: error }, "Failed to fetch FAQs"); res.status(500).json({ error: "Failed to fetch FAQs" }); }
 });
 
 // Admin: create FAQ
@@ -19,7 +20,7 @@ router.post("/", authenticate, authorize("head"), requirePermission("canManageCo
     const { question, answer, order } = req.body;
     const faq = await prisma.faq.create({ data: { question, answer, order: order || 0 } });
     res.status(201).json({ faq });
-  } catch { res.status(500).json({ error: "Failed to create FAQ" }); }
+  } catch (error) { logger.error({ err: error }, "Failed to create FAQ"); res.status(500).json({ error: "Failed to create FAQ" }); }
 });
 
 // Admin: update FAQ
@@ -31,7 +32,7 @@ router.patch("/:id", authenticate, authorize("head"), requirePermission("canMana
       data: { question, answer, order },
     });
     res.json({ faq });
-  } catch { res.status(500).json({ error: "Failed to update FAQ" }); }
+  } catch (error) { logger.error({ err: error }, "Failed to update FAQ"); res.status(500).json({ error: "Failed to update FAQ" }); }
 });
 
 // Admin: delete FAQ
@@ -39,7 +40,8 @@ router.delete("/:id", authenticate, authorize("head"), requirePermission("canMan
   try {
     await prisma.faq.delete({ where: { id: req.params.id as string } });
     res.json({ success: true });
-  } catch { res.status(500).json({ error: "Failed to delete FAQ" }); }
+  } catch (error) { logger.error({ err: error }, "Failed to delete FAQ"); res.status(500).json({ error: "Failed to delete FAQ" }); }
 });
 
 export default router;
+

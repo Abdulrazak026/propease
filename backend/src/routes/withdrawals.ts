@@ -3,6 +3,7 @@ import prisma from "../lib/prisma";
 import { authenticate, AuthRequest } from "../middleware/auth";
 import { authorize } from "../middleware/rbac";
 import { emailService } from "../services/email";
+import { logger } from "../lib/logger";
 
 const router = Router();
 
@@ -34,7 +35,7 @@ router.get("/my-withdrawals", authenticate, async (req: AuthRequest, res: Respon
       orderBy: { createdAt: "desc" },
     });
     res.json({ withdrawals });
-  } catch { res.status(500).json({ error: "Failed to fetch withdrawals" }); }
+  } catch (error) { logger.error({ err: error }, "Failed to fetch withdrawals"); res.status(500).json({ error: "Failed to fetch withdrawals" }); }
 });
 
 // User's own transactions
@@ -46,7 +47,7 @@ router.get("/transactions", authenticate, async (req: AuthRequest, res: Response
       take: 50,
     });
     res.json({ transactions: txs });
-  } catch { res.status(500).json({ error: "Failed to fetch transactions" }); }
+  } catch (error) { logger.error({ err: error }, "Failed to fetch transactions"); res.status(500).json({ error: "Failed to fetch transactions" }); }
 });
 
 // Admin lists all withdrawals
@@ -113,3 +114,4 @@ router.post("/withdrawals/:id/reject", authenticate, authorize("head"), async (r
 });
 
 export default router;
+

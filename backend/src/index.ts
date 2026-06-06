@@ -41,10 +41,7 @@ import faqRoutes from "./routes/faqs";
 import uploadRoutes from "./routes/upload";
 import contactRoutes from "./routes/contact";
 import agentSettingsRoutes from "./routes/agent-settings";
-import crypto from "crypto";
-import bcrypt from "bcryptjs";
 import prisma from "./lib/prisma";
-import { emailService } from "./services/email";
 import { logger } from "./lib/logger";
 
 const app = express();
@@ -127,39 +124,6 @@ app.use("/api/faqs", faqRoutes);
 app.use("/api/upload", uploadRoutes);
 app.use("/api/contact", contactRoutes);
 app.use("/api/agent/settings", agentSettingsRoutes);
-
-// Auth helpers (mounted directly to bypass cache)
-app.post("/api/auth/forgot-password", async (req, res) => {
-  try {
-    const { email } = req.body;
-    if (!email) return res.status(400).json({ error: "Email is required" });
-    const user = await prisma.user.findUnique({ where: { email } });
-    if (!user) return res.json({ message: "If that email exists, a reset link has been sent" });
-    const resetToken = crypto.randomBytes(32).toString("hex");
-    await prisma.passwordResetToken.create({
-      data: { token: resetToken, userId: user.id, expiresAt: new Date(Date.now() + 15 * 60 * 1000) },
-    });
-    emailService.passwordReset(user.email, user.name, resetToken).catch(() => {});
-    res.json({ message: "If that email exists, a reset link has been sent" });
-  } catch (error) {
-    res.status(500).json({ error: "Failed to process request" });
-  }
-});
-
-app.post("/api/auth/reset-password", async (req, res) => {
-  try {
-    const { token, password } = req.body;
-    if (!token || !password) return res.status(400).json({ error: "Token and new password are required" });
-    if (password.length < 8) return res.status(400).json({ error: "Password must be at least 8 characters" });
-    const record = await prisma.passwordResetToken.findUnique({ where: { token } });
-    if (!record || record.expiresAt < new Date()) return res.status(400).json({ error: "Invalid or expired reset token" });
-    await prisma.user.update({ where: { id: record.userId }, data: { password: await bcrypt.hash(password, 12) } });
-    await prisma.passwordResetToken.delete({ where: { id: record.id } });
-    res.json({ message: "Password has been reset. You can now sign in." });
-  } catch (error) {
-    res.status(500).json({ error: "Failed to reset password" });
-  }
-});
 
 // 404 handler
 app.use((_req, res) => {

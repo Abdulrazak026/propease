@@ -12,7 +12,7 @@ router.get("/", authenticate, authorize("head"), requirePermission("canManageUse
       orderBy: { createdAt: "desc" },
     });
     res.json({ users });
-  } catch { res.status(500).json({ error: "Failed to fetch users" }); }
+  } catch (error) { logger.error({ err: error }, "Failed to fetch users"); res.status(500).json({ error: "Failed to fetch users" }); }
 });
 
 router.patch("/:id", authenticate, authorize("head"), requirePermission("canManageUsers"), async (req: AuthRequest, res: Response) => {
@@ -25,7 +25,7 @@ router.patch("/:id", authenticate, authorize("head"), requirePermission("canMana
       select: { id: true, name: true, email: true, role: true, isApproved: true, canCreateTasks: true, canCloseDeals: true, canCreateListings: true, canManageUsers: true, canManageContent: true, canViewAnalytics: true, canManageAgreements: true },
     });
     res.json({ user });
-  } catch { res.status(500).json({ error: "Failed to update user" }); }
+  } catch (error) { logger.error({ err: error }, "Failed to update user"); res.status(500).json({ error: "Failed to update user" }); }
 });
 
 router.post("/", authenticate, authorize("head"), requirePermission("canManageUsers"), async (req: AuthRequest, res: Response) => {
@@ -38,7 +38,7 @@ router.post("/", authenticate, authorize("head"), requirePermission("canManageUs
       select: { id: true, name: true, email: true, role: true },
     });
     res.status(201).json({ user });
-  } catch { res.status(500).json({ error: "Failed to create user" }); }
+  } catch (error) { logger.error({ err: error }, "Failed to create user"); res.status(500).json({ error: "Failed to create user" }); }
 });
 
 router.delete("/:id", authenticate, authorize("head"), requirePermission("canManageUsers"), async (req: AuthRequest, res: Response) => {
@@ -79,5 +79,6 @@ router.delete("/:id", authenticate, authorize("head"), requirePermission("canMan
 });
 
 export default router;
+
 
 

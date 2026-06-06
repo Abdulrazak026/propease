@@ -2,6 +2,7 @@ import { Router, Response } from "express";
 import prisma from "../lib/prisma";
 import { authenticate, AuthRequest } from "../middleware/auth";
 import { authorize, requirePermission } from "../middleware/rbac";
+import { logger } from "../lib/logger";
 
 const router = Router();
 
@@ -14,7 +15,7 @@ router.get("/", async (_req, res: Response) => {
       include: { author: { select: { name: true } } },
     });
     res.json({ posts });
-  } catch { res.status(500).json({ error: "Failed to fetch posts" }); }
+  } catch (error) { logger.error({ err: error }, "Failed to fetch posts"); res.status(500).json({ error: "Failed to fetch posts" }); }
 });
 
 // Public: get single post by slug
@@ -26,7 +27,7 @@ router.get("/:slug", async (req, res: Response) => {
     });
     if (!post || !post.published) return res.status(404).json({ error: "Post not found" });
     res.json({ post });
-  } catch { res.status(500).json({ error: "Failed to fetch post" }); }
+  } catch (error) { logger.error({ err: error }, "Failed to fetch post"); res.status(500).json({ error: "Failed to fetch post" }); }
 });
 
 // Admin: list all posts
@@ -37,7 +38,7 @@ router.get("/all", authenticate, authorize("head"), requirePermission("canManage
       include: { author: { select: { name: true } } },
     });
     res.json({ posts });
-  } catch { res.status(500).json({ error: "Failed to fetch posts" }); }
+  } catch (error) { logger.error({ err: error }, "Failed to fetch posts"); res.status(500).json({ error: "Failed to fetch posts" }); }
 });
 
 // Admin: create post
@@ -54,7 +55,7 @@ router.post("/", authenticate, authorize("head"), requirePermission("canManageCo
       },
     });
     res.status(201).json({ post });
-  } catch { res.status(500).json({ error: "Failed to create post" }); }
+  } catch (error) { logger.error({ err: error }, "Failed to create post"); res.status(500).json({ error: "Failed to create post" }); }
 });
 
 // Admin: update post
@@ -75,7 +76,7 @@ router.patch("/:id", authenticate, authorize("head"), requirePermission("canMana
       data,
     });
     res.json({ post });
-  } catch { res.status(500).json({ error: "Failed to update post" }); }
+  } catch (error) { logger.error({ err: error }, "Failed to update post"); res.status(500).json({ error: "Failed to update post" }); }
 });
 
 // Admin: delete post
@@ -83,7 +84,8 @@ router.delete("/:id", authenticate, authorize("head"), requirePermission("canMan
   try {
     await prisma.blogPost.delete({ where: { id: req.params.id as string } });
     res.json({ success: true });
-  } catch { res.status(500).json({ error: "Failed to delete post" }); }
+  } catch (error) { logger.error({ err: error }, "Failed to delete post"); res.status(500).json({ error: "Failed to delete post" }); }
 });
 
 export default router;
+

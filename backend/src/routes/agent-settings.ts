@@ -23,7 +23,7 @@ router.get("/me", authenticate, async (req: AuthRequest, res: Response) => {
     }
 
     res.json({ profile: user, preferences });
-  } catch { res.status(500).json({ error: "Failed to fetch settings" }); }
+  } catch (error) { logger.error({ err: error }, "Failed to fetch settings"); res.status(500).json({ error: "Failed to fetch settings" }); }
 });
 
 // Update agent/ambassador profile
@@ -75,3 +75,4 @@ router.patch("/me/notifications", authenticate, async (req: AuthRequest, res: Re
 });
 
 export default router;
+
