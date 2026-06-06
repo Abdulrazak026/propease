@@ -4,10 +4,47 @@ import bcrypt from "bcryptjs";
 async function main() {
   console.log("Seeding database...");
 
-  // Skip if admin already exists
+  // Always seed/update site settings (runs every deploy)
+  const settings = {
+    site_name: "MBPP",
+    site_tagline: "Find Your Dream Property in Kano",
+    primary_color: "#0d6e4e",
+    secondary_color: "#f97316",
+    accent_color: "#facc15",
+    heading_font: "Inter",
+    body_font: "Inter",
+    meta_title: "MBPP — Real Estate Marketplace, Kano",
+    meta_description: "Find verified houses, land, flats and commercial properties for rent and sale in Kano, Nigeria. Your trusted real estate marketplace.",
+    support_email: "support@mbpproperties.com",
+    support_phone: "",
+    support_whatsapp: "",
+    office_address: "Kano Municipal, Kano State, Nigeria",
+    business_hours: "Mon–Fri 8AM–6PM, Sat 9AM–2PM",
+    robots_txt: "User-agent: *\nAllow: /\nSitemap: https://mbpproperties.com/sitemap.xml",
+    measurement: "sqft",
+    currency: "NGN",
+    currency_pos: "left",
+    property_statuses: "For Sale,For Rent,Sold,Rented",
+    property_types: "House,Flat,Land,Commercial,Shop,Warehouse",
+    amenities: "Pool,Gym,Security,Parking,Borehole,Solar,Furnished,CCTV",
+    cookie_text: "We use cookies to improve your experience. By continuing to browse, you agree to our use of cookies.",
+    agent_dir_visible: "true",
+    maintenance_mode: "false",
+    timezone: "Africa/Lagos",
+    date_format: "DD/MM/YYYY",
+  };
+  for (const [key, value] of Object.entries(settings)) {
+    await prisma.siteSettings.upsert({
+      where: { key },
+      update: { value },
+      create: { key, value },
+    });
+  }
+
+  // Skip user seeding if admin already exists
   const existing = await prisma.user.findFirst({ where: { email: "admin@mbpproperties.com" } });
   if (existing) {
-    console.log("Database already seeded. Skipping.");
+    console.log("Database already seeded. Skipping user/commission creation.");
     return;
   }
 
@@ -52,43 +89,6 @@ async function main() {
       { dealType: "partnership", totalRate: 15, ambassadorRate: 8, agentRate: 5 },
     ],
   });
-
-  // Site settings
-  const settings = {
-    site_name: "MBPP",
-    site_tagline: "Find Your Dream Property in Kano",
-    primary_color: "#0d6e4e",
-    secondary_color: "#f97316",
-    accent_color: "#facc15",
-    heading_font: "Inter",
-    body_font: "Inter",
-    meta_title: "MBPP — Real Estate Marketplace, Kano",
-    meta_description: "Find verified houses, land, flats and commercial properties for rent and sale in Kano, Nigeria. Your trusted real estate marketplace.",
-    support_email: "support@mbpproperties.com",
-    support_phone: "",
-    support_whatsapp: "",
-    office_address: "Kano Municipal, Kano State, Nigeria",
-    business_hours: "Mon–Fri 8AM–6PM, Sat 9AM–2PM",
-    robots_txt: "User-agent: *\nAllow: /\nSitemap: https://mbpproperties.com/sitemap.xml",
-    measurement: "sqft",
-    currency: "NGN",
-    currency_pos: "left",
-    property_statuses: "For Sale,For Rent,Sold,Rented",
-    property_types: "House,Flat,Land,Commercial,Shop,Warehouse",
-    amenities: "Pool,Gym,Security,Parking,Borehole,Solar,Furnished,CCTV",
-    cookie_text: "We use cookies to improve your experience. By continuing to browse, you agree to our use of cookies.",
-    agent_dir_visible: "true",
-    maintenance_mode: "false",
-    timezone: "Africa/Lagos",
-    date_format: "DD/MM/YYYY",
-  };
-  for (const [key, value] of Object.entries(settings)) {
-    await prisma.siteSettings.upsert({
-      where: { key },
-      update: { value },
-      create: { key, value },
-    });
-  }
 
   console.log("Seed complete!");
   console.log("Admin account: admin@mbpproperties.com / password123");
