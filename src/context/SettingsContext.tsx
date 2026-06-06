@@ -49,7 +49,7 @@ export function SiteStyle() {
   const { get } = useSettings();
   const primary = get("primary_color", "#0d6e4e");
   return (
-    <style>{`
+    <style suppressHydrationWarning>{`
       :root {
         --color-primary: ${primary};
         --color-primary-light: ${adjustColor(primary, 15)};

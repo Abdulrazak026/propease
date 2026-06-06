@@ -3,7 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
 import { RoleProvider } from "@/context/RoleContext";
-import { SettingsProvider, SiteStyle, useSettings } from "@/context/SettingsContext";
+import { SettingsProvider, useSettings } from "@/context/SettingsContext";
 import ErrorBoundary from "@/components/ui/ErrorBoundary";
 import LayoutShell from "@/components/layout/LayoutShell";
 import PwaRegister from "@/components/pwa/PwaRegister";
@@ -52,7 +52,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
       <body className="h-full antialiased">
         <SettingsProvider>
-          <SiteStyle />
           <RoleProvider>
             <ErrorBoundary>
               <LayoutShell>
