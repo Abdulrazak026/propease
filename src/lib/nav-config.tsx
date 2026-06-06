@@ -15,8 +15,11 @@ export const dashboardNav: Record<string, NavItem[]> = {
   { label: "Staffs", href: "/admin/staffs", icon: "tasks" },
  { label: "Commissions", href: "/admin/commissions", icon: "commissions" },
   { label: "Deals", href: "/admin/deals", icon: "audit" },
- { label: "Settings", href: "/admin/settings", icon: "settings" },
- { label: "Audit Log", href: "/admin/audit", icon: "audit", badge: "withdrawals" },
+  { label: "Settings", href: "/admin/settings", icon: "settings" },
+  { label: "Moderation", href: "/admin/moderation", icon: "agreements" },
+  { label: "Blog", href: "/admin/blog", icon: "agreements" },
+  { label: "FAQs", href: "/admin/faqs", icon: "inquiries" },
+  { label: "Audit Log", href: "/admin/audit", icon: "audit", badge: "withdrawals" },
  ],
  agent: [
  { label: "Task Board", href: "/agent", icon: "tasks", badge: "tasks" },
