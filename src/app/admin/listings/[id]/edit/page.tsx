@@ -4,10 +4,10 @@ import { useParams, useRouter } from "next/navigation";
 import Button from "@/components/ui/Button";
 import { api, getAccessToken } from "@/lib/api-client";
 import { resolveImageUrl } from "@/lib/utils";
+import { useSettings } from "@/context/SettingsContext";
 
 const API_URL = "https://propease-production.up.railway.app";
 const PROPERTY_TYPES = ["house", "flat", "land", "commercial", "other"];
-const CITIES = ["Kano Municipal", "Fagge", "Tarauni", "Nassarawa"];
 const FEATURES = ["Borehole", "Parking", "Security", "Pool", "Gym", "Solar", "Furnished", "CCTV"];
 
 export default function AdminEditListingPage() {
@@ -21,6 +21,10 @@ export default function AdminEditListingPage() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
+  const { get } = useSettings();
+
+  const rawCities = get("available_cities") || "Kano Municipal, Kano State; Fagge, Kano State; Tarauni, Kano State; Nassarawa, Kano State";
+  const CITIES = rawCities.split(";").map(c => c.trim().split(",")[0].trim()).filter(Boolean);
 
   useEffect(() => {
     api.get<any>(`/api/listings/${id}`).then(r => {

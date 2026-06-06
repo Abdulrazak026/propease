@@ -1,15 +1,15 @@
 "use client";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Button from "@/components/ui/Button";
 import { api, getAccessToken } from "@/lib/api-client";
+import { useSettings } from "@/context/SettingsContext";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "https://propease-production.up.railway.app";
 
 const PROPERTY_TYPES = ["house", "flat", "land", "commercial", "other"] as const;
 const LISTING_TYPES = ["sale", "rent"] as const;
 const RENT_TIERS = ["rent_only", "rent_management", "rent_full"] as const;
-const CITIES = ["Kano Municipal", "Fagge", "Tarauni", "Nassarawa"];
 const FEATURES = ["Borehole", "Parking", "Security", "Pool", "Gym", "Solar", "Furnished", "CCTV"];
 
 export default function AdminNewListingPage() {
@@ -28,6 +28,10 @@ export default function AdminNewListingPage() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
+  const { get } = useSettings();
+
+  const rawCities = get("available_cities") || "Kano Municipal, Kano State; Fagge, Kano State; Tarauni, Kano State; Nassarawa, Kano State";
+  const CITIES = rawCities.split(";").map(c => c.trim().split(",")[0].trim()).filter(Boolean);
 
   const u = (f: string, v: any) => setForm(p => ({ ...p, [f]: v }));
   const tf = (f: string) => (e: any) => u(f, e.target.type === "checkbox" ? e.target.checked : e.target.value);

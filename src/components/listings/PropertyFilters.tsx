@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { PropertyType, ListingType, RentTier, ListingCategory } from "@/lib/types";
 import { propertyTypeLabels, rentTierLabels } from "@/lib/utils";
+import { useSettings } from "@/context/SettingsContext";
 
 interface PropertyFiltersProps {
   onFilterChange: (filters: FilterState) => void;
@@ -19,10 +20,11 @@ export interface FilterState {
   paymentOption: string;
 }
 
-const cities = ["All Cities", "Kano Municipal", "Fagge", "Tarauni", "Nassarawa"];
-const propertyTypes = ["", "house", "flat", "land", "commercial"] as const;
-
 export default function PropertyFilters({ onFilterChange }: PropertyFiltersProps) {
+  const { get } = useSettings();
+  const rawCities = get("available_cities") || "Kano Municipal, Kano State; Fagge, Kano State; Tarauni, Kano State; Nassarawa, Kano State";
+  const cities = ["All Cities", ...rawCities.split(";").map(c => c.trim().split(",")[0].trim()).filter(Boolean)];
+  const propertyTypes = ["", "house", "flat", "land", "commercial"] as const;
   const [filters, setFilters] = useState<FilterState>({
     search: "", propertyType: "", listingType: "", rentTier: "",
     category: "", city: "", minPrice: "", maxPrice: "", paymentOption: "",
