@@ -1,8 +1,9 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { api } from "@/lib/api-client";
 import Button from "@/components/ui/Button";
 import DOMPurify from "dompurify";
+import { resolveImageUrl } from "@/lib/utils";
 
 type SettingsMap = Record<string, string>;
 
@@ -416,14 +417,42 @@ function MediaPicker({ label, current, onSelect }: { label: string; current: str
   const [open, setOpen] = useState(false);
   const [images, setImages] = useState<{ id: string; url: string; filename: string }[]>([]);
   const [loading, setLoading] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const fileRef = useRef<HTMLInputElement>(null);
 
   const loadImages = () => {
     setLoading(true);
     api.get<{ files: { id: string; url: string; filename: string }[] }>("/api/upload")
-      .then((r) => { if (r.data?.files) setImages(r.data.files.filter((f: any) => f.mimeType?.startsWith("image/"))); })
+      .then((r) => { if (r.data?.files) setImages(r.data.files); })
       .catch(() => {})
       .finally(() => setLoading(false));
   };
+
+  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    const form = new FormData();
+    form.append("file", file);
+    try {
+      const token = localStorage.getItem("accessToken");
+      const res = await fetch("https://propease-production.up.railway.app/api/upload", {
+        method: "POST",
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+        body: form,
+      });
+      const data = await res.json();
+      if (data.url) {
+        onSelect(resolveImageUrl(data.url) || data.url);
+        setOpen(false);
+        loadImages();
+      }
+    } catch {}
+    setUploading(false);
+    if (fileRef.current) fileRef.current.value = "";
+  };
+
+  const previewUrl = resolveImageUrl(current);
 
   return (
     <div className="space-y-1">
@@ -431,9 +460,11 @@ function MediaPicker({ label, current, onSelect }: { label: string; current: str
       <div className="flex gap-2">
         <input value={current} onChange={(e) => onSelect(e.target.value)} placeholder="Paste URL or pick from media" className="flex-1 rounded-lg border border-gray-200 px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20" />
         <button type="button" onClick={() => { setOpen(true); loadImages(); }} className="px-3 py-2 rounded-lg border border-gray-200 text-xs text-gray-600 hover:bg-gray-50">Browse</button>
+        <button type="button" onClick={() => fileRef.current?.click()} disabled={uploading} className="px-3 py-2 rounded-lg border border-gray-200 text-xs text-gray-600 hover:bg-gray-50">{uploading ? "..." : "Upload"}</button>
         {current && <button type="button" onClick={() => onSelect("")} className="px-2 py-2 text-xs text-red-500 hover:text-red-700" title="Remove">x</button>}
       </div>
-      {current && <img src={current} alt="" className="h-10 mt-1 rounded border border-gray-200 object-contain" />}
+      <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleUpload} />
+      {previewUrl && <img src={previewUrl} alt="" className="h-10 mt-1 rounded border border-gray-200 object-contain" />}
 
       {open && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={() => setOpen(false)}>
@@ -446,7 +477,7 @@ function MediaPicker({ label, current, onSelect }: { label: string; current: str
               {loading ? (
                 <div className="text-center py-8 text-gray-400 text-sm">Loading...</div>
               ) : images.length === 0 ? (
-                <div className="text-center py-8 text-gray-400 text-sm">No images uploaded yet. Upload in <a href="/admin/media" className="text-[var(--color-primary)] underline">Media</a>.</div>
+                <div className="text-center py-8 text-gray-400 text-sm">No images uploaded yet.</div>
               ) : (
                 <div className="grid grid-cols-4 gap-3">
                   {images.map((img) => (
@@ -455,12 +486,15 @@ function MediaPicker({ label, current, onSelect }: { label: string; current: str
                       onClick={() => { onSelect(img.url); setOpen(false); }}
                       className={`border-2 rounded-lg overflow-hidden hover:border-[var(--color-primary)] transition-colors ${current === img.url ? "border-[var(--color-primary)]" : "border-gray-200"}`}
                     >
-                      <img src={img.url} alt={img.filename} className="w-full h-24 object-cover" />
+                      <img src={resolveImageUrl(img.url) || ""} alt={img.filename} className="w-full h-24 object-cover" />
                       <p className="text-[10px] text-gray-500 p-1 truncate">{img.filename}</p>
                     </button>
                   ))}
                 </div>
               )}
+              <div className="border-t border-gray-100 pt-3 mt-3 text-center">
+                <button type="button" onClick={() => fileRef.current?.click()} disabled={uploading} className="text-xs text-[var(--color-primary)] font-medium hover:underline">{uploading ? "Uploading..." : "Upload from computer"}</button>
+              </div>
             </div>
           </div>
         </div>
