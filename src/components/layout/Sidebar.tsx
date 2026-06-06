@@ -159,7 +159,7 @@ export default function Sidebar() {
             <Link href="/" className="shrink-0 hover:opacity-90 transition-opacity">
               {siteLogo ? <img src={siteLogo} alt={siteName} className="w-7 h-7 rounded-lg object-contain" /> : (
                 <div className="w-7 h-7 bg-[var(--color-primary)] rounded-lg flex items-center justify-center">
-                  <span className="text-white font-bold text-[10px]">P</span>
+                  <span className="text-white font-bold text-[10px]">M</span>
                 </div>
               )}
             </Link>
@@ -169,7 +169,7 @@ export default function Sidebar() {
                 <img src={siteLogo} alt={siteName} className="h-7 w-auto rounded-lg object-contain" />
               ) : (
                 <div className="w-7 h-7 bg-[var(--color-primary)] rounded-lg flex items-center justify-center shrink-0 group-hover:shadow-md transition-shadow">
-                  <span className="text-white font-bold text-[10px]">P</span>
+                  <span className="text-white font-bold text-[10px]">M</span>
                 </div>
               )}
               {!siteLogo && <span className="text-sm font-bold text-[var(--color-primary)]">MBPP</span>}
