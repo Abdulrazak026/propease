@@ -18,6 +18,8 @@ const defaults: SettingsMap = {
   heading_font: "Inter", body_font: "Inter",
   meta_title: "MBPP — Real Estate in Kano", meta_description: "Verified properties for rent and sale in Kano.",
   site_logo: "", site_favicon: "",
+  available_cities: "Kano Municipal, Kano State; Fagge, Kano State; Tarauni, Kano State; Nassarawa, Kano State",
+  terms_of_service: "", privacy_policy: "", cookie_text: "",
 };
 
 const SettingsContext = createContext<SettingsContextType>({
