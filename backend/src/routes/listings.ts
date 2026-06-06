@@ -140,6 +140,40 @@ router.put("/:id", authenticate, authorize("head", "ambassador"), async (req: Au
   }
 });
 
+router.post("/:id/submit", authenticate, async (req: AuthRequest, res: Response) => {
+  try {
+    const listing = await prisma.listing.findUnique({ where: { id: req.params.id as string } });
+    if (!listing || listing.postedById !== req.user!.id) return res.status(403).json({ error: "Not your listing" });
+    if (listing.status !== "draft") return res.status(400).json({ error: "Only draft listings can be submitted" });
+    const updated = await prisma.listing.update({ where: { id: req.params.id as string }, data: { status: "review" } });
+    res.json({ listing: updated });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to submit for review" });
+  }
+});
+
+router.post("/:id/approve", authenticate, authorize("head"), async (req: AuthRequest, res: Response) => {
+  try {
+    const listing = await prisma.listing.findUnique({ where: { id: req.params.id as string } });
+    if (!listing || listing.status !== "review") return res.status(400).json({ error: "Listing not in review" });
+    const updated = await prisma.listing.update({ where: { id: req.params.id as string }, data: { status: "approved" } });
+    res.json({ listing: updated, message: "Listing approved" });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to approve listing" });
+  }
+});
+
+router.post("/:id/reject", authenticate, authorize("head"), async (req: AuthRequest, res: Response) => {
+  try {
+    const listing = await prisma.listing.findUnique({ where: { id: req.params.id as string } });
+    if (!listing) return res.status(404).json({ error: "Listing not found" });
+    const updated = await prisma.listing.update({ where: { id: req.params.id as string }, data: { status: "draft" } });
+    res.json({ listing: updated });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to reject listing" });
+  }
+});
+
 router.delete("/:id", authenticate, authorize("head"), async (req: AuthRequest, res: Response) => {
   try {
     await prisma.listing.delete({ where: { id: req.params.id as string } });

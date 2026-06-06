@@ -14,7 +14,7 @@ router.get("/dashboard", authenticate, authorize("ambassador"), async (req: Auth
     const cityNames = userCities.map((uc) => uc.city.name);
 
     const activeListings = await prisma.listing.count({
-      where: { city: { in: cityNames }, status: { not: "taken" } },
+      where: { city: { in: cityNames }, status: { notIn: ["sold", "rented"] } },
     });
     const totalListings = await prisma.listing.count({
       where: { city: { in: cityNames } },

@@ -2,6 +2,7 @@ import { Router, Response } from "express";
 import prisma from "../lib/prisma";
 import { authenticate, AuthRequest } from "../middleware/auth";
 import { authorize } from "../middleware/rbac";
+import { emailService } from "../services/email";
 import { validate } from "../middleware/validate";
 import { createInquirySchema } from "../validators";
 
@@ -23,11 +24,16 @@ router.post("/:listingId", validate(createInquirySchema), async (req, res: Respo
       },
       include: {
         listing: { select: { id: true, title: true } },
-        assignedAgent: { select: { id: true, name: true } },
+        assignedAgent: { select: { id: true, name: true, email: true } },
       },
     });
 
     res.status(201).json({ inquiry });
+
+    if (inquiry.assignedAgent) {
+      emailService.inquiryNotification(inquiry.assignedAgent.email, inquiry.assignedAgent.name, inquiry.clientName, listing.title, inquiry.message).catch(() => {});
+    }
+    emailService.inquiryConfirmation(req.body.clientContact || "", req.body.clientName || "", listing.title).catch(() => {});
   } catch (error) {
     console.error("Create inquiry error:", error);
     res.status(500).json({ error: "Failed to submit inquiry" });

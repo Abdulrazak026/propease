@@ -54,7 +54,7 @@ router.post("/", async (req, res: Response) => {
   }
 });
 
-router.get("/", authenticate, authorize("admin", "head", "ambassador", "agent"), async (req: AuthRequest, res: Response) => {
+router.get("/", authenticate, authorize("head", "ambassador", "agent"), async (req: AuthRequest, res: Response) => {
   try {
     const { status } = req.query;
     const where: any = {};
@@ -82,7 +82,7 @@ router.get("/", authenticate, authorize("admin", "head", "ambassador", "agent"),
   }
 });
 
-router.get("/:id", authenticate, authorize("admin", "head", "ambassador", "agent"), async (req: AuthRequest, res: Response) => {
+router.get("/:id", authenticate, authorize("head", "ambassador", "agent"), async (req: AuthRequest, res: Response) => {
   try {
     const application = await prisma.tenantApplication.findUnique({
       where: { id: req.params.id as string },
@@ -108,7 +108,7 @@ router.get("/:id", authenticate, authorize("admin", "head", "ambassador", "agent
   }
 });
 
-router.patch("/:id/status", authenticate, authorize("admin", "head", "ambassador", "agent"), async (req: AuthRequest, res: Response) => {
+router.patch("/:id/status", authenticate, authorize("head", "ambassador", "agent"), async (req: AuthRequest, res: Response) => {
   try {
     const { status, agentNotes } = req.body;
     const appId = req.params.id as string;

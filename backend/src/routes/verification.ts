@@ -5,7 +5,7 @@ import { authorize } from "../middleware/rbac";
 
 const router = Router();
 
-router.patch("/users/:id/verify", authenticate, authorize("admin", "head"), async (req: AuthRequest, res: Response) => {
+router.patch("/users/:id/verify", authenticate, authorize("head"), async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.params.id as string;
     const user = await prisma.user.findUnique({ where: { id: userId } });
@@ -47,7 +47,7 @@ router.patch("/users/:id/verify", authenticate, authorize("admin", "head"), asyn
   }
 });
 
-router.patch("/users/:id/unverify", authenticate, authorize("admin", "head"), async (req: AuthRequest, res: Response) => {
+router.patch("/users/:id/unverify", authenticate, authorize("head"), async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.params.id as string;
     const updated = await prisma.user.update({
@@ -73,7 +73,7 @@ router.patch("/users/:id/unverify", authenticate, authorize("admin", "head"), as
   }
 });
 
-router.get("/users", authenticate, authorize("admin", "head"), async (_req: AuthRequest, res: Response) => {
+router.get("/users", authenticate, authorize("head"), async (_req: AuthRequest, res: Response) => {
   try {
     const users = await prisma.user.findMany({
       select: {

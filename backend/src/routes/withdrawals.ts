@@ -1,0 +1,77 @@
+import { Router, Response } from "express";
+import prisma from "../lib/prisma";
+import { authenticate, AuthRequest } from "../middleware/auth";
+import { authorize } from "../middleware/rbac";
+
+const router = Router();
+
+// Agent/ambassador requests withdrawal
+router.post("/withdraw", authenticate, async (req: AuthRequest, res: Response) => {
+  try {
+    const { amount, bankName, accountNumber, accountName } = req.body;
+    if (!amount || amount < 1000) return res.status(400).json({ error: "Minimum withdrawal is ₦1,000" });
+    if (!bankName || !accountNumber || !accountName) return res.status(400).json({ error: "Bank details required" });
+    const uid = req.user!.id as string;
+    const user = await prisma.user.findUnique({ where: { id: uid } });
+    if (!user || user.walletBalance < amount) return res.status(400).json({ error: "Insufficient balance" });
+
+    const withdrawal = await prisma.withdrawal.create({
+      data: { amount, bankName, accountNumber, accountName, userId: uid },
+    });
+    res.status(201).json({ withdrawal, message: "Withdrawal request submitted" });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to request withdrawal" });
+  }
+});
+
+// Admin lists all withdrawals
+router.get("/withdrawals", authenticate, authorize("head"), async (_req: AuthRequest, res: Response) => {
+  try {
+    const withdrawals = await prisma.withdrawal.findMany({
+      include: { user: { select: { name: true, email: true } } },
+      orderBy: { createdAt: "desc" },
+    });
+    res.json({ withdrawals });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch withdrawals" });
+  }
+});
+
+// Admin approves withdrawal
+router.post("/withdrawals/:id/approve", authenticate, authorize("head"), async (req: AuthRequest, res: Response) => {
+  try {
+    const wid = req.params.id as string;
+    const withdrawal = await prisma.withdrawal.findUnique({ where: { id: wid } });
+    if (!withdrawal) return res.status(404).json({ error: "Withdrawal not found" });
+    if (withdrawal.status !== "pending") return res.status(400).json({ error: "Already processed" });
+
+    await prisma.$transaction([
+      prisma.withdrawal.update({ where: { id: wid }, data: { status: "approved" } }),
+      prisma.user.update({ where: { id: withdrawal.userId }, data: { walletBalance: { decrement: withdrawal.amount } } }),
+      prisma.transaction.create({
+        data: { type: "withdrawal", amount: withdrawal.amount, reference: `WD-${withdrawal.id.slice(0,8)}`, method: "transfer", status: "completed", userId: withdrawal.userId },
+      }),
+      prisma.auditLog.create({
+        data: { action: "APPROVE_WITHDRAWAL", entity: "Withdrawal", entityId: wid, userId: req.user!.id as string, details: { amount: withdrawal.amount } },
+      }),
+    ]);
+    res.json({ success: true, message: "Withdrawal approved" });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to approve withdrawal" });
+  }
+});
+
+// Admin rejects withdrawal
+router.post("/withdrawals/:id/reject", authenticate, authorize("head"), async (req: AuthRequest, res: Response) => {
+  try {
+    const wid = req.params.id as string;
+    const withdrawal = await prisma.withdrawal.findUnique({ where: { id: wid } });
+    if (!withdrawal) return res.status(404).json({ error: "Withdrawal not found" });
+    await prisma.withdrawal.update({ where: { id: wid }, data: { status: "rejected" } });
+    res.json({ success: true, message: "Withdrawal rejected" });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to reject withdrawal" });
+  }
+});
+
+export default router;

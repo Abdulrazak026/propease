@@ -26,9 +26,13 @@ enum RentTier {
 }
 
 enum ListingStatus {
+  draft
+  review
+  approved
   available
   reserved
-  taken
+  sold
+  rented
 }
 
 enum ListingCategory {
@@ -194,7 +198,7 @@ model Listing {
   damageDeposit    Int?
   maintenanceCharge Int?
   salePrice        Int?
-  status           ListingStatus  @default(available)
+  status           ListingStatus  @default(draft)
   category         ListingCategory
   partnerCompany   String?
   lat              Float?

@@ -2,10 +2,11 @@ import { Router, Response } from "express";
 import prisma from "../lib/prisma";
 import { authenticate, AuthRequest } from "../middleware/auth";
 import { authorize } from "../middleware/rbac";
+import { calculateAndDistributeCommission } from "./commissions";
 
 const router = Router();
 
-router.post("/", authenticate, authorize("admin", "head", "ambassador", "agent"), async (req: AuthRequest, res: Response) => {
+router.post("/", authenticate, authorize("head", "ambassador", "agent"), async (req: AuthRequest, res: Response) => {
   try {
     const {
       listingId, applicationId, tenantName, tenantEmail, tenantPhone,
@@ -183,6 +184,20 @@ router.post("/:id/sign", authenticate, async (req: AuthRequest, res: Response) =
         });
       }
 
+      // Trigger commission distribution on agreement completion
+      if (agreement.annualRent && agreement.agentId && agreement.listingId) {
+        const ambassadorId = (await prisma.user.findUnique({ where: { id: agreement.agentId }, select: { ambassadorId: true } }))?.ambassadorId || "";
+        calculateAndDistributeCommission(agId, agreement.propertyTitle, "rent_full", agreement.annualRent, ambassadorId, agreement.agentId).catch(() => {});
+      }
+
+      // Update listing status to rented
+      if (agreement.listingId) {
+        await prisma.listing.update({
+          where: { id: agreement.listingId },
+          data: { status: "rented" },
+        }).catch(() => {});
+      }
+
       return res.json({ agreement: updated });
     }
 
@@ -193,7 +208,7 @@ router.post("/:id/sign", authenticate, async (req: AuthRequest, res: Response) =
   }
 });
 
-router.patch("/:id/status", authenticate, authorize("admin", "head", "ambassador", "agent"), async (req: AuthRequest, res: Response) => {
+router.patch("/:id/status", authenticate, authorize("head", "ambassador", "agent"), async (req: AuthRequest, res: Response) => {
   try {
     const { status } = req.body;
     const agId = req.params.id as string;

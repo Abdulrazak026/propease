@@ -76,7 +76,7 @@ router.get("/agent/:agentId", async (req, res: Response) => {
   }
 });
 
-router.get("/", authenticate, authorize("admin", "head"), async (req: AuthRequest, res: Response) => {
+router.get("/", authenticate, authorize("head"), async (req: AuthRequest, res: Response) => {
   try {
     const { status } = req.query;
     const where: any = {};
@@ -99,7 +99,7 @@ router.get("/", authenticate, authorize("admin", "head"), async (req: AuthReques
   }
 });
 
-router.patch("/:id/moderate", authenticate, authorize("admin", "head"), async (req: AuthRequest, res: Response) => {
+router.patch("/:id/moderate", authenticate, authorize("head"), async (req: AuthRequest, res: Response) => {
   try {
     const { status } = req.body;
     if (!["approved", "hidden"].includes(status)) {
