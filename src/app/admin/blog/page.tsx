@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { api } from "@/lib/api-client";
 import Button from "@/components/ui/Button";
 import Badge from "@/components/ui/Badge";
+import ImagePicker from "@/components/ui/ImagePicker";
 
 interface Post { id: string; title: string; slug: string; excerpt: string | null; content: string; coverImage: string | null; published: boolean; publishedAt: string | null; createdAt: string; author?: { name: string } | null; }
 
@@ -76,7 +77,7 @@ export default function BlogPage() {
           <h3 className="text-sm font-semibold text-gray-900">{editId ? "Edit Post" : "New Post"}</h3>
           <input value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} placeholder="Post title" className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm" />
           <input value={form.excerpt} onChange={e => setForm({ ...form, excerpt: e.target.value })} placeholder="Excerpt (optional)" className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm" />
-          <input value={form.coverImage} onChange={e => setForm({ ...form, coverImage: e.target.value })} placeholder="Cover image URL (optional)" className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm" />
+          <ImagePicker value={form.coverImage} onChange={url => setForm({ ...form, coverImage: url })} label="Cover Image" />
           <textarea value={form.content} onChange={e => setForm({ ...form, content: e.target.value })} placeholder="Content (Markdown supported)" rows={6} className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm" />
           <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={form.published} onChange={e => setForm({ ...form, published: e.target.checked })} /> Published</label>
           <div className="flex gap-2"><Button size="sm" onClick={save} disabled={saving}>{saving ? "Saving..." : "Save"}</Button><Button size="sm" variant="outline" onClick={() => setShowForm(false)}>Cancel</Button></div>
