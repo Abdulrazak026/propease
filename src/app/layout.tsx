@@ -19,8 +19,8 @@ async function getPublicSettings() {
 export async function generateMetadata(): Promise<Metadata> {
   const s = await getPublicSettings();
   return {
-    title: s.meta_title || "MBPP — Real Estate in Kano",
-    description: s.meta_description || "Find properties for rent and sale in Kano.",
+    title: s.meta_title || "MBPP \u2014 Real Estate Marketplace, Kano",
+    description: s.meta_description || "Find verified houses, land, flats and commercial properties for rent and sale in Kano, Nigeria.",
     manifest: "/manifest.webmanifest",
     openGraph: { title: s.meta_title || "MBPP", description: s.meta_description || "", images: s.og_image ? [s.og_image] : [], siteName: s.site_name || "MBPP", type: "website" },
     twitter: { card: "summary_large_image", title: s.meta_title || "MBPP", description: s.meta_description || "", images: s.og_image ? [s.og_image] : [] },

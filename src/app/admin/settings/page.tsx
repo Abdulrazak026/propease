@@ -82,7 +82,13 @@ export default function AdminSettings() {
 
   useEffect(() => {
     api.get<{ settings: SettingsMap }>("/api/admin/settings").then((r) => {
-      if (r.data) setSettings((p) => ({ ...p, ...(r.data!.settings || {}) }));
+      if (r.data?.settings) {
+        const merged: SettingsMap = {};
+        for (const [k, v] of Object.entries(r.data.settings)) {
+          if (v) merged[k] = v; // skip empty values to preserve defaults
+        }
+        setSettings((p) => ({ ...p, ...merged }));
+      }
       setLoading(false);
     });
   }, []);
