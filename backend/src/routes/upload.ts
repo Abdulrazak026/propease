@@ -68,11 +68,23 @@ async function uploadToR2(filePath: string, fileName: string, mimeType: string):
   }
 }
 
+// Public file serving — no auth required
+router.get("/file/:filename", async (req, res: Response) => {
+  try {
+    const filename = req.params.filename as string;
+    const filePath = path.join(uploadsDir, filename);
+    if (!fs.existsSync(filePath)) return res.status(404).json({ error: "File not found" });
+    res.sendFile(filePath);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to serve file" });
+  }
+});
+
 router.post("/", authenticate, authorize("head", "ambassador"), requirePermission("canManageContent"), upload.single("file"), async (req: AuthRequest, res: Response) => {
   try {
     if (!req.file) return res.status(400).json({ error: "No file provided" });
 
-    let url = `/uploads/${req.file.filename}`;
+    let url = `/api/upload/file/${req.file.filename}`;
 
     const r2Url = await uploadToR2(req.file.path, req.file.filename, req.file.mimetype);
     if (r2Url) url = r2Url;
