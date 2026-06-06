@@ -195,11 +195,8 @@ export default function AdminSettings() {
           <F label="Property Types (comma-separated)" v={s("property_types")} onChange={(v) => set("property_types", v)} />
           <F label="Amenities (comma-separated)" v={s("amenities")} onChange={(v) => set("amenities", v)} />
           <div className="border-t border-gray-100 pt-3 mt-2">
-            <h4 className="text-xs font-semibold text-gray-700 mb-2">Available Cities</h4>
-            <div className="bg-gray-50 rounded-lg p-3 text-xs text-gray-500">
-              <p className="mb-2">Current cities: <span className="font-medium text-gray-700">{s("available_cities") || "None configured"}</span></p>
-              <F label="Add/Edit Cities (comma-separated, format: City Name, State)" v={s("available_cities")} onChange={(v) => set("available_cities", v)} placeholder="e.g. Kano Municipal, Kano; Fagge, Kano; Abuja, FCT" />
-            </div>
+            <h4 className="text-xs font-semibold text-gray-700 mb-3">Available Cities ({s("available_cities").split(";").filter(c => c.trim()).length})</h4>
+            <CityManager value={s("available_cities")} onChange={(v) => set("available_cities", v)} />
           </div>
         </>)}
 
@@ -362,4 +359,46 @@ function S({ label, v, onChange, opts }: { label: string; v: string; onChange: (
       {opts.map(([k, l]) => <option key={k} value={k}>{l}</option>)}
     </select>
   </div>;
+}
+
+function CityManager({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  const [newCity, setNewCity] = useState("");
+  const [newState, setNewState] = useState("Kano State");
+  const cities = value.split(";").map(c => c.trim()).filter(Boolean).map(c => {
+    const parts = c.split(",");
+    return { name: parts[0]?.trim() || "", state: parts[1]?.trim() || "Kano State" };
+  });
+
+  const add = () => {
+    if (!newCity.trim()) return;
+    const entry = `${newCity.trim()}, ${newState.trim()}`;
+    if (cities.some(c => c.name.toLowerCase() === newCity.trim().toLowerCase())) return;
+    const updated = [...cities, { name: newCity.trim(), state: newState.trim() }];
+    onChange(updated.map(c => `${c.name}, ${c.state}`).join("; "));
+    setNewCity("");
+  };
+
+  const remove = (name: string) => {
+    const updated = cities.filter(c => c.name !== name);
+    onChange(updated.map(c => `${c.name}, ${c.state}`).join("; "));
+  };
+
+  return (
+    <div className="space-y-3">
+      <div className="flex flex-wrap gap-1.5 max-h-48 overflow-y-auto">
+        {cities.map(c => (
+          <span key={c.name} className="inline-flex items-center gap-1 px-2.5 py-1.5 bg-gray-100 text-gray-700 rounded-lg text-xs">
+            {c.name}
+            <button type="button" onClick={() => remove(c.name)} className="text-gray-400 hover:text-red-500 ml-1">&times;</button>
+          </span>
+        ))}
+        {cities.length === 0 && <span className="text-xs text-gray-400">No cities configured</span>}
+      </div>
+      <div className="flex gap-2">
+        <input value={newCity} onChange={e => setNewCity(e.target.value)} onKeyDown={e => e.key === "Enter" && (e.preventDefault(), add())} placeholder="City name" className="flex-1 rounded-lg border border-gray-200 px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)]" />
+        <input value={newState} onChange={e => setNewState(e.target.value)} placeholder="State" className="w-28 rounded-lg border border-gray-200 px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)]" />
+        <button type="button" onClick={add} className="px-4 py-2 bg-[var(--color-primary)] text-white text-xs font-medium rounded-lg hover:opacity-90">Add</button>
+      </div>
+    </div>
+  );
 }
