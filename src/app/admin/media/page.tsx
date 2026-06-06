@@ -2,6 +2,8 @@
 import { useState, useRef, useEffect } from "react";
 import { api, getAccessToken } from "@/lib/api-client";
 
+const API_URL = "https://propease-production.up.railway.app";
+
 interface MediaItem {
   id: string;
   key: string;
@@ -37,7 +39,7 @@ export default function MediaPage() {
     formData.append("file", e.target.files[0]);
 
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/upload`, {
+      const res = await fetch(`${API_URL}/api/upload`, {
         method: "POST",
         headers: { Authorization: `Bearer ${getAccessToken() || ""}` },
         body: formData,
