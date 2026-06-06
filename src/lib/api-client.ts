@@ -53,7 +53,7 @@ export async function apiFetch<T>(
   });
   clearTimeout(timeout);
 
-  if (res.status === 401 && accessToken) {
+  if (res.status === 401) {
     if (!refreshPromise) {
       refreshPromise = refreshAccessToken();
     }
