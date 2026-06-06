@@ -1,7 +1,8 @@
 "use client";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { api } from "@/lib/api-client";
 import Button from "@/components/ui/Button";
+import DOMPurify from "dompurify";
 
 type SettingsMap = Record<string, string>;
 
@@ -64,7 +65,7 @@ function RichTextArea({ label, value, onChange, rows = 6 }: { label: string; val
         </div>
       )}
       {showPreview ? (
-        <div className="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm min-h-[100px] prose prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: value.replace(/\n/g, "<br>").replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>").replace(/{{(.*?)}}/g, "<code>{$1}</code>") }} />
+        <div className="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm min-h-[100px] prose prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(value) }} />
       ) : (
         <textarea value={value} onChange={(e) => onChange(e.target.value)} rows={rows} className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-xs font-mono focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20 resize-y" />
       )}

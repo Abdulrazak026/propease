@@ -12,7 +12,6 @@ import authRoutes from "./routes/auth";
 import listingRoutes from "./routes/listings";
 import taskRoutes from "./routes/tasks";
 import commissionRoutes from "./routes/commissions";
-import paymentRoutes from "./routes/payments";
 import inquiryRoutes from "./routes/inquiries";
 import reservationRoutes from "./routes/reservations";
 import customOrderRoutes from "./routes/custom-orders";
@@ -63,6 +62,9 @@ const authLimiter = rateLimit({
   legacyHeaders: false,
 });
 app.use("/api/auth/login", authLimiter);
+app.use("/api/auth/register", authLimiter);
+app.use("/api/auth/forgot-password", authLimiter);
+app.use("/api/auth/reset-password", authLimiter);
 
 // Body parsing
 app.use(express.json({ limit: "10mb" }));
@@ -81,7 +83,6 @@ app.use("/api/auth", authRoutes);
 app.use("/api/listings", listingRoutes);
 app.use("/api/tasks", taskRoutes);
 app.use("/api/commissions", commissionRoutes);
-app.use("/api/payments", paymentRoutes);
 app.use("/api/inquiries", inquiryRoutes);
 app.use("/api/reservations", reservationRoutes);
 app.use("/api/custom-orders", customOrderRoutes);

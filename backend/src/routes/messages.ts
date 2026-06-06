@@ -1,11 +1,12 @@
 import { Router, Response } from "express";
 import prisma from "../lib/prisma";
+import { authenticate, AuthRequest } from "../middleware/auth";
 
 const router = Router();
 
-router.get("/conversations", async (req, res: Response) => {
+router.get("/conversations", authenticate, async (req: AuthRequest, res: Response) => {
   try {
-    const userId = req.headers["x-user-id"] as string;
+    const userId = req.user!.id as string;
     if (!userId) return res.status(401).json({ error: "User ID required" });
     const conversations = await prisma.conversation.findMany({
       where: { participants: { some: { userId } } },
@@ -22,15 +23,17 @@ router.get("/conversations", async (req, res: Response) => {
   }
 });
 
-router.get("/conversations/:id/messages", async (req, res: Response) => {
+router.get("/conversations/:id/messages", authenticate, async (req: AuthRequest, res: Response) => {
   try {
+    const uid = req.user!.id as string;
+    const convId = req.params.id as string;
     const messages = await prisma.message.findMany({
-      where: { conversationId: req.params.id },
+      where: { conversationId: convId },
       orderBy: { createdAt: "asc" },
       include: { sender: { select: { id: true, name: true, email: true } } },
     });
     await prisma.message.updateMany({
-      where: { conversationId: req.params.id, senderId: { not: req.headers["x-user-id"] as string }, read: false },
+      where: { conversationId: convId, senderId: { not: uid }, read: false },
       data: { read: true },
     });
     res.json(messages);
@@ -39,17 +42,18 @@ router.get("/conversations/:id/messages", async (req, res: Response) => {
   }
 });
 
-router.post("/conversations/:id/messages", async (req, res: Response) => {
+router.post("/conversations/:id/messages", authenticate, async (req: AuthRequest, res: Response) => {
   try {
-    const senderId = req.headers["x-user-id"] as string;
+    const senderId = req.user!.id as string;
+    const convId = req.params.id as string;
     if (!senderId) return res.status(401).json({ error: "User ID required" });
     const { content } = req.body;
     const message = await prisma.message.create({
-      data: { content, conversationId: req.params.id, senderId },
+      data: { content, conversationId: convId, senderId },
       include: { sender: { select: { id: true, name: true, email: true } } },
     });
     await prisma.conversation.update({
-      where: { id: req.params.id },
+      where: { id: convId },
       data: { updatedAt: new Date() },
     });
     res.status(201).json(message);
@@ -58,9 +62,9 @@ router.post("/conversations/:id/messages", async (req, res: Response) => {
   }
 });
 
-router.post("/conversations", async (req, res: Response) => {
+router.post("/conversations", authenticate, async (req: AuthRequest, res: Response) => {
   try {
-    const senderId = req.headers["x-user-id"] as string;
+    const senderId = req.user!.id;
     if (!senderId) return res.status(401).json({ error: "User ID required" });
     const { recipientId, listingId, subject, content } = req.body;
     const existing = await prisma.conversation.findFirst({

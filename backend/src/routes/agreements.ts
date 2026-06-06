@@ -111,7 +111,7 @@ router.get("/:id", authenticate, async (req: AuthRequest, res: Response) => {
   }
 });
 
-router.post("/:id/sign", async (req: AuthRequest, res: Response) => {
+router.post("/:id/sign", authenticate, async (req: AuthRequest, res: Response) => {
   try {
     const { role, signature } = req.body;
     const agId = req.params.id as string;
