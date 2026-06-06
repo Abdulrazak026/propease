@@ -22,14 +22,19 @@ export default async function PrivacyPage() {
     .replace(/\n/g, "<br/>");
 
   return (
-    <div className="flex-1 py-16 px-4">
-      <div className="max-w-3xl mx-auto">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Privacy Policy</h1>
-        <p className="text-sm text-gray-500 mb-8">Last updated: June 2026</p>
+    <div className="flex-1 bg-white">
+      <section className="bg-gray-50 py-16 px-4 border-b border-gray-200">
+        <div className="max-w-3xl mx-auto text-center">
+          <span className="text-xs font-medium text-[var(--color-primary)] uppercase tracking-wider">Legal</span>
+          <h1 className="text-3xl font-bold text-gray-900 mt-2">Privacy Policy</h1>
+          <p className="text-sm text-gray-500 mt-2">Last updated: June 2026</p>
+        </div>
+      </section>
+      <div className="max-w-3xl mx-auto px-4 py-10">
         {content ? (
-          <div className="prose prose-sm max-w-none text-gray-700 leading-relaxed" dangerouslySetInnerHTML={{ __html: html }} />
+          <div className="prose prose-sm max-w-none text-gray-700 leading-relaxed space-y-4" dangerouslySetInnerHTML={{ __html: html }} />
         ) : (
-          <div className="text-sm text-gray-400 py-8 text-center">No content set. Configure in Admin → Settings → SEO & Legal.</div>
+          <div className="text-sm text-gray-400 py-8 text-center border border-dashed border-gray-200 rounded-lg">No content set. Configure in Admin &rarr; Settings &rarr; SEO &amp; Legal.</div>
         )}
       </div>
     </div>

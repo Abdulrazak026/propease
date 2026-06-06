@@ -25,7 +25,7 @@ export function useListings() {
       setLoading(true);
       setError(null);
       try {
-        const { data, status } = await api.get<{ listings: ApiListing[] }>("/api/listings?status=available");
+        const { data, status } = await api.get<{ listings: ApiListing[] }>("/api/listings");
         if (status === 200 && data) {
           setListings(data.listings || []);
         } else {
@@ -40,6 +40,8 @@ export function useListings() {
 
   const filtered = useMemo(() => {
     return listings.filter((l) => {
+      // Public homepage only shows available/reserved listings
+      if (!["available", "reserved", "approved"].includes(l.status)) return false;
       if (filters.search) {
         const q = filters.search.toLowerCase();
         if (!l.title.toLowerCase().includes(q) && !(l.address || "").toLowerCase().includes(q)) return false;
