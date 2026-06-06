@@ -30,10 +30,10 @@ export default function Footer() {
 
   return (
     <footer className="bg-white border-t border-gray-200">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
           {/* Logo + About */}
-          <div className="space-y-4">
+          <div className="space-y-3">
             <Link href="/" className="inline-flex items-center gap-2">
               {logo ? <img src={logo} alt={brand} className="h-8 w-auto" /> : <span className="text-lg font-bold text-gray-900">{brand}</span>}
             </Link>
@@ -43,8 +43,8 @@ export default function Footer() {
 
           {/* Quick Links */}
           <div>
-            <h4 className="text-xs font-semibold text-gray-900 uppercase tracking-wider mb-4">Company</h4>
-            <ul className="space-y-2.5">
+            <h4 className="text-xs font-semibold text-gray-900 uppercase tracking-wider mb-3">Company</h4>
+            <ul className="space-y-2">
               {[
                 { l: "About us", h: "/about" },
                 { l: "Contact us", h: "/contact" },
@@ -60,18 +60,20 @@ export default function Footer() {
 
           {/* Contact Info */}
           <div>
-            <h4 className="text-xs font-semibold text-gray-900 uppercase tracking-wider mb-4">Head Office</h4>
-            <div className="space-y-2.5 text-sm text-gray-500">
+            <h4 className="text-xs font-semibold text-gray-900 uppercase tracking-wider mb-3">Head Office</h4>
+            <div className="space-y-2 text-sm text-gray-500">
               <p>{address}</p>
               {phone && <p>{phone}</p>}
-              {whatsapp && <a href={`https://wa.me/${whatsapp.replace(/[^0-9]/g, "")}`} target="_blank" rel="noopener noreferrer" className="text-[var(--color-primary)] hover:underline">{whatsapp}</a>}
+              {whatsapp && (!phone || whatsapp !== phone) && (
+                <a href={`https://wa.me/${whatsapp.replace(/[^0-9]/g, "")}`} target="_blank" rel="noopener noreferrer" className="text-[var(--color-primary)] hover:underline">{whatsapp}</a>
+              )}
               <p>{hours}</p>
             </div>
           </div>
         </div>
 
         {/* Social + Newsletter */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-6 mt-10 pt-8 border-t border-gray-100">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-6 pt-6 border-t border-gray-100">
           {socialItems.length > 0 && (
             <div className="flex items-center gap-3">
               <span className="text-xs text-gray-500 font-medium">Follow Us on</span>
@@ -89,7 +91,7 @@ export default function Footer() {
         </div>
 
         {/* Copyright */}
-        <div className="text-center text-xs text-gray-400 mt-8 pt-6 border-t border-gray-100">
+        <div className="text-center text-xs text-gray-400 mt-6 pt-4 border-t border-gray-100">
           Copyright &copy; {new Date().getFullYear()} {brand}. All rights reserved.
         </div>
       </div>
