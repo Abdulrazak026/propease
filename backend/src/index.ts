@@ -38,6 +38,7 @@ import crypto from "crypto";
 import bcrypt from "bcryptjs";
 import prisma from "./lib/prisma";
 import { emailService } from "./services/email";
+import { logger } from "./lib/logger";
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -77,9 +78,14 @@ app.use(express.urlencoded({ extended: true }));
 // Logging
 app.use(morgan("dev"));
 
-// Health check
-app.get("/api/health", (_req, res) => {
-  res.json({ status: "ok", timestamp: new Date().toISOString() });
+// Health check with DB connectivity
+app.get("/api/health", async (_req, res) => {
+  try {
+    await prisma.$queryRaw`SELECT 1`;
+    res.json({ status: "ok", db: "connected", timestamp: new Date().toISOString() });
+  } catch {
+    res.status(503).json({ status: "error", db: "disconnected" });
+  }
 });
 
 // Routes
@@ -154,8 +160,21 @@ app.use((err: Error, _req: express.Request, res: express.Response, _next: expres
   res.status(500).json({ error: "Internal server error" });
 });
 
-app.listen(PORT, () => {
-  console.log(`PropEase API running on port ${PORT}`);
+const server = app.listen(PORT, () => {
+  logger.info({ port: PORT }, "API server started");
 });
+
+async function shutdown(signal: string) {
+  logger.warn({ signal }, "Shutting down...");
+  server.close(async () => {
+    await prisma.$disconnect();
+    logger.info("Server stopped. DB disconnected.");
+    process.exit(0);
+  });
+  setTimeout(() => { logger.error("Forced shutdown after 10s"); process.exit(1); }, 10000);
+}
+
+process.on("SIGTERM", () => shutdown("SIGTERM"));
+process.on("SIGINT", () => shutdown("SIGINT"));
 
 export default app;

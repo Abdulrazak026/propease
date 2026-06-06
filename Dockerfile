@@ -14,4 +14,4 @@ COPY --from=builder /app/package*.json ./
 COPY --from=builder /app/prisma ./prisma
 RUN npx prisma generate
 EXPOSE 4000
-CMD sh -c "node dist/migrate-listing-status.js && npx prisma db push && node dist/index.js"
+CMD sh -c "node dist/migrate-listing-status.js && npx prisma migrate deploy && node dist/index.js"
