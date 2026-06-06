@@ -1,6 +1,7 @@
 import { Router, Response } from "express";
 import prisma from "../lib/prisma";
 import { authenticate, AuthRequest } from "../middleware/auth";
+import { authorize } from "../middleware/rbac";
 import { validate } from "../middleware/validate";
 import { createInquirySchema } from "../validators";
 
@@ -81,6 +82,19 @@ router.patch("/:id/status", authenticate, async (req: AuthRequest, res: Response
   } catch (error) {
     console.error("Update inquiry error:", error);
     res.status(500).json({ error: "Failed to update inquiry" });
+  }
+});
+
+router.get("/all", authenticate, authorize("head"), async (_req: AuthRequest, res: Response) => {
+  try {
+    const inquiries = await prisma.inquiry.findMany({
+      orderBy: { createdAt: "desc" },
+      include: { listing: { select: { title: true } } },
+      take: 100,
+    });
+    res.json({ inquiries });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch inquiries" });
   }
 });
 

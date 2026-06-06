@@ -1,16 +1,31 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Badge from "@/components/ui/Badge";
 import Button from "@/components/ui/Button";
-import { users } from "@/lib/mock-data";
+import { api } from "@/lib/api-client";
+
+interface ApiUser { id: string; name: string; email: string; role: string; city: string | null; walletBalance: number; isApproved: boolean; isVerified: boolean; canCreateTasks: boolean; canCloseDeals: boolean; }
 
 export default function StaffsPage() {
+  const [users, setUsers] = useState<ApiUser[]>([]);
   const [view, setView] = useState<"ambassadors"|"agents">("ambassadors");
+  const [loading, setLoading] = useState(true);
   const [editUser, setEditUser] = useState<string|null>(null);
-  const [viewUser, setViewUser] = useState<(typeof users)[0]|null>(null);
+
+  const fetchUsers = () => {
+    api.get<{ users: ApiUser[] }>("/api/admin/users").then(r => {
+      if (r.data?.users) setUsers(r.data.users);
+      setLoading(false);
+    }).catch(() => setLoading(false));
+  };
+
+  useEffect(() => { fetchUsers(); }, []);
+
   const ambassadors = users.filter(u => u.role === "ambassador");
   const agents = users.filter(u => u.role === "agent");
   const list = view === "ambassadors" ? ambassadors : agents;
+
+  if (loading) return <div className="flex items-center justify-center h-64"><div className="h-8 w-8 border-2 border-[var(--color-primary)] border-t-transparent rounded-full animate-spin" /></div>;
 
   return (
     <div className="space-y-6">
@@ -32,12 +47,10 @@ export default function StaffsPage() {
               {list.map(user => (
                 <tr key={user.id} className="border-b border-gray-50 hover:bg-gray-50/50">
                   <td className="px-4 py-3"><div className="flex items-center gap-2"><div className="w-8 h-8 rounded-full bg-[var(--color-primary)]/10 flex items-center justify-center text-xs font-bold text-[var(--color-primary)]">{user.name.split(" ").map(n=>n[0]).join("")}</div><div><p className="font-medium text-gray-900 text-xs">{user.name}</p><p className="text-[10px] text-gray-400">{user.email}</p></div></div></td>
-                  <td className="px-4 py-3 text-xs text-gray-600">{user.city}</td>
+                  <td className="px-4 py-3 text-xs text-gray-600">{user.city||"—"}</td>
                   <td className="px-4 py-3"><Badge variant={user.isApproved?"success":"warning"}>{user.isApproved?"Active":"Pending"}</Badge></td>
-                  <td className="px-4 py-3"><div className="flex flex-wrap gap-1">{user.canCreateTasks&&<span className="text-[10px] bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded">Create Tasks</span>}{user.canCloseDeals&&<span className="text-[10px] bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded">Close Deals</span>}{!user.canCreateTasks&&!user.canCloseDeals&&<span className="text-[10px] text-gray-400">—</span>}</div></td>
-                  <td className="px-4 py-3">
-                    <div className="flex gap-1"><Button size="sm" variant="ghost" onClick={()=>setViewUser(user)}>View</Button><Button size="sm" variant="outline" onClick={()=>setEditUser(user.id)}>Roles</Button></div>
-                  </td>
+                  <td className="px-4 py-3"><div className="flex flex-wrap gap-1">{user.canCreateTasks&&<span className="text-[10px] bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded">Create Tasks</span>}{user.canCloseDeals&&<span className="text-[10px] bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded">Close Deals</span>}</div></td>
+                  <td className="px-4 py-3"><Button size="sm" variant="outline" onClick={()=>setEditUser(user.id)}>Edit Roles</Button></td>
                 </tr>
               ))}
             </tbody>
@@ -45,78 +58,52 @@ export default function StaffsPage() {
         </div>
       </div>
 
-      {/* View User Modal */}
-      {viewUser && <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4" onClick={()=>setViewUser(null)}><div className="bg-white rounded-xl p-6 max-w-md w-full shadow-2xl" onClick={e=>e.stopPropagation()}>
-        <div className="flex items-center justify-between mb-4"><h3 className="text-lg font-bold text-gray-900">{viewUser.name}</h3><button onClick={()=>setViewUser(null)} className="text-gray-400 hover:text-gray-600"><svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12"/></svg></button></div>
-        <div className="grid grid-cols-2 gap-3 text-sm">
-          <div><span className="text-gray-400 text-xs">Email</span><p className="font-medium">{viewUser.email}</p></div>
-          <div><span className="text-gray-400 text-xs">Role</span><p className="font-medium capitalize">{viewUser.role}</p></div>
-          <div><span className="text-gray-400 text-xs">City</span><p className="font-medium">{viewUser.city||"—"}</p></div>
-          <div><span className="text-gray-400 text-xs">Wallet</span><p className="font-medium">₦{viewUser.walletBalance.toLocaleString()}</p></div>
-        </div>
-        <div className="mt-4 pt-4 border-t border-gray-100"><h4 className="text-xs font-semibold text-gray-700 mb-2">Transaction History</h4><div className="text-xs text-gray-400">No transactions recorded yet.</div></div>
-        <div className="mt-4 flex gap-2"><Button variant="outline" size="sm" className="flex-1" onClick={()=>{setViewUser(null);setEditUser(viewUser.id)}}>Manage Roles</Button><Button variant="danger" size="sm" className="flex-1">Suspend</Button></div>
-      </div></div>}
-
-      {/* Roles/Permissions Modal */}
-      {editUser && (
-        <RolesModal userId={editUser} onClose={() => setEditUser(null)} />
-      )}
+      {editUser && <RolesModal userId={editUser} users={users} onClose={()=>{setEditUser(null);fetchUsers()}} />}
     </div>
   );
 }
 
-function RolesModal({ userId, onClose }: { userId: string; onClose: () => void }) {
+function RolesModal({ userId, users, onClose }: { userId: string; users: ApiUser[]; onClose: () => void }) {
   const u = users.find(x => x.id === userId)!;
+  const [saving, setSaving] = useState(false);
   if (!u) return null;
+
+  const update = async (data: Record<string, unknown>) => {
+    setSaving(true);
+    await api.patch(`/api/admin/users/${userId}`, data);
+    onClose();
+  };
+
   return (
     <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4" onClick={onClose}>
       <div className="bg-white rounded-xl p-6 max-w-md w-full shadow-2xl" onClick={e => e.stopPropagation()}>
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-bold text-gray-900">Manage Roles — {u.name}</h3>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600"><svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg></button>
-        </div>
+        <div className="flex items-center justify-between mb-4"><h3 className="text-lg font-bold text-gray-900">Manage Roles — {u.name}</h3><button onClick={onClose} className="text-gray-400 hover:text-gray-600"><svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12"/></svg></button></div>
         <div className="space-y-4">
           <div>
             <label className="text-xs font-semibold text-gray-700">Role</label>
-            <select defaultValue={u.role} className="w-full mt-1 rounded-lg border border-gray-200 px-3 py-2 text-sm">
-              <option value="ambassador">Ambassador</option><option value="agent">Agent</option><option value="head">Head (Admin)</option>
+            <select defaultValue={u.role} className="w-full mt-1 rounded-lg border border-gray-200 px-3 py-2 text-sm" onChange={async e => { await update({ role: e.target.value }); }}>
+              <option value="ambassador">Ambassador</option><option value="agent">Agent</option>
             </select>
           </div>
           <div>
             <label className="text-xs font-semibold text-gray-700 mb-2 block">Permissions</label>
             <div className="space-y-2">
               {[
-                {k:"canCreateTasks",l:"Create & Assign Tasks",d:"Create outsourcing tasks and assign to agents"},
-                {k:"canCloseDeals",l:"Close Deals",d:"Mark deals as completed and trigger commissions"},
-                {k:"canViewReports",l:"View Reports",d:"Access analytics and performance reports"},
-                {k:"canManageListings",l:"Manage Listings",d:"Create, edit, and remove property listings"},
-                {k:"canApproveUsers",l:"Approve Users",d:"Approve or reject new user registrations"},
-                {k:"canWithdrawFunds",l:"Withdraw Funds",d:"Request withdrawals from wallet balance"},
-                {k:"canSendNotifications",l:"Send Notifications",d:"Broadcast notifications to users"},
-                {k:"canExportData",l:"Export Data",d:"Download reports, agreements, and user data"},
+                { k: "canCreateTasks", l: "Create & Assign Tasks" },
+                { k: "canCloseDeals", l: "Close Deals" },
               ].map(p => (
-                <label key={p.k} className="flex items-start gap-3 p-2 rounded-lg hover:bg-gray-50 cursor-pointer">
-                  <input type="checkbox" defaultChecked={false} className="mt-0.5 rounded" />
-                  <div><p className="text-sm font-medium text-gray-900">{p.l}</p><p className="text-[10px] text-gray-400">{p.d}</p></div>
+                <label key={p.k} className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50 cursor-pointer" onClick={async () => { await update({ [p.k]: !(u as any)[p.k] }); }}>
+                  <div className={`w-10 h-6 rounded-full relative transition-colors ${(u as any)[p.k] ? "bg-[var(--color-primary)]" : "bg-gray-300"}`}><span className={`absolute top-0.5 w-5 h-5 rounded-full bg-white transition-transform ${(u as any)[p.k] ? "translate-x-5" : "left-0.5"}`} /></div>
+                  <span className="text-sm font-medium text-gray-900">{p.l}</span>
                 </label>
               ))}
             </div>
           </div>
           <div>
-            <label className="text-xs font-semibold text-gray-700">Commission Rate (%)</label>
-            <input type="number" defaultValue="5" className="w-full mt-1 rounded-lg border border-gray-200 px-3 py-2 text-sm" />
-          </div>
-          <div>
-            <label className="text-xs font-semibold text-gray-700">Assigned Cities</label>
-            <div className="flex flex-wrap gap-2 mt-1">
-              {["Kano Municipal","Fagge","Tarauni","Nassarawa"].map(c => (
-                <label key={c} className="flex items-center gap-1 text-xs"><input type="checkbox" defaultChecked className="rounded" />{c}</label>
-              ))}
-            </div>
+            <label className="text-xs font-semibold text-gray-700">Status</label>
+            <Button size="sm" variant={u.isApproved ? "outline" : "primary"} className="mt-1 w-full" onClick={async () => { await update({ isApproved: !u.isApproved }); }} disabled={saving}>{u.isApproved ? "Suspend" : "Approve"}</Button>
           </div>
         </div>
-        <div className="mt-4 flex gap-2"><Button className="flex-1" onClick={onClose}>Save Permissions</Button><Button variant="outline" className="flex-1" onClick={onClose}>Cancel</Button></div>
       </div>
     </div>
   );
