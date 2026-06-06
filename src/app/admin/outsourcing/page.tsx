@@ -4,7 +4,7 @@ import Badge from "@/components/ui/Badge";
 import Button from "@/components/ui/Button";
 import Link from "next/link";
 import { api } from "@/lib/api-client";
-import { formatNaira } from "@/lib/utils";
+import { formatNaira, resolveImageUrl } from "@/lib/utils";
 
 interface Listing { id: string; title: string; propertyType: string; listingType: string; category: string; city: string; address: string; price: number; status: string; photos?: { url: string }[]; }
 
@@ -70,13 +70,13 @@ export default function OutsourcingPage() {
                 <tr key={p.id} className="border-b border-gray-50 hover:bg-gray-50/50">
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-3">
-                      {p.photos?.[0]?.url ? (
-                        <img src={p.photos[0].url} alt="" className="w-10 h-10 rounded-lg object-cover shrink-0 border border-gray-100" />
+                      {resolveImageUrl(p.photos?.[0]?.url) ? (
+                        <img src={resolveImageUrl(p.photos?.[0]?.url)!} alt="" className="w-10 h-10 rounded-lg object-cover shrink-0 border border-gray-100" />
                       ) : (
                         <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center shrink-0 text-gray-300 text-xs">N/A</div>
                       )}
                       <div className="min-w-0">
-                        <Link href={`/listings/${p.id}`} className="text-xs font-medium text-gray-900 hover:text-[var(--color-primary)] transition-colors truncate block max-w-[200px]">{p.title}</Link>
+                        <a href={`/listings/${p.id}`} target="_blank" rel="noopener noreferrer" className="text-xs font-medium text-gray-900 hover:text-[var(--color-primary)] transition-colors truncate block max-w-[200px]">{p.title}</a>
                         <p className="text-[10px] text-gray-400 capitalize">{p.listingType} · {p.category}</p>
                       </div>
                     </div>
@@ -97,8 +97,8 @@ export default function OutsourcingPage() {
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex gap-1.5">
-                      <a href={`/listings/${p.id}`} className="text-[10px] px-2 py-1 rounded bg-gray-100 text-gray-600 hover:bg-gray-200">View</a>
-                      <a href={`/admin/listings/new`} className="text-[10px] px-2 py-1 rounded bg-blue-50 text-blue-600 hover:bg-blue-100">Edit</a>
+                      <a href={`/listings/${p.id}`} target="_blank" rel="noopener noreferrer" className="text-[10px] px-2 py-1 rounded bg-gray-100 text-gray-600 hover:bg-gray-200">View</a>
+                      <a href={`/admin/listings/${p.id}/edit`} className="text-[10px] px-2 py-1 rounded bg-blue-50 text-blue-600 hover:bg-blue-100">Edit</a>
                       <button onClick={() => deleteListing(p.id)} className="text-[10px] px-2 py-1 rounded bg-red-50 text-red-600 hover:bg-red-100">Delete</button>
                     </div>
                   </td>

@@ -5,6 +5,7 @@ import { SettingsProvider, useSettings } from "@/context/SettingsContext";
 import ErrorBoundary from "@/components/ui/ErrorBoundary";
 import LayoutShell from "@/components/layout/LayoutShell";
 import PwaRegister from "@/components/pwa/PwaRegister";
+import WhatsAppButton from "@/components/ui/WhatsAppButton";
 
 export default function ClientBody({ children }: { children: React.ReactNode }) {
   return (
@@ -17,6 +18,7 @@ export default function ClientBody({ children }: { children: React.ReactNode }) 
           </LayoutShell>
         </ErrorBoundary>
       </RoleProvider>
+      <WhatsAppButton />
       <AnalyticsInjector />
     </SettingsProvider>
   );

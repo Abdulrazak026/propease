@@ -180,8 +180,6 @@ async function seedAdminPermissions() {
 async function seedBlogPosts() {
   const admin = await prisma.user.findFirst({ where: { email: ADMIN_EMAIL } });
   if (!admin) return;
-  const existing = await prisma.blogPost.count();
-  if (existing >= 3) return;
 
   const posts = [
     {
@@ -340,8 +338,6 @@ async function seedBlogPosts() {
 }
 
 async function seedFaqs() {
-  const existing = await prisma.faq.count();
-  if (existing >= 5) return;
 
   const faqs = [
     { question: "How do I reset my password?", answer: "Go to the login page and click 'Forgot Password'. Enter your email address and we will send you a reset link. The link expires in 15 minutes. If you don't see the email, check your spam folder or contact support@mbpproperties.com.", order: 1 },
@@ -357,7 +353,8 @@ async function seedFaqs() {
   ];
 
   for (const faq of faqs) {
-    await prisma.faq.create({ data: faq });
+    const exists = await prisma.faq.findFirst({ where: { question: faq.question } });
+    if (!exists) await prisma.faq.create({ data: faq });
   }
   console.log(`Seeded ${faqs.length} FAQs`);
 }
@@ -365,8 +362,6 @@ async function seedFaqs() {
 async function seedListings() {
   const admin = await prisma.user.findFirst({ where: { email: ADMIN_EMAIL } });
   if (!admin) return;
-  const existing = await prisma.listing.count();
-  if (existing >= 3) return;
 
   const listings = [
     { title: "3-Bedroom Bungalow with Borehole \u2014 Kano Municipal", description: "Spacious 3-bedroom bungalow in a serene environment. Features include a living room, dining area, kitchen, three bedrooms (one en-suite), borehole water supply, and ample parking. Close to Aminu Kano Teaching Hospital.", propertyType: "house", listingType: "sale", city: "Kano Municipal", address: "No. 15 Zaria Road, Kano Municipal", price: 35000000, salePrice: 35000000, bedrooms: 3, bathrooms: 2, sqft: 1800, status: "approved", category: "portfolio", features: ["Borehole", "Parking", "Security"], lat: 12.0022, lng: 8.5387 },
@@ -380,9 +375,12 @@ async function seedListings() {
   ];
 
   for (const l of listings) {
-    await prisma.listing.create({
-      data: { ...l, postedById: admin.id } as any,
-    });
+    const exists = await prisma.listing.findFirst({ where: { title: l.title } });
+    if (!exists) {
+      await prisma.listing.create({
+        data: { ...l, postedById: admin.id } as any,
+      });
+    }
   }
   console.log(`Seeded ${listings.length} listings`);
 }

@@ -53,3 +53,11 @@ export const statusColors: Record<string, string> = {
   read: "bg-gray-100 text-gray-800",
   responded: "bg-emerald-100 text-emerald-800",
 };
+
+const BACKEND_URL = "https://propease-production.up.railway.app";
+
+export function resolveImageUrl(url: string | undefined | null): string | null {
+  if (!url) return null;
+  if (url.startsWith("http://") || url.startsWith("https://")) return url;
+  return `${BACKEND_URL}${url.startsWith("/") ? "" : "/"}${url}`;
+}

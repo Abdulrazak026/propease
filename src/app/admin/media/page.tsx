@@ -1,6 +1,7 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
 import { api, getAccessToken } from "@/lib/api-client";
+import { resolveImageUrl } from "@/lib/utils";
 
 const API_URL = "https://propease-production.up.railway.app";
 
@@ -101,7 +102,7 @@ export default function MediaPage() {
             {files.map(f => (
               <div key={f.id} className="bg-white border border-gray-200 rounded-lg overflow-hidden group">
                 {f.mimeType.startsWith("image/") ? (
-                  <img src={f.url} alt={f.filename} className="w-full h-32 object-cover" />
+                  <img src={resolveImageUrl(f.url)!} alt={f.filename} className="w-full h-32 object-cover" />
                 ) : (
                   <div className="w-full h-32 bg-gray-50 flex items-center justify-center text-2xl text-gray-300">📄</div>
                 )}
