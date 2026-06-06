@@ -45,9 +45,9 @@ export default function AboutPage() {
   <div className="bg-white rounded-lg border border-gray-200 p-8 shadow-lg grid grid-cols-2 md:grid-cols-4 gap-8">
   {[
   { value: "20+", label: "Verified Listings" },
-  { value: "4", label: "Cities Covered" },
+  { value: "14+", label: "Cities Covered" },
   { value: "10+", label: "Agents & Staff" },
-  { value: "₦14M+", label: "Revenue Generated" },
+  { value: "₦30M+", label: "Revenue Generated" },
   ].map((s) => (
   <div key={s.label} className="text-center">
   <p className="text-2xl md:text-3xl font-bold text-[var(--color-primary)]">{s.value}</p>
