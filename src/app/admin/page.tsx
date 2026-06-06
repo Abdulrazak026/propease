@@ -27,12 +27,12 @@ export default function AdminOverview() {
  const pendingWithdrawals = withdrawals.filter((w) => w.status === "pending");
  const activeUsers = users.filter((u) => u.role !== "admin");
 
- const cards = [
- { label: "Total Users", value: activeUsers.length, sub: `${users.filter(u => u.role === "agent").length} agents`, accent: "bg-blue-100", color: "text-blue-600" },
- { label: "Active Listings", value: platformStats.availableListings, sub: `${listings.length} total`, accent: "bg-emerald-100", color: "text-emerald-600" },
- { label: "Open Tasks", value: platformStats.openTasks, sub: `${tasks.length} total tasks`, accent: "bg-amber-100", color: "text-amber-600" },
- { label: "Company Revenue", value: formatNaira(totalRevenue), sub: `${commissions.length} deals`, accent: "bg-violet-100", color: "text-violet-600" },
- ];
+  const cards = [
+  { label: "Total Users", value: activeUsers.length, sub: `${users.filter(u => u.role === "agent").length} agents`, accent: "bg-blue-100", color: "text-blue-600", href: "/admin/users" },
+  { label: "Active Listings", value: platformStats.availableListings, sub: `${listings.length} total`, accent: "bg-emerald-100", color: "text-emerald-600", href: "/admin/outsourcing" },
+  { label: "Open Tasks", value: platformStats.openTasks, sub: `${tasks.length} total tasks`, accent: "bg-amber-100", color: "text-amber-600", href: "/admin/crm" },
+  { label: "Company Revenue", value: formatNaira(totalRevenue), sub: `${commissions.length} deals`, accent: "bg-violet-100", color: "text-violet-600", href: "/admin/commissions" },
+  ];
 
  const recentActivity = [
  { icon: "👤", text: "New user registered as agent", time: "2 hours ago" },
@@ -59,21 +59,21 @@ export default function AdminOverview() {
  )}
  </div>
 
- <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
- {cards.map((s) => (
- <div key={s.label} className="bg-white rounded-lg border border-gray-200 p-4 card-hover">
- <div className="flex items-center gap-3">
- <div className={`w-10 h-10 ${s.accent} rounded-lg flex items-center justify-center`}>
- <span className={`text-sm font-bold ${s.color}`}>{typeof s.value === "string" ? "₦" : s.value}</span>
- </div>
- <div>
- <p className="text-xs text-gray-500">{s.label}</p>
- <p className={`text-sm font-bold ${s.color} mt-0.5`}>{s.value}</p>
- <p className="text-[10px] text-gray-400">{s.sub}</p>
- </div>
- </div>
- </div>
- ))}
+  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+  {cards.map((s) => (
+  <Link key={s.label} href={s.href} className="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-md hover:border-[var(--color-primary)]/30 transition-all">
+  <div className="flex items-center gap-3">
+  <div className={`w-10 h-10 ${s.accent} rounded-lg flex items-center justify-center`}>
+  <span className={`text-sm font-bold ${s.color}`}>{typeof s.value === "string" ? "₦" : s.value}</span>
+  </div>
+  <div>
+  <p className="text-xs text-gray-500">{s.label}</p>
+  <p className={`text-sm font-bold ${s.color} mt-0.5`}>{s.value}</p>
+  <p className="text-[10px] text-gray-400">{s.sub}</p>
+  </div>
+  </div>
+  </Link>
+  ))}
  </div>
 
  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
