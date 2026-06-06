@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import Button from "@/components/ui/Button";
+import { useSettings } from "@/context/SettingsContext";
 
 const faqs = [
   { q: "How do I schedule a property viewing?", a: "Click 'Inquire' on the property page, fill in your details, and the assigned agent will contact you within 24 hours to arrange a viewing." },
@@ -10,6 +11,7 @@ const faqs = [
 ];
 
 export default function ContactPage() {
+  const { get: g } = useSettings();
   const [form, setForm] = useState({ name: "", email: "", phone: "", subject: "General Inquiry", message: "" });
   const [submitted, setSubmitted] = useState(false);
   const [sending, setSending] = useState(false);
@@ -104,10 +106,10 @@ export default function ContactPage() {
               <h3 className="text-sm font-semibold text-gray-900 mb-4">Contact Information</h3>
               <div className="space-y-4">
                 {[
-                  { icon: "\uD83D\uDCCD", label: "Office Address", value: "No. 15 Bompai Road, Kano Municipal, Kano State" },
-                  { icon: "\uD83D\uDCDE", label: "Phone", value: "+234 800 000 0000" },
-                  { icon: "\u2709\uFE0F", label: "Email", value: "hello@mbpp.ng" },
-                  { icon: "\uD83D\uDD50", label: "Working Hours", value: "Monday \u2013 Saturday, 8:00 AM \u2013 6:00 PM" },
+                  { icon: "\uD83D\uDCCD", label: "Office Address", value: g("office_address", "No. 15 Bompai Road, Kano Municipal, Kano State") },
+                  { icon: "\uD83D\uDCDE", label: "Phone", value: g("support_phone", "+234 800 000 0000") },
+                  { icon: "\u2709\uFE0F", label: "Email", value: g("support_email", "hello@mbpp.ng") },
+                  { icon: "\uD83D\uDD50", label: "Working Hours", value: g("business_hours", "Monday \u2013 Saturday, 8:00 AM \u2013 6:00 PM") },
                 ].map((item) => (
                   <div key={item.label} className="flex items-start gap-3">
                     <div className="w-9 h-9 rounded-lg bg-[var(--color-primary)]/5 flex items-center justify-center shrink-0"><span className="text-base">{item.icon}</span></div>

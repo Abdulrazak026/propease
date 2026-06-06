@@ -1,4 +1,6 @@
+"use client";
 import Link from "next/link";
+import { useSettings } from "@/context/SettingsContext";
 
 const protectedClasses = [
   "Race, colour, and ethnicity",
@@ -11,6 +13,7 @@ const protectedClasses = [
 ];
 
 export default function FairHousingPage() {
+  const { get: g } = useSettings();
   return (
     <div className="flex-1">
       <section className="bg-gray-50 py-16 px-4 border-b border-gray-200">
@@ -66,9 +69,9 @@ export default function FairHousingPage() {
           </p>
           <div className="bg-white rounded-lg border border-gray-200 p-5 mt-4">
             <div className="space-y-2 text-sm">
-              <p><strong>Email:</strong> fairhousing@mbpp.ng</p>
-              <p><strong>Phone:</strong> +234 800 000 0000</p>
-              <p><strong>In Person:</strong> No. 15 Bompai Road, Kano Municipal, Kano State</p>
+              <p><strong>Email:</strong> {g("support_email", "fairhousing@mbpp.ng")}</p>
+              <p><strong>Phone:</strong> {g("support_phone", "+234 800 000 0000")}</p>
+              <p><strong>In Person:</strong> {g("office_address", "No. 15 Bompai Road, Kano Municipal, Kano State")}</p>
             </div>
           </div>
 
