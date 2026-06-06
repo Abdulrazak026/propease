@@ -1,107 +1,58 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { api } from "@/lib/api-client";
 import Link from "next/link";
-import { useRole } from "@/context/RoleContext";
-import Button from "@/components/ui/Button";
-import { formatNaira, formatDate } from "@/lib/utils";
+import Badge from "@/components/ui/Badge";
 
-interface Agreement {
- id: string;
- tenantName: string;
- landlordName: string;
- propertyTitle: string;
- annualRent: number;
- status: AgreementStatus;
- createdAt: string;
-}
+interface Agreement { id: string; tenantName: string; landlordName: string; propertyTitle: string; annualRent: number; status: string; createdAt: string; }
 
-type AgreementStatus = "draft" | "pending_landlord" | "pending_tenant" | "completed" | "expired" | "terminated";
-
-const mockAgreements: Agreement[] = [
- { id: "ag-001", tenantName: "Sani Ibrahim Musa", landlordName: "Alh. Sani Abubakar", propertyTitle: "3-Bedroom Flat — Fagge", annualRent: 1_200_000, status: "pending_landlord", createdAt: "2026-06-04" },
- { id: "ag-002", tenantName: "Fatima Kabir Abdullahi", landlordName: "Dr. Khalid Suleiman", propertyTitle: "Shop Space — Kano Municipal", annualRent: 1_200_000, status: "pending_tenant", createdAt: "2026-06-03" },
- { id: "ag-003", tenantName: "Musa Abubakar Bello", landlordName: "Alh. Sani Abubakar", propertyTitle: "Warehouse Space — Fagge", annualRent: 2_400_000, status: "completed", createdAt: "2026-06-01" },
-];
-
-const statusStyles: Record<AgreementStatus, string> = {
- draft: "bg-gray-100 text-gray-700",
- pending_landlord: "bg-amber-100 text-amber-800",
- pending_tenant: "bg-blue-100 text-blue-800",
- completed: "bg-emerald-100 text-emerald-800",
- expired: "bg-red-100 text-red-800",
- terminated: "bg-red-100 text-red-800",
+const statusStyles: Record<string, string> = {
+  draft: "bg-gray-100 text-gray-700", pending_landlord: "bg-amber-100 text-amber-800",
+  pending_tenant: "bg-blue-100 text-blue-800", completed: "bg-emerald-100 text-emerald-800",
 };
 
-export default function AgentAgreementsPage() {
- const { currentUser } = useRole();
- const [agreements] = useState(mockAgreements);
+export default function AgentAgreements() {
+  const [agreements, setAgreements] = useState<Agreement[]>([]);
+  const [loading, setLoading] = useState(true);
 
- const handleShareViaWhatsApp = (ag: Agreement) => {
- const link = `${window.location.origin}/agreements/${ag.id}`;
- const url = `https://wa.me/?text=${encodeURIComponent(`Please sign your tenancy agreement for ${ag.propertyTitle}: ${link}`)}`;
- window.open(url, "_blank");
- };
+  useEffect(() => {
+    api.get<Agreement[]>("/api/agreements").then(r => {
+      if (r.data) setAgreements(Array.isArray(r.data) ? r.data : []);
+      setLoading(false);
+    }).catch(() => setLoading(false));
+  }, []);
 
- return (
- <div className="space-y-4">
- <div className="flex items-center justify-between">
- <div>
- <h1 className="text-xl font-bold text-gray-900">Tenancy Agreements</h1>
- <p className="text-sm text-gray-500 mt-0.5">Generate and manage digital rent agreements</p>
- </div>
- <Link href="/agent/agreements/new">
- <Button>+ New Agreement</Button>
- </Link>
- </div>
+  if (loading) return <div className="flex items-center justify-center h-64"><div className="h-8 w-8 border-2 border-[var(--color-primary)] border-t-transparent rounded-full animate-spin" /></div>;
 
- {agreements.length === 0 ? (
- <div className="bg-white rounded-lg border border-gray-200 p-10 text-center">
- <div className="w-14 h-14 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
- <svg className="w-7 h-7 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
- <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
- </svg>
- </div>
- <p className="text-sm font-medium text-gray-900">No agreements yet</p>
- <p className="text-xs text-gray-500 mt-1">Create your first digital tenancy agreement</p>
- </div>
- ) : (
- <div className="space-y-2">
- {agreements.map((ag) => (
- <div key={ag.id} className="bg-white rounded-lg border border-gray-200 p-4">
- <div className="flex items-start justify-between gap-3">
- <div className="min-w-0 flex-1">
- <div className="flex items-center gap-2 mb-1">
- <Link href={`/agreements/${ag.id}`} className="text-sm font-medium text-gray-900 hover:text-[var(--color-primary)] transition line-clamp-1">
- {ag.propertyTitle}
- </Link>
- <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium shrink-0 ${statusStyles[ag.status]}`}>
- {ag.status.replace("_", " ")}
- </span>
- </div>
- <div className="flex items-center gap-3 text-xs text-gray-500">
- <span>Tenant: {ag.tenantName}</span>
- <span>·</span>
- <span>Landlord: {ag.landlordName}</span>
- <span>·</span>
- <span>{formatNaira(ag.annualRent)}/yr</span>
- </div>
- </div>
- <div className="flex items-center gap-2 shrink-0">
- <Link href={`/agreements/${ag.id}`} className="text-xs font-medium text-[var(--color-primary)] hover:underline px-2 py-1">
- View
- </Link>
- <button
- onClick={() => handleShareViaWhatsApp(ag)}
- className="text-xs font-medium text-green-600 hover:underline px-2 py-1"
->
- Share on WhatsApp
- </button>
- </div>
- </div>
- </div>
- ))}
- </div>
- )}
- </div>
- );
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <a href="/agent" className="text-gray-400 hover:text-[var(--color-primary)]"><svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg></a>
+          <div><h1 className="text-xl font-bold text-gray-900">Agreements</h1><p className="text-xs text-gray-500">Manage tenancy contracts</p></div>
+        </div>
+        <Link href="/agent/agreements/new" className="text-xs font-medium px-3 py-2 bg-[var(--color-primary)] text-white rounded-lg hover:opacity-90">+ New</Link>
+      </div>
+
+      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead><tr className="border-b border-gray-100 bg-gray-50 text-left"><th className="px-4 py-3 text-xs font-medium text-gray-600">Tenant</th><th className="px-4 py-3 text-xs font-medium text-gray-600">Property</th><th className="px-4 py-3 text-xs font-medium text-gray-600">Rent</th><th className="px-4 py-3 text-xs font-medium text-gray-600">Status</th><th className="px-4 py-3 text-xs font-medium text-gray-600">Actions</th></tr></thead>
+            <tbody>
+              {agreements.map(a => (
+                <tr key={a.id} className="border-b border-gray-50">
+                  <td className="px-4 py-3 text-xs text-gray-900">{a.tenantName}</td>
+                  <td className="px-4 py-3 text-xs text-gray-600 max-w-[150px] truncate">{a.propertyTitle}</td>
+                  <td className="px-4 py-3 text-xs font-medium">₦{a.annualRent.toLocaleString()}</td>
+                  <td className="px-4 py-3"><span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${statusStyles[a.status]||""}`}>{a.status.replace(/_/g," ")}</span></td>
+                  <td className="px-4 py-3"><Link href={`/agreements/${a.id}`} className="text-xs text-[var(--color-primary)] hover:underline font-medium">View</Link></td>
+                </tr>
+              ))}
+              {agreements.length === 0 && <tr><td colSpan={5} className="px-4 py-8 text-center text-gray-400 text-sm">No agreements yet</td></tr>}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  );
 }

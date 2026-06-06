@@ -1,6 +1,8 @@
 "use client";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Button from "@/components/ui/Button";
+import { api } from "@/lib/api-client";
 
 interface FormData {
   fullName: string;
@@ -13,12 +15,15 @@ interface FormData {
 }
 
 export default function ApplyAsAgentPage() {
+  const router = useRouter();
   const [step, setStep] = useState<"form" | "terms" | "done">("form");
   const [form, setForm] = useState<FormData>({
     fullName: "", email: "", phone: "", location: "",
     experience: "", whyAgent: "", heardAbout: "",
   });
   const [agreed, setAgreed] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState("");
 
   const update = (field: keyof FormData, value: string) =>
     setForm((prev) => ({ ...prev, [field]: value }));
@@ -28,8 +33,24 @@ export default function ApplyAsAgentPage() {
     setStep("terms");
   };
 
-  const handleConfirm = () => {
-    setStep("done");
+  const handleConfirm = async () => {
+    setSubmitting(true);
+    setError("");
+    const { status } = await api.post("/api/auth/register", {
+      name: form.fullName,
+      email: form.email,
+      password: form.phone,
+      role: "agent",
+      city: form.location,
+    });
+    setSubmitting(false);
+    if (status === 201) {
+      setStep("done");
+    } else if (status === 409) {
+      setError("This email is already registered");
+    } else {
+      setError("Submission failed. Please try again.");
+    }
   };
 
   if (step === "done") {

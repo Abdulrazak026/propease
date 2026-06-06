@@ -1,104 +1,85 @@
 "use client";
-import { useRole } from "@/context/RoleContext";
-import { listings, tasks, users } from "@/lib/mock-data";
-import { formatNaira } from "@/lib/utils";
-import Button from "@/components/ui/Button";
+import { useState, useEffect } from "react";
+import { api } from "@/lib/api-client";
 import Link from "next/link";
-import Badge from "@/components/ui/Badge";
 
-export default function AmbassadorOverview() {
- const { currentUser } = useRole();
- const city = currentUser?.city || "";
- const cityListings = listings.filter((l) => l.city === city);
- const cityActiveListings = cityListings.filter((l) => l.status !== "taken");
- const cityTasks = tasks.filter((t) => t.area === city);
- const myAgents = users.filter((u) => u.ambassadorId === currentUser?.id);
+interface Stats { totalListings: number; availableListings: number; agentCount: number; openTasks: number; }
+interface Listing { id: string; title: string; price: number; status: string; listingType: string; }
+interface Agent { id: string; name: string; walletBalance: number; }
 
- return (
- <div className="space-y-6">
- <div className="flex items-center justify-between">
- <div>
- <h1 className="text-xl font-bold text-gray-900">Ambassador Dashboard</h1>
- <p className="text-sm text-gray-500 mt-0.5">{city} — city overview</p>
- </div>
- </div>
+export default function AmbassadorPage() {
+  const [stats, setStats] = useState<Stats | null>(null);
+  const [listings, setListings] = useState<Listing[]>([]);
+  const [agents, setAgents] = useState<Agent[]>([]);
+  const [loading, setLoading] = useState(true);
 
- <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
- {[
- { label: "Active Listings", value: cityActiveListings.length, accent: "bg-blue-100", color: "text-[var(--color-primary)]" },
- { label: "Total Listings", value: cityListings.length, accent: "bg-gray-100", color: "text-gray-900" },
- { label: "Agents", value: myAgents.length, accent: "bg-amber-100", color: "text-amber-600" },
- { label: "Open Tasks", value: cityTasks.filter((t) => t.status === "open" || t.status === "in_progress").length, accent: "bg-emerald-100", color: "text-emerald-600" },
- ].map((s) => (
- <div key={s.label} className="bg-white rounded-lg border border-gray-200 p-4 card-hover">
- <div className="flex items-center gap-3">
- <div className={`w-10 h-10 ${s.accent} rounded-lg flex items-center justify-center`}>
- <span className={`text-sm font-bold ${s.color}`}>{s.value}</span>
- </div>
- <p className="text-xs text-gray-500">{s.label}</p>
- </div>
- </div>
- ))}
- </div>
+  useEffect(() => {
+    Promise.all([
+      api.get<{ stats: Stats }>("/api/ambassador/dashboard"),
+      api.get<{ listings: Listing[] }>("/api/ambassador/city-listings"),
+      api.get<{ agents: Agent[] }>("/api/ambassador/agents"),
+    ]).then(([dash, list, ag]) => {
+      if (dash.data?.stats) setStats(dash.data.stats);
+      if (list.data?.listings) setListings(list.data.listings);
+      if (ag.data?.agents) setAgents(ag.data.agents);
+      setLoading(false);
+    }).catch(() => setLoading(false));
+  }, []);
 
- <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
- <div className="bg-white rounded-lg border border-gray-200 p-5">
- <div className="flex items-center justify-between mb-4">
- <h2 className="text-sm font-semibold text-gray-900">Your Listings</h2>
- <Link href="/ambassador/listings/new">
- <Button size="sm">+ Post New</Button>
- </Link>
- </div>
+  if (loading) return <div className="flex items-center justify-center h-64"><div className="h-8 w-8 border-2 border-[var(--color-primary)] border-t-transparent rounded-full animate-spin" /></div>;
 
- {cityActiveListings.length> 0 ? (
- <div className="space-y-1">
- {cityActiveListings.slice(0, 5).map((l) => (
- <div key={l.id} className="flex items-center justify-between py-2.5 px-3 rounded-lg hover:bg-gray-50 transition-colors">
- <div>
- <p className="text-sm font-medium text-gray-900">{l.title}</p>
- <p className="text-xs text-gray-400 mt-0.5">{formatNaira(l.price)}{l.listingType === "rent" ? "/yr" : ""}</p>
- </div>
- <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${
- l.status === "available" ? "bg-emerald-100 text-emerald-700" :
- l.status === "reserved" ? "bg-amber-100 text-amber-700" : "bg-gray-100 text-gray-700"
- }`}>
- {l.status}
- </span>
- </div>
- ))}
- </div>
- ) : (
- <p className="text-sm text-gray-400 py-6 text-center">No listings in your city yet</p>
- )}
- </div>
+  const s = stats || { totalListings: 0, availableListings: 0, agentCount: 0, openTasks: 0 };
 
- <div className="bg-white rounded-lg border border-gray-200 p-5">
- <h2 className="text-sm font-semibold text-gray-900 mb-4">Your Agents</h2>
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between gap-3">
+        <div>
+          <h1 className="text-xl font-bold text-gray-900">City Overview</h1>
+          <p className="text-xs text-gray-500">Your city performance dashboard</p>
+        </div>
+        <Link href="/ambassador/listings/new" className="text-xs font-medium px-3 py-2 bg-[var(--color-primary)] text-white rounded-lg">+ Post Listing</Link>
+      </div>
 
- {myAgents.length> 0 ? (
- <div className="space-y-1">
- {myAgents.map((a) => (
- <Link key={a.id} href={`/agents/${a.id}`} className="flex items-center gap-3 py-2.5 px-3 rounded-lg hover:bg-gray-50 transition-colors group">
- <div className="w-9 h-9 rounded-full bg-[var(--color-primary)]/10 flex items-center justify-center">
- <span className="text-xs font-medium text-[var(--color-primary)]">
- {a.name.split(" ").map(n => n[0]).join("").slice(0, 2)}
- </span>
- </div>
- <div className="flex-1 min-w-0">
- <p className="text-sm font-medium text-gray-900 group-hover:text-[var(--color-primary)] transition-colors">{a.name}</p>
- <p className="text-xs text-gray-400">
- Wallet: {formatNaira(a.walletBalance)} • {listings.filter((l) => l.assignedAgent?.id === a.id).length} listings
- </p>
- </div>
- <svg className="w-4 h-4 text-gray-300 group-hover:text-[var(--color-primary)] transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" /></svg>
- </Link>
- ))}
- </div>
- ) : (
- <p className="text-sm text-gray-400 py-6 text-center">No agents assigned to you yet</p>
- )}
- </div>
- </div>
- </div>
- );
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        {[
+          { label: "Active Listings", value: s.availableListings, sub: `${s.totalListings} total` },
+          { label: "Agents", value: s.agentCount },
+          { label: "Open Tasks", value: s.openTasks },
+          { label: "Revenue", value: "—" },
+        ].map(c => (
+          <div key={c.label} className="bg-white rounded-xl border border-gray-200 p-4">
+            <p className="text-xs text-gray-500">{c.label}</p>
+            <p className="text-xl font-bold text-gray-900 mt-1">{c.value}</p>
+            {c.sub && <p className="text-[10px] text-gray-400">{c.sub}</p>}
+          </div>
+        ))}
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <div className="bg-white rounded-xl border border-gray-200 p-5">
+          <h3 className="text-sm font-semibold text-gray-900 mb-3">Your Agents</h3>
+          <div className="space-y-2">
+            {agents.map(a => (
+              <Link key={a.id} href={`/agents/${a.id}`} className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition-colors">
+                <div className="flex items-center gap-3"><div className="w-8 h-8 rounded-full bg-[var(--color-primary)]/10 flex items-center justify-center text-xs font-bold text-[var(--color-primary)]">{a.name.split(" ").map(n=>n[0]).join("")}</div><span className="text-sm font-medium text-gray-900">{a.name}</span></div>
+                <span className="text-xs font-medium text-emerald-600">₦{a.walletBalance.toLocaleString()}</span>
+              </Link>
+            ))}
+          </div>
+        </div>
+
+        <div className="bg-white rounded-xl border border-gray-200 p-5">
+          <h3 className="text-sm font-semibold text-gray-900 mb-3">Recent Listings</h3>
+          <div className="space-y-2">
+            {listings.slice(0, 5).map(l => (
+              <div key={l.id} className="flex items-center justify-between p-2">
+                <div><p className="text-xs font-medium text-gray-900 truncate max-w-[200px]">{l.title}</p><p className="text-[10px] text-gray-400">{l.listingType === "rent" ? "For Rent" : "For Sale"} • {l.status}</p></div>
+                <span className="text-xs font-medium">₦{l.price.toLocaleString()}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 }

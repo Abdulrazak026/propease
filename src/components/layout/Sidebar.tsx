@@ -4,13 +4,19 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useRole } from "@/context/RoleContext";
 import { useSettings } from "@/context/SettingsContext";
-import { users } from "@/lib/mock-data";
+import { api } from "@/lib/api-client";
 
-const NOTIFICATIONS_MOCK = [
-  { id: "n1", read: false },
-  { id: "n2", read: false },
-  { id: "n3", read: true },
-];
+let unreadCount = 0;
+let fetchedUnread = false;
+async function fetchUnread() {
+  if (fetchedUnread) return;
+  try {
+    const r = await api.get<{ unread: number }>("/api/notifications");
+    if (r.data?.unread) unreadCount = r.data.unread;
+  } catch {}
+  fetchedUnread = true;
+}
+fetchUnread();
 
 const NAV_ITEMS = [
   {
@@ -43,7 +49,7 @@ const NAV_ITEMS = [
   {
     label: "Updates",
     href: "/notifications",
-    count: NOTIFICATIONS_MOCK.filter((n) => !n.read).length,
+    count: unreadCount,
     icon: (active: boolean) => (
       <svg className="w-5 h-5" fill={active ? "currentColor" : "none"} viewBox="0 0 24 24" stroke="currentColor" strokeWidth={active ? 0 : 1.5}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" />
@@ -133,17 +139,13 @@ export default function Sidebar() {
     return () => document.removeEventListener("mousedown", handleClick);
   }, []);
 
-  const handleDemoLogin = (userId: string) => {
-    const user = users.find((u) => u.id === userId) || null;
-    setCurrentUser(user);
-    setDemoOpen(false);
-    if (user) router.push(user.role === "head" ? "/admin" : `/${user.role}`);
+  const handleDemoLogin = (_userId: string) => {
+    router.push("/login");
   };
 
   if (isDashboard) return null;
 
   const isActive = (href: string) => pathname === href;
-  const demoUsers = users.filter((u) => ["u0", "u2", "u4"].includes(u.id));
 
   return (
     <>
@@ -229,27 +231,11 @@ export default function Sidebar() {
                   </div>
                 </div>
               ) : (
-                <div ref={demoRef} className="relative flex justify-center">
-                  <button
-                    onClick={() => setDemoOpen(!demoOpen)}
-                    className="w-9 h-9 rounded-lg flex items-center justify-center text-gray-400 hover:text-[var(--color-primary)] hover:bg-[var(--color-primary)]/5 transition-all duration-150"
-                    title="Demo Login"
-                  >
-                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9" />
-                    </svg>
-                  </button>
-                  {demoOpen && (
-                    <div className="absolute left-full ml-3 bottom-0 w-44 bg-white rounded-lg border border-gray-200 shadow-lg p-1.5 z-50">
-                      <p className="text-[11px] text-gray-500 font-medium px-2.5 py-1.5">Quick login as...</p>
-                      {demoUsers.map((u) => (
-                        <button key={u.id} onClick={() => handleDemoLogin(u.id)} className="flex items-center gap-2 w-full px-2.5 py-2 rounded-lg hover:bg-gray-50 text-xs">
-                          <span className="text-gray-600">{u.id === "u0" ? "Admin" : u.role === "ambassador" ? "Ambassador" : "Agent"}</span>
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                </div>
+                <Link href="/login" className="flex justify-center py-2" title="Sign In">
+                  <div className="w-9 h-9 rounded-lg flex items-center justify-center text-gray-400 hover:text-[var(--color-primary)] hover:bg-[var(--color-primary)]/5 transition-all">
+                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9" /></svg>
+                  </div>
+                </Link>
               )}
               <button
                 onClick={() => setCollapsed(false)}
@@ -274,32 +260,11 @@ export default function Sidebar() {
                   </div>
                 </div>
               ) : (
-                <div ref={demoRef} className="relative px-3 py-1.5">
-                  <button
-                    onClick={() => setDemoOpen(!demoOpen)}
-                    className="flex items-center gap-2 text-xs text-gray-500 hover:text-[var(--color-primary)] hover:bg-[var(--color-primary)]/5 rounded-lg px-2 py-1.5 w-full transition-all duration-150"
-                  >
-                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9" />
-                    </svg>
-                    Demo
-                    <svg className={`w-3 h-3 ml-auto transition-transform duration-150 ${demoOpen ? "rotate-180" : ""}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-                    </svg>
-                  </button>
-                  {demoOpen && (
-                    <div className="absolute left-0 right-0 bottom-full mb-1 bg-white rounded-lg border border-gray-200 shadow-lg p-1.5 z-50">
-                      <p className="text-[11px] text-gray-500 font-medium px-2.5 py-1.5">Quick login as...</p>
-                      {demoUsers.map((u) => (
-                        <button key={u.id} onClick={() => handleDemoLogin(u.id)} className="flex items-center gap-2.5 w-full px-2.5 py-2 rounded-lg hover:bg-gray-50 text-xs">
-                          <div className="w-6 h-6 rounded-full bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center text-gray-600 text-[10px] font-bold shrink-0">
-                            {u.name.split(" ").map(n => n[0]).join("").slice(0, 2)}
-                          </div>
-                          <span className="font-medium text-gray-900 capitalize">{u.id === "u0" ? "Admin" : u.role === "ambassador" ? "Ambassador" : "Agent"}</span>
-                        </button>
-                      ))}
-                    </div>
-                  )}
+                <div className="px-3 py-1.5">
+                  <Link href="/login" className="flex items-center gap-2 text-xs text-gray-500 hover:text-[var(--color-primary)] hover:bg-[var(--color-primary)]/5 rounded-lg px-2 py-1.5 w-full transition-all">
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9" /></svg>
+                    Sign In
+                  </Link>
                 </div>
               )}
               <button

@@ -1,15 +1,61 @@
 "use client";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
+import { api } from "@/lib/api-client";
 
 export default function PostListingPage() {
- const [step, setStep] = useState(1);
+  const router = useRouter();
+  const [step, setStep] = useState(1);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState(false);
 
- const handleSubmit = (e: React.FormEvent) => {
- e.preventDefault();
- alert("Listing posted! (Demo) It will appear on the public listings page.");
- };
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSubmitting(true);
+    setError("");
+    const form = e.currentTarget as HTMLFormElement;
+    const fd = new FormData(form);
+    const data: Record<string, unknown> = {};
+    fd.forEach((v, k) => { data[k] = v; });
+
+    const { status } = await api.post("/api/listings", {
+      title: data.title,
+      description: data.description,
+      propertyType: (data.propertyType as string)?.toLowerCase() || "house",
+      listingType: (data.listingType as string) === "For Sale" ? "sale" : "rent",
+      city: data.city as string,
+      address: (data.address as string) || "",
+      bedrooms: parseInt(data.bedrooms as string) || undefined,
+      bathrooms: parseInt(data.bathrooms as string) || undefined,
+      sqft: parseInt(data.sqft as string) || undefined,
+      price: parseInt(data.price as string) || 0,
+      rentTier: data.rentTier as string || "normal",
+      category: (data.category as string) || "portfolio",
+      features: [],
+    });
+    setSubmitting(false);
+    if (status === 201) {
+      setSuccess(true);
+      setTimeout(() => router.push("/ambassador"), 2000);
+    } else {
+      setError("Failed to create listing. Please try again.");
+    }
+  };
+
+  if (success) {
+    return (
+      <div className="max-w-2xl mx-auto text-center py-16">
+        <div className="w-16 h-16 bg-emerald-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
+          <svg className="w-8 h-8 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7"/></svg>
+        </div>
+        <h2 className="text-2xl font-bold text-gray-900">Listing Published!</h2>
+        <p className="text-sm text-gray-500 mt-2">Your property is now visible on the platform.</p>
+      </div>
+    );
+  }
 
  return (
  <div className="max-w-2xl mx-auto space-y-6">
