@@ -222,8 +222,8 @@ export default function AdminSettings() {
             <S label="Heading Font" v={s("heading_font")} onChange={(v) => set("heading_font", v)} opts={[["Inter","Inter"],["Poppins","Poppins"],["Merriweather","Merriweather"]]} />
             <S label="Body Font" v={s("body_font")} onChange={(v) => set("body_font", v)} opts={[["Inter","Inter"],["Roboto","Roboto"],["Lato","Lato"]]} />
           </div>
-          <F label="Homepage Hero Image URL" v={s("hero_image")} onChange={(v) => set("hero_image", v)} />
-          <F label="About Page Hero Image URL" v={s("about_hero_image")} onChange={(v) => set("about_hero_image", v)} />
+          <MediaPicker label="Homepage Hero Image" current={s("hero_image")} onSelect={(url) => set("hero_image", url)} />
+          <MediaPicker label="About Page Hero Image" current={s("about_hero_image")} onSelect={(url) => set("about_hero_image", url)} />
           <MediaPicker label="Site Logo" current={s("site_logo")} onSelect={(url) => set("site_logo", url)} />
           <MediaPicker label="Favicon" current={s("site_favicon")} onSelect={(url) => set("site_favicon", url)} />
           <div className="grid grid-cols-2 gap-3">
@@ -237,6 +237,7 @@ export default function AdminSettings() {
           <h3 className="text-sm font-semibold text-gray-900">SEO</h3>
           <F label="Meta Title" v={s("meta_title")} onChange={(v) => set("meta_title", v)} />
           <TA label="Meta Description" v={s("meta_description")} onChange={(v) => set("meta_description", v)} rows={2} />
+          <MediaPicker label="OG Image (social share preview)" current={s("og_image")} onSelect={(url) => set("og_image", url)} />
           <div className="grid grid-cols-3 gap-3">
             <F label="Google Analytics" v={s("ga_id")} onChange={(v) => set("ga_id", v)} placeholder="G-XXXXX" />
             <F label="Google Tag Manager" v={s("gtm_id")} onChange={(v) => set("gtm_id", v)} placeholder="GTM-XXXXX" />
