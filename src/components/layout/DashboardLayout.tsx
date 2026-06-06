@@ -23,7 +23,7 @@ const icons: Record<string, React.ReactNode> = {
 };
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
-  const { role, currentUser } = useRole();
+  const { role, currentUser, loading } = useRole();
   const { get: getSetting } = useSettings();
   const pathname = usePathname();
 
@@ -53,7 +53,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </div>
         </div>
         <nav className="flex-1 p-2 space-y-0.5 overflow-y-auto">
-          {items.map((item) => {
+          {loading ? (
+            Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="flex items-center gap-2 px-3 py-2 rounded-lg">
+                <div className="w-4 h-4 rounded bg-slate-700 animate-pulse shrink-0" />
+                <div className="h-3 bg-slate-700 rounded animate-pulse flex-1" />
+              </div>
+            ))
+          ) : (items.map((item) => {
             const active = pathname === item.href || pathname.startsWith(item.href + "/");
             const count = badgeCount(item.badge);
             return (
@@ -69,7 +76,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 )}
               </Link>
             );
-          })}
+          }))}
         </nav>
         <div className="p-2 border-t border-slate-700">
           <Link href="/" className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs text-slate-500 hover:bg-slate-800 hover:text-slate-300 transition-all">

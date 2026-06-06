@@ -14,7 +14,14 @@ export default function LayoutShell({ children }: { children: React.ReactNode })
 
   if (isAuth) return <>{children}</>;
 
-  if (isDashboard) return <>{children}</>;
+  if (isDashboard) {
+    return (
+      <>
+        <div className="flex h-full">{children}</div>
+        <BottomNav />
+      </>
+    );
+  }
 
   return (
     <div className="flex h-full">
