@@ -41,4 +41,11 @@ router.post("/", authenticate, authorize("head"), async (req: AuthRequest, res: 
   } catch { res.status(500).json({ error: "Failed to create user" }); }
 });
 
+router.delete("/:id", authenticate, authorize("head"), async (req: AuthRequest, res: Response) => {
+  try {
+    await prisma.user.delete({ where: { id: String(req.params.id) } });
+    res.json({ success: true });
+  } catch { res.status(500).json({ error: "Failed to delete user" }); }
+});
+
 export default router;

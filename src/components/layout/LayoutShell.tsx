@@ -5,7 +5,7 @@ import Sidebar from "@/components/layout/Sidebar";
 import BottomNav from "@/components/layout/BottomNav";
 
 const NO_SIDEBAR_PATHS = ["/login", "/register", "/forgot-password", "/reset-password"];
-const DASHBOARD_PATHS = ["/admin", "/agent", "/ambassador"];
+const DASHBOARD_PATHS = ["/admin", "/agent", "/ambassador", "/wallet"];
 
 export default function LayoutShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();

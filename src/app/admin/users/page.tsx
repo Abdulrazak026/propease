@@ -12,6 +12,7 @@ export default function UsersPage() {
   const [viewUser, setViewUser] = useState<ApiUser | null>(null);
   const [showAdd, setShowAdd] = useState(false);
   const [saving, setSaving] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState<string | null>(null);
 
   const fetchUsers = () => {
     api.get<{ users: ApiUser[] }>("/api/admin/users").then(r => { if (r.data?.users) setUsers(r.data.users); });
@@ -23,6 +24,14 @@ export default function UsersPage() {
     await api.patch(`/api/admin/users/${u.id}`, { isApproved: !u.isApproved });
     fetchUsers();
     setSaving(null);
+  };
+
+  const deleteUser = async (u: ApiUser) => {
+    setDeleting(u.id);
+    await api.delete(`/api/admin/users/${u.id}`);
+    fetchUsers();
+    setDeleting(null);
+    setViewUser(null);
   };
 
   const createUser = async (form: { name: string; email: string; role: string; password: string }) => {
@@ -81,7 +90,7 @@ export default function UsersPage() {
           <div><span className="text-gray-400 text-xs">Wallet</span><p className="font-medium">₦{viewUser.walletBalance.toLocaleString()}</p></div>
           <div><span className="text-gray-400 text-xs">Verified</span><p className="font-medium">{viewUser.isVerified?"Yes":"No"}</p></div>
         </div>
-        <div className="mt-4 flex gap-2">{viewUser.role!=="head"&&<><Button variant="outline" size="sm" className="flex-1" onClick={()=>{toggleApprove(viewUser);setViewUser(null)}}>{viewUser.isApproved?"Suspend":"Approve"}</Button><Button variant="danger" size="sm" className="flex-1" onClick={()=>setViewUser(null)}>Delete</Button></>}</div>
+        <div className="mt-4 flex gap-2">{viewUser.role!=="head"&&<><Button variant="outline" size="sm" className="flex-1" onClick={()=>{toggleApprove(viewUser);setViewUser(null)}}>{viewUser.isApproved?"Suspend":"Approve"}</Button><Button variant="danger" size="sm" className="flex-1" disabled={deleting===viewUser.id} onClick={()=>deleteUser(viewUser)}>{deleting===viewUser.id?"Deleting...":"Delete"}</Button></>}</div>
       </div></div>}
 
       {showAdd && <AddUserModal onClose={()=>setShowAdd(false)} onSave={createUser} />}
