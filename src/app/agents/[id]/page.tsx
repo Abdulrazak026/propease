@@ -1,14 +1,28 @@
 "use client";
 import { useParams } from "next/navigation";
 import Link from "next/link";
-import { users, tasks, commissions, inquiries, listings } from "@/lib/mock-data";
+import { useState, useEffect } from "react";
 import { formatNaira, formatDate } from "@/lib/utils";
 import Badge from "@/components/ui/Badge";
+import { api } from "@/lib/api-client";
 
 export default function AgentProfilePage() {
- const { id } = useParams();
- const agent = users.find((u) => u.id === id && u.role === "agent");
- if (!agent) {
+  const { id } = useParams();
+  const [agent, setAgent] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    api.get<any>(`/api/admin/users`).then(r => {
+      if (r.data?.users) {
+        const found = r.data.users.find((u: any) => u.id === id && u.role === "agent");
+        setAgent(found || null);
+      }
+      setLoading(false);
+    }).catch(() => setLoading(false));
+  }, [id]);
+
+  if (loading) return <div className="flex items-center justify-center h-64"><div className="h-8 w-8 border-2 border-[var(--color-primary)] border-t-transparent rounded-full animate-spin" /></div>;
+  if (!agent) {
  return (
  <div className="flex-1 flex items-center justify-center py-24">
  <div className="text-center">
@@ -19,12 +33,12 @@ export default function AgentProfilePage() {
  );
  }
 
- const agentTasks = tasks.filter((t) => t.assignedTo.id === agent.id);
- const agentCommissions = commissions.filter((c) => c.agent.id === agent.id);
- const agentInquiries = inquiries.filter((i) => i.assignedAgent?.id === agent.id);
- const agentListings = listings.filter((l) => l.assignedAgent?.id === agent.id);
- const fulfilledTasks = agentTasks.filter((t) => t.status === "fulfilled");
- const totalEarned = agentCommissions.reduce((s, c) => s + c.agentCut, 0);
+  const agentTasks: any[] = [];
+  const agentCommissions: any[] = [];
+  const agentInquiries: any[] = [];
+  const agentListings: any[] = [];
+  const fulfilledTasks: any[] = [];
+  const totalEarned = 0;
 
  return (
  <div className="flex-1">
@@ -37,7 +51,7 @@ export default function AgentProfilePage() {
  <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
  <div className="flex items-center gap-4">
  <div className="w-16 h-16 rounded-full bg-[var(--color-primary)] flex items-center justify-center text-white text-xl font-bold">
- {agent.name.split(" ").map(n => n[0]).join("").slice(0, 2)}
+  {agent.name.split(" ").map((n: string) => n[0]).join("").slice(0, 2)}
  </div>
  <div className="flex-1">
  <h1 className="text-xl font-bold text-gray-900">{agent.name}</h1>

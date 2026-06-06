@@ -1,10 +1,10 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Button from "@/components/ui/Button";
-import { listings } from "@/lib/mock-data";
 import { formatNaira } from "@/lib/utils";
+import { api } from "@/lib/api-client";
 
 interface FormData {
  listingId: string;
@@ -29,8 +29,15 @@ const emptyForm: FormData = {
 
 export default function NewAgreementPage() {
  const router = useRouter();
- const [form, setForm] = useState<FormData>(emptyForm);
- const [created, setCreated] = useState(false);
+  const [form, setForm] = useState<FormData>(emptyForm);
+  const [created, setCreated] = useState(false);
+  const [listings, setListings] = useState<any[]>([]);
+
+  useEffect(() => {
+    api.get<{ listings: any[] }>("/api/listings").then(r => {
+      if (r.data?.listings) setListings(r.data.listings);
+    }).catch(() => {});
+  }, []);
 
  const update = (field: keyof FormData, value: string | number) => {
  setForm((prev) => ({ ...prev, [field]: value }));

@@ -1,11 +1,11 @@
 "use client";
 import { useState, useMemo } from "react";
 import { useRole } from "@/context/RoleContext";
-import { transactions, users } from "@/lib/mock-data";
 import { formatNaira } from "@/lib/utils";
 import Button from "@/components/ui/Button";
 import Badge from "@/components/ui/Badge";
 import PaystackButton from "@/components/payments/PaystackButton";
+import { api } from "@/lib/api-client";
 
 type Tab = "overview" | "top" | "withdraw";
 
@@ -16,14 +16,10 @@ export default function WalletPage() {
  const [withdrawAmount, setWithdrawAmount] = useState("");
  const [successMsg, setSuccessMsg] = useState("");
 
- const myTxs = useMemo(() =>
- transactions.filter((t) => t.userId === currentUser?.id).sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()),
- [currentUser]
- );
-
- const balance = currentUser?.walletBalance || 0;
- const pending = myTxs.filter((t) => t.status === "pending");
- const completedTx = myTxs.filter((t) => t.status === "completed");
+  const myTxs: any[] = [];
+  const pending = myTxs.filter((t: any) => t.status === "pending");
+  const completedTx = myTxs.filter((t: any) => t.status === "completed");
+  const balance = currentUser?.walletBalance || 0;
 
  const handlePaySuccess = (reference: string) => {
  const amount = parseInt(topUpAmount);

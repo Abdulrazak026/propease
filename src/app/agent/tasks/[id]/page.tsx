@@ -1,17 +1,27 @@
 "use client";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { tasks } from "@/lib/mock-data";
+import { useState, useEffect } from "react";
 import Badge from "@/components/ui/Badge";
 import Button from "@/components/ui/Button";
 import { formatNaira, formatDate, propertyTypeLabels, statusColors } from "@/lib/utils";
+import { api } from "@/lib/api-client";
 
 export default function AgentTaskDetail() {
- const { id } = useParams();
- const router = useRouter();
- const task = tasks.find((t) => t.id === id);
+  const { id } = useParams();
+  const router = useRouter();
+  const [task, setTask] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
 
- if (!task) {
+  useEffect(() => {
+    api.get<any>(`/api/tasks/${id}`).then(r => {
+      if (r.data) setTask(r.data);
+      setLoading(false);
+    }).catch(() => setLoading(false));
+  }, [id]);
+
+  if (loading) return <div className="flex items-center justify-center h-64"><div className="h-8 w-8 border-2 border-[var(--color-primary)] border-t-transparent rounded-full animate-spin" /></div>;
+  if (!task) {
  return (
  <div className="text-center py-24">
  <div className="text-5xl mb-4">🔍</div>
@@ -83,11 +93,11 @@ export default function AgentTaskDetail() {
 
  {task.comments.length> 0 ? (
  <div className="space-y-3">
- {task.comments.map((c) => (
- <div key={c.id} className="flex gap-3">
- <div className="w-8 h-8 rounded-full bg-[var(--color-primary)]/10 flex items-center justify-center shrink-0">
- <span className="text-xs font-medium text-[var(--color-primary)]">
- {c.author.name.split(" ").map(n => n[0]).join("").slice(0, 2)}
+  {task.comments.map((c: any) => (
+  <div key={c.id} className="flex gap-3">
+  <div className="w-8 h-8 rounded-full bg-[var(--color-primary)]/10 flex items-center justify-center shrink-0">
+  <span className="text-xs font-medium text-[var(--color-primary)]">
+  {c.author.name.split(" ").map((n: string) => n[0]).join("").slice(0, 2)}
  </span>
  </div>
  <div>

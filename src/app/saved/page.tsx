@@ -2,9 +2,9 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import PropertyCard from "@/components/listings/PropertyCard";
-import { listings } from "@/lib/mock-data";
 import { getFavorites } from "@/lib/favorites";
 import { formatDate } from "@/lib/utils";
+import { api } from "@/lib/api-client";
 
 interface SavedSearch {
  id: string;
@@ -16,7 +16,16 @@ interface SavedSearch {
 export default function SavedPage() {
  const [tab, setTab] = useState<"searches" | "favorites">("favorites");
  const [searches, setSearches] = useState<SavedSearch[]>([]);
- const [favIds, setFavIds] = useState<string[]>([]);
+  const [favIds, setFavIds] = useState<string[]>([]);
+  const [listings, setListings] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    api.get<{ listings: any[] }>("/api/listings").then(r => {
+      if (r.data?.listings) setListings(r.data.listings);
+      setLoading(false);
+    }).catch(() => setLoading(false));
+  }, []);
 
  useEffect(() => {
  setSearches(JSON.parse(localStorage.getItem("savedSearches") || "[]"));
