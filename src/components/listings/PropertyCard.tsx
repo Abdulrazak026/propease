@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import Badge from "@/components/ui/Badge";
 import VerifiedBadge from "@/components/ui/VerifiedBadge";
+import { resolveImageUrl } from "@/lib/utils";
 import { Listing } from "@/lib/types";
 import { formatNaira, propertyTypeLabels } from "@/lib/utils";
 import { isFavorite, toggleFavorite } from "@/lib/favorites";
@@ -30,7 +31,7 @@ export default function PropertyCard({ listing }: PropertyCardProps) {
     >
       <div className="relative h-48 bg-gray-100">
         {hasPhoto ? (
-          <img src={listing.photos[0].url} alt={listing.photos[0].alt} className="w-full h-full object-cover" loading="lazy" />
+          <img src={resolveImageUrl(listing.photos[0].url) || ""} alt={listing.photos[0].alt} className="w-full h-full object-cover" loading="lazy" />
         ) : (
           <div className="absolute inset-0 flex items-center justify-center text-gray-300 text-3xl">🏠</div>
         )}

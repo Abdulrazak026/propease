@@ -14,7 +14,7 @@ import ValuationEstimate from "@/components/listings/ValuationEstimate";
 import MapPlaceholder from "@/components/ui/MapPlaceholder";
 import { isFavorite, toggleFavorite } from "@/lib/favorites";
 import PaystackButton from "@/components/payments/PaystackButton";
-import { formatNaira, formatDate, propertyTypeLabels, rentTierLabels } from "@/lib/utils";
+import { formatNaira, formatDate, propertyTypeLabels, rentTierLabels, resolveImageUrl } from "@/lib/utils";
 
 export default function ListingDetail() {
   const { id } = useParams();
@@ -93,7 +93,7 @@ export default function ListingDetail() {
             <div className="relative h-72 md:h-96 bg-gray-100 rounded-lg overflow-hidden">
               {listing.photos.length > 0 ? (
                 <img
-                  src={listing.photos[selectedPhoto]?.url}
+                  src={resolveImageUrl(listing.photos[selectedPhoto]?.url) || ""}
                   alt={listing.photos[selectedPhoto]?.alt}
                   className="w-full h-full object-cover"
                 />
@@ -121,7 +121,7 @@ export default function ListingDetail() {
                       i === selectedPhoto ? "border-[var(--color-primary)]" : "border-transparent hover:border-gray-300"
                     }`}
                   >
-                    <img src={photo.url} alt={photo.alt} className="w-full h-full object-cover" loading="lazy" />
+                    <img src={resolveImageUrl(photo.url) || ""} alt={photo.alt} className="w-full h-full object-cover" loading="lazy" />
                   </button>
                 ))}
               </div>
