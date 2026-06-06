@@ -9,13 +9,16 @@ const router = Router();
 
 router.get("/dashboard", authenticate, authorize("head"), async (req: AuthRequest, res: Response) => {
   try {
-    const totalUsers = await prisma.user.count();
-    const totalListings = await prisma.listing.count();
-    const availableListings = await prisma.listing.count({ where: { status: "available" } });
-    const totalTasks = await prisma.task.count();
-    const openTasks = await prisma.task.count({ where: { status: "open" } });
-    const totalCommissions = await prisma.commission.aggregate({ _sum: { companyCut: true } });
-    const totalCommissionsPaid = await prisma.commission.aggregate({ _sum: { ambassadorCut: true, agentCut: true } });
+    const [totalUsers, totalListings, availableListings, totalTasks, openTasks, totalCommissions, totalCommissionsPaid] =
+      await Promise.all([
+        prisma.user.count(),
+        prisma.listing.count(),
+        prisma.listing.count({ where: { status: "available" } }),
+        prisma.task.count(),
+        prisma.task.count({ where: { status: "open" } }),
+        prisma.commission.aggregate({ _sum: { companyCut: true } }),
+        prisma.commission.aggregate({ _sum: { ambassadorCut: true, agentCut: true } }),
+      ]);
 
     res.json({
       stats: {

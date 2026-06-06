@@ -168,6 +168,7 @@ model RefreshToken {
 
   @@index([token])
   @@index([userId])
+  @@index([expiresAt])
 }
 
 model City {
@@ -235,6 +236,7 @@ model Listing {
   @@index([listingType])
   @@index([postedById])
   @@index([assignedAgentId])
+  @@index([price])
 }
 
 model ListingPhoto {
@@ -338,6 +340,7 @@ model Transaction {
 
   @@index([userId])
   @@index([reference])
+  @@index([status])
 }
 
 model Inquiry {
@@ -356,6 +359,7 @@ model Inquiry {
 
   @@index([listingId])
   @@index([assignedAgentId])
+  @@index([status])
 }
 
 model Reservation {
@@ -373,6 +377,8 @@ model Reservation {
   user   User?   @relation(fields: [userId], references: [id])
 
   @@index([listingId])
+ @@index([status])
+ @@index([expiresAt])
 }
 
 enum ApplicationStatus {
@@ -634,6 +640,7 @@ model Message {
   sender   User   @relation(fields: [senderId], references: [id])
 
   @@index([conversationId, createdAt])
+  @@index([senderId])
 }
 
 model Notification {

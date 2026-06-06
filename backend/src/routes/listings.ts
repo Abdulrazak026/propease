@@ -9,7 +9,7 @@ const router = Router();
 
 router.get("/", async (req, res: Response) => {
   try {
-    const { city, listingType, propertyType, status, minPrice, maxPrice, search } = req.query;
+    const { city, listingType, propertyType, status, minPrice, maxPrice, search, limit, offset } = req.query;
 
     const where: any = {};
 
@@ -30,17 +30,25 @@ router.get("/", async (req, res: Response) => {
       if (maxPrice) where.price.lte = parseInt(maxPrice as string);
     }
 
-    const listings = await prisma.listing.findMany({
-      where,
-      include: {
-        photos: { orderBy: { order: "asc" } },
-        postedBy: { select: { id: true, name: true, role: true, isVerified: true } },
-        assignedAgent: { select: { id: true, name: true, isVerified: true, whatsapp: true } },
-      },
-      orderBy: { createdAt: "desc" },
-    });
+    const take = Math.min(parseInt(limit as string) || 20, 100);
+    const skip = parseInt(offset as string) || 0;
 
-    res.json({ listings });
+    const [listings, total] = await Promise.all([
+      prisma.listing.findMany({
+        where,
+        take,
+        skip,
+        include: {
+          photos: { orderBy: { order: "asc" } },
+          postedBy: { select: { id: true, name: true, role: true, isVerified: true } },
+          assignedAgent: { select: { id: true, name: true, isVerified: true, whatsapp: true } },
+        },
+        orderBy: { createdAt: "desc" },
+      }),
+      prisma.listing.count({ where }),
+    ]);
+
+    res.json({ listings, total, limit: take, offset: skip });
   } catch (error) {
     console.error("List listings error:", error);
     res.status(500).json({ error: "Failed to fetch listings" });
