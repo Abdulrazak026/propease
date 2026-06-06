@@ -88,6 +88,7 @@ export default function AdminEditListingPage() {
         features: form.features, category: form.category,
         partnerCompany: form.category === "partnership" ? form.partnerCompany : undefined,
         negotiable: form.negotiable,
+        photos: uploadedUrls.map(url => ({ url })),
       });
       if (r.error) { setError(r.error); } else { setSuccess(true); }
     } catch { setError("Failed to update"); }

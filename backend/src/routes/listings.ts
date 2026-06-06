@@ -139,15 +139,30 @@ router.put("/:id", authenticate, authorize("head", "ambassador"), async (req: Au
       return res.status(403).json({ error: "You can only edit your own listings" });
     }
 
+    const { photos: newPhotos, ...listingData } = req.body;
+
     const updated = await prisma.listing.update({
       where: { id: listingId },
-      data: req.body,
+      data: listingData,
+      include: { photos: true, postedBy: { select: { id: true, name: true } } },
+    });
+
+    // Replace photos if provided
+    if (Array.isArray(newPhotos) && newPhotos.length > 0) {
+      await prisma.listingPhoto.deleteMany({ where: { listingId } });
+      await prisma.listingPhoto.createMany({
+        data: newPhotos.map((p: { url: string }) => ({ url: p.url, listingId })),
+      });
+    }
+
+    const fresh = await prisma.listing.findUnique({
+      where: { id: listingId },
       include: { photos: true, postedBy: { select: { id: true, name: true } } },
     });
 
     invalidate("listings:*");
     invalidate("dashboard:stats");
-    res.json({ listing: updated });
+    res.json({ listing: fresh });
   } catch (error) {
     logger.error({ err: error }, "Update listing error:");
     res.status(500).json({ error: "Failed to update listing" });
