@@ -39,41 +39,26 @@ function toUser(a: ApiUser): User {
 }
 
 export function RoleProvider({ children }: { children: ReactNode }) {
-  const [currentUser, setCurrentUserState] = useState<User | null>(() => {
-    try {
-      const cached = localStorage.getItem("mbpp-user");
-      return cached ? JSON.parse(cached) : null;
-    } catch { return null; }
-  });
-  const [loading, setLoading] = useState(!currentUser);
+  const [currentUser, setCurrentUserState] = useState<User | null>(null);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
-    const validate = async () => {
+    (async () => {
       try {
         const { data } = await api.get<{ user: ApiUser }>("/api/auth/me");
         if (!cancelled && data?.user) {
-          const u = toUser(data.user);
-          setCurrentUserState(u);
-          localStorage.setItem("mbpp-user", JSON.stringify(u));
-        } else if (!cancelled) {
-          setCurrentUserState(null);
-          localStorage.removeItem("mbpp-user");
+          setCurrentUserState(toUser(data.user));
         }
       } catch {
-        setCurrentUserState(null);
-        localStorage.removeItem("mbpp-user");
+        // no backend or invalid session — stay logged out
       }
-      if (!cancelled) setLoading(false);
-    };
-    validate();
+    })();
     return () => { cancelled = true; };
   }, []);
 
   const setCurrentUser = useCallback((user: User | null) => {
     setCurrentUserState(user);
-    if (user) localStorage.setItem("mbpp-user", JSON.stringify(user));
-    else localStorage.removeItem("mbpp-user");
     if (!user) setAccessToken(null);
   }, []);
 
@@ -88,7 +73,6 @@ export function RoleProvider({ children }: { children: ReactNode }) {
     setAccessToken(data.accessToken);
     const user = toUser(data.user);
     setCurrentUserState(user);
-    localStorage.setItem("mbpp-user", JSON.stringify(user));
     return { role: user.role };
   }, []);
 
@@ -96,7 +80,6 @@ export function RoleProvider({ children }: { children: ReactNode }) {
     await api.post("/api/auth/logout");
     setAccessToken(null);
     setCurrentUserState(null);
-    localStorage.removeItem("mbpp-user");
   }, []);
 
   return (
