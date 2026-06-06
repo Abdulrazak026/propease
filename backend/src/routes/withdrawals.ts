@@ -37,26 +37,36 @@ router.get("/withdrawals", authenticate, authorize("head"), async (_req: AuthReq
   }
 });
 
-// Admin approves withdrawal
+// Admin approves withdrawal — with balance re-check to prevent negative wallets
 router.post("/withdrawals/:id/approve", authenticate, authorize("head"), async (req: AuthRequest, res: Response) => {
   try {
     const wid = req.params.id as string;
-    const withdrawal = await prisma.withdrawal.findUnique({ where: { id: wid } });
-    if (!withdrawal) return res.status(404).json({ error: "Withdrawal not found" });
-    if (withdrawal.status !== "pending") return res.status(400).json({ error: "Already processed" });
 
-    await prisma.$transaction([
-      prisma.withdrawal.update({ where: { id: wid }, data: { status: "approved" } }),
-      prisma.user.update({ where: { id: withdrawal.userId }, data: { walletBalance: { decrement: withdrawal.amount } } }),
-      prisma.transaction.create({
+    const result = await prisma.$transaction(async (tx) => {
+      const withdrawal = await tx.withdrawal.findUnique({ where: { id: wid } });
+      if (!withdrawal) throw new Error("NOT_FOUND");
+      if (withdrawal.status !== "pending") throw new Error("ALREADY_PROCESSED");
+
+      // Re-check balance at approval time — prevents race condition
+      const user = await tx.user.findUnique({ where: { id: withdrawal.userId } });
+      if (!user || user.walletBalance < withdrawal.amount) throw new Error("INSUFFICIENT_BALANCE");
+
+      await tx.withdrawal.update({ where: { id: wid }, data: { status: "approved" } });
+      await tx.user.update({ where: { id: withdrawal.userId }, data: { walletBalance: { decrement: withdrawal.amount } } });
+      await tx.transaction.create({
         data: { type: "withdrawal", amount: withdrawal.amount, reference: `WD-${withdrawal.id.slice(0,8)}`, method: "transfer", status: "completed", userId: withdrawal.userId },
-      }),
-      prisma.auditLog.create({
+      });
+      await tx.auditLog.create({
         data: { action: "APPROVE_WITHDRAWAL", entity: "Withdrawal", entityId: wid, userId: req.user!.id as string, details: { amount: withdrawal.amount } },
-      }),
-    ]);
+      });
+      return withdrawal;
+    });
+
     res.json({ success: true, message: "Withdrawal approved" });
-  } catch (error) {
+  } catch (error: any) {
+    if (error.message === "NOT_FOUND") return res.status(404).json({ error: "Withdrawal not found" });
+    if (error.message === "ALREADY_PROCESSED") return res.status(400).json({ error: "Already processed" });
+    if (error.message === "INSUFFICIENT_BALANCE") return res.status(400).json({ error: "Insufficient wallet balance at time of approval" });
     res.status(500).json({ error: "Failed to approve withdrawal" });
   }
 });

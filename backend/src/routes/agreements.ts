@@ -3,6 +3,7 @@ import prisma from "../lib/prisma";
 import { authenticate, AuthRequest } from "../middleware/auth";
 import { authorize } from "../middleware/rbac";
 import { calculateAndDistributeCommission } from "./commissions";
+import { logger } from "../lib/logger";
 
 const router = Router();
 
@@ -194,8 +195,25 @@ router.post("/:id/sign", authenticate, async (req: AuthRequest, res: Response) =
 
       // Trigger commission distribution on agreement completion
       if (agreement.annualRent && agreement.agentId && agreement.listingId) {
-        const ambassadorId = (await prisma.user.findUnique({ where: { id: agreement.agentId }, select: { ambassadorId: true } }))?.ambassadorId || "";
-        calculateAndDistributeCommission(agId, agreement.propertyTitle, "rent_full", agreement.annualRent, ambassadorId, agreement.agentId).catch(() => {});
+        try {
+          const ambassadorId = (await prisma.user.findUnique({ where: { id: agreement.agentId }, select: { ambassadorId: true } }))?.ambassadorId || "";
+          await calculateAndDistributeCommission(agId, agreement.propertyTitle, "rent_full", agreement.annualRent, ambassadorId, agreement.agentId);
+        } catch (err) {
+          logger.error({ err, agreementId: agId, agentId: agreement.agentId, amount: agreement.annualRent }, "Commission distribution failed for agreement");
+          // Alert all admin users about the failure
+          const admins = await prisma.user.findMany({ where: { role: "head" }, select: { id: true } });
+          for (const admin of admins) {
+            await prisma.notification.create({
+              data: {
+                userId: admin.id,
+                type: "agreement_signed",
+                title: "⚠️ Commission Failed",
+                body: `Commission for agreement "${agreement.propertyTitle}" (₦${agreement.annualRent.toLocaleString()}) failed to distribute. Manual review required.`,
+                link: `/admin/agreements`,
+              },
+            }).catch(() => {});
+          }
+        }
       }
 
       // Update listing status to rented
