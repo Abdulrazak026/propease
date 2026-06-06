@@ -43,9 +43,18 @@ router.post("/", authenticate, authorize("head"), async (req: AuthRequest, res: 
 
 router.delete("/:id", authenticate, authorize("head"), async (req: AuthRequest, res: Response) => {
   try {
-    await prisma.user.delete({ where: { id: String(req.params.id) } });
+    const uid = String(req.params.id);
+    // Clean up related records first to avoid FK issues
+    await prisma.refreshToken.deleteMany({ where: { userId: uid } });
+    await prisma.passwordResetToken.deleteMany({ where: { userId: uid } });
+    await prisma.notification.deleteMany({ where: { userId: uid } });
+    await prisma.auditLog.deleteMany({ where: { userId: uid } });
+    await prisma.user.delete({ where: { id: uid } });
     res.json({ success: true });
-  } catch { res.status(500).json({ error: "Failed to delete user" }); }
+  } catch (err) { 
+    console.error("Delete user error:", err);
+    res.status(500).json({ error: "Failed to delete user" }); 
+  }
 });
 
 export default router;
