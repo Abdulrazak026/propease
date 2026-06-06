@@ -1,7 +1,9 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Button from "@/components/ui/Button";
+
+const API = process.env.NEXT_PUBLIC_API_URL || "https://propease-production.up.railway.app";
 
 const topics = [
   { title: "Searching Properties", icon: "🔍", desc: "Learn how to find the perfect home using filters, maps, and saved searches." },
@@ -14,17 +16,17 @@ const topics = [
   { title: "Commission Structure", icon: "📊", desc: "How commissions are calculated, split, and paid out to agents." },
 ];
 
-const faqs = [
-  { q: "How do I reset my password?", a: "Click 'Forgot Password' on the login page. A reset link will be sent to your registered email address." },
-  { q: "Can I cancel a viewing?", a: "Yes, go to your messages and inform the agent. We recommend cancelling at least 2 hours before the scheduled time." },
-  { q: "What happens after I sign a rent agreement?", a: "The agreement is digitally stored and accessible from your account. You will receive a confirmation via email and WhatsApp." },
-  { q: "How long does a withdrawal take?", a: "Withdrawal requests are processed within 1-2 business days after admin approval." },
-  { q: "Is my personal data safe?", a: "Yes. We use encryption, access controls, and regular security audits. We never share your data without consent." },
-];
-
 export default function HelpPage() {
   const [search, setSearch] = useState("");
   const [openFaq, setOpenFaq] = useState<number | null>(null);
+  const [faqs, setFaqs] = useState<{ question: string; answer: string }[]>([]);
+  const [faqsLoading, setFaqsLoading] = useState(true);
+
+  useEffect(() => {
+    fetch(`${API}/api/faqs`).then(r => r.json()).then(d => {
+      if (d.faqs) setFaqs(d.faqs);
+    }).catch(() => {}).finally(() => setFaqsLoading(false));
+  }, []);
 
   const filtered = topics.filter(
     (t) => t.title.toLowerCase().includes(search.toLowerCase()) || t.desc.toLowerCase().includes(search.toLowerCase())
@@ -73,23 +75,27 @@ export default function HelpPage() {
             <span className="text-xs font-medium text-[var(--color-primary)] uppercase tracking-wider">FAQ</span>
             <h2 className="text-xl font-bold text-gray-900 mt-1">Frequently Asked Questions</h2>
           </div>
-          <div className="space-y-2">
-            {faqs.map((faq, i) => (
-              <div key={i} className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-                <button onClick={() => setOpenFaq(openFaq === i ? null : i)} className="flex items-center justify-between w-full px-5 py-4 text-left">
-                  <span className="text-sm font-medium text-gray-900">{faq.q}</span>
-                  <svg className={`w-4 h-4 text-gray-400 transition-transform shrink-0 ${openFaq === i ? "rotate-180" : ""}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-                  </svg>
-                </button>
-                {openFaq === i && (
-                  <div className="px-5 pb-4">
-                    <p className="text-sm text-gray-600 leading-relaxed">{faq.a}</p>
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
+          {faqsLoading ? (
+            <p className="text-sm text-gray-400 text-center py-8">Loading FAQs...</p>
+          ) : (
+            <div className="space-y-2">
+              {faqs.map((faq, i) => (
+                <div key={i} className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+                  <button onClick={() => setOpenFaq(openFaq === i ? null : i)} className="flex items-center justify-between w-full px-5 py-4 text-left">
+                    <span className="text-sm font-medium text-gray-900">{faq.question}</span>
+                    <svg className={`w-4 h-4 text-gray-400 transition-transform shrink-0 ${openFaq === i ? "rotate-180" : ""}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </button>
+                  {openFaq === i && (
+                    <div className="px-5 pb-4">
+                      <p className="text-sm text-gray-600 leading-relaxed">{faq.answer}</p>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         <div className="bg-[var(--color-primary)]/5 rounded-lg border border-[var(--color-primary)]/10 p-8 text-center">
