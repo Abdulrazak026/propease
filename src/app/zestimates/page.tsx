@@ -66,10 +66,10 @@ export default function ZestimatesPage() {
             Get a free instant valuation on any property. No sign-up required for basic estimates.
           </p>
           <Link
-            href="/"
+            href="/?type=sale"
             className="inline-flex items-center px-6 py-3 bg-[var(--color-primary)] text-white rounded-lg text-sm font-medium hover:bg-[var(--color-primary-light)] transition-all"
           >
-            Estimate a Property
+            Browse Properties for Valuation
           </Link>
         </div>
       </div>

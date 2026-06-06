@@ -21,16 +21,39 @@ export default function SavedPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    api.get<{ listings: any[] }>("/api/listings").then(r => {
-      if (r.data?.listings) setListings(r.data.listings);
+    const load = async () => {
+      try {
+        // Fetch listings
+        const listingsR = await api.get<{ listings: any[] }>("/api/listings");
+        if (listingsR.data?.listings) setListings(listingsR.data.listings);
+      } catch {}
       setLoading(false);
-    }).catch(() => setLoading(false));
+    };
+    load();
   }, []);
 
  useEffect(() => {
- setSearches(JSON.parse(localStorage.getItem("savedSearches") || "[]"));
- setFavIds(getFavorites());
+   // Load saved searches from backend, fallback to localStorage
+   api.get<{ searches: SavedSearch[] }>("/api/saved-searches").then(r => {
+     if (r.data?.searches && r.data.searches.length > 0) {
+       setSearches(r.data.searches);
+     } else {
+       setSearches(JSON.parse(localStorage.getItem("savedSearches") || "[]"));
+     }
+   }).catch(() => {
+    setSearches(JSON.parse(localStorage.getItem("savedSearches") || "[]"));
+   });
+   setFavIds(getFavorites());
  }, []);
+
+ const syncToBackend = (updated: SavedSearch[]) => {
+   // Save latest search to backend
+   const last = updated[updated.length - 1];
+   if (last) {
+     api.post("/api/saved-searches", last).catch(() => {});
+   }
+   localStorage.setItem("savedSearches", JSON.stringify(updated));
+ };
 
  const favListings = listings.filter((l) => favIds.includes(l.id));
 
@@ -48,9 +71,10 @@ export default function SavedPage() {
  };
 
  const handleDeleteSearch = (id: string) => {
- const updated = searches.filter((s) => s.id !== id);
- setSearches(updated);
- localStorage.setItem("savedSearches", JSON.stringify(updated));
+   const updated = searches.filter((s) => s.id !== id);
+   setSearches(updated);
+   api.delete(`/api/saved-searches/${id}`).catch(() => {});
+   localStorage.setItem("savedSearches", JSON.stringify(updated));
  };
 
  return (

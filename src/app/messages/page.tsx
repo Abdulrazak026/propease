@@ -1,7 +1,8 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { formatDate } from "@/lib/utils";
+import { api } from "@/lib/api-client";
 
 interface User { id: string; name: string; avatar?: string; }
 interface Conversation {
@@ -14,17 +15,23 @@ interface Conversation {
   unread: number;
 }
 
-const MOCK_CONVOS: Conversation[] = [
-  { id: "c1", subject: "Inquiry about No. 15 Kabo Road", participants: [{ user: { id: "u2", name: "Aisha Abubakar" } }], listing: { id: "l2", title: "No. 15 Kabo Road" }, lastMessage: "Is this property still available?", lastMessageAt: new Date(Date.now() - 1800000).toISOString(), unread: 2 },
-  { id: "c2", subject: "Tenancy agreement for No. 42 Ibrahim Taiwo Road", participants: [{ user: { id: "u1", name: "Dr. Amina Yusuf" } }], listing: { id: "l1", title: "No. 42 Ibrahim Taiwo Road" }, lastMessage: "I've reviewed the agreement terms.", lastMessageAt: new Date(Date.now() - 86400000).toISOString(), unread: 0 },
-  { id: "c3", subject: "Partnership inquiry", participants: [{ user: { id: "u4", name: "Fatima Bello" } }], listing: null, lastMessage: "We'd like to partner with MBPP.", lastMessageAt: new Date(Date.now() - 172800000).toISOString(), unread: 0 },
-];
-
 export default function MessagesPage() {
-  const [conversations] = useState<Conversation[]>(MOCK_CONVOS);
+  const [conversations, setConversations] = useState<Conversation[]>([]);
+  const [loading, setLoading] = useState(true);
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
+  const fetchConversations = () => {
+    api.get<{ conversations: Conversation[] }>("/api/messages/conversations").then(r => {
+      if (r.data?.conversations) setConversations(r.data.conversations);
+      setLoading(false);
+    }).catch(() => setLoading(false));
+  };
+
+  useEffect(() => { fetchConversations(); }, []);
+
   const selected = conversations.find((c) => c.id === selectedId);
+
+  if (loading) return <div className="flex items-center justify-center h-64"><div className="h-8 w-8 border-2 border-[var(--color-primary)] border-t-transparent rounded-full animate-spin" /></div>;
 
   return (
     <div className="h-full flex flex-col">
@@ -105,15 +112,25 @@ export default function MessagesPage() {
 
 function ConversationDetail({ conversation, onBack }: { conversation: Conversation; onBack: () => void }) {
   const [input, setInput] = useState("");
-  const [messages, setMessages] = useState<{ id: string; content: string; isMe: boolean; time: string }[]>([
-    { id: "m1", content: "Hello, is this property still available?", isMe: true, time: "10:30 AM" },
-    { id: "m2", content: "Yes, it's still available! Would you like to schedule a viewing?", isMe: false, time: "10:45 AM" },
-    { id: "m3", content: "Great! I'd love to see it this weekend.", isMe: true, time: "11:00 AM" },
-  ]);
+  const [messages, setMessages] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const handleSend = () => {
+  useEffect(() => {
+    api.get<any>(`/api/messages/conversations/${conversation.id}`).then(r => {
+      if ((r.data as any)?.messages) setMessages((r.data as any).messages);
+      setLoading(false);
+    }).catch(() => setLoading(false));
+  }, [conversation.id]);
+
+  const handleSend = async () => {
     if (!input.trim()) return;
-    setMessages((prev) => [...prev, { id: crypto.randomUUID(), content: input.trim(), isMe: true, time: "Now" }]);
+    try {
+      const r = await api.post(`/api/messages/conversations/${conversation.id}`, { content: input.trim() });
+      if (r.data) {
+        const newMsg = (r.data as any).message || { id: crypto.randomUUID(), content: input.trim(), senderId: "me", createdAt: new Date().toISOString() };
+        setMessages(prev => [...prev, newMsg]);
+      }
+    } catch {}
     setInput("");
   };
 
@@ -137,18 +154,22 @@ function ConversationDetail({ conversation, onBack }: { conversation: Conversati
       </div>
 
       <div className="flex-1 overflow-y-auto px-5 py-4 space-y-3 min-h-0">
-        {messages.map((msg) => (
-          <div key={msg.id} className={`flex ${msg.isMe ? "justify-end" : "justify-start"}`}>
-            <div className={`max-w-[70%] ${msg.isMe ? "order-1" : "order-1"}`}>
+        {loading ? <p className="text-xs text-gray-400 text-center">Loading...</p> :
+          messages.map((msg: any) => {
+            const isMe = msg.senderId !== conversation.participants[0]?.user.id;
+            return (
+          <div key={msg.id} className={`flex ${isMe ? "justify-end" : "justify-start"}`}>
+            <div className={`max-w-[70%]`}>
               <div className={`px-4 py-2.5 rounded-lg text-sm leading-relaxed ${
-                msg.isMe ? "bg-[var(--color-primary)] text-white rounded-br-md" : "bg-white border border-gray-200 text-gray-900 rounded-bl-md"
+                isMe ? "bg-[var(--color-primary)] text-white rounded-br-md" : "bg-white border border-gray-200 text-gray-900 rounded-bl-md"
               }`}>
                 {msg.content}
               </div>
-              <p className={`text-[10px] text-gray-400 mt-1 ${msg.isMe ? "text-right" : "text-left"}`}>{msg.time}</p>
+              <p className={`text-[10px] text-gray-400 mt-1 ${isMe ? "text-right" : "text-left"}`}>{formatDate(msg.createdAt)}</p>
             </div>
           </div>
-        ))}
+          );
+          })}
       </div>
 
       <div className="shrink-0 border-t border-gray-200 px-5 py-3 bg-white">

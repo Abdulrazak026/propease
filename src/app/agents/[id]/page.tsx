@@ -4,19 +4,25 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import { formatNaira, formatDate } from "@/lib/utils";
 import Badge from "@/components/ui/Badge";
+import ReviewSection from "@/components/listings/ReviewSection";
 import { api } from "@/lib/api-client";
 
 export default function AgentProfilePage() {
   const { id } = useParams();
   const [agent, setAgent] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [reviews, setReviews] = useState<any>(null);
 
   useEffect(() => {
-    api.get<any>(`/api/admin/users`).then(r => {
-      if (r.data?.users) {
-        const found = r.data.users.find((u: any) => u.id === id && u.role === "agent");
+    Promise.all([
+      api.get<any>(`/api/admin/users`),
+      api.get<any>(`/api/reviews/agent/${id}`),
+    ]).then(([usersR, revR]) => {
+      if (usersR.data?.users) {
+        const found = usersR.data.users.find((u: any) => u.id === id);
         setAgent(found || null);
       }
+      if ((revR.data as any)?.reviews) setReviews(revR.data);
       setLoading(false);
     }).catch(() => setLoading(false));
   }, [id]);
@@ -33,12 +39,9 @@ export default function AgentProfilePage() {
  );
  }
 
-  const agentTasks: any[] = [];
-  const agentCommissions: any[] = [];
-  const agentInquiries: any[] = [];
-  const agentListings: any[] = [];
-  const fulfilledTasks: any[] = [];
-  const totalEarned = 0;
+  const avgRating = reviews?.averageRating || 0;
+  const reviewCount = reviews?.totalCount || 0;
+  const totalEarned = agent.walletBalance || 0;
 
  return (
  <div className="flex-1">
@@ -66,15 +69,15 @@ export default function AgentProfilePage() {
 
  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
  {[
- { label: "Tasks Completed", value: fulfilledTasks.length, sub: `${agentTasks.length} total assigned`, accent: "bg-emerald-100", color: "text-emerald-600" },
- { label: "Commissions Earned", value: formatNaira(totalEarned), sub: `${agentCommissions.length} deals`, accent: "bg-[var(--color-primary)]/10", color: "text-[var(--color-primary)]" },
- { label: "Inquiries Handled", value: agentInquiries.length, sub: `${agentInquiries.filter(i => i.status === "new").length} new`, accent: "bg-blue-100", color: "text-blue-600" },
- { label: "Listings Managed", value: agentListings.length, sub: `${agentListings.filter(l => l.status === "available").length} active`, accent: "bg-amber-100", color: "text-amber-600" },
+ { label: "Rating", value: avgRating > 0 ? avgRating.toFixed(1) : "—", sub: `${reviewCount} reviews`, accent: "bg-emerald-100", color: "text-emerald-600" },
+ { label: "Commissions Earned", value: formatNaira(totalEarned), sub: "from closed deals", accent: "bg-[var(--color-primary)]/10", color: "text-[var(--color-primary)]" },
+ { label: "Inquiries Handled", value: "—", sub: "across listings", accent: "bg-blue-100", color: "text-blue-600" },
+ { label: "Listings Managed", value: "—", sub: "active properties", accent: "bg-amber-100", color: "text-amber-600" },
  ].map((s) => (
  <div key={s.label} className="bg-white rounded-lg border border-gray-200 p-4 card-hover">
  <div className="flex items-center gap-3">
  <div className={`w-10 h-10 ${s.accent} rounded-lg flex items-center justify-center`}>
- <span className={`text-sm font-bold ${s.color}`}>{typeof s.value === "string" && s.value.startsWith("₦") ? "₦" : s.value}</span>
+ <span className={`text-sm font-bold ${s.color}`}>{s.value}</span>
  </div>
  <div className="min-w-0">
  <p className="text-xs text-gray-500">{s.label}</p>
@@ -86,46 +89,15 @@ export default function AgentProfilePage() {
  ))}
  </div>
 
- <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
- <div className="bg-white rounded-lg border border-gray-200 p-5">
- <h2 className="text-sm font-semibold text-gray-900 mb-4">Recent Tasks</h2>
- {agentTasks.length> 0 ? (
- <div className="space-y-1">
- {agentTasks.slice(0, 5).map((t) => (
- <div key={t.id} className="flex items-center justify-between py-2.5 px-3 rounded-lg hover:bg-gray-50 transition-colors">
- <div className="min-w-0 flex-1">
- <p className="text-sm text-gray-900 truncate">{t.title}</p>
- <p className="text-xs text-gray-400 mt-0.5">{t.area}</p>
+ <div className="max-w-3xl">
+   <ReviewSection
+     agentId={id as string}
+     agentName={agent.name}
+     listingId=""
+     currentUserId=""
+   />
  </div>
- <Badge variant={t.status === "fulfilled" ? "success" : t.status === "in_progress" ? "warning" : "default"}>{t.status}</Badge>
- </div>
- ))}
- </div>
- ) : (
- <p className="text-sm text-gray-400 py-6 text-center">No tasks assigned</p>
- )}
- </div>
-
- <div className="bg-white rounded-lg border border-gray-200 p-5">
- <h2 className="text-sm font-semibold text-gray-900 mb-4">Commission History</h2>
- {agentCommissions.length> 0 ? (
- <div className="space-y-1">
- {agentCommissions.map((c) => (
- <div key={c.id} className="flex items-center justify-between py-2.5 px-3 rounded-lg hover:bg-gray-50 transition-colors">
- <div className="min-w-0 flex-1">
- <p className="text-sm text-gray-900 truncate">{c.dealTitle}</p>
- <p className="text-xs text-gray-400 mt-0.5">{c.dealType} • {formatDate(c.paidAt)}</p>
- </div>
- <span className="text-sm font-medium text-emerald-600">{formatNaira(c.agentCut)}</span>
- </div>
- ))}
- </div>
- ) : (
- <p className="text-sm text-gray-400 py-6 text-center">No commissions yet</p>
- )}
- </div>
- </div>
- </div>
- </div>
+</div>
+</div>
  );
 }

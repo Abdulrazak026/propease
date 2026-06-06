@@ -2,6 +2,7 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { formatDate } from "@/lib/utils";
+import { api } from "@/lib/api-client";
 
 interface Notification {
  id: string;
@@ -13,16 +14,24 @@ interface Notification {
  createdAt: string;
 }
 
-const MOCK_NOTIFICATIONS: Notification[] = [
- { id: "n1", type: "saved_search_match", title: "New match found", body: "2 new properties match your '2-bedroom flat' search", link: "/saved", read: false, createdAt: new Date(Date.now() - 3600000).toISOString() },
- { id: "n2", type: "review_response", title: "Review responded", body: "Agent responded to your review", link: "/listings/l2", read: false, createdAt: new Date(Date.now() - 86400000).toISOString() },
- { id: "n3", type: "agreement_signed", title: "Agreement signed", body: "Tenant signed the tenancy agreement", link: "/agreements/a1", read: true, createdAt: new Date(Date.now() - 172800000).toISOString() },
-];
-
 export default function NotificationBell() {
  const [open, setOpen] = useState(false);
- const [notifications, setNotifications] = useState<Notification[]>(MOCK_NOTIFICATIONS);
+ const [notifications, setNotifications] = useState<Notification[]>([]);
+ const [loading, setLoading] = useState(true);
  const ref = useRef<HTMLDivElement>(null);
+
+ const fetchNotifications = () => {
+   api.get<{ notifications: Notification[] }>("/api/notifications").then(r => {
+     if (r.data?.notifications) setNotifications(r.data.notifications);
+     setLoading(false);
+   }).catch(() => setLoading(false));
+ };
+
+ useEffect(() => {
+   fetchNotifications();
+   const interval = setInterval(fetchNotifications, 30000);
+   return () => clearInterval(interval);
+ }, []);
 
  useEffect(() => {
  const handleClick = (e: MouseEvent) => {
@@ -35,7 +44,13 @@ export default function NotificationBell() {
  const unread = notifications.filter((n) => !n.read).length;
 
  const markAllRead = () => {
- setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
+   api.patch("/api/notifications/read-all").catch(() => {});
+   setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
+ };
+
+ const markRead = (id: string) => {
+   api.patch(`/api/notifications/${id}/read`).catch(() => {});
+   setNotifications((prev) => prev.map((p) => p.id === id ? { ...p, read: true } : p));
  };
 
  return (
@@ -74,10 +89,10 @@ export default function NotificationBell() {
  <Link
  key={n.id}
  href={n.link || "#"}
- onClick={() => {
- if (!n.read) setNotifications((prev) => prev.map((p) => p.id === n.id ? { ...p, read: true } : p));
- setOpen(false);
- }}
+                    onClick={() => {
+                      if (!n.read) markRead(n.id);
+                      setOpen(false);
+                    }}
  className={`flex items-start gap-3 px-4 py-3 hover:bg-gray-50 transition-colors ${!n.read ? "bg-blue-50/40" : ""}`}
 >
  <span className={`w-2 h-2 rounded-full mt-1.5 shrink-0 ${!n.read ? "bg-[var(--color-primary)]" : "bg-transparent"}`} />

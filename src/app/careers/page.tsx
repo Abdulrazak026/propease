@@ -92,7 +92,7 @@ export default function CareersPage() {
                 </div>
                 <p className="text-xs text-gray-400 mb-2">{role.location}</p>
                 <p className="text-xs text-gray-500 leading-relaxed mb-4">{role.desc}</p>
-                <Button size="sm">Apply Now</Button>
+                <a href="mailto:careers@mbpproperties.com?subject=Application%20for%20${encodeURIComponent(role.title)}"><Button size="sm">Apply Now</Button></a>
               </div>
             ))}
           </div>

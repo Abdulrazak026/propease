@@ -27,6 +27,7 @@ export default function ListingDetail() {
   const [reserveStep, setReserveStep] = useState<"confirm" | "pay" | "done">("confirm");
   const [bookingSuccess, setBookingSuccess] = useState(false);
   const [fav, setFav] = useState(false);
+  const [priceHistory, setPriceHistory] = useState<any[]>([]);
 
   useEffect(() => {
     api.get<any>(`/api/listings/${id}`).then(r => {
@@ -36,6 +37,13 @@ export default function ListingDetail() {
   }, [id]);
 
   useEffect(() => { if (listing) setFav(isFavorite(listing.id)); }, [listing]);
+
+  useEffect(() => {
+    if (!id) return;
+    api.get<any>(`/api/price-history/listing/${id}`).then(r => {
+      if ((r.data as any)?.history) setPriceHistory((r.data as any).history);
+    }).catch(() => {});
+  }, [id]);
 
   const handleToggleFav = () => {
     const now = toggleFavorite(listing!.id);
@@ -246,7 +254,7 @@ export default function ListingDetail() {
 
             <PriceHistory
               currentPrice={listing.price}
-              history={[
+              history={priceHistory.length > 0 ? priceHistory : [
                 { date: listing.createdAt, price: listing.price, reason: "Initial listing" },
               ]}
               priceLabel={listing.priceLabel}

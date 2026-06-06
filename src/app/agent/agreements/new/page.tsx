@@ -91,6 +91,8 @@ export default function NewAgreementPage() {
   };
 
  if (created) {
+  const signingUrl = agreementId ? `https://mbpproperties.com/agreements/${agreementId}?role=landlord` : "";
+  const copyLink = () => { navigator.clipboard.writeText(signingUrl); alert("Link copied!"); };
  return (
  <div className="flex-1 max-w-2xl mx-auto px-4 py-8">
  <div className="bg-white rounded-lg border border-gray-200 p-8 text-center">
@@ -101,12 +103,23 @@ export default function NewAgreementPage() {
  </div>
  <h2 className="text-lg font-bold text-gray-900 mb-1">Agreement Created!</h2>
  <p className="text-sm text-gray-500 mb-2">The landlord needs to sign first, then the tenant.</p>
- <p className="text-xs text-gray-400 mb-6">Share the link via WhatsApp so they can sign digitally.</p>
- <div className="flex items-center justify-center gap-3">
- <Link href="/agent/agreements">
- <Button variant="outline">View All Agreements</Button>
- </Link>
- <Button onClick={() => setCreated(false)}>Create Another</Button>
+ <p className="text-xs text-gray-400 mb-6">Share the link so they can sign digitally.</p>
+ {signingUrl && (
+   <div className="mb-4 bg-gray-50 rounded-lg p-3 text-xs text-gray-600 font-mono break-all">{signingUrl}</div>
+ )}
+ <div className="flex items-center justify-center gap-3 flex-wrap">
+   {signingUrl && (
+     <>
+       <Button size="sm" variant="outline" onClick={copyLink}>Copy Link</Button>
+       <a href={`https://wa.me/?text=${encodeURIComponent(`Please sign the tenancy agreement: ${signingUrl}`)}`} target="_blank" rel="noopener noreferrer">
+         <Button size="sm" variant="outline">Share via WhatsApp</Button>
+       </a>
+     </>
+   )}
+   <Link href="/agent/agreements">
+     <Button variant="outline">View All Agreements</Button>
+   </Link>
+   <Button onClick={() => setCreated(false)}>Create Another</Button>
  </div>
  </div>
  </div>

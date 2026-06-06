@@ -10,13 +10,14 @@ export default function AmbassadorTasks() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    api.get<{ tasks: Task[] }>("/api/ambassador/dashboard").then(r => {
-      setLoading(false);
-    }).catch(() => setLoading(false));
-    api.get<{ tasks: Task[] }>("/api/tasks/my").then(r => {
-      if (r.data?.tasks) setTasks(r.data.tasks);
-      setLoading(false);
-    }).catch(() => setLoading(false));
+    let cancelled = false;
+    Promise.all([
+      api.get<{ tasks: Task[] }>("/api/tasks/my"),
+    ]).then(([tasksR]) => {
+      if (!cancelled && tasksR.data?.tasks) setTasks(tasksR.data.tasks);
+      if (!cancelled) setLoading(false);
+    }).catch(() => { if (!cancelled) setLoading(false); });
+    return () => { cancelled = true; };
   }, []);
 
   if (loading) return <div className="flex items-center justify-center h-64"><div className="h-8 w-8 border-2 border-[var(--color-primary)] border-t-transparent rounded-full animate-spin" /></div>;

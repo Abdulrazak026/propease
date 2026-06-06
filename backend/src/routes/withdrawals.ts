@@ -24,6 +24,29 @@ router.post("/withdraw", authenticate, async (req: AuthRequest, res: Response) =
   }
 });
 
+// User's own withdrawals (no admin auth needed)
+router.get("/my-withdrawals", authenticate, async (req: AuthRequest, res: Response) => {
+  try {
+    const withdrawals = await prisma.withdrawal.findMany({
+      where: { userId: req.user!.id as string },
+      orderBy: { createdAt: "desc" },
+    });
+    res.json({ withdrawals });
+  } catch { res.status(500).json({ error: "Failed to fetch withdrawals" }); }
+});
+
+// User's own transactions
+router.get("/transactions", authenticate, async (req: AuthRequest, res: Response) => {
+  try {
+    const txs = await prisma.transaction.findMany({
+      where: { userId: req.user!.id as string },
+      orderBy: { createdAt: "desc" },
+      take: 50,
+    });
+    res.json({ transactions: txs });
+  } catch { res.status(500).json({ error: "Failed to fetch transactions" }); }
+});
+
 // Admin lists all withdrawals
 router.get("/withdrawals", authenticate, authorize("head"), async (_req: AuthRequest, res: Response) => {
   try {

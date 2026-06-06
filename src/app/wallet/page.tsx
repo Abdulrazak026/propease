@@ -27,21 +27,16 @@ export default function WalletPage() {
   useEffect(() => {
     if (!currentUser?.id) return;
     setTxsLoading(true);
-    // Fetch transactions — use the head endpoint if admin, else a simple approach
-    fetch(`${API}/api/head/dashboard`, {
-      headers: { "Content-Type": "application/json" },
-    }).then(r => r.json()).catch(() => ({}));
-    // Also check for withdrawal history
-    api.get<{ withdrawals: any[] }>("/api/wallet/withdrawals").then(r => {
-      if (r.data?.withdrawals) {
-        setTxs(r.data.withdrawals.map((w: any) => ({
-          id: w.id,
-          reference: w.id.slice(0, 12),
-          type: "withdrawal",
-          amount: w.amount,
-          method: "wallet",
-          status: w.status,
-          createdAt: w.createdAt,
+    api.get<{ transactions: any[] }>("/api/wallet/transactions").then(r => {
+      if (r.data?.transactions) {
+        setTxs(r.data.transactions.map((t: any) => ({
+          id: t.id,
+          reference: t.reference,
+          type: t.type,
+          amount: t.amount,
+          method: t.method,
+          status: t.status,
+          createdAt: t.createdAt,
         })));
       }
     }).catch(() => {}).finally(() => setTxsLoading(false));
