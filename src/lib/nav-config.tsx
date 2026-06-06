@@ -17,8 +17,11 @@ export const dashboardNav: Record<string, NavItem[]> = {
   { label: "Deals", href: "/admin/deals", icon: "audit" },
   { label: "Settings", href: "/admin/settings", icon: "settings" },
   { label: "Moderation", href: "/admin/moderation", icon: "agreements" },
+  { label: "New Listing", href: "/admin/listings/new", icon: "agreements" },
   { label: "Blog", href: "/admin/blog", icon: "agreements" },
   { label: "FAQs", href: "/admin/faqs", icon: "inquiries" },
+  { label: "Media", href: "/admin/media", icon: "agreements" },
+  { label: "Analytics", href: "/admin/analytics", icon: "audit" },
   { label: "Audit Log", href: "/admin/audit", icon: "audit", badge: "withdrawals" },
  ],
  agent: [

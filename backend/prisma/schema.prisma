@@ -220,6 +220,7 @@ model Listing {
   sqft             Int?
   price            Int            @default(0)
   features         String[]
+  negotiable       Boolean        @default(false)
   createdAt        DateTime       @default(now())
   updatedAt        DateTime       @updatedAt
 
