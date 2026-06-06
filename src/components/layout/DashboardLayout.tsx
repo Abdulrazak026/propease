@@ -1,7 +1,7 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useRole } from "@/context/RoleContext";
 import { useSettings } from "@/context/SettingsContext";
 import { dashboardNav } from "@/lib/nav-config";
@@ -21,9 +21,10 @@ const icons: Record<string, React.ReactNode> = {
 };
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
-  const { role, currentUser, loading, isAuthenticated } = useRole();
+  const { role, currentUser, loading, isAuthenticated, logout } = useRole();
   const { get: getSetting } = useSettings();
   const pathname = usePathname();
+  const router = useRouter();
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const resolvedRole = role === "head" ? "admin" : role;
@@ -99,7 +100,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               <button onClick={() => setMobileOpen(false)} className="text-white/60 p-1"><svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12"/></svg></button>
             </div>
             <nav className="flex-1 p-2 space-y-0.5 overflow-y-auto"><NavItems /></nav>
-            <div className="p-2 border-t border-slate-700">
+            <div className="p-2 border-t border-slate-700 space-y-0.5">
+              <button
+                onClick={async () => { await logout(); setMobileOpen(false); router.push("/login"); }}
+                className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs text-red-400 hover:bg-red-900/30 hover:text-red-300 transition-all w-full text-left"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75" /></svg>
+                Sign Out
+              </button>
               <Link href="/" onClick={() => setMobileOpen(false)} className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs text-slate-500 hover:bg-slate-800 hover:text-slate-300">← Back to Site</Link>
             </div>
           </div>
@@ -120,7 +128,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </div>
         </div>
         <nav className="flex-1 p-2 space-y-0.5 overflow-y-auto"><NavItems /></nav>
-        <div className="p-2 border-t border-slate-700">
+        <div className="p-2 border-t border-slate-700 space-y-0.5">
+          <button
+            onClick={async () => { await logout(); router.push("/login"); }}
+            className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs text-red-400 hover:bg-red-900/30 hover:text-red-300 transition-all w-full text-left"
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75" /></svg>
+            Sign Out
+          </button>
           <Link href="/" className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs text-slate-500 hover:bg-slate-800 hover:text-slate-300 transition-all">
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
             Back to Site
