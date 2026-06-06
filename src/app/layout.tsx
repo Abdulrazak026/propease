@@ -24,7 +24,13 @@ export async function generateMetadata(): Promise<Metadata> {
     manifest: "/manifest.webmanifest",
     openGraph: { title: s.meta_title || "MBPP", description: s.meta_description || "", images: s.og_image ? [s.og_image] : [], siteName: s.site_name || "MBPP", type: "website" },
     twitter: { card: "summary_large_image", title: s.meta_title || "MBPP", description: s.meta_description || "", images: s.og_image ? [s.og_image] : [] },
-    other: { "theme-color": s.primary_color || "#0D6B3D" },
+    other: {
+      "theme-color": s.primary_color || "#0D6B3D",
+      "mobile-web-app-capable": "yes",
+      "apple-mobile-web-app-capable": "yes",
+      "apple-mobile-web-app-status-bar-style": "default",
+      "apple-mobile-web-app-title": s.site_name || "MBPP",
+    },
   };
 }
 

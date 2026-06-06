@@ -2,7 +2,7 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import PropertyCard from "@/components/listings/PropertyCard";
-import PropertyFilters, { FilterState } from "@/components/listings/PropertyFilters";
+import PropertyFilters from "@/components/listings/PropertyFilters";
 import { useListings } from "@/hooks/useListings";
 import { EmptyState } from "@/components/ui/Skeleton";
 import Footer from "@/components/layout/Footer";
@@ -49,7 +49,7 @@ export default function HomePage() {
     }
      }, [listings]);
 
-  const handleFilterChange = (next: FilterState) => {
+  const handleFilterChange = (next: any) => {
     setFilters({
       search: next.search,
       propertyType: next.propertyType,
@@ -74,9 +74,10 @@ export default function HomePage() {
 
   return (
     <div className="flex-1 flex flex-col min-h-0 overflow-y-auto">
-      <section ref={heroRef} className="relative h-[35vh] md:h-[42vh] bg-gray-900 overflow-hidden">
+      {/* Hero */}
+      <section ref={heroRef} className="relative h-[40vh] md:h-[48vh] bg-gray-900 overflow-hidden">
         <img src={heroImage} alt="" className="absolute inset-0 w-full h-full object-cover opacity-60" />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/40 to-black/70" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/50 to-black/80" />
         <div className="absolute top-0 left-0 right-0 flex items-center justify-between px-4 sm:px-6 py-3 z-10">
           <div>{siteLogo ? <img src={siteLogo} alt={siteName} className="h-8 w-auto" /> : null}</div>
           <Link href="/login" className="text-sm text-white/80 hover:text-white font-medium bg-white/10 px-4 py-1.5 rounded-full backdrop-blur-sm">Sign In</Link>
@@ -84,19 +85,35 @@ export default function HomePage() {
         <div className="relative flex flex-col items-center justify-center h-full text-white px-4 text-center">
           <h1 className="text-3xl md:text-5xl font-bold tracking-tight drop-shadow-lg">{siteName}</h1>
           <p className="text-base md:text-lg mt-3 max-w-md text-white/80 drop-shadow">{siteTagline}</p>
-          <div className="flex gap-4 mt-6 text-sm">
+          <div className="flex gap-4 mt-4 md:mt-6 text-sm">
             <span className="text-white/60">500+ Properties</span>
             <span className="text-white/60">50+ Agents</span>
             <span className="text-white/60">4 Cities</span>
           </div>
+          {/* Quick search shortcut on mobile */}
+          <div className="mt-5 w-full max-w-md lg:hidden">
+            <div className="relative">
+              <svg className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+              <input type="text" placeholder="Search properties..."
+                onFocus={() => {
+                  document.querySelector<HTMLElement>('[data-filter-search]')?.scrollIntoView({ behavior: "smooth", block: "center" });
+                  setTimeout(() => document.querySelector<HTMLInputElement>('[data-filter-search]')?.focus(), 300);
+                }}
+                className="w-full rounded-xl border border-white/20 bg-white/10 backdrop-blur-md pl-10 pr-4 py-3 text-sm text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/30" />
+            </div>
+          </div>
         </div>
       </section>
 
-      <div className="sticky top-0 z-30 bg-white border-b border-gray-100">
+      {/* Filters */}
+      <div className="sticky top-0 z-30 bg-white border-b border-gray-100 shadow-sm" data-filter-search>
         <PropertyFilters onFilterChange={handleFilterChange} />
       </div>
 
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      {/* Listings */}
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         {loading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-5">
             {Array.from({ length: 6 }).map((_, i) => (
@@ -111,6 +128,9 @@ export default function HomePage() {
           <EmptyState title="No listings found" description="Try adjusting your filters or check back later." />
         ) : (
           <>
+            <div className="flex items-center justify-between mb-4">
+              <p className="text-sm text-gray-500">{listings.length} property{listings.length !== 1 ? "ies" : "y"} found</p>
+            </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-5">
               {visibleListings.map((l) => (
                 <PropertyCard key={l.id} listing={l as any} />
@@ -118,7 +138,7 @@ export default function HomePage() {
             </div>
             {listings.length > showCount && (
               <div className="flex justify-center mt-8">
-                <button onClick={() => setShowCount(c => c + LOAD_MORE)} className="px-6 py-2 text-sm font-medium rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors">Show More Properties</button>
+                <button onClick={() => setShowCount(c => c + LOAD_MORE)} className="min-h-[44px] px-8 py-2.5 text-sm font-medium rounded-xl border border-gray-200 bg-white hover:bg-gray-50 hover:border-gray-300 active:scale-95 transition-all shadow-sm">Show More Properties</button>
               </div>
             )}
             {/* News slider */}
@@ -130,10 +150,10 @@ export default function HomePage() {
                 </div>
                 <div className="flex gap-4 overflow-x-auto pb-2 -mx-4 px-4 snap-x snap-mandatory scrollbar-hide">
                   {posts.slice(0, 6).map((p) => (
-                    <Link key={p.id} href={`/news/${p.slug}`} className="min-w-[260px] max-w-[260px] bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-md transition-shadow snap-start shrink-0 group">
+                    <Link key={p.id} href={`/news/${p.slug}`} className="min-w-[260px] max-w-[260px] bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-md hover:border-gray-300 active:scale-[0.98] transition-all snap-start shrink-0 group">
                       {p.coverImage && <img src={p.coverImage} alt={p.title} className="w-full h-36 object-cover" />}
                       <div className="p-4">
-                        <span className="text-[10px] font-medium text-[var(--color-primary)] uppercase">News</span>
+                        <span className="text-[10px] font-medium text-[var(--color-primary)] uppercase tracking-wider">News</span>
                         <h3 className="text-sm font-semibold text-gray-900 mt-1 group-hover:text-[var(--color-primary)] transition-colors line-clamp-2">{p.title}</h3>
                         <p className="text-xs text-gray-500 mt-1.5 line-clamp-2">{p.excerpt || p.content?.slice(0, 100)}</p>
                         <p className="text-[11px] text-gray-400 mt-2">{p.publishedAt ? new Date(p.publishedAt).toLocaleDateString() : ""}</p>
@@ -152,7 +172,7 @@ export default function HomePage() {
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {researchReports.slice(0, 4).map((r, i) => (
-                    <div key={i} className="bg-white rounded-lg border border-gray-200 p-5 hover:shadow-sm transition-shadow">
+                    <div key={i} className="bg-white rounded-xl border border-gray-200 p-5 hover:shadow-md hover:border-gray-300 active:scale-[0.99] transition-all">
                       <div className="flex items-start justify-between mb-2">
                         <h3 className="text-sm font-semibold text-gray-900">{r.title}</h3>
                         <span className="text-[11px] text-gray-400 shrink-0 ml-3">{r.date}</span>

@@ -27,7 +27,7 @@ export default function PropertyCard({ listing }: PropertyCardProps) {
   return (
     <Link
       href={`/listings/${listing.id}`}
-      className="group block bg-white rounded-lg border border-gray-200 overflow-hidden hover:border-gray-300 hover:shadow-sm transition-all"
+      className="group block bg-white rounded-xl border border-gray-200 overflow-hidden hover:border-gray-300 hover:shadow-md active:shadow-sm transition-all active:scale-[0.99]"
     >
       <div className="relative h-48 bg-gray-100">
         {hasPhoto ? (
@@ -45,7 +45,7 @@ export default function PropertyCard({ listing }: PropertyCardProps) {
           {listing.postedBy?.isVerified && <VerifiedBadge />}
         </div>
 
-        <button onClick={handleFav} className="absolute top-2 right-2 w-8 h-8 rounded-full bg-white/80 flex items-center justify-center hover:bg-white transition-colors">
+        <button onClick={handleFav} className="absolute top-2 right-2 w-9 h-9 rounded-full bg-white/80 flex items-center justify-center hover:bg-white hover:shadow-md active:scale-90 transition-all">
           <svg className={`w-4 h-4 ${fav ? "text-red-500 fill-red-500" : "text-gray-600"}`} viewBox="0 0 24 24" fill={fav ? "currentColor" : "none"} stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
           </svg>

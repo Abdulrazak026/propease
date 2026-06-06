@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useRole } from "@/context/RoleContext";
@@ -134,44 +134,53 @@ export default function BottomNav() {
 
   const tabs = showDashboardNav ? DASHBOARD_TABS : TABS;
 
+  const handleTabClick = useCallback((href: string) => {
+    if (href === pathname) {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  }, [pathname]);
+
   return (
     <>
       <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-200 pb-safe">
-        <div className="flex items-center justify-around h-14">
+        <div className="flex items-center justify-around h-16">
           {tabs.map((tab) => {
             const active = pathname === tab.href;
             return (
               <Link
                 key={tab.href}
                 href={tab.href}
-                className={`relative flex flex-col items-center justify-center gap-0.5 h-full px-3 transition-colors duration-150 active:scale-95 ${
+                onClick={() => handleTabClick(tab.href)}
+                className={`relative flex flex-col items-center justify-center gap-0.5 h-full px-2 transition-colors duration-150 active:scale-95 min-w-0 ${
                   active ? "text-[var(--color-primary)]" : "text-gray-400"
                 }`}
               >
                 {active && (
                   <span className="absolute -top-px left-1/2 -translate-x-1/2 w-6 h-0.5 bg-[var(--color-primary)] rounded-full" />
                 )}
-                {tab.icon(active)}
-                {tab.label === "Updates" && unreadCount > 0 && (
-                  <span className="absolute -top-0.5 right-2 w-4 h-4 bg-red-500 text-white text-[8px] font-bold rounded-full flex items-center justify-center">
-                    {unreadCount > 9 ? "9+" : unreadCount}
-                  </span>
-                )}
-                <span className={`text-[10px] font-medium ${active ? "font-semibold" : ""}`}>{tab.label}</span>
+                <div className="relative">
+                  {tab.icon(active)}
+                  {tab.label === "Updates" && unreadCount > 0 && (
+                    <span className="absolute -top-1 -right-2 w-4 h-4 bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center">
+                      {unreadCount > 9 ? "9+" : unreadCount}
+                    </span>
+                  )}
+                </div>
+                <span className={`text-[11px] font-medium leading-tight ${active ? "font-semibold" : ""}`}>{tab.label}</span>
               </Link>
             );
           })}
           {!showDashboardNav && (
           <button
             onClick={() => setSheetOpen(true)}
-            className="relative flex flex-col items-center justify-center gap-0.5 h-full px-3 text-gray-400 active:scale-95 transition-transform duration-150"
+            className="relative flex flex-col items-center justify-center gap-0.5 h-full px-2 text-gray-400 active:scale-95 transition-transform duration-150 min-w-0"
           >
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
               <circle cx="12" cy="5" r="1.5" fill="currentColor" stroke="none" />
               <circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none" />
               <circle cx="12" cy="19" r="1.5" fill="currentColor" stroke="none" />
             </svg>
-            <span className="text-[10px] font-medium">More</span>
+            <span className="text-[11px] font-medium leading-tight">More</span>
           </button>
           )}
         </div>
@@ -180,13 +189,13 @@ export default function BottomNav() {
       {sheetOpen && (
         <>
           <div className="fixed inset-0 z-40 bg-black/40 lg:hidden" onClick={() => setSheetOpen(false)} />
-          <div className="fixed bottom-0 left-0 right-0 z-50 bg-white rounded-t-xl shadow-xl lg:hidden animate-slide-up-bottom">
+          <div className="fixed bottom-0 left-0 right-0 z-50 bg-white rounded-t-xl shadow-xl lg:hidden animate-slide-up-bottom" style={{ animation: "slideUpBottom 0.25s ease-out" }}>
             <div className="flex items-center justify-center pt-3 pb-2">
               <div className="w-9 h-1 bg-gray-300 rounded-full" />
             </div>
-            <div className="px-4 pb-8">
+            <div className="px-4 pb-8 max-h-[70vh] overflow-y-auto">
               <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider px-1 pb-3">More</p>
-              <div className="space-y-1.5">
+              <div className="space-y-0.5">
                 {MORE_TABS.map((tab) => {
                   const actualHref = isAuthenticated && tab.href === "/login"
                     ? (currentUser!.role === "head" ? "/admin" : `/${currentUser!.role}`)
@@ -211,15 +220,6 @@ export default function BottomNav() {
               </div>
             </div>
           </div>
-          <style>{`
-            @keyframes slideUpBottom {
-              from { transform: translateY(100%); }
-              to { transform: translateY(0); }
-            }
-            .animate-slide-up-bottom {
-              animation: slideUpBottom 0.25s ease-out;
-            }
-          `}</style>
         </>
       )}
     </>
