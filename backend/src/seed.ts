@@ -31,6 +31,7 @@ async function seedSettings() {
     maintenance_mode: "false",
     timezone: "Africa/Lagos",
     date_format: "DD/MM/YYYY",
+    available_cities: "Kano Municipal, Kano State; Fagge, Kano State; Tarauni, Kano State; Nassarawa, Kano State",
     terms_of_service: `# Terms of Service
 
 **Last updated: June 2026**
@@ -385,6 +386,24 @@ async function seedListings() {
   console.log(`Seeded ${listings.length} listings`);
 }
 
+async function seedAuditLogs() {
+  const admin = await prisma.user.findFirst({ where: { email: ADMIN_EMAIL } });
+  if (!admin) return;
+  const existing = await prisma.auditLog.count();
+  if (existing >= 3) return;
+
+  const logs = [
+    { action: "SEED_DATABASE", entity: "System", entityId: "seed", userId: admin.id, details: { version: "1.0" } },
+    { action: "INITIAL_SETUP", entity: "Settings", entityId: "brand", userId: admin.id, details: { colors: "#0d6e4e, #f97316, #facc15" } },
+    { action: "USER_CREATED", entity: "User", entityId: admin.id, userId: admin.id, details: { role: "head", email: ADMIN_EMAIL } },
+    { action: "COMMISSION_RATES_SEEDED", entity: "CommissionRate", entityId: "rates", userId: admin.id, details: { count: 5 } },
+  ];
+  for (const log of logs) {
+    await prisma.auditLog.create({ data: log });
+  }
+  console.log(`Seeded ${logs.length} audit logs`);
+}
+
 async function main() {
   console.log("Seeding database...");
 
@@ -394,6 +413,7 @@ async function main() {
   await seedBlogPosts();
   await seedFaqs();
   await seedListings();
+  await seedAuditLogs();
 
   // Skip user creation if admin exists
   const existing = await prisma.user.findFirst({ where: { email: ADMIN_EMAIL } });

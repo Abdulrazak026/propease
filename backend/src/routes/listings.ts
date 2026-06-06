@@ -20,7 +20,6 @@ router.get("/", async (req, res: Response) => {
     if (listingType) where.listingType = listingType;
     if (propertyType) where.propertyType = propertyType;
     if (status) where.status = status;
-    else where.status = "available";
     if (search) {
       where.OR = [
         { title: { contains: search as string, mode: "insensitive" } },

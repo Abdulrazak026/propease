@@ -194,6 +194,13 @@ export default function AdminSettings() {
           <F label="Property Statuses (comma-separated)" v={s("property_statuses")} onChange={(v) => set("property_statuses", v)} />
           <F label="Property Types (comma-separated)" v={s("property_types")} onChange={(v) => set("property_types", v)} />
           <F label="Amenities (comma-separated)" v={s("amenities")} onChange={(v) => set("amenities", v)} />
+          <div className="border-t border-gray-100 pt-3 mt-2">
+            <h4 className="text-xs font-semibold text-gray-700 mb-2">Available Cities</h4>
+            <div className="bg-gray-50 rounded-lg p-3 text-xs text-gray-500">
+              <p className="mb-2">Current cities: <span className="font-medium text-gray-700">{s("available_cities") || "None configured"}</span></p>
+              <F label="Add/Edit Cities (comma-separated, format: City Name, State)" v={s("available_cities")} onChange={(v) => set("available_cities", v)} placeholder="e.g. Kano Municipal, Kano; Fagge, Kano; Abuja, FCT" />
+            </div>
+          </div>
         </>)}
 
         {/* Integrations */}

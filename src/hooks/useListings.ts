@@ -25,7 +25,7 @@ export function useListings() {
       setLoading(true);
       setError(null);
       try {
-        const { data, status } = await api.get<{ listings: ApiListing[] }>("/api/listings");
+        const { data, status } = await api.get<{ listings: ApiListing[] }>("/api/listings?status=available");
         if (status === 200 && data) {
           setListings(data.listings || []);
         } else {

@@ -6,6 +6,7 @@ import ErrorBoundary from "@/components/ui/ErrorBoundary";
 import LayoutShell from "@/components/layout/LayoutShell";
 import PwaRegister from "@/components/pwa/PwaRegister";
 import WhatsAppButton from "@/components/ui/WhatsAppButton";
+import CookieConsent from "@/components/ui/CookieConsent";
 
 export default function ClientBody({ children }: { children: React.ReactNode }) {
   return (
@@ -19,6 +20,7 @@ export default function ClientBody({ children }: { children: React.ReactNode }) 
         </ErrorBoundary>
       </RoleProvider>
       <WhatsAppButton />
+      <CookieConsent />
       <AnalyticsInjector />
     </SettingsProvider>
   );
