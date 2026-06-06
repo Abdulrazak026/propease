@@ -17,8 +17,9 @@ self.addEventListener("activate", (e) => {
 self.addEventListener("fetch", (e) => {
   const url = new URL(e.request.url);
   const isStatic = STATIC_EXTENSIONS.some((ext) => url.pathname.endsWith(ext));
+  const isSameOrigin = url.origin === self.location.origin;
 
-  if (isStatic) {
+  if (isStatic && isSameOrigin) {
     e.respondWith(
       caches.match(e.request).then((cached) => cached || fetch(e.request).then((res) => {
         const clone = res.clone();
