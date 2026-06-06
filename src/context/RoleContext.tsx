@@ -39,38 +39,47 @@ function toUser(a: ApiUser): User {
 }
 
 export function RoleProvider({ children }: { children: ReactNode }) {
-  const [currentUser, setCurrentUserState] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [currentUser, setCurrentUserState] = useState<User | null>(() => {
+    try {
+      const cached = localStorage.getItem("mbpp-user");
+      return cached ? JSON.parse(cached) : null;
+    } catch { return null; }
+  });
+  const [loading, setLoading] = useState(!currentUser);
 
   useEffect(() => {
     let cancelled = false;
-    (async () => {
+    const validate = async () => {
       try {
         const { data } = await api.get<{ user: ApiUser }>("/api/auth/me");
         if (!cancelled && data?.user) {
-          setCurrentUserState(toUser(data.user));
+          const u = toUser(data.user);
+          setCurrentUserState(u);
+          localStorage.setItem("mbpp-user", JSON.stringify(u));
+        } else if (!cancelled) {
+          setCurrentUserState(null);
+          localStorage.removeItem("mbpp-user");
         }
       } catch {
-        // no backend available — stay logged out
+        setCurrentUserState(null);
+        localStorage.removeItem("mbpp-user");
       }
       if (!cancelled) setLoading(false);
-    })();
-    // Hard timeout — never show loading for more than 5 seconds
-    const timer = setTimeout(() => { if (!cancelled) setLoading(false); }, 5000);
-    return () => { cancelled = true; clearTimeout(timer); };
+    };
+    validate();
+    return () => { cancelled = true; };
   }, []);
 
   const setCurrentUser = useCallback((user: User | null) => {
     setCurrentUserState(user);
-    if (!user) {
-      setAccessToken(null);
-    }
+    if (user) localStorage.setItem("mbpp-user", JSON.stringify(user));
+    else localStorage.removeItem("mbpp-user");
+    if (!user) setAccessToken(null);
   }, []);
 
   const login = useCallback(async (email: string, password: string): Promise<{ role: string } | string> => {
     const { data, status, error } = await api.post<ApiAuthResponse>("/api/auth/login", { email, password });
     if (status === 0 || error) {
-      console.warn("Login network error:", error);
       return error || "Network error. Check your connection.";
     }
     if (status !== 200 || !data) {
@@ -79,6 +88,7 @@ export function RoleProvider({ children }: { children: ReactNode }) {
     setAccessToken(data.accessToken);
     const user = toUser(data.user);
     setCurrentUserState(user);
+    localStorage.setItem("mbpp-user", JSON.stringify(user));
     return { role: user.role };
   }, []);
 
@@ -86,6 +96,7 @@ export function RoleProvider({ children }: { children: ReactNode }) {
     await api.post("/api/auth/logout");
     setAccessToken(null);
     setCurrentUserState(null);
+    localStorage.removeItem("mbpp-user");
   }, []);
 
   return (
