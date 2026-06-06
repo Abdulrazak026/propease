@@ -1,7 +1,7 @@
 "use client";
-import { useMemo } from "react";
+import { useMemo, useEffect, useState } from "react";
 import { Listing } from "@/lib/types";
-import { listings } from "@/lib/mock-data";
+import { api } from "@/lib/api-client";
 import { formatNaira } from "@/lib/utils";
 
 interface ValuationEstimateProps {
@@ -9,140 +9,65 @@ interface ValuationEstimateProps {
 }
 
 interface ValuationResult {
- estimatedValue: number;
- lowEstimate: number;
- highEstimate: number;
+ rangeLow: number; rangeHigh: number; estimatedValue: number;
  confidence: "high" | "medium" | "low";
- comps: Listing[];
  avgPricePerSqft: number | null;
 }
 
-function computeValuation(listing: Listing): ValuationResult {
- const cityComps = listings.filter(
- (l) =>
- l.id !== listing.id &&
- l.city === listing.city &&
- l.propertyType === listing.propertyType &&
- l.status !== "taken"
- );
+function computeValuation(listing: Listing, cityComps: Listing[]): ValuationResult {
+  const avgPricePerSqft =
+    cityComps.filter((c) => c.sqft && c.sqft > 0).length > 1
+      ? cityComps
+          .filter((c) => c.sqft && c.sqft > 0)
+          .reduce((sum, c) => sum + c.price / c.sqft!, 0) /
+        cityComps.filter((c) => c.sqft && c.sqft > 0).length
+      : null;
 
- const avgPricePerSqft =
- cityComps.filter((c) => c.sqft).length> 1
- ? cityComps
- .filter((c) => c.sqft)
- .reduce((sum, c) => sum + c.price / c.sqft!, 0) /
- cityComps.filter((c) => c.sqft).length
- : null;
+  const avgPrice = cityComps.length > 0 ? cityComps.reduce((s, c) => s + c.price, 0) / cityComps.length : listing.price;
+  const sqftEstimate = avgPricePerSqft && listing.sqft ? avgPricePerSqft * listing.sqft : null;
+  const estimatedValue = sqftEstimate || avgPrice;
+  const rangeLow = Math.round(estimatedValue * 0.85);
+  const rangeHigh = Math.round(estimatedValue * 1.15);
+  const confidence = cityComps.length >= 5 ? "high" : cityComps.length >= 2 ? "medium" : "low";
 
- let estimatedValue = listing.price;
- let lowEstimate = listing.price * 0.85;
- let highEstimate = listing.price * 1.15;
-
- if (cityComps.length> 0) {
- const compPrices = cityComps.map((c) => c.price);
- const avgPrice = compPrices.reduce((a, b) => a + b, 0) / compPrices.length;
-
- if (avgPricePerSqft && listing.sqft) {
- estimatedValue = Math.round(avgPricePerSqft * listing.sqft);
- } else {
- estimatedValue = Math.round(avgPrice);
- }
-
- const stdDev = Math.sqrt(
- compPrices.reduce((sum, p) => sum + (p - avgPrice) ** 2, 0) / compPrices.length
- );
- lowEstimate = Math.round(Math.max(estimatedValue - stdDev, estimatedValue * 0.7));
- highEstimate = Math.round(Math.min(estimatedValue + stdDev, estimatedValue * 1.3));
- }
-
- const confidence =
- cityComps.length>= 5
- ? "high"
- : cityComps.length>= 2
- ? "medium"
- : "low";
-
- return {
- estimatedValue,
- lowEstimate,
- highEstimate,
- confidence,
- comps: cityComps.slice(0, 3),
- avgPricePerSqft: avgPricePerSqft ? Math.round(avgPricePerSqft) : null,
- };
+  return { rangeLow, rangeHigh, estimatedValue: Math.round(estimatedValue), confidence, avgPricePerSqft };
 }
 
-const confidenceConfig = {
- high: { label: "High Confidence", color: "text-emerald-600", bg: "bg-emerald-50", dot: "bg-emerald-500" },
- medium: { label: "Medium Confidence", color: "text-amber-600", bg: "bg-amber-50", dot: "bg-amber-500" },
- low: { label: "Low Confidence", color: "text-gray-500", bg: "bg-gray-100", dot: "bg-gray-400" },
-};
-
 export default function ValuationEstimate({ listing }: ValuationEstimateProps) {
- const valuation = useMemo(() => computeValuation(listing), [listing]);
- const cfg = confidenceConfig[valuation.confidence];
- const diff = listing.price - valuation.estimatedValue;
- const percentDiff = listing.price> 0 ? Math.round((diff / valuation.estimatedValue) * 100) : 0;
+  const [comps, setComps] = useState<Listing[]>([]);
 
- return (
- <div className="bg-white rounded-lg border border-gray-200 p-6">
- <h3 className="font-semibold text-gray-900 text-sm mb-4">Market Valuation</h3>
+  useEffect(() => {
+    api.get<{ listings: Listing[] }>(`/api/listings?city=${listing.city}&propertyType=${listing.propertyType}`).then(r => {
+      if (r.data?.listings) setComps(r.data.listings.filter(l => l.id !== listing.id));
+    }).catch(() => {});
+  }, [listing.city, listing.propertyType, listing.id]);
 
- <div className="flex items-center gap-2 mb-4">
- <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-medium ${cfg.bg} ${cfg.color}`}>
- <span className={`w-1.5 h-1.5 rounded-full ${cfg.dot}`} />
- {cfg.label}
- </span>
- {valuation.comps.length> 0 && (
- <span className="text-[10px] text-gray-400">{valuation.comps.length} comparable{valuation.comps.length !== 1 ? "s" : ""}</span>
- )}
- </div>
+  const result = useMemo(() => computeValuation(listing, comps), [listing, comps]);
 
- <div className="space-y-3 mb-4">
- <div className="flex items-baseline justify-between">
- <span className="text-xs text-gray-500">Estimated Value</span>
- <span className="text-lg font-bold text-gray-900">{formatNaira(valuation.estimatedValue)}</span>
- </div>
- <div className="flex items-baseline justify-between">
- <span className="text-xs text-gray-500">Price Range</span>
- <span className="text-sm text-gray-700">
- {formatNaira(valuation.lowEstimate)} — {formatNaira(valuation.highEstimate)}
- </span>
- </div>
- {valuation.avgPricePerSqft && (
- <div className="flex items-baseline justify-between">
- <span className="text-xs text-gray-500">Avg Price / sqft</span>
- <span className="text-sm text-gray-700">{formatNaira(valuation.avgPricePerSqft)}</span>
- </div>
- )}
- <div className="pt-2 border-t border-gray-100">
- <div className="flex items-baseline justify-between">
- <span className="text-xs text-gray-500">Listed Price</span>
- <span className="text-sm font-semibold text-gray-900">{formatNaira(listing.price)}</span>
- </div>
- {valuation.comps.length> 0 && (
- <div className="mt-1 text-right">
- <span className={`text-xs font-medium ${diff <= 0 ? "text-emerald-600" : "text-red-500"}`}>
- {diff <= 0 ? "Below market" : "Above market"} by {Math.abs(percentDiff)}%
- </span>
- </div>
- )}
- </div>
- </div>
+  if (!result) return null;
 
- {valuation.comps.length> 0 && (
- <div className="pt-3 border-t border-gray-100">
- <p className="text-[10px] font-medium text-gray-400 uppercase tracking-wider mb-2">Comparable Properties</p>
- <div className="space-y-1.5">
- {valuation.comps.map((comp) => (
- <div key={comp.id} className="flex items-center justify-between text-xs text-gray-600">
- <span className="truncate max-w-[180px]">{comp.title}</span>
- <span className="font-medium">{formatNaira(comp.price)}</span>
- </div>
- ))}
- </div>
- </div>
- )}
- </div>
- );
+  return (
+    <div className="bg-white rounded-lg border border-gray-200 p-5">
+      <h3 className="text-sm font-semibold text-gray-900 mb-4">Valuation Estimate</h3>
+      <div className="text-center mb-4">
+        <p className="text-xs text-gray-500">Estimated Value</p>
+        <p className="text-2xl font-bold text-[var(--color-primary)] mt-1">{formatNaira(result.estimatedValue)}</p>
+        <p className="text-xs text-gray-400 mt-1">
+          Range: {formatNaira(result.rangeLow)} – {formatNaira(result.rangeHigh)}
+        </p>
+      </div>
+      <div className="flex items-center justify-between text-xs">
+        <span className="text-gray-500">Confidence</span>
+        <span className={`font-medium capitalize ${result.confidence === "high" ? "text-emerald-600" : result.confidence === "medium" ? "text-amber-600" : "text-red-500"}`}>
+          {result.confidence} ({comps.length} comparable{comps.length !== 1 ? "s" : ""})
+        </span>
+      </div>
+      {result.avgPricePerSqft && (
+        <div className="flex items-center justify-between text-xs mt-2">
+          <span className="text-gray-500">Avg Price / Sqft</span>
+          <span className="font-medium">{formatNaira(result.avgPricePerSqft)}</span>
+        </div>
+      )}
+    </div>
+  );
 }

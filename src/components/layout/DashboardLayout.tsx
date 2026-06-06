@@ -1,11 +1,11 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useRole } from "@/context/RoleContext";
 import { useSettings } from "@/context/SettingsContext";
-import { inquiries, tasks, withdrawals } from "@/lib/mock-data";
 import { dashboardNav } from "@/lib/nav-config";
+import { api } from "@/lib/api-client";
 
 const icons: Record<string, React.ReactNode> = {
   dashboard: <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zm0 9.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zm0 9.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z" /></svg>,
@@ -21,20 +21,25 @@ const icons: Record<string, React.ReactNode> = {
 };
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
-  const { role, currentUser, loading } = useRole();
+  const { role, currentUser, loading, isAuthenticated } = useRole();
   const { get: getSetting } = useSettings();
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const resolvedRole = role === "head" ? "admin" : role;
   const items = resolvedRole ? dashboardNav[resolvedRole] || [] : [];
+  const [counts, setCounts] = useState<Record<string, number>>({});
+
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    api.get<{ unread: number }>("/api/notifications").then(r => {
+      if (r.data?.unread) setCounts(c => ({ ...c, notifications: r.data!.unread }));
+    }).catch(() => {});
+  }, [isAuthenticated]);
 
   const badgeCount = (badge: string | undefined): number => {
-    if (!badge || !currentUser) return 0;
-    if (badge === "inquiries") return inquiries.filter((i) => i.assignedAgent?.id === currentUser.id && i.status === "new").length;
-    if (badge === "tasks") return tasks.filter((t) => t.assignedTo.id === currentUser.id && (t.status === "open" || t.status === "in_progress")).length;
-    if (badge === "withdrawals") return withdrawals.filter((w) => w.status === "pending").length;
-    return 0;
+    if (!badge) return 0;
+    return counts[badge] || 0;
   };
 
   const NavItems = () => <>
