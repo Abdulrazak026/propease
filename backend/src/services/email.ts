@@ -1,15 +1,33 @@
 import { getResend, FROM_ADDRESS } from "../lib/resend";
-import { templates } from "./email-templates";
+import { templates as defaultTemplates } from "./email-templates";
+
+async function getDbTemplate(key: string): Promise<string | null> {
+  try {
+    const prisma = (await import("../lib/prisma")).default;
+    const row = await prisma.siteSettings.findUnique({ where: { key } });
+    return row?.value || null;
+  } catch {
+    return null;
+  }
+}
+
+async function getTemplate(key: string, ...args: string[]): Promise<string> {
+  const dbTpl = await getDbTemplate(key);
+  if (dbTpl) {
+    let result = dbTpl;
+    args.forEach((arg, i) => {
+      const placeholders = ["name", "role", "propertyTitle", "status", "senderName", "amount", "reference", "purpose", "listingId", "agentName", "clientName", "clientContact", "message", "oldPrice", "newPrice", "token", "loginUrl", "resetUrl"];
+      if (placeholders[i]) result = result.split(`{{${placeholders[i]}}}`).join(arg || "");
+    });
+    return result;
+  }
+  return "";
+}
 
 async function send(to: string, subject: string, html: string) {
   try {
     const resend = await getResend();
-    const { data, error } = await resend.emails.send({
-      from: FROM_ADDRESS,
-      to,
-      subject,
-      html,
-    });
+    const { data, error } = await resend.emails.send({ from: FROM_ADDRESS, to, subject, html });
     if (error) console.error("[EMAIL ERROR]", error);
     else console.log("[EMAIL SENT]", subject, "→", to, "id:", data?.id);
     return { data, error };
@@ -20,93 +38,79 @@ async function send(to: string, subject: string, html: string) {
 }
 
 export const emailService = {
-  /** Sent when a new user registers */
   async welcome(email: string, name: string) {
-    const html = templates.welcome(name);
+    const tpl = await getTemplate("welcome_template", name);
+    const html = tpl || defaultTemplates.welcome(name);
     return send(email, "Welcome to MBPP — Account Pending Review", html);
   },
-
-  /** Sent when an admin approves a user account */
   async accountApproved(email: string, name: string, role: string) {
-    const html = templates.accountApproved(name, role);
+    const tpl = await getTemplate("approved_template", name, role);
+    const html = tpl || defaultTemplates.accountApproved(name, role);
     return send(email, "Your MBPP account has been approved!", html);
   },
-
-  /** Password reset email with token link */
   async passwordReset(email: string, name: string, token: string) {
-    const html = templates.passwordReset(name, token);
+    const tpl = await getTemplate("reset_template", name, token);
+    const html = tpl || defaultTemplates.passwordReset(name, token);
     return send(email, "Reset your MBPP password", html);
   },
-
-  /** Notify agent about a new property inquiry */
   async inquiryNotification(agentEmail: string, agentName: string, clientName: string, propertyTitle: string, message: string) {
-    const html = templates.inquiryNotification(agentName, clientName, propertyTitle, message);
+    const tpl = await getTemplate("inquiry_template", agentName, clientName, propertyTitle, message);
+    const html = tpl || defaultTemplates.inquiryNotification(agentName, clientName, propertyTitle, message);
     return send(agentEmail, `New inquiry: ${propertyTitle}`, html);
   },
-
-  /** Confirm to client that their inquiry was received */
   async inquiryConfirmation(clientEmail: string, clientName: string, propertyTitle: string) {
-    const html = templates.inquiryConfirmation(clientName, propertyTitle);
+    const tpl = await getTemplate("inquiry_template", clientName, clientName, propertyTitle, "");
+    const html = tpl || defaultTemplates.inquiryConfirmation(clientName, propertyTitle);
     return send(clientEmail, "Your inquiry has been received", html);
   },
-
-  /** Confirm rental application submission */
   async applicationReceived(email: string, name: string, propertyTitle: string) {
-    const html = templates.applicationReceived(name, propertyTitle);
+    const tpl = await getTemplate("application_template", name, propertyTitle);
+    const html = tpl || defaultTemplates.applicationReceived(name, propertyTitle);
     return send(email, "Application received — " + propertyTitle, html);
   },
-
-  /** Notify of application status change */
   async applicationStatus(email: string, name: string, propertyTitle: string, status: string) {
-    const html = templates.applicationStatus(name, propertyTitle, status);
+    const tpl = await getTemplate("application_template", name, propertyTitle, status);
+    const html = tpl || defaultTemplates.applicationStatus(name, propertyTitle, status);
     return send(email, `Application ${status} — ${propertyTitle}`, html);
   },
-
-  /** Tenancy agreement ready for signing */
   async agreementReady(email: string, name: string, propertyTitle: string) {
-    const html = templates.agreementReady(name, propertyTitle);
+    const tpl = await getTemplate("agreement_template", name, propertyTitle);
+    const html = tpl || defaultTemplates.agreementReady(name, propertyTitle);
     return send(email, "Tenancy agreement ready for signing", html);
   },
-
-  /** Agreement signed by all parties */
   async agreementSigned(email: string, name: string, propertyTitle: string) {
-    const html = templates.agreementSigned(name, propertyTitle);
+    const tpl = await getTemplate("agreement_template", name, propertyTitle);
+    const html = tpl || defaultTemplates.agreementSigned(name, propertyTitle);
     return send(email, "Agreement signed — complete!", html);
   },
-
-  /** Price drop alert for saved search subscribers */
   async priceDropAlert(email: string, name: string, propertyTitle: string, oldPrice: number, newPrice: number) {
-    const html = templates.priceDropAlert(name, propertyTitle, oldPrice, newPrice);
+    const tpl = await getTemplate("price_drop_template", name, propertyTitle, String(oldPrice), String(newPrice));
+    const html = tpl || defaultTemplates.priceDropAlert(name, propertyTitle, oldPrice, newPrice);
     return send(email, `Price drop: ${propertyTitle}`, html);
   },
-
-  /** New message notification */
   async newMessage(email: string, name: string, senderName: string) {
-    const html = templates.newMessage(name, senderName);
+    const tpl = await getTemplate("message_template", name, senderName);
+    const html = tpl || defaultTemplates.newMessage(name, senderName);
     return send(email, `New message from ${senderName}`, html);
   },
-
-  /** Payment receipt */
   async paymentReceipt(email: string, name: string, amount: number, reference: string, purpose: string) {
-    const html = templates.paymentReceipt(name, amount, reference, purpose);
+    const tpl = await getTemplate("payment_template", name, String(amount), reference, purpose);
+    const html = tpl || defaultTemplates.paymentReceipt(name, amount, reference, purpose);
     return send(email, "Payment receipt — MBPP", html);
   },
-
-  /** Agent application confirmation */
   async agentApplicationSubmitted(email: string, name: string) {
-    const html = templates.agentApplicationSubmitted(name);
+    const tpl = await getTemplate("agent_application_template", name);
+    const html = tpl || defaultTemplates.agentApplicationSubmitted(name);
     return send(email, "Agent application received", html);
   },
-
-  /** Listing published notification */
   async listingPublished(email: string, agentName: string, propertyTitle: string, listingId: string) {
-    const html = templates.listingPublished(agentName, propertyTitle, listingId);
+    const tpl = await getTemplate("listing_published_template", agentName, propertyTitle, listingId);
+    const html = tpl || defaultTemplates.listingPublished(agentName, propertyTitle, listingId);
     return send(email, "Your listing is live!", html);
   },
-
-  /** Verification documents submitted */
   async verificationSubmitted(email: string, name: string) {
-    const html = templates.verificationSubmitted(name);
+    const tpl = await getTemplate("verification_template", name);
+    const html = tpl || defaultTemplates.verificationSubmitted(name);
     return send(email, "Verification documents received", html);
   },
 };

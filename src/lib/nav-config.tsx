@@ -24,9 +24,8 @@ export const dashboardNav: Record<string, NavItem[]> = {
  { label: "Applications", href: "/agent/applications", icon: "applications" },
  { label: "Agreements", href: "/agent/agreements", icon: "agreements" },
  { label: "Commissions", href: "/agent/commissions", icon: "commissions" },
- { label: "Wallet", href: "/wallet", icon: "wallet" },
- { label: "Settings", href: "/agent/settings", icon: "settings" },
- ],
+  { label: "Wallet", href: "/wallet", icon: "wallet" },
+  ],
  ambassador: [
  { label: "City Overview", href: "/ambassador", icon: "city-overview" },
  { label: "Post Listing", href: "/ambassador/listings/new", icon: "post-listing" },

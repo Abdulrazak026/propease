@@ -1,14 +1,7 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import Link from "next/link";
 import { useSettings } from "@/context/SettingsContext";
-
-const SOCIALS = [
-  { label: "Facebook", href: "#", icon: "facebook" },
-  { label: "Instagram", href: "#", icon: "instagram" },
-  { label: "TikTok", href: "#", icon: "tiktok" },
-  { label: "LinkedIn", href: "#", icon: "linkedin" },
-];
 
 const SOCIAL_ICONS: Record<string, React.ReactNode> = {
   facebook: (
@@ -68,6 +61,14 @@ function getLinkCols(brand: string) {
 export default function Footer() {
   const { get: getSetting } = useSettings();
   const brand = getSetting("site_name", "MBPP");
+
+  const socials = [
+    { label: "Facebook", href: getSetting("facebook_url") || "#", icon: "facebook" },
+    { label: "Instagram", href: getSetting("instagram_url") || "#", icon: "instagram" },
+    { label: "LinkedIn", href: getSetting("linkedin_url") || "#", icon: "linkedin" },
+  ].filter((s) => s.href && s.href !== "#");
+  if (getSetting("youtube_url")) socials.push({ label: "YouTube", href: getSetting("youtube_url"), icon: "youtube" });
+  if (getSetting("twitter_url")) socials.push({ label: "X", href: getSetting("twitter_url"), icon: "twitter" });
   const LINK_COLS = getLinkCols(brand);
   const [email, setEmail] = useState("");
   const [subscribed, setSubscribed] = useState(false);
@@ -91,7 +92,7 @@ export default function Footer() {
             <span className="text-sm text-gray-400 ml-2">&mdash; Kano&apos;s trusted real estate marketplace</span>
           </Link>
           <div className="flex items-center gap-2">
-            {SOCIALS.map((s) => (
+            {socials.map((s) => (
               <a key={s.label} href={s.href} className="w-8 h-8 bg-gray-800 rounded-lg flex items-center justify-center text-gray-400 hover:bg-[var(--color-primary)] hover:text-white transition-all duration-200" aria-label={s.label}>
                 {SOCIAL_ICONS[s.icon]}
               </a>

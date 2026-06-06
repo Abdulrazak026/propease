@@ -8,6 +8,7 @@ import { EmptyState } from "@/components/ui/Skeleton";
 import { listings, cities } from "@/lib/mock-data";
 import { formatNaira } from "@/lib/utils";
 import Footer from "@/components/layout/Footer";
+import { useSettings } from "@/context/SettingsContext";
 
 const INITIAL_SHOW = 6;
 const LOAD_MORE = 6;
@@ -15,6 +16,8 @@ const LOAD_MORE = 6;
 const activeListings = listings.filter((l) => l.status !== "taken");
 
 export default function HomePage() {
+  const { get: getSetting } = useSettings();
+  const heroImage = getSetting("hero_image") || "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=1400&h=800&fit=crop";
   const [showFilters, setShowFilters] = useState(false);
   const [showCount, setShowCount] = useState(INITIAL_SHOW);
   const [filters, setFilters] = useState<FilterState>({
@@ -55,7 +58,7 @@ export default function HomePage() {
     <>
     <section ref={heroRef} className="relative h-[35vh] md:h-[42vh] bg-gray-900 overflow-hidden">
         <img
-          src="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=1400&h=800&fit=crop"
+            src={heroImage}
           alt=""
           className="absolute inset-0 w-full h-full object-cover opacity-65"
         />
