@@ -19,9 +19,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   if (loading || !isAuthenticated) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-center mx-auto">
-          <div className="w-10 h-10 border-2 border-[var(--color-primary)] border-t-transparent rounded-full animate-spin mb-3" />
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <div className="w-10 h-10 border-2 border-[var(--color-primary)] border-t-transparent rounded-full animate-spin mx-auto mb-3" />
           <p className="text-sm text-gray-500">Checking access...</p>
         </div>
       </div>
