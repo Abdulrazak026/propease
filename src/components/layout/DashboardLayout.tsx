@@ -28,6 +28,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const resolvedRole = role === "head" ? "admin" : role;
+  const logo = getSetting("site_logo");
   const items = resolvedRole ? dashboardNav[resolvedRole] || [] : [];
   const [counts, setCounts] = useState<Record<string, number>>({});
 
@@ -116,6 +117,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
       {/* Desktop sidebar */}
       <aside className="w-44 bg-slate-900 hidden md:flex md:flex-col shrink-0">
+        {logo && (
+          <div className="p-3 border-b border-slate-700">
+            <Link href="/"><img src={logo} alt="" className="h-6 w-auto mx-auto rounded" /></Link>
+          </div>
+        )}
         <div className="p-4 border-b border-slate-700">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-lg bg-[var(--color-primary)] flex items-center justify-center text-white text-xs font-bold shrink-0">

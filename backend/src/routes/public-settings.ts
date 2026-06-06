@@ -13,6 +13,7 @@ const PUBLIC_KEYS = [
   "measurement", "currency", "currency_pos", "property_statuses", "property_types", "amenities",
   "agent_dir_visible", "maintenance_mode",
   "facebook_url", "instagram_url", "linkedin_url", "youtube_url", "twitter_url",
+  "site_logo", "site_favicon",
 ];
 
 router.get("/", async (_req, res: Response) => {

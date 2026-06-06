@@ -18,6 +18,7 @@ export default function HomePage() {
   const heroImage = getSetting("hero_image") || "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=1400&h=800&fit=crop";
   const siteName = getSetting("site_name", "MBPP");
   const siteTagline = getSetting("site_tagline", "Find Your Dream Property in Kano");
+  const siteLogo = getSetting("site_logo");
   const heroRef = useRef<HTMLElement>(null);
   const [showCount, setShowCount] = useState(INITIAL_SHOW);
   const [cities, setCities] = useState<City[]>([]);
@@ -57,7 +58,7 @@ export default function HomePage() {
         <img src={heroImage} alt="" className="absolute inset-0 w-full h-full object-cover opacity-60" />
         <div className="absolute inset-0 bg-gradient-to-b from-black/40 to-black/70" />
         <div className="absolute top-0 left-0 right-0 flex items-center justify-between px-4 sm:px-6 py-3 z-10">
-          <Link href="/" className="text-white font-bold text-lg">{siteName}</Link>
+          <div>{siteLogo ? <img src={siteLogo} alt={siteName} className="h-8 w-auto" /> : null}</div>
           <Link href="/login" className="text-sm text-white/80 hover:text-white font-medium bg-white/10 px-4 py-1.5 rounded-full backdrop-blur-sm">Sign In</Link>
         </div>
         <div className="relative flex flex-col items-center justify-center h-full text-white px-4 text-center">

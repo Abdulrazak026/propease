@@ -110,6 +110,8 @@ export default function Sidebar() {
   const router = useRouter();
   const { currentUser, setCurrentUser, isAuthenticated } = useRole();
   const { get: getSetting } = useSettings();
+  const siteLogo = getSetting("site_logo");
+  const siteName = getSetting("site_name", "MBPP");
   const [collapsed, setCollapsed] = useState(false);
   const [moreOpen, setMoreOpen] = useState(false);
   const [demoOpen, setDemoOpen] = useState(false);
@@ -154,15 +156,23 @@ export default function Sidebar() {
         {/* Logo */}
         <div className={`flex items-center border-b border-gray-200 ${collapsed ? "justify-center h-12" : "px-3 h-12"}`}>
           {collapsed ? (
-            <Link href="/" className="w-7 h-7 bg-[var(--color-primary)] rounded-lg flex items-center justify-center shrink-0 hover:opacity-90 transition-opacity">
-              <span className="text-white font-bold text-[10px]">P</span>
+            <Link href="/" className="shrink-0 hover:opacity-90 transition-opacity">
+              {siteLogo ? <img src={siteLogo} alt={siteName} className="w-7 h-7 rounded-lg object-contain" /> : (
+                <div className="w-7 h-7 bg-[var(--color-primary)] rounded-lg flex items-center justify-center">
+                  <span className="text-white font-bold text-[10px]">P</span>
+                </div>
+              )}
             </Link>
           ) : (
             <Link href="/" className="flex items-center gap-2 group">
-              <div className="w-7 h-7 bg-[var(--color-primary)] rounded-lg flex items-center justify-center shrink-0 group-hover:shadow-md transition-shadow">
-                <span className="text-white font-bold text-[10px]">P</span>
-              </div>
-              <span className="text-sm font-bold text-[var(--color-primary)]">{getSetting("site_name", "MBPP")}</span>
+              {siteLogo ? (
+                <img src={siteLogo} alt={siteName} className="h-7 w-auto rounded-lg object-contain" />
+              ) : (
+                <div className="w-7 h-7 bg-[var(--color-primary)] rounded-lg flex items-center justify-center shrink-0 group-hover:shadow-md transition-shadow">
+                  <span className="text-white font-bold text-[10px]">P</span>
+                </div>
+              )}
+              {!siteLogo && <span className="text-sm font-bold text-[var(--color-primary)]">{siteName}</span>}
             </Link>
           )}
         </div>

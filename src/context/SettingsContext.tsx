@@ -15,7 +15,9 @@ const defaults: SettingsMap = {
   support_email: "support@mbpproperties.com", support_phone: "", support_whatsapp: "",
   office_address: "", business_hours: "Mon-Fri 8AM-6PM",
   primary_color: "#0d6e4e", secondary_color: "#f97316", accent_color: "#facc15",
+  heading_font: "Inter", body_font: "Inter",
   meta_title: "MBPP — Real Estate in Kano", meta_description: "Verified properties for rent and sale in Kano.",
+  site_logo: "", site_favicon: "",
 };
 
 const SettingsContext = createContext<SettingsContextType>({

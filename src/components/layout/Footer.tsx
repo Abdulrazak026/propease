@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useMemo } from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import { useSettings } from "@/context/SettingsContext";
 
@@ -61,6 +61,7 @@ function getLinkCols(brand: string) {
 export default function Footer() {
   const { get: getSetting } = useSettings();
   const brand = getSetting("site_name", "MBPP");
+  const logo = getSetting("site_logo");
 
   const socials = [
     { label: "Facebook", href: getSetting("facebook_url") || "#", icon: "facebook" },
@@ -70,8 +71,6 @@ export default function Footer() {
   if (getSetting("youtube_url")) socials.push({ label: "YouTube", href: getSetting("youtube_url"), icon: "youtube" });
   if (getSetting("twitter_url")) socials.push({ label: "X", href: getSetting("twitter_url"), icon: "twitter" });
   const LINK_COLS = getLinkCols(brand);
-  const [email, setEmail] = useState("");
-  const [subscribed, setSubscribed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState<Record<string, boolean>>({});
 
   const toggleSection = (title: string) => {
@@ -79,36 +78,43 @@ export default function Footer() {
   };
 
   return (
-    <footer className="bg-[#0f172a] text-gray-300">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Desktop grid — hidden on mobile */}
-        {/* Brand — top, full width */}
+    <footer className="bg-gray-100 text-gray-600">
+      <div className="px-4 sm:px-6 lg:px-8 max-w-none">
+        {/* Desktop — top bar */}
         <div className="hidden lg:flex items-center justify-between pt-14 pb-8">
           <Link href="/" className="flex items-center gap-2.5 group">
-            <div className="w-9 h-9 bg-[var(--color-primary)] rounded-lg flex items-center justify-center group-hover:shadow-md transition-shadow">
-              <span className="text-white font-bold text-sm">P</span>
-            </div>
-            <span className="text-lg font-bold text-white">{brand}</span>
-            <span className="text-sm text-gray-400 ml-2">&mdash; Kano&apos;s trusted real estate marketplace</span>
+            {logo ? (
+              <img src={logo} alt={brand} className="h-9 w-auto rounded-lg" />
+            ) : (
+              <div className="w-9 h-9 bg-[var(--color-primary)] rounded-lg flex items-center justify-center group-hover:shadow-md transition-shadow">
+                <span className="text-white font-bold text-sm">P</span>
+              </div>
+            )}
+            {!logo && (
+              <>
+                <span className="text-lg font-bold text-gray-900">{brand}</span>
+                <span className="text-sm text-gray-500 ml-2">— Kano&apos;s trusted real estate marketplace</span>
+              </>
+            )}
           </Link>
           <div className="flex items-center gap-2">
             {socials.map((s) => (
-              <a key={s.label} href={s.href} className="w-8 h-8 bg-gray-800 rounded-lg flex items-center justify-center text-gray-400 hover:bg-[var(--color-primary)] hover:text-white transition-all duration-200" aria-label={s.label}>
+              <a key={s.label} href={s.href} className="w-8 h-8 bg-gray-200 rounded-lg flex items-center justify-center text-gray-500 hover:bg-[var(--color-primary)] hover:text-white transition-all duration-200" aria-label={s.label}>
                 {SOCIAL_ICONS[s.icon]}
               </a>
             ))}
           </div>
         </div>
 
-        {/* Link columns */}
+        {/* Link columns — full width 4-col grid */}
         <div className="hidden lg:grid lg:grid-cols-4 gap-10 pb-10">
           {LINK_COLS.map((col) => (
             <div key={col.title}>
-              <h4 className="text-xs font-semibold text-gray-200 uppercase tracking-wider mb-5">{col.title}</h4>
+              <h4 className="text-xs font-semibold text-gray-700 uppercase tracking-wider mb-5">{col.title}</h4>
               <ul className="space-y-3">
                 {col.links.map((l) => (
                   <li key={l.label}>
-                    <Link href={l.href} className="text-sm text-gray-400 hover:text-white transition-colors duration-150">{l.label}</Link>
+                    <Link href={l.href} className="text-sm text-gray-500 hover:text-gray-900 transition-colors duration-150">{l.label}</Link>
                   </li>
                 ))}
               </ul>
@@ -116,19 +122,23 @@ export default function Footer() {
           ))}
         </div>
 
-        {/* Mobile accordion — only on mobile */}
+        {/* Mobile accordion */}
         <div className="lg:hidden pt-8 pb-4">
           <Link href="/" className="flex items-center gap-2.5 mb-6">
-            <div className="w-8 h-8 bg-[var(--color-primary)] rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-xs">P</span>
-            </div>
-            <span className="text-base font-bold text-white">{brand}</span>
+            {logo ? (
+              <img src={logo} alt={brand} className="h-8 w-auto rounded-lg" />
+            ) : (
+              <div className="w-8 h-8 bg-[var(--color-primary)] rounded-lg flex items-center justify-center">
+                <span className="text-white font-bold text-xs">P</span>
+              </div>
+            )}
+            {!logo && <span className="text-base font-bold text-gray-900">{brand}</span>}
           </Link>
           {LINK_COLS.map((col) => (
-            <div key={col.title} className="border-b border-gray-800">
+            <div key={col.title} className="border-b border-gray-200">
               <button
                 onClick={() => toggleSection(col.title)}
-                className="flex items-center justify-between w-full py-3.5 text-sm font-medium text-gray-200"
+                className="flex items-center justify-between w-full py-3.5 text-sm font-medium text-gray-700"
               >
                 {col.title}
                 <svg className={`w-4 h-4 transition-transform duration-150 ${mobileOpen[col.title] ? "rotate-180" : ""}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -138,7 +148,7 @@ export default function Footer() {
               {mobileOpen[col.title] && (
                 <div className="pb-3 space-y-2.5">
                   {col.links.map((l) => (
-                    <Link key={l.label} href={l.href} className="block text-sm text-gray-400 hover:text-white transition-colors">{l.label}</Link>
+                    <Link key={l.label} href={l.href} className="block text-sm text-gray-500 hover:text-gray-900 transition-colors">{l.label}</Link>
                   ))}
                 </div>
               )}
@@ -147,36 +157,29 @@ export default function Footer() {
         </div>
 
         {/* Legal notice */}
-        <div className="hidden lg:block border-t border-gray-800 py-6 text-xs text-gray-500 leading-relaxed space-y-2">
+        <div className="hidden lg:block border-t border-gray-200 py-6 text-xs text-gray-400 leading-relaxed space-y-2">
           <p>{brand} is committed to ensuring digital accessibility for individuals with disabilities. We are continuously working to improve the accessibility of our web experience for everyone, and we welcome feedback and accommodation requests.</p>
           <p>All information provided on this website is for informational purposes only. {brand} does not guarantee the accuracy of listings, pricing, or availability. Always verify with the property owner or agent.</p>
           <p className="flex items-center gap-2 mt-3">
-            <span className="inline-block w-5 h-5 rounded-full border border-gray-600 flex items-center justify-center text-[9px] text-gray-500 font-bold">EO</span>
+            <span className="inline-block w-5 h-5 rounded-full border border-gray-300 flex items-center justify-center text-[9px] text-gray-400 font-bold">EO</span>
             <span>Equal Housing Opportunity. We do not discriminate on the basis of race, color, religion, sex, handicap, familial status, or national origin.</span>
           </p>
         </div>
 
         {/* Bottom bar */}
-        <div className="border-t border-gray-800 py-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex flex-col sm:flex-row items-center gap-3 text-xs text-gray-500">
-            <span>&copy; 2006&ndash;2026 {brand}. All rights reserved.</span>
-            <span className="hidden sm:inline">&middot;</span>
-            <Link href="/privacy" className="hover:text-gray-300 transition-colors">Privacy</Link>
-            <span className="hidden sm:inline">&middot;</span>
-            <Link href="/terms" className="hover:text-gray-300 transition-colors">Terms</Link>
-            <span className="hidden sm:inline">&middot;</span>
+        <div className="border-t border-gray-200 py-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex flex-col sm:flex-row items-center gap-3 text-xs text-gray-400">
+            <span>&copy; 2006–2026 {brand}. All rights reserved.</span>
+            <span className="hidden sm:inline">·</span>
+            <Link href="/privacy" className="hover:text-gray-600 transition-colors">Privacy</Link>
+            <span className="hidden sm:inline">·</span>
+            <Link href="/terms" className="hover:text-gray-600 transition-colors">Terms</Link>
+            <span className="hidden sm:inline">·</span>
             <span>Equal Housing Opportunity</span>
           </div>
-          <div className="flex items-center gap-1 text-xs text-gray-500">
+          <div className="flex items-center gap-1 text-xs text-gray-400">
             <span>Designed by</span>
-            <a
-              href="https://savannix.com/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-gray-300 hover:text-white font-medium transition-colors"
-            >
-              SAVANNIX TECHNOLOGIES LTD
-            </a>
+            <a href="https://savannix.com/" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-gray-900 font-medium transition-colors">SAVANNIX TECHNOLOGIES LTD</a>
           </div>
         </div>
       </div>

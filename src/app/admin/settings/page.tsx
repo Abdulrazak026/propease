@@ -152,6 +152,8 @@ export default function AdminSettings() {
             <S label="Body Font" v={s("body_font")} onChange={(v) => set("body_font", v)} opts={[["Inter","Inter"],["Roboto","Roboto"],["Lato","Lato"]]} />
           </div>
           <F label="Hero Image URL" v={s("hero_image")} onChange={(v) => set("hero_image", v)} />
+          <MediaPicker label="Site Logo" current={s("site_logo")} onSelect={(url) => set("site_logo", url)} />
+          <MediaPicker label="Favicon" current={s("site_favicon")} onSelect={(url) => set("site_favicon", url)} />
           <div className="grid grid-cols-2 gap-3">
             <div><label className="block text-xs font-medium text-gray-700 mb-1">Custom CSS</label><textarea value={s("custom_css")} onChange={(e) => set("custom_css", e.target.value)} rows={3} className="w-full rounded-lg border border-gray-200 px-3 py-2 text-xs font-mono focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20" /></div>
             <div><label className="block text-xs font-medium text-gray-700 mb-1">Custom JS</label><textarea value={s("custom_js")} onChange={(e) => set("custom_js", e.target.value)} rows={3} className="w-full rounded-lg border border-gray-200 px-3 py-2 text-xs font-mono focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20" /></div>
@@ -271,6 +273,63 @@ export default function AdminSettings() {
 }
 
 /* Mini components */
+function MediaPicker({ label, current, onSelect }: { label: string; current: string; onSelect: (url: string) => void }) {
+  const [open, setOpen] = useState(false);
+  const [images, setImages] = useState<{ id: string; url: string; filename: string }[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  const loadImages = () => {
+    setLoading(true);
+    api.get<{ files: { id: string; url: string; filename: string }[] }>("/api/upload")
+      .then((r) => { if (r.data?.files) setImages(r.data.files.filter((f: any) => f.mimeType?.startsWith("image/"))); })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  };
+
+  return (
+    <div className="space-y-1">
+      <label className="text-xs font-medium text-gray-700">{label}</label>
+      <div className="flex gap-2">
+        <input value={current} onChange={(e) => onSelect(e.target.value)} placeholder="Paste URL or pick from media" className="flex-1 rounded-lg border border-gray-200 px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20" />
+        <button type="button" onClick={() => { setOpen(true); loadImages(); }} className="px-3 py-2 rounded-lg border border-gray-200 text-xs text-gray-600 hover:bg-gray-50">Browse</button>
+        {current && <button type="button" onClick={() => onSelect("")} className="px-2 py-2 text-xs text-red-500 hover:text-red-700" title="Remove">x</button>}
+      </div>
+      {current && <img src={current} alt="" className="h-10 mt-1 rounded border border-gray-200 object-contain" />}
+
+      {open && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={() => setOpen(false)}>
+          <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[80vh] overflow-hidden m-4" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between px-5 py-3 border-b border-gray-200">
+              <h3 className="text-sm font-semibold text-gray-900">Media Library</h3>
+              <button onClick={() => setOpen(false)} className="text-gray-400 hover:text-gray-600 text-lg">&times;</button>
+            </div>
+            <div className="p-4 overflow-y-auto max-h-[60vh]">
+              {loading ? (
+                <div className="text-center py-8 text-gray-400 text-sm">Loading...</div>
+              ) : images.length === 0 ? (
+                <div className="text-center py-8 text-gray-400 text-sm">No images uploaded yet. Upload in <a href="/admin/media" className="text-[var(--color-primary)] underline">Media</a>.</div>
+              ) : (
+                <div className="grid grid-cols-4 gap-3">
+                  {images.map((img) => (
+                    <button
+                      key={img.id}
+                      onClick={() => { onSelect(img.url); setOpen(false); }}
+                      className={`border-2 rounded-lg overflow-hidden hover:border-[var(--color-primary)] transition-colors ${current === img.url ? "border-[var(--color-primary)]" : "border-gray-200"}`}
+                    >
+                      <img src={img.url} alt={img.filename} className="w-full h-24 object-cover" />
+                      <p className="text-[10px] text-gray-500 p-1 truncate">{img.filename}</p>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 function F({ label, v, onChange, type = "text", placeholder }: { label: string; v: string; onChange: (v: string) => void; type?: string; placeholder?: string }) {
   return <div className="space-y-1">
     <label className="text-xs font-medium text-gray-700">{label}</label>
