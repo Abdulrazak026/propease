@@ -48,7 +48,7 @@ export default function AdminOverview() {
           <h1 className="text-xl font-bold text-gray-900">Admin Dashboard</h1>
           <p className="text-sm text-gray-500 mt-0.5">Full platform control and oversight</p>
         </div>
-        <a href="/admin/listings/new" className="px-4 py-2 bg-[var(--color-primary)] text-white text-sm font-medium rounded-lg hover:opacity-90 transition-opacity">+ Create Listing</a>
+        <a href="/admin/outsourcing" className="px-4 py-2 bg-[var(--color-primary)] text-white text-sm font-medium rounded-lg hover:opacity-90 transition-opacity">Manage Listings</a>
       </div>
 
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">

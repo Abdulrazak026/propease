@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import Badge from "@/components/ui/Badge";
 import Button from "@/components/ui/Button";
+import Link from "next/link";
 import { api } from "@/lib/api-client";
 
 interface Listing { id: string; title: string; propertyType: string; listingType: string; category: string; city: string; address: string; price: number; status: string; }
@@ -28,6 +29,18 @@ export default function OutsourcingPage() {
         <a href="/admin" className="text-gray-400 hover:text-[var(--color-primary)]"><svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg></a>
         <div><h1 className="text-xl font-bold text-gray-900">Outsourcing</h1><p className="text-xs text-gray-500">All platform listings</p></div>
       </div>
+
+      <Link href="/admin/listings/new" className="block bg-white rounded-xl border border-gray-200 p-4 hover:border-[var(--color-primary)]/30 hover:shadow-sm transition-all">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 bg-[var(--color-primary)]/10 rounded-lg flex items-center justify-center shrink-0">
+            <svg className="w-5 h-5 text-[var(--color-primary)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4"/></svg>
+          </div>
+          <div>
+            <p className="text-sm font-semibold text-gray-900">Create New Listing</p>
+            <p className="text-xs text-gray-500 mt-0.5">Add a house, flat, land, or commercial property with full details, photos, and pricing</p>
+          </div>
+        </div>
+      </Link>
 
       <div className="flex gap-2">
         {["all","partnership","portfolio","sale","rent"].map(f=><button key={f} onClick={()=>setFilterType(f)} className={`px-3 py-1.5 text-xs font-medium rounded-lg border capitalize transition-all ${filterType===f?"bg-[var(--color-primary)] text-white border-[var(--color-primary)]":"bg-white text-gray-600 border-gray-200 hover:border-gray-300"}`}>{f}</button>)}
