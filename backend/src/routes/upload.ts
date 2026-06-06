@@ -68,7 +68,7 @@ async function uploadToR2(filePath: string, fileName: string, mimeType: string):
   }
 }
 
-router.post("/", authenticate, authorize("head"), requirePermission("canManageContent"), upload.single("file"), async (req: AuthRequest, res: Response) => {
+router.post("/", authenticate, authorize("head", "ambassador"), requirePermission("canManageContent"), upload.single("file"), async (req: AuthRequest, res: Response) => {
   try {
     if (!req.file) return res.status(400).json({ error: "No file provided" });
 

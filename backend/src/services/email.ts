@@ -113,4 +113,20 @@ export const emailService = {
     const html = tpl || defaultTemplates.verificationSubmitted(name);
     return send(email, "Verification documents received", html);
   },
+  async contactFormSubmission(data: { name: string; email: string; phone: string; subject: string; message: string }) {
+    const supportEmail = process.env.SUPPORT_EMAIL || "support@mbpproperties.com";
+    const html = `<div style="font-family:sans-serif;max-width:600px;margin:0 auto">
+      <h2>New Contact Form Submission</h2>
+      <table style="width:100%;border-collapse:collapse">
+        <tr><td style="padding:8px;border-bottom:1px solid #eee;font-weight:600">Name</td><td style="padding:8px;border-bottom:1px solid #eee">${data.name}</td></tr>
+        <tr><td style="padding:8px;border-bottom:1px solid #eee;font-weight:600">Email</td><td style="padding:8px;border-bottom:1px solid #eee">${data.email}</td></tr>
+        <tr><td style="padding:8px;border-bottom:1px solid #eee;font-weight:600">Phone</td><td style="padding:8px;border-bottom:1px solid #eee">${data.phone || "N/A"}</td></tr>
+        <tr><td style="padding:8px;border-bottom:1px solid #eee;font-weight:600">Subject</td><td style="padding:8px;border-bottom:1px solid #eee">${data.subject}</td></tr>
+      </table>
+      <div style="margin-top:16px;padding:12px;background:#f9fafb;border-radius:8px">
+        <p style="white-space:pre-wrap;margin:0">${data.message}</p>
+      </div>
+    </div>`;
+    return send(supportEmail, `[Contact] ${data.subject} — from ${data.name}`, html);
+  },
 };

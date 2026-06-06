@@ -1,9 +1,11 @@
 "use client";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
-import { api } from "@/lib/api-client";
+import { api, getAccessToken } from "@/lib/api-client";
+
+const API = process.env.NEXT_PUBLIC_API_URL || "https://propease-production.up.railway.app";
 
 export default function PostListingPage() {
   const router = useRouter();
@@ -11,6 +13,33 @@ export default function PostListingPage() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
+  const [uploadedUrls, setUploadedUrls] = useState<string[]>([]);
+  const [uploading, setUploading] = useState(false);
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files?.length) return;
+    setUploading(true);
+    const token = getAccessToken();
+    for (const file of Array.from(files).slice(0, 10)) {
+      const fd = new FormData();
+      fd.append("file", file);
+      try {
+        const res = await fetch(`${API}/api/upload`, {
+          method: "POST",
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
+          body: fd,
+        });
+        if (res.ok) {
+          const { url } = await res.json();
+          setUploadedUrls(prev => [...prev, url]);
+        }
+      } catch {}
+    }
+    setUploading(false);
+    if (fileRef.current) fileRef.current.value = "";
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,6 +64,9 @@ export default function PostListingPage() {
       rentTier: data.rentTier as string || "normal",
       category: (data.category as string) || "portfolio",
       features: [],
+      lat: parseFloat(data.lat as string) || undefined,
+      lng: parseFloat(data.lng as string) || undefined,
+      photos: uploadedUrls,
     });
     setSubmitting(false);
     if (status === 201) {
@@ -123,27 +155,22 @@ export default function PostListingPage() {
 
  {step === 2 && (
  <>
- <h2 className="font-semibold text-gray-900 text-sm">Photos & Location</h2>
- <div className="border-2 border-dashed border-gray-200 rounded-lg p-8 text-center hover:border-[var(--color-primary)] transition cursor-pointer">
- <div className="text-4xl mb-2">📷</div>
- <p className="text-sm font-medium text-gray-700">Upload Photos</p>
- <p className="text-xs text-gray-400 mt-1">Drag & drop or click to browse</p>
- <p className="text-xs text-gray-300 mt-2">Max 10 files • JPG, PNG, WebP</p>
- </div>
- <div className="bg-gray-50 rounded-lg p-4">
- <div className="flex items-center justify-between">
- <div>
- <p className="text-sm font-medium text-gray-900">📍 Capture Location</p>
- <p className="text-xs text-gray-500">Click to drop a pin using Google Maps</p>
- </div>
- <Button size="sm" variant="outline" onClick={() => alert("Google Maps picker would open here (demo)")}>
- Open Map
- </Button>
- </div>
- <div className="mt-3 bg-gray-200 h-32 rounded-lg flex items-center justify-center">
- <p className="text-xs text-gray-500">📍 Pin dropped at 11.9950, 8.5350 (demo)</p>
- </div>
- </div>
+      <h2 className="font-semibold text-gray-900 text-sm">Photos & Location</h2>
+      <input type="file" ref={fileRef} multiple accept="image/*" onChange={handleFileUpload} className="hidden" />
+      <div onClick={() => fileRef.current?.click()} className="border-2 border-dashed border-gray-200 rounded-lg p-8 text-center hover:border-[var(--color-primary)] transition cursor-pointer">
+        <div className="text-4xl mb-2">📷</div>
+        <p className="text-sm font-medium text-gray-700">{uploading ? "Uploading..." : "Upload Photos"}</p>
+        <p className="text-xs text-gray-400 mt-1">Click to browse</p>
+        <p className="text-xs text-gray-300 mt-2">Max 10 files • JPG, PNG, WebP</p>
+        {uploadedUrls.length > 0 && <p className="text-xs text-emerald-600 mt-2">{uploadedUrls.length} uploaded</p>}
+      </div>
+      <div className="bg-gray-50 rounded-lg p-4">
+        <p className="text-sm font-medium text-gray-900 mb-3">📍 Location Coordinates</p>
+        <div className="grid grid-cols-2 gap-3">
+          <div><label className="text-xs text-gray-500 mb-1 block">Latitude</label><input name="lat" type="number" step="any" defaultValue="11.9950" className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm" /></div>
+          <div><label className="text-xs text-gray-500 mb-1 block">Longitude</label><input name="lng" type="number" step="any" defaultValue="8.5350" className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm" /></div>
+        </div>
+      </div>
  <div className="flex gap-3">
  <Button variant="outline" className="w-1/2" onClick={() => setStep(1)}>← Back</Button>
  <Button className="w-1/2" onClick={() => setStep(3)}>Next — Pricing</Button>

@@ -32,6 +32,9 @@ export default function NewAgreementPage() {
   const [form, setForm] = useState<FormData>(emptyForm);
   const [created, setCreated] = useState(false);
   const [listings, setListings] = useState<any[]>([]);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState("");
+  const [agreementId, setAgreementId] = useState("");
 
   useEffect(() => {
     api.get<{ listings: any[] }>("/api/listings").then(r => {
@@ -59,9 +62,33 @@ export default function NewAgreementPage() {
  }
  };
 
- const handleSubmit = () => {
- setCreated(true);
- };
+  const handleSubmit = async () => {
+    setSubmitting(true);
+    setError("");
+    try {
+      const r = await api.post<any>("/api/agreements", {
+        tenantName: form.tenantName,
+        tenantEmail: form.tenantEmail,
+        tenantPhone: form.tenantPhone,
+        landlordName: form.landlordName,
+        listingId: form.listingId || undefined,
+        startDate: new Date(form.startDate).toISOString(),
+        endDate: new Date(form.endDate).toISOString(),
+        rentDueDay: form.rentDueDay,
+        annualRent: form.annualRent,
+        damageDeposit: form.damageDeposit,
+        serviceCharge: form.serviceCharge,
+        noticePeriodDays: form.noticePeriodDays,
+        propertyTitle: selectedListing?.title,
+        propertyAddress: selectedListing?.address,
+        propertyCity: selectedListing?.city,
+      });
+      if (r.error) { setError(r.error); setSubmitting(false); return; }
+      setAgreementId(r.data?.agreement?.id || "");
+      setCreated(true);
+    } catch { setError("Failed to create agreement"); }
+    setSubmitting(false);
+  };
 
  if (created) {
  return (
@@ -187,17 +214,18 @@ export default function NewAgreementPage() {
  </div>
  )}
 
- <div className="flex items-center justify-end gap-3 pt-3 border-t border-gray-100">
- <Link href="/agent/agreements">
- <Button variant="outline">Cancel</Button>
- </Link>
- <Button
- disabled={!form.tenantName || !form.tenantEmail || !form.landlordName || !form.startDate || form.annualRent <= 0}
- onClick={handleSubmit}
->
- Create Agreement → Send for Signing
- </Button>
- </div>
+  <div className="flex items-center justify-end gap-3 pt-3 border-t border-gray-100">
+    {error && <span className="text-xs text-red-600 mr-auto">{error}</span>}
+    <Link href="/agent/agreements">
+      <Button variant="outline">Cancel</Button>
+    </Link>
+    <Button
+      disabled={!form.tenantName || !form.tenantEmail || !form.landlordName || !form.startDate || form.annualRent <= 0 || submitting}
+      onClick={handleSubmit}
+    >
+      {submitting ? "Creating..." : "Create Agreement \u2192 Send for Signing"}
+    </Button>
+  </div>
  </div>
  </div>
  );

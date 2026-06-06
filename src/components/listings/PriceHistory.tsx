@@ -13,12 +13,6 @@ interface PriceHistoryProps {
  priceLabel: string;
 }
 
-const mockHistory: PricePoint[] = [
- { date: "2026-04-15", price: 2_200_000, reason: "Initial listing" },
- { date: "2026-05-01", price: 2_000_000, reason: "Market adjustment" },
- { date: "2026-05-20", price: 1_800_000, reason: "Price reduction for quick rent" },
-];
-
 export default function PriceHistory({ currentPrice, history, priceLabel }: PriceHistoryProps) {
  const allPoints = [...history, { date: new Date().toISOString().split("T")[0], price: currentPrice }];
  const minPrice = Math.min(...allPoints.map((p) => p.price));

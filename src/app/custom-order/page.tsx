@@ -3,6 +3,8 @@ import { useState } from "react";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 
+const API = process.env.NEXT_PUBLIC_API_URL || "https://propease-production.up.railway.app";
+
 const propertyTypes = [
  { value: "house", label: "House" },
  { value: "flat", label: "Flat" },
@@ -17,12 +19,37 @@ export default function CustomOrderPage() {
  propertyType: "house", area: "", budget: "",
  purpose: "rent", notes: "",
  });
- const [submitted, setSubmitted] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [error, setError] = useState("");
 
- const handleSubmit = (e: React.FormEvent) => {
- e.preventDefault();
- setSubmitted(true);
- };
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSending(true);
+    setError("");
+    try {
+      const res = await fetch(`${API}/api/custom-orders`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          clientName: form.clientName,
+          clientContact: form.clientContact,
+          propertyType: form.propertyType,
+          area: form.area,
+          budget: Number(form.budget) || 0,
+          notes: form.notes,
+        }),
+      });
+      if (!res.ok) {
+        const d = await res.json().catch(() => ({}));
+        throw new Error(d.error || "Failed to submit");
+      }
+      setSubmitted(true);
+    } catch (err: any) {
+      setError(err.message || "Something went wrong");
+    }
+    setSending(false);
+  };
 
  if (submitted) {
  return (
@@ -110,16 +137,18 @@ export default function CustomOrderPage() {
 
  <div className="space-y-1.5">
  <label className="block text-sm font-medium text-gray-700">Special Requirements</label>
- <textarea
- value={form.notes}
- onChange={(e) => setForm({ ...form, notes: e.target.value })}
- rows={3}
- placeholder="e.g. Must have borehole, gated compound, proximity to school..."
- className="w-full rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20 focus:border-[var(--color-primary)] transition-all resize-none"
- />
- </div>
+      <textarea
+        value={form.notes}
+        onChange={(e) => setForm({ ...form, notes: e.target.value })}
+        rows={3}
+        placeholder="e.g. Must have borehole, gated compound, proximity to school..."
+        className="w-full rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20 focus:border-[var(--color-primary)] transition-all resize-none"
+      />
+    </div>
 
- <Button type="submit" className="w-full">Submit Request</Button>
+    {error && <div className="bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-2 rounded-lg">{error}</div>}
+
+    <Button type="submit" disabled={sending} className="w-full">{sending ? "Submitting..." : "Submit Request"}</Button>
  </form>
  </div>
  </div>

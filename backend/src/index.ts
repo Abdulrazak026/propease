@@ -39,6 +39,8 @@ import withdrawalRoutes from "./routes/withdrawals";
 import blogRoutes from "./routes/blog";
 import faqRoutes from "./routes/faqs";
 import uploadRoutes from "./routes/upload";
+import contactRoutes from "./routes/contact";
+import agentSettingsRoutes from "./routes/agent-settings";
 import crypto from "crypto";
 import bcrypt from "bcryptjs";
 import prisma from "./lib/prisma";
@@ -123,6 +125,8 @@ app.use("/api/wallet", withdrawalRoutes);
 app.use("/api/blog", blogRoutes);
 app.use("/api/faqs", faqRoutes);
 app.use("/api/upload", uploadRoutes);
+app.use("/api/contact", contactRoutes);
+app.use("/api/agent/settings", agentSettingsRoutes);
 
 // Auth helpers (mounted directly to bypass cache)
 app.post("/api/auth/forgot-password", async (req, res) => {

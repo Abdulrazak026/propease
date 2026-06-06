@@ -4,6 +4,8 @@ import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Button from "@/components/ui/Button";
 
+const API = process.env.NEXT_PUBLIC_API_URL || "https://propease-production.up.railway.app";
+
 type Step = 1 | 2 | 3 | 4 | 5 | 6 | 7;
 
 interface ApplicationData {
@@ -96,9 +98,11 @@ function ApplyPage() {
  ...emptyForm,
  listingId: searchParams.get("listing") || "",
  }));
- const [submitted, setSubmitted] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [error, setError] = useState("");
 
- const update = (field: keyof ApplicationData, value: string) => {
+  const update = (field: keyof ApplicationData, value: string) => {
  setForm((prev) => ({ ...prev, [field]: value }));
  };
 
@@ -114,9 +118,46 @@ function ApplyPage() {
  }
  };
 
- const handleSubmit = () => {
- setSubmitted(true);
- };
+  const handleSubmit = async () => {
+    setSending(true);
+    setError("");
+    try {
+      const res = await fetch(`${API}/api/applications`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          fullName: form.fullName,
+          email: form.email,
+          phone: form.phone,
+          listingId: form.listingId || undefined,
+          dateOfBirth: form.dateOfBirth || undefined,
+          employmentStatus: form.employmentStatus,
+          employer: form.employer,
+          jobTitle: form.jobTitle,
+          workAddress: form.workAddress,
+          monthlyIncome: form.monthlyIncome ? Number(form.monthlyIncome) : undefined,
+          idType: form.idType,
+          idNumber: form.idNumber,
+          refName: form.refName,
+          refPhone: form.refPhone,
+          refEmail: form.refEmail,
+          refRelation: form.refRelation,
+          nokName: form.nokName,
+          nokPhone: form.nokPhone,
+          nokEmail: form.nokEmail,
+          nokRelation: form.nokRelation,
+        }),
+      });
+      if (!res.ok) {
+        const d = await res.json().catch(() => ({}));
+        throw new Error(d.error || "Failed to submit application");
+      }
+      setSubmitted(true);
+    } catch (err: any) {
+      setError(err.message || "Something went wrong");
+    }
+    setSending(false);
+  };
 
  if (submitted) {
  return (
@@ -379,11 +420,14 @@ function ApplyPage() {
  Review →
  </Button>
  )}
- {step === 7 && (
- <Button onClick={handleSubmit}>
- Submit Application
- </Button>
- )}
+  {step === 7 && (
+    <>
+      {error && <p className="text-xs text-red-600 text-center mb-2">{error}</p>}
+      <Button onClick={handleSubmit} disabled={sending}>
+        {sending ? "Submitting..." : "Submit Application"}
+      </Button>
+    </>
+  )}
  </div>
  </div>
 
