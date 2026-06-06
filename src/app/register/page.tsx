@@ -1,12 +1,14 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useRole } from "@/context/RoleContext";
 import { useSettings } from "@/context/SettingsContext";
 import Button from "@/components/ui/Button";
-import { api } from "@/lib/api-client";
+import { api, setAccessToken } from "@/lib/api-client";
 
 export default function RegisterPage() {
   const router = useRouter();
+  const { login } = useRole();
   const { get: getSetting } = useSettings();
   const [form, setForm] = useState({ name: "", email: "", password: "" });
   const [submitting, setSubmitting] = useState(false);
@@ -18,16 +20,16 @@ export default function RegisterPage() {
     if (form.password.length < 8) { setError("Password must be at least 8 characters"); return; }
     setError(null);
     setSubmitting(true);
-    const { status } = await api.post("/api/auth/register", {
-      name: form.name,
-      email: form.email,
-      password: form.password,
-      role: "agent",
+    const { status, data } = await api.post<{ accessToken: string; user: { role: string } }>("/api/auth/register", {
+      name: form.name, email: form.email, password: form.password, role: "client",
     });
     setSubmitting(false);
-    if (status === 201) {
+    if (status === 201 && data) {
       setSuccess(true);
-      setTimeout(() => router.push("/"), 2500);
+      // Auto-login
+      setAccessToken(data.accessToken);
+      await login(form.email, form.password);
+      setTimeout(() => router.push("/"), 1500);
     } else if (status === 409) {
       setError("This email is already registered");
     } else {

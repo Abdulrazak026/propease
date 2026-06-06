@@ -39,14 +39,21 @@ router.post("/register", validate(registerSchema), async (req, res: Response) =>
         name,
         email,
         password: hashedPassword,
-        role: role || "agent",
+        role: role || "client",
         city,
         isApproved: true,
       },
       select: { id: true, name: true, email: true, role: true, city: true, isApproved: true },
     });
 
-    res.status(201).json({ user, message: "Registration submitted for approval" });
+    // Auto-login after signup
+    const accessToken = generateAccessToken(user);
+    const refreshTokenValue = generateRefreshToken();
+    await prisma.refreshToken.create({
+      data: { token: refreshTokenValue, userId: user.id, expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) },
+    });
+    res.cookie("refreshToken", refreshTokenValue, { httpOnly: true, secure: true, sameSite: "none", maxAge: 7 * 24 * 60 * 60 * 1000 });
+    res.status(201).json({ accessToken, user, message: "Registration successful" });
 
     const admins = await prisma.user.findMany({
       where: { role: "head" },
@@ -58,13 +65,12 @@ router.post("/register", validate(registerSchema), async (req, res: Response) =>
           userId: admin.id,
           type: "application_status",
           title: "New User Registration",
-          body: `${name} (${email}) registered as ${role}. Pending approval.`,
+          body: `${name} (${email}) registered as ${user.role}.`,
           link: "/admin/users",
         },
       })
     );
     Promise.all(adminNotifications).catch(() => {});
-
     emailService.welcome(email, name).catch(() => {});
   } catch (error) {
     console.error("Register error:", error);
