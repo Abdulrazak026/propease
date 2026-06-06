@@ -14,7 +14,8 @@ const PUBLIC_KEYS = [
   "agent_dir_visible", "maintenance_mode",
   "facebook_url", "instagram_url", "linkedin_url", "youtube_url", "twitter_url",
   "site_logo", "site_favicon",
-  "available_cities",
+  "available_cities", "about_hero_image",
+  "team_members", "research_reports",
 ];
 
 router.get("/", async (_req, res: Response) => {
