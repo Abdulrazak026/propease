@@ -483,7 +483,7 @@ function MediaPicker({ label, current, onSelect }: { label: string; current: str
                   {images.map((img) => (
                     <button
                       key={img.id}
-                      onClick={() => { onSelect(img.url); setOpen(false); }}
+                      onClick={() => { onSelect(resolveImageUrl(img.url) || img.url); setOpen(false); }}
                       className={`border-2 rounded-lg overflow-hidden hover:border-[var(--color-primary)] transition-colors ${current === img.url ? "border-[var(--color-primary)]" : "border-gray-200"}`}
                     >
                       <img src={resolveImageUrl(img.url) || ""} alt={img.filename} className="w-full h-24 object-cover" />

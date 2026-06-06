@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useSettings } from "@/context/SettingsContext";
+import { resolveImageUrl } from "@/lib/utils";
 
 const defaultTeam = [
   { name: "Ahmad Abubakar", role: "MD \u2014 Managing Director", bio: "Overall leadership, final approvals, capital management, investor relations, and strategic direction.", photo: "" },
@@ -101,7 +102,7 @@ export default function AboutPage() {
   <div key={m.name} className="bg-white rounded-lg border border-gray-200 p-5 text-center card-hover">
   <div className="w-20 h-20 rounded-full mx-auto mb-3 overflow-hidden bg-gray-100 flex items-center justify-center">
     {m.photo ? (
-      <img src={m.photo} alt={m.name} className="w-full h-full object-cover" />
+      <img src={resolveImageUrl(m.photo) || ""} alt={m.name} className="w-full h-full object-cover" />
     ) : (
       <span className="text-lg font-bold text-gray-400">{m.name.split(" ").map(n => n[0]).join("").slice(0, 2)}</span>
     )}
