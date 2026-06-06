@@ -142,6 +142,7 @@ model User {
   auditLogs     AuditLog[]
   tokens        RefreshToken[]
   passwordResetTokens PasswordResetToken[]
+  blogPosts      BlogPost[]
   rentAgreementsAsTenant  RentAgreement[] @relation("RentAgreementTenant")
   rentAgreementsAsAgent   RentAgreement[] @relation("RentAgreementAgent")
   priceChanges        PriceChange[]
@@ -685,4 +686,31 @@ model PasswordResetToken {
   createdAt DateTime @default(now())
 
   @@index([token])
+}
+
+model BlogPost {
+  id          String   @id @default(uuid())
+  title       String
+  slug        String   @unique
+  content     String
+  excerpt     String?
+  coverImage  String?
+  published   Boolean  @default(false)
+  publishedAt DateTime?
+  authorId    String
+  author      User     @relation(fields: [authorId], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([slug])
+  @@index([published])
+}
+
+model Faq {
+  id        String   @id @default(uuid())
+  question  String
+  answer    String
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

@@ -31,6 +31,9 @@ import settingsRoutes from "./routes/settings";
 import publicSettingsRoutes from "./routes/public-settings";
 import adminUsersRoutes from "./routes/admin-users";
 import withdrawalRoutes from "./routes/withdrawals";
+import blogRoutes from "./routes/blog";
+import faqRoutes from "./routes/faqs";
+import uploadRoutes from "./routes/upload";
 import crypto from "crypto";
 import bcrypt from "bcryptjs";
 import prisma from "./lib/prisma";
@@ -103,6 +106,9 @@ app.use("/api/admin/settings", settingsRoutes);
 app.use("/api/settings", publicSettingsRoutes);
 app.use("/api/admin/users", adminUsersRoutes);
 app.use("/api/wallet", withdrawalRoutes);
+app.use("/api/blog", blogRoutes);
+app.use("/api/faqs", faqRoutes);
+app.use("/api/upload", uploadRoutes);
 
 // Auth helpers (mounted directly to bypass cache)
 app.post("/api/auth/forgot-password", async (req, res) => {
