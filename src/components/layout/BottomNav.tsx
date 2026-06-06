@@ -121,10 +121,9 @@ export default function BottomNav() {
   const pathname = usePathname();
   const { isAuthenticated, currentUser, role, loading } = useRole();
   const [sheetOpen, setSheetOpen] = useState(false);
-  const isDashboard = pathname.startsWith("/admin") || pathname.startsWith("/agent") || pathname.startsWith("/ambassador");
-
-  // On dashboard pages, always show dashboard nav (user must be auth to be here)
-  const showDashboardNav = isDashboard;
+  // Staff users always see dashboard nav, regardless of page
+  const isStaff = isAuthenticated && (role === "head" || role === "admin" || role === "ambassador" || role === "agent");
+  const showDashboardNav = isStaff;
 
   const resolvedRole = role === "head" ? "admin" : (role || "admin");
 

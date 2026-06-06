@@ -1,30 +1,13 @@
 import { Router, Response } from "express";
 import prisma from "../lib/prisma";
+import { authenticate, AuthRequest } from "../middleware/auth";
 
 const router = Router();
 
-router.post("/", async (req, res: Response) => {
+router.get("/", authenticate, async (req: AuthRequest, res: Response) => {
   try {
-    const { userId, type, title, body, link } = req.body;
-    if (!userId || !type || !title || !body) {
-      return res.status(400).json({ error: "Missing required fields: userId, type, title, body" });
-    }
-    const notification = await prisma.notification.create({
-      data: { userId, type, title, body, link },
-    });
-    res.status(201).json({ notification });
-  } catch (error) {
-    console.error("Create notification error:", error);
-    res.status(500).json({ error: "Failed to create notification" });
-  }
-});
-
-router.get("/", async (req, res: Response) => {
-  try {
-    const userId = req.headers["x-user-id"] as string;
-    if (!userId) return res.status(401).json({ error: "User ID required" });
     const notifications = await prisma.notification.findMany({
-      where: { userId },
+      where: { userId: req.user!.id as string },
       orderBy: { createdAt: "desc" },
       take: 50,
     });
@@ -35,10 +18,11 @@ router.get("/", async (req, res: Response) => {
   }
 });
 
-router.patch("/:id/read", async (req, res: Response) => {
+router.patch("/:id/read", authenticate, async (req: AuthRequest, res: Response) => {
   try {
+    const uid = req.user?.id || "";
     await prisma.notification.updateMany({
-      where: { id: req.params.id, userId: req.headers["x-user-id"] as string },
+      where: { id: String(req.params.id), userId: uid },
       data: { read: true },
     });
     res.json({ success: true });
@@ -47,15 +31,27 @@ router.patch("/:id/read", async (req, res: Response) => {
   }
 });
 
-router.patch("/read-all", async (req, res: Response) => {
+router.patch("/read-all", authenticate, async (req: AuthRequest, res: Response) => {
   try {
     await prisma.notification.updateMany({
-      where: { userId: req.headers["x-user-id"] as string, read: false },
+      where: { userId: req.user!.id as string, read: false },
       data: { read: true },
     });
     res.json({ success: true });
   } catch (error) {
     res.status(500).json({ error: "Failed to mark all as read" });
+  }
+});
+
+router.post("/", authenticate, async (req: AuthRequest, res: Response) => {
+  try {
+    const { type, title, body, link } = req.body;
+    const notif = await prisma.notification.create({
+      data: { type, title, body, link, userId: req.user!.id as string },
+    });
+    res.status(201).json({ notification: notif });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to create notification" });
   }
 });
 
