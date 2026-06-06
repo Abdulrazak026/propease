@@ -6,18 +6,6 @@ import { useRole } from "@/context/RoleContext";
 import { useSettings } from "@/context/SettingsContext";
 import { api } from "@/lib/api-client";
 
-let unreadCount = 0;
-let fetchedUnread = false;
-async function fetchUnread() {
-  if (fetchedUnread) return;
-  try {
-    const r = await api.get<{ unread: number }>("/api/notifications");
-    if (r.data?.unread) unreadCount = r.data.unread;
-  } catch {}
-  fetchedUnread = true;
-}
-fetchUnread();
-
 const NAV_ITEMS = [
   {
     label: "Browse",
@@ -49,7 +37,7 @@ const NAV_ITEMS = [
   {
     label: "Updates",
     href: "/notifications",
-    count: unreadCount,
+    count: 0,
     icon: (active: boolean) => (
       <svg className="w-5 h-5" fill={active ? "currentColor" : "none"} viewBox="0 0 24 24" stroke="currentColor" strokeWidth={active ? 0 : 1.5}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" />
@@ -125,8 +113,17 @@ export default function Sidebar() {
   const [collapsed, setCollapsed] = useState(false);
   const [moreOpen, setMoreOpen] = useState(false);
   const [demoOpen, setDemoOpen] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
   const moreRef = useRef<HTMLDivElement>(null);
   const demoRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      api.get<{ unread: number }>("/api/notifications").then(r => {
+        if (r.data?.unread) setUnreadCount(r.data.unread);
+      }).catch(() => {});
+    }
+  }, [isAuthenticated]);
 
   const isDashboard = pathname.startsWith("/admin") || pathname.startsWith("/agent") || pathname.startsWith("/ambassador");
 
@@ -175,6 +172,7 @@ export default function Sidebar() {
           {NAV_ITEMS.map((item) => {
             const active = isActive(item.href);
             const isMore = item.href === null;
+            const count = item.href === "/notifications" ? unreadCount : ((item as any).count || 0);
             return (
               <div key={item.label} className="relative">
                 {isMore ? (
@@ -206,9 +204,9 @@ export default function Sidebar() {
                     {!collapsed && (
                       <>
                         <span className="text-sm">{item.label}</span>
-                        {((item as any).count ?? 0) > 0 && (
+                        {count > 0 && (
                           <span className="ml-auto bg-red-500 text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center">
-                            {(item as any).count > 9 ? "9+" : (item as any).count}
+                            {count > 9 ? "9+" : count}
                           </span>
                         )}
                       </>
