@@ -104,9 +104,14 @@ export default function HomePage() {
             </div>
             {listings.length > showCount && (
               <div className="flex justify-center mt-8">
-                <button onClick={() => setShowCount(c => c + LOAD_MORE)} className="px-6 py-2 text-sm font-medium rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors">Load More</button>
+                <button onClick={() => setShowCount(c => c + LOAD_MORE)} className="px-6 py-2 text-sm font-medium rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors">Show More Properties</button>
               </div>
             )}
+            <div className="flex items-center justify-center gap-6 mt-10 pt-8 border-t border-gray-100">
+              <Link href="/news" className="text-sm text-gray-500 hover:text-[var(--color-primary)] font-medium">News & Insights</Link>
+              <span className="text-gray-200">|</span>
+              <Link href="/research" className="text-sm text-gray-500 hover:text-[var(--color-primary)] font-medium">Market Research</Link>
+            </div>
           </>
         )}
       </main>

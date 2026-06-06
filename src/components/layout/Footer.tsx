@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React from "react";
 import Link from "next/link";
 import { useSettings } from "@/context/SettingsContext";
 
@@ -26,8 +26,6 @@ function getLinkCols(brand: string) {
         { label: "Browse Homes", href: "/" },
         { label: "Rentals", href: "/?type=rent" },
         { label: `About ${brand}`, href: "/about" },
-        { label: "News", href: "/news" },
-        { label: "Research", href: "/research" },
       ],
     },
     {
@@ -71,11 +69,6 @@ export default function Footer() {
   if (getSetting("youtube_url")) socials.push({ label: "YouTube", href: getSetting("youtube_url"), icon: "youtube" });
   if (getSetting("twitter_url")) socials.push({ label: "X", href: getSetting("twitter_url"), icon: "twitter" });
   const LINK_COLS = getLinkCols(brand);
-  const [mobileOpen, setMobileOpen] = useState<Record<string, boolean>>({});
-
-  const toggleSection = (title: string) => {
-    setMobileOpen((prev) => ({ ...prev, [title]: !prev[title] }));
-  };
 
   return (
     <footer className="bg-gray-100 text-gray-600">
@@ -122,7 +115,7 @@ export default function Footer() {
           ))}
         </div>
 
-        {/* Mobile accordion */}
+        {/* Mobile — always visible links */}
         <div className="lg:hidden pt-8 pb-4">
           <Link href="/" className="flex items-center gap-2.5 mb-6">
             {logo ? (
@@ -134,26 +127,20 @@ export default function Footer() {
             )}
             {!logo && <span className="text-base font-bold text-gray-900">{brand}</span>}
           </Link>
-          {LINK_COLS.map((col) => (
-            <div key={col.title} className="border-b border-gray-200">
-              <button
-                onClick={() => toggleSection(col.title)}
-                className="flex items-center justify-between w-full py-3.5 text-sm font-medium text-gray-700"
-              >
-                {col.title}
-                <svg className={`w-4 h-4 transition-transform duration-150 ${mobileOpen[col.title] ? "rotate-180" : ""}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-                </svg>
-              </button>
-              {mobileOpen[col.title] && (
-                <div className="pb-3 space-y-2.5">
+          <div className="space-y-4">
+            {LINK_COLS.map((col) => (
+              <div key={col.title}>
+                <h4 className="text-xs font-semibold text-gray-700 uppercase tracking-wider mb-3">{col.title}</h4>
+                <ul className="space-y-2">
                   {col.links.map((l) => (
-                    <Link key={l.label} href={l.href} className="block text-sm text-gray-500 hover:text-gray-900 transition-colors">{l.label}</Link>
+                    <li key={l.label}>
+                      <Link href={l.href} className="text-sm text-gray-500 hover:text-gray-900">{l.label}</Link>
+                    </li>
                   ))}
-                </div>
-              )}
-            </div>
-          ))}
+                </ul>
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* Legal notice */}
