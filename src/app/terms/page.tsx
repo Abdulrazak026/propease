@@ -1,16 +1,25 @@
-"use client";
-import { useEffect, useState } from "react";
-import DOMPurify from "dompurify";
+const API = "https://propease-production.up.railway.app";
 
-export default function TermsPage() {
-  const [content, setContent] = useState("");
+async function getSetting(key: string): Promise<string> {
+  try {
+    const res = await fetch(`${API}/api/settings`, { next: { revalidate: 300 } });
+    const data = await res.json();
+    return data.settings?.[key] || "";
+  } catch {
+    return "";
+  }
+}
 
-  useEffect(() => {
-    const apiBase = process.env.NEXT_PUBLIC_API_URL || "https://propease-production.up.railway.app";
-    fetch(`${apiBase}/api/settings`).then(r => r.json()).then(d => {
-      setContent(d.settings?.terms_of_service || "No content set.");
-    }).catch(() => setContent("Failed to load content."));
-  }, []);
+export default async function TermsPage() {
+  const content = await getSetting("terms_of_service");
+
+  const html = content
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+    .replace(/\n## (.+)/g, '\n<h2 class="text-xl font-bold mt-6 mb-3">$1</h2>')
+    .replace(/\n# (.+)/g, '\n<h1 class="text-2xl font-bold mt-8 mb-4">$1</h1>')
+    .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
+    .replace(/\n- (.+)/g, '\n<li class="ml-4 list-disc">$1</li>')
+    .replace(/\n/g, "<br/>");
 
   return (
     <div className="flex-1 py-16 px-4">
@@ -18,11 +27,9 @@ export default function TermsPage() {
         <h1 className="text-3xl font-bold text-gray-900 mb-2">Terms of Service</h1>
         <p className="text-sm text-gray-500 mb-8">Last updated: June 2026</p>
         {content ? (
-          <div className="prose prose-sm max-w-none text-gray-600" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(content.replace(/\n/g, "<br/>")) }} />
+          <div className="prose prose-sm max-w-none text-gray-700 leading-relaxed" dangerouslySetInnerHTML={{ __html: html }} />
         ) : (
-          <div className="animate-pulse space-y-3">
-            <div className="h-4 bg-gray-100 rounded w-3/4" /><div className="h-4 bg-gray-100 rounded w-1/2" /><div className="h-4 bg-gray-100 rounded w-5/6" />
-          </div>
+          <div className="text-sm text-gray-400 py-8 text-center">No content set. Configure in Admin → Settings → SEO & Legal.</div>
         )}
       </div>
     </div>
