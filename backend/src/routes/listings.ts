@@ -232,6 +232,24 @@ router.post("/:id/reject", authenticate, authorize("head"), async (req: AuthRequ
   }
 });
 
+router.patch("/:id/status", authenticate, authorize("head"), async (req: AuthRequest, res: Response) => {
+  try {
+    const { status } = req.body;
+    const validStatuses = ["draft", "review", "approved", "available", "reserved", "sold", "rented"];
+    if (!validStatuses.includes(status)) return res.status(400).json({ error: "Invalid status" });
+    const updated = await prisma.listing.update({
+      where: { id: req.params.id as string },
+      data: { status },
+    });
+    invalidate("listings:*");
+    invalidate("dashboard:stats");
+    res.json({ listing: updated });
+  } catch (error) {
+    logger.error({ err: error }, "Update listing status error:");
+    res.status(500).json({ error: "Failed to update status" });
+  }
+});
+
 router.delete("/:id", authenticate, authorize("head"), async (req: AuthRequest, res: Response) => {
   try {
     await prisma.listing.delete({ where: { id: req.params.id as string } });
