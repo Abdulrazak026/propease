@@ -11,12 +11,12 @@ interface SettingsContextType {
 }
 
 const defaults: SettingsMap = {
-  site_name: "MBPP", site_tagline: "Find Your Dream Property in Kano",
+  site_name: "Mutual Benefit Premier Properties", site_tagline: "Find Your Dream Property in Kano",
   support_email: "support@mbpproperties.com", support_phone: "", support_whatsapp: "",
   office_address: "", business_hours: "Mon-Fri 8AM-6PM",
   primary_color: "#0d6e4e", secondary_color: "#f97316", accent_color: "#facc15",
   heading_font: "Inter", body_font: "Inter",
-  meta_title: "MBPP — Real Estate in Kano", meta_description: "Verified properties for rent and sale in Kano.",
+  meta_title: "Mutual Benefit Premier Properties \u2014 Real Estate in Kano", meta_description: "Verified properties for rent and sale in Kano.",
   site_logo: "", site_favicon: "",
   available_cities: "Kano Municipal, Kano State; Bichi, Kano State; Rano, Kano State; Wudil, Kano State; Gwarzo, Kano State; Dambatta, Kano State; Karaye, Kano State; Tudun Wada, Kano State; Doguwa, Kano State; Dawakin Tofa, Kano State; Dawakin Kudu, Kano State; Kura, Kano State; Madobi, Kano State; Gezawa, Kano State; Minjibir, Kano State; Fagge, Kano State; Dala, Kano State; Gwale, Kano State; Nasarawa, Kano State; Tarauni, Kano State; Ungogo, Kano State; Kumbotso, Kano State; Bebeji, Kano State; Bunkure, Kano State; Garko, Kano State; Garun Mallam, Kano State; Kibiya, Kano State; Kiru, Kano State; Rogo, Kano State; Sumaila, Kano State; Takai, Kano State; Ajingi, Kano State; Bagwai, Kano State; Gabasawa, Kano State; Kunchi, Kano State; Makoda, Kano State; Rimin Gado, Kano State; Shanono, Kano State; Tofa, Kano State; Tsanyawa, Kano State; Gaya, Kano State; Albasu, Kano State; Babura, Kano State",
   terms_of_service: "", privacy_policy: "", cookie_text: "",

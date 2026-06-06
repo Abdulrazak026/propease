@@ -11,10 +11,10 @@ type Tab = (typeof TABS)[number];
 
 function defaults(): SettingsMap {
   return {
-    site_name: "MBPP", site_tagline: "Find Your Dream Property in Kano",
+    site_name: "Mutual Benefit Premier Properties", site_tagline: "Find Your Dream Property in Kano",
     support_email: "support@mbpproperties.com", support_phone: "", support_whatsapp: "",
     office_address: "Kano Municipal, Kano State", business_hours: "Mon-Fri 8AM-6PM",
-    meta_title: "MBPP — Real Estate Marketplace, Kano",
+    meta_title: "Mutual Benefit Premier Properties \u2014 Real Estate Marketplace, Kano",
     meta_description: "Find verified houses, land, flats and commercial properties for rent and sale in Kano, Nigeria. Your trusted real estate marketplace with secure transactions and verified agents.",
     og_image: "", ga_id: "", gtm_id: "", fb_pixel: "", robots_txt: "User-agent: *\nAllow: /\nSitemap: https://mbpproperties.com/sitemap.xml",
     terms_of_service: "# Terms of Service\n\n**Last updated: June 2026**\n\n## 1. Acceptance of Terms\nBy accessing or using MBPP, you agree to these Terms. If you do not agree, do not use the Platform.\n\n## 2. Services\nMBPP provides a real estate marketplace connecting property seekers with verified listings in Kano, Nigeria. Services include property browsing, tenant applications, agent management, and transaction facilitation.\n\n## 3. User Accounts\nYou must provide accurate information when creating an account. You are responsible for maintaining the confidentiality of your login credentials. MBPP reserves the right to suspend accounts that violate these terms.\n\n## 4. Property Listings\nAll listings must be accurate and truthful. MBPP reserves the right to remove any listing that violates these terms or contains misleading information.\n\n## 5. Payments & Transactions\nAll payments are processed securely through authorized payment providers. MBPP is not liable for payment disputes between buyers, sellers, landlords, or tenants.\n\n## 6. Privacy\nYour data is handled according to our Privacy Policy. We never sell your personal information to third parties.\n\n## 7. Limitation of Liability\nMBPP is not liable for any direct or indirect damages arising from the use of the Platform. Properties listed are the responsibility of their respective owners or agents.\n\n## 8. Contact\nFor questions about these terms, contact support@mbpproperties.com.",

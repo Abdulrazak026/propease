@@ -104,7 +104,7 @@ export default function MediaPage() {
                 <div className="aspect-square bg-gray-50">
                   {f.mimeType.startsWith("image/") ? (
                     <img src={resolveImageUrl(f.url)!} alt={f.filename} className="w-full h-full object-cover"
-                      onError={(e) => { const t = e.target as HTMLImageElement; t.src = "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100'><rect fill='%23f1f5f9' width='100' height='100'/><text x='50' y='55' text-anchor='middle' fill='%2394a3b8' font-size='12'>Broken</text></svg>"; }} />
+                      onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center text-3xl text-gray-300">📄</div>
                   )}

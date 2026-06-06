@@ -5,14 +5,14 @@ const ADMIN_EMAIL = "admin@mbpproperties.com";
 
 async function seedSettings() {
   const settings: Record<string, string> = {
-    site_name: "MBPP",
+    site_name: "Mutual Benefit Premier Properties",
     site_tagline: "Find Your Dream Property in Kano",
     primary_color: "#0d6e4e",
     secondary_color: "#f97316",
     accent_color: "#facc15",
     heading_font: "Inter",
     body_font: "Inter",
-    meta_title: "MBPP \u2014 Real Estate Marketplace, Kano",
+    meta_title: "Mutual Benefit Premier Properties \u2014 Real Estate Marketplace, Kano",
     meta_description: "Find verified houses, land, flats and commercial properties for rent and sale in Kano, Nigeria. Your trusted real estate marketplace.",
     support_email: "support@mbpproperties.com",
     support_phone: "",
