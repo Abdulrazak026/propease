@@ -39,9 +39,9 @@ router.post("/register", validate(registerSchema), async (req, res: Response) =>
         name,
         email,
         password: hashedPassword,
-        role,
+        role: role || "agent",
         city,
-        isApproved: false,
+        isApproved: true,
       },
       select: { id: true, name: true, email: true, role: true, city: true, isApproved: true },
     });

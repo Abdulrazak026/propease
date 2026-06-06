@@ -1,105 +1,123 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useSettings } from "@/context/SettingsContext";
 import Button from "@/components/ui/Button";
-import Input from "@/components/ui/Input";
 import { api } from "@/lib/api-client";
-import type { ApiUser } from "@/lib/api-types";
 
 export default function RegisterPage() {
- const router = useRouter();
-  const [form, setForm] = useState({ name: "", email: "", password: "", role: "agent" });
- const [submitting, setSubmitting] = useState(false);
- const [error, setError] = useState<string | null>(null);
- const [success, setSuccess] = useState(false);
+  const router = useRouter();
+  const { get: getSetting } = useSettings();
+  const [form, setForm] = useState({ name: "", email: "", password: "" });
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
 
- const handleSubmit = async (e: React.FormEvent) => {
- e.preventDefault();
- setError(null);
- setSubmitting(true);
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (form.password.length < 8) { setError("Password must be at least 8 characters"); return; }
+    setError(null);
+    setSubmitting(true);
+    const { status } = await api.post("/api/auth/register", {
+      name: form.name,
+      email: form.email,
+      password: form.password,
+      role: "agent",
+    });
+    setSubmitting(false);
+    if (status === 201) {
+      setSuccess(true);
+      setTimeout(() => router.push("/"), 2500);
+    } else if (status === 409) {
+      setError("This email is already registered");
+    } else {
+      setError("Registration failed. Please try again.");
+    }
+  };
 
- const { status, data } = await api.post<{ user: ApiUser; message: string }>(
- "/api/auth/register",
- {
- name: form.name,
- email: form.email,
-  password: form.password,
- role: form.role,
- }
- );
+  if (success) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center max-w-md p-8">
+          <div className="w-16 h-16 bg-emerald-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
+            <svg className="w-8 h-8 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
+          </div>
+          <h2 className="text-2xl font-bold text-gray-900">Welcome aboard!</h2>
+          <p className="text-sm text-gray-500 mt-2">Your account is ready. Redirecting you to the homepage...</p>
+        </div>
+      </div>
+    );
+  }
 
- setSubmitting(false);
+  return (
+    <div className="min-h-screen flex">
+      {/* Left panel */}
+      <div className="hidden lg:flex lg:w-[45%] xl:w-1/2 relative overflow-hidden bg-gray-900">
+        <img src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800&h=1200&fit=crop" alt="" className="absolute inset-0 w-full h-full object-cover opacity-60" />
+        <div className="absolute inset-0 bg-gradient-to-br from-[var(--color-primary)]/90 to-gray-900/80" />
+        <div className="relative flex flex-col justify-center p-16 text-white">
+          <div className="max-w-md">
+            <div className="w-14 h-14 bg-white/15 rounded-2xl flex items-center justify-center mb-8 backdrop-blur-sm">
+              <span className="text-white font-bold text-2xl">P</span>
+            </div>
+            <h1 className="text-4xl font-bold leading-tight mb-4">Find Your Perfect Home</h1>
+            <p className="text-lg text-white/70 leading-relaxed">
+              Join {getSetting("site_name", "MBPP")} to browse verified properties, connect with trusted agents, and find your dream property in Kano.
+            </p>
+          </div>
+        </div>
+      </div>
 
- if (status === 201 && data) {
- setSuccess(true);
- setTimeout(() => router.push("/login"), 2000);
- } else if (status === 409) {
- setError("This email is already registered");
- } else {
- setError("Registration failed. Please try again.");
- }
- };
+      {/* Right — form */}
+      <div className="flex-1 flex items-center justify-center p-8 bg-white">
+        <div className="w-full max-w-md">
+          <div className="lg:hidden text-center mb-8">
+            <div className="w-14 h-14 bg-[var(--color-primary)] rounded-2xl flex items-center justify-center mx-auto mb-4">
+              <span className="text-white font-bold text-2xl">P</span>
+            </div>
+            <h2 className="text-2xl font-bold text-gray-900">{getSetting("site_name", "MBPP")}</h2>
+          </div>
 
- if (success) {
- return (
- <div className="flex-1 flex items-center justify-center py-16 px-4 bg-gray-50">
- <div className="text-center max-w-md">
- <div className="w-14 h-14 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4">
- <svg className="w-7 h-7 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
- <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
- </svg>
- </div>
- <h2 className="text-xl font-bold text-gray-900">Registration submitted!</h2>
- <p className="text-sm text-gray-500 mt-2">A head/admin will review and approve your account.</p>
- </div>
- </div>
- );
- }
+          <div className="mb-8">
+            <h2 className="text-2xl font-bold text-gray-900">Create your account</h2>
+            <p className="text-sm text-gray-500 mt-1">Join for free and start exploring properties</p>
+          </div>
 
- return (
- <div className="flex-1 flex items-center justify-center py-16 px-4 bg-gray-50">
- <div className="w-full max-w-md">
- <div className="text-center mb-8">
- <div className="w-14 h-14 bg-[var(--color-primary)] rounded-lg flex items-center justify-center mx-auto mb-5 shadow-lg shadow-[var(--color-primary)]/20">
- <span className="text-white font-bold text-2xl">P</span>
- </div>
- <h1 className="text-2xl font-bold text-gray-900">Join MBPP</h1>
- <p className="text-sm text-gray-500 mt-1">Register as an agent or ambassador</p>
- </div>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">Full Name</label>
+              <input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="e.g. Sadiq Abdullahi" required
+                className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20 focus:border-[var(--color-primary)] focus:bg-white transition-all" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">Email Address</label>
+              <input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} placeholder="you@email.com" required
+                className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20 focus:border-[var(--color-primary)] focus:bg-white transition-all" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">Password</label>
+              <input type="password" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} placeholder="Min. 8 characters" required
+                className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20 focus:border-[var(--color-primary)] focus:bg-white transition-all" />
+            </div>
 
- <form onSubmit={handleSubmit} className="bg-white rounded-lg border border-gray-200 p-6 shadow-lg space-y-4">
- <Input label="Full Name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required placeholder="e.g. Sadiq Abdullahi" />
- <Input label="Email Address" type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} required placeholder="you@email.com" />
-  <Input label="Password" type="password" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} required placeholder="Min. 8 characters" />
+            {error && (
+              <div className="flex items-center gap-2 text-sm text-red-600 bg-red-50 rounded-xl px-4 py-3 border border-red-100">
+                <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                {error}
+              </div>
+            )}
 
- <div className="space-y-1.5">
- <label className="block text-sm font-medium text-gray-700">I want to join as</label>
- <select
- value={form.role}
- onChange={(e) => setForm({ ...form, role: e.target.value })}
- className="w-full rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20 focus:border-[var(--color-primary)] transition-all"
->
- <option value="agent">Agent</option>
- <option value="ambassador">Ambassador</option>
- </select>
- </div>
+            <Button type="submit" disabled={submitting} className="w-full py-3 text-base rounded-xl">
+              {submitting ? <span className="flex items-center justify-center gap-2"><svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>Creating account...</span> : "Create Account"}
+            </Button>
+          </form>
 
- {error && (
- <p className="text-sm text-red-500 bg-red-50 rounded-lg px-4 py-2 border border-red-100">{error}</p>
- )}
-
- <Button type="submit" disabled={submitting} className="w-full">
- {submitting ? "Submitting..." : "Submit Registration"}
- </Button>
-
- <p className="text-xs text-gray-400 text-center mt-2">
- Already have an account?{" "}
- <button type="button" onClick={() => router.push("/login")} className="text-[var(--color-primary)] hover:underline font-medium">
- Sign in
- </button>
- </p>
- </form>
- </div>
- </div>
- );
+          <p className="text-sm text-gray-500 text-center mt-8">
+            Already have an account?{" "}
+            <a href="/login" className="text-[var(--color-primary)] hover:underline font-semibold">Sign in</a>
+          </p>
+        </div>
+      </div>
+    </div>
+  );
 }
