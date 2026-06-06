@@ -9,6 +9,8 @@ import Footer from "@/components/layout/Footer";
 import { useSettings } from "@/context/SettingsContext";
 
 interface City { id: string; name: string; }
+interface BlogPost { id: string; slug: string; title: string; excerpt?: string | null; content?: string | null; coverImage: string | null; publishedAt: string | null; author?: { name: string } | null; }
+interface ResearchReport { title: string; date: string; summary: string; metrics: string[]; }
 
 const INITIAL_SHOW = 6;
 const LOAD_MORE = 6;
@@ -22,6 +24,18 @@ export default function HomePage() {
   const heroRef = useRef<HTMLElement>(null);
   const [showCount, setShowCount] = useState(INITIAL_SHOW);
   const [cities, setCities] = useState<City[]>([]);
+  const [posts, setPosts] = useState<BlogPost[]>([]);
+  const [postsLoading, setPostsLoading] = useState(true);
+
+  let researchReports: ResearchReport[] = [];
+  try { const raw = getSetting("research_reports"); if (raw) researchReports = JSON.parse(raw); } catch {}
+
+  useEffect(() => {
+    fetch("https://propease-production.up.railway.app/api/blog").then(r => r.json()).then(d => {
+      setPosts((d.posts || []).filter((p: BlogPost) => p.publishedAt));
+      setPostsLoading(false);
+    }).catch(() => setPostsLoading(false));
+  }, []);
 
   const { listings, loading, filters, setFilters } = useListings();
 
@@ -107,11 +121,53 @@ export default function HomePage() {
                 <button onClick={() => setShowCount(c => c + LOAD_MORE)} className="px-6 py-2 text-sm font-medium rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors">Show More Properties</button>
               </div>
             )}
-            <div className="flex items-center justify-center gap-6 mt-10 pt-8 border-t border-gray-100">
-              <Link href="/news" className="text-sm text-gray-500 hover:text-[var(--color-primary)] font-medium">News & Insights</Link>
-              <span className="text-gray-200">|</span>
-              <Link href="/research" className="text-sm text-gray-500 hover:text-[var(--color-primary)] font-medium">Market Research</Link>
-            </div>
+            {/* News slider */}
+            {!postsLoading && posts.length > 0 && (
+              <div className="mt-12 pt-8 border-t border-gray-100">
+                <div className="flex items-center justify-between mb-5">
+                  <h2 className="text-lg font-bold text-gray-900">News & Insights</h2>
+                  <Link href="/news" className="text-xs text-[var(--color-primary)] font-medium hover:underline">View all</Link>
+                </div>
+                <div className="flex gap-4 overflow-x-auto pb-2 -mx-4 px-4 snap-x snap-mandatory scrollbar-hide">
+                  {posts.slice(0, 6).map((p) => (
+                    <Link key={p.id} href={`/news/${p.slug}`} className="min-w-[260px] max-w-[260px] bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-md transition-shadow snap-start shrink-0 group">
+                      {p.coverImage && <img src={p.coverImage} alt={p.title} className="w-full h-36 object-cover" />}
+                      <div className="p-4">
+                        <span className="text-[10px] font-medium text-[var(--color-primary)] uppercase">News</span>
+                        <h3 className="text-sm font-semibold text-gray-900 mt-1 group-hover:text-[var(--color-primary)] transition-colors line-clamp-2">{p.title}</h3>
+                        <p className="text-xs text-gray-500 mt-1.5 line-clamp-2">{p.excerpt || p.content?.slice(0, 100)}</p>
+                        <p className="text-[11px] text-gray-400 mt-2">{p.publishedAt ? new Date(p.publishedAt).toLocaleDateString() : ""}</p>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            )}
+            {/* Research section */}
+            {researchReports.length > 0 && (
+              <div className="mt-10 pt-8 border-t border-gray-100">
+                <div className="flex items-center justify-between mb-5">
+                  <h2 className="text-lg font-bold text-gray-900">Market Research</h2>
+                  <Link href="/research" className="text-xs text-[var(--color-primary)] font-medium hover:underline">View all</Link>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {researchReports.slice(0, 4).map((r, i) => (
+                    <div key={i} className="bg-white rounded-lg border border-gray-200 p-5 hover:shadow-sm transition-shadow">
+                      <div className="flex items-start justify-between mb-2">
+                        <h3 className="text-sm font-semibold text-gray-900">{r.title}</h3>
+                        <span className="text-[11px] text-gray-400 shrink-0 ml-3">{r.date}</span>
+                      </div>
+                      <p className="text-xs text-gray-600 leading-relaxed mb-3">{r.summary}</p>
+                      <div className="flex flex-wrap gap-1.5">
+                        {(r.metrics || []).map((m) => (
+                          <span key={m} className="px-2 py-0.5 bg-[var(--color-primary)]/5 text-[var(--color-primary)] text-[10px] font-medium rounded-full">{m}</span>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </>
         )}
       </main>

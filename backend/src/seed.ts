@@ -31,6 +31,12 @@ async function seedSettings() {
     maintenance_mode: "false",
     timezone: "Africa/Lagos",
     date_format: "DD/MM/YYYY",
+    research_reports: JSON.stringify([
+      { title: "Kano Residential Market Report \u2014 Q1 2026", date: "April 2026", summary: "Average rents rose 12% year-on-year across Kano Municipal. Tarauni and Nassarawa saw the highest demand for 2-bedroom flats.", metrics: ["12% YoY rent increase", "340 active listings", "4.2 avg days on market", "\u20A6850K avg annual rent"] },
+      { title: "Northern Nigeria Real Estate Outlook 2026", date: "January 2026", summary: "Comprehensive analysis of property trends across Kano, Kaduna, and Katsina states including urban migration patterns and infrastructure impact.", metrics: ["6 states covered", "2,100+ data points", "15 city districts", "3-year forecast"] },
+      { title: "Rental Affordability Index \u2014 Kano State", date: "March 2026", summary: "How rent-to-income ratios vary across Kano\u2019s eight local government areas. Fagge remains the most affordable district for young professionals.", metrics: ["28% avg rent-to-income", "\u20A6180K median salary", "8 LGAs analysed", "5 property types"] },
+      { title: "Commercial Property Trends in Kano", date: "February 2026", summary: "Demand for retail and office space is shifting toward the new Kano City Centre development. Industrial space in Fagge remains undersupplied.", metrics: ["22% vacancy rate", "\u20A62.1M avg annual rent", "3 new developments", "+8% commercial growth"] },
+    ]),
     team_members: JSON.stringify([
       { name: "Ahmad Abubakar", role: "MD \u2014 Managing Director", bio: "Overall leadership, final approvals, capital management, investor relations, and strategic direction.", photo: "" },
       { name: "Barr. Sulaiman Usman", role: "Legal Adviser", bio: "Handles land titles, contracts, legal agreements, compliance, and dispute resolution.", photo: "" },

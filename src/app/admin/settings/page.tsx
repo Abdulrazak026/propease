@@ -6,7 +6,7 @@ import DOMPurify from "dompurify";
 
 type SettingsMap = Record<string, string>;
 
-const TABS = ["General", "Branding", "SEO & Legal", "Properties", "Team", "Integrations", "Email Templates", "Staff & Roles", "System"] as const;
+const TABS = ["General", "Branding", "SEO & Legal", "Properties", "Team", "Content", "Integrations", "Email Templates", "Staff & Roles", "System"] as const;
 type Tab = (typeof TABS)[number];
 
 function defaults(): SettingsMap {
@@ -74,10 +74,18 @@ function RichTextArea({ label, value, onChange, rows = 6 }: { label: string; val
 }
 
 interface TeamMember { name: string; role: string; bio: string; photo: string; }
+interface ResearchReport { title: string; date: string; summary: string; metrics: string[]; }
 
-function parseTeam(raw: string): TeamMember[] {
+function parseJson<T>(raw: string): T[] {
   try { return JSON.parse(raw); } catch { return []; }
 }
+
+const defaultResearchJSON = JSON.stringify([
+  { title: "Kano Residential Market Report — Q1 2026", date: "April 2026", summary: "Average rents rose 12% year-on-year across Kano Municipal. Tarauni and Nassarawa saw the highest demand for 2-bedroom flats.", metrics: ["12% YoY rent increase", "340 active listings", "4.2 avg days on market", "₦850K avg annual rent"] },
+  { title: "Northern Nigeria Real Estate Outlook 2026", date: "January 2026", summary: "Comprehensive analysis of property trends across Kano, Kaduna, and Katsina states including urban migration patterns and infrastructure impact.", metrics: ["6 states covered", "2,100+ data points", "15 city districts", "3-year forecast"] },
+  { title: "Rental Affordability Index — Kano State", date: "March 2026", summary: "How rent-to-income ratios vary across Kano's eight local government areas. Fagge remains the most affordable district for young professionals.", metrics: ["28% avg rent-to-income", "₦180K median salary", "8 LGAs analysed", "5 property types"] },
+  { title: "Commercial Property Trends in Kano", date: "February 2026", summary: "Demand for retail and office space is shifting toward the new Kano City Centre development. Industrial space in Fagge remains undersupplied.", metrics: ["22% vacancy rate", "₦2.1M avg annual rent", "3 new developments", "+8% commercial growth"] },
+]);
 
 export default function AdminSettings() {
   const [settings, setSettings] = useState<SettingsMap>(defaults());
@@ -85,7 +93,8 @@ export default function AdminSettings() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState<{ type: "success" | "error"; text: string } | null>(null);
-  const [teamMembers, setTeamMembers] = useState<TeamMember[]>(parseTeam((defaults()).team_members));
+  const [teamMembers, setTeamMembers] = useState<TeamMember[]>(parseJson<TeamMember>((defaults()).team_members));
+  const [researchReports, setResearchReports] = useState<ResearchReport[]>(parseJson<ResearchReport>(defaultResearchJSON));
 
   useEffect(() => {
     api.get<{ settings: SettingsMap }>("/api/admin/settings").then((r) => {
@@ -95,7 +104,8 @@ export default function AdminSettings() {
           if (v) merged[k] = v; // skip empty values to preserve defaults
         }
         setSettings((p) => ({ ...p, ...merged }));
-        if (merged.team_members) setTeamMembers(parseTeam(merged.team_members));
+        if (merged.team_members) setTeamMembers(parseJson<TeamMember>(merged.team_members));
+        if (merged.research_reports) setResearchReports(parseJson<ResearchReport>(merged.research_reports));
       }
       setLoading(false);
     });
@@ -120,6 +130,24 @@ export default function AdminSettings() {
     const updated = teamMembers.filter((_, idx) => idx !== i);
     setTeamMembers(updated);
     set("team_members", JSON.stringify(updated));
+  };
+
+  const updateReport = (i: number, field: string, value: string | string[]) => {
+    const updated = researchReports.map((r, idx) => idx === i ? { ...r, [field]: value } : r);
+    setResearchReports(updated);
+    set("research_reports", JSON.stringify(updated));
+  };
+
+  const addReport = () => {
+    const updated = [...researchReports, { title: "", date: "", summary: "", metrics: [] }];
+    setResearchReports(updated);
+    set("research_reports", JSON.stringify(updated));
+  };
+
+  const removeReport = (i: number) => {
+    const updated = researchReports.filter((_, idx) => idx !== i);
+    setResearchReports(updated);
+    set("research_reports", JSON.stringify(updated));
   };
 
   const save = async () => {
@@ -251,6 +279,43 @@ export default function AdminSettings() {
               </div>
             ))}
             <button type="button" onClick={addMember} className="w-full py-2 border-2 border-dashed border-gray-200 rounded-lg text-xs text-gray-400 hover:border-gray-300 hover:text-gray-600 transition-colors">+ Add Member</button>
+          </div>
+        </>)}
+
+        {/* Content */}
+        {tab === "Content" && (<>
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-sm font-semibold text-gray-900">Market Research Reports</h3>
+            <p className="text-xs text-gray-500">{researchReports.length} reports</p>
+          </div>
+          <p className="text-xs text-gray-500 mb-4">These appear on the homepage research section and the /research page.</p>
+          <div className="space-y-4">
+            {researchReports.map((r, i) => (
+              <div key={i} className="border border-gray-200 rounded-lg p-4 space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-semibold text-gray-700">Report {i + 1}</span>
+                  <button type="button" onClick={() => removeReport(i)} className="text-[10px] text-red-500 hover:text-red-700">Remove</button>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <F label="Title" v={r.title || ""} onChange={(v) => updateReport(i, "title", v)} />
+                  <F label="Date" v={r.date || ""} onChange={(v) => updateReport(i, "date", v)} placeholder="e.g. April 2026" />
+                </div>
+                <div className="col-span-2">
+                  <label className="block text-xs font-medium text-gray-700 mb-1">Summary</label>
+                  <textarea value={r.summary || ""} onChange={(e) => updateReport(i, "summary", e.target.value)} rows={2} className="w-full rounded-lg border border-gray-200 px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20 resize-y" />
+                </div>
+                <div className="col-span-2">
+                  <label className="block text-xs font-medium text-gray-700 mb-1">Metrics (comma-separated)</label>
+                  <input value={(r.metrics || []).join(", ")} onChange={(e) => updateReport(i, "metrics", e.target.value.split(",").map(m => m.trim()))} placeholder="e.g. 12% YoY rent increase, 340 active listings" className="w-full rounded-lg border border-gray-200 px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20" />
+                </div>
+              </div>
+            ))}
+            <button type="button" onClick={addReport} className="w-full py-2 border-2 border-dashed border-gray-200 rounded-lg text-xs text-gray-400 hover:border-gray-300 hover:text-gray-600 transition-colors">+ Add Report</button>
+          </div>
+          <hr className="border-gray-100 my-6" />
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <h4 className="text-xs font-semibold text-blue-900 mb-1">Blog Posts</h4>
+            <p className="text-xs text-blue-700">Blog posts are managed at <a href="/admin/blog" className="underline font-medium">/admin/blog</a>. Latest 6 published posts appear automatically in the homepage news slider.</p>
           </div>
         </>)}
 

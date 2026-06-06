@@ -10,6 +10,13 @@ interface SettingsContextType {
   loading: boolean;
 }
 
+const defaultResearch = JSON.stringify([
+  { title: "Kano Residential Market Report — Q1 2026", date: "April 2026", summary: "Average rents rose 12% year-on-year across Kano Municipal. Tarauni and Nassarawa saw the highest demand for 2-bedroom flats.", metrics: ["12% YoY rent increase", "340 active listings", "4.2 avg days on market", "₦850K avg annual rent"] },
+  { title: "Northern Nigeria Real Estate Outlook 2026", date: "January 2026", summary: "Comprehensive analysis of property trends across Kano, Kaduna, and Katsina states including urban migration patterns and infrastructure impact.", metrics: ["6 states covered", "2,100+ data points", "15 city districts", "3-year forecast"] },
+  { title: "Rental Affordability Index — Kano State", date: "March 2026", summary: "How rent-to-income ratios vary across Kano's eight local government areas. Fagge remains the most affordable district for young professionals.", metrics: ["28% avg rent-to-income", "₦180K median salary", "8 LGAs analysed", "5 property types"] },
+  { title: "Commercial Property Trends in Kano", date: "February 2026", summary: "Demand for retail and office space is shifting toward the new Kano City Centre development. Industrial space in Fagge remains undersupplied.", metrics: ["22% vacancy rate", "₦2.1M avg annual rent", "3 new developments", "+8% commercial growth"] },
+]);
+
 const defaultTeam = JSON.stringify([
   { name: "Ahmad Abubakar", role: "MD \u2014 Managing Director", bio: "Overall leadership, final approvals, capital management, investor relations, and strategic direction.", photo: "" },
   { name: "Barr. Sulaiman Usman", role: "Legal Adviser", bio: "Handles land titles, contracts, legal agreements, compliance, and dispute resolution.", photo: "" },
@@ -31,6 +38,7 @@ const defaults: SettingsMap = {
   meta_title: "Mutual Benefit Premier Properties \u2014 Real Estate in Kano", meta_description: "Verified properties for rent and sale in Kano.",
   site_logo: "", site_favicon: "",
   team_members: defaultTeam,
+  research_reports: defaultResearch,
   available_cities: "Kano Municipal, Kano State; Bichi, Kano State; Rano, Kano State; Wudil, Kano State; Gwarzo, Kano State; Dambatta, Kano State; Karaye, Kano State; Tudun Wada, Kano State; Doguwa, Kano State; Dawakin Tofa, Kano State; Dawakin Kudu, Kano State; Kura, Kano State; Madobi, Kano State; Gezawa, Kano State; Minjibir, Kano State; Fagge, Kano State; Dala, Kano State; Gwale, Kano State; Nasarawa, Kano State; Tarauni, Kano State; Ungogo, Kano State; Kumbotso, Kano State; Bebeji, Kano State; Bunkure, Kano State; Garko, Kano State; Garun Mallam, Kano State; Kibiya, Kano State; Kiru, Kano State; Rogo, Kano State; Sumaila, Kano State; Takai, Kano State; Ajingi, Kano State; Bagwai, Kano State; Gabasawa, Kano State; Kunchi, Kano State; Makoda, Kano State; Rimin Gado, Kano State; Shanono, Kano State; Tofa, Kano State; Tsanyawa, Kano State; Gaya, Kano State; Albasu, Kano State; Babura, Kano State",
   terms_of_service: "", privacy_policy: "", cookie_text: "",
 };
