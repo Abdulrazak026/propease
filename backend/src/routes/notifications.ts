@@ -2,6 +2,7 @@ import { Router, Response } from "express";
 import prisma from "../lib/prisma";
 import { authenticate, AuthRequest } from "../middleware/auth";
 import { authorize } from "../middleware/rbac";
+import { logger } from "../lib/logger";
 
 const router = Router();
 
@@ -14,9 +15,7 @@ router.get("/", authenticate, async (req: AuthRequest, res: Response) => {
     });
     const unread = notifications.filter((n) => !n.read).length;
     res.json({ notifications, unread });
-  } catch (error) {
-    res.status(500).json({ error: "Failed to fetch notifications" });
-  }
+  } catch (error) { logger.error({ err: error }, "Failed to fetch notifications"); res.status(500).json({ error: "Failed to fetch notifications" }); }
 });
 
 router.patch("/:id/read", authenticate, async (req: AuthRequest, res: Response) => {
@@ -27,9 +26,7 @@ router.patch("/:id/read", authenticate, async (req: AuthRequest, res: Response) 
       data: { read: true },
     });
     res.json({ success: true });
-  } catch (error) {
-    res.status(500).json({ error: "Failed to mark as read" });
-  }
+  } catch (error) { logger.error({ err: error }, "Failed to mark as read"); res.status(500).json({ error: "Failed to mark as read" }); }
 });
 
 router.patch("/read-all", authenticate, async (req: AuthRequest, res: Response) => {
@@ -39,9 +36,7 @@ router.patch("/read-all", authenticate, async (req: AuthRequest, res: Response) 
       data: { read: true },
     });
     res.json({ success: true });
-  } catch (error) {
-    res.status(500).json({ error: "Failed to mark all as read" });
-  }
+  } catch (error) { logger.error({ err: error }, "Failed to mark all as read"); res.status(500).json({ error: "Failed to mark all as read" }); }
 });
 
 router.post("/", authenticate, authorize("head", "admin"), async (req: AuthRequest, res: Response) => {
@@ -52,9 +47,7 @@ router.post("/", authenticate, authorize("head", "admin"), async (req: AuthReque
       data: { type, title, body, link, userId: targetUserId },
     });
     res.status(201).json({ notification: notif });
-  } catch (error) {
-    res.status(500).json({ error: "Failed to create notification" });
-  }
+  } catch (error) { logger.error({ err: error }, "Failed to create notification"); res.status(500).json({ error: "Failed to create notification" }); }
 });
 
 export default router;

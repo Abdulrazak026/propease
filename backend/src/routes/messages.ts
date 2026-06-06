@@ -1,6 +1,7 @@
 import { Router, Response } from "express";
 import prisma from "../lib/prisma";
 import { authenticate, AuthRequest } from "../middleware/auth";
+import { logger } from "../lib/logger";
 
 const router = Router();
 
@@ -18,9 +19,7 @@ router.get("/conversations", authenticate, async (req: AuthRequest, res: Respons
       },
     });
     res.json(conversations);
-  } catch (error) {
-    res.status(500).json({ error: "Failed to fetch conversations" });
-  }
+  } catch (error) { logger.error({ err: error }, "Failed to fetch conversations"); res.status(500).json({ error: "Failed to fetch conversations" }); }
 });
 
 router.get("/conversations/:id/messages", authenticate, async (req: AuthRequest, res: Response) => {
@@ -37,9 +36,7 @@ router.get("/conversations/:id/messages", authenticate, async (req: AuthRequest,
       data: { read: true },
     });
     res.json(messages);
-  } catch (error) {
-    res.status(500).json({ error: "Failed to fetch messages" });
-  }
+  } catch (error) { logger.error({ err: error }, "Failed to fetch messages"); res.status(500).json({ error: "Failed to fetch messages" }); }
 });
 
 router.post("/conversations/:id/messages", authenticate, async (req: AuthRequest, res: Response) => {
@@ -57,9 +54,7 @@ router.post("/conversations/:id/messages", authenticate, async (req: AuthRequest
       data: { updatedAt: new Date() },
     });
     res.status(201).json(message);
-  } catch (error) {
-    res.status(500).json({ error: "Failed to send message" });
-  }
+  } catch (error) { logger.error({ err: error }, "Failed to send message"); res.status(500).json({ error: "Failed to send message" }); }
 });
 
 router.post("/conversations", authenticate, async (req: AuthRequest, res: Response) => {
@@ -101,9 +96,7 @@ router.post("/conversations", authenticate, async (req: AuthRequest, res: Respon
       },
     });
     res.status(201).json({ conversation });
-  } catch (error) {
-    res.status(500).json({ error: "Failed to create conversation" });
-  }
+  } catch (error) { logger.error({ err: error }, "Failed to create conversation"); res.status(500).json({ error: "Failed to create conversation" }); }
 });
 
 export default router;
