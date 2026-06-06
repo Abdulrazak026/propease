@@ -103,16 +103,15 @@ export default function MediaPage() {
               <div key={f.id} className="bg-white border border-gray-200 rounded-lg overflow-hidden">
                 <div className="aspect-square bg-gray-50">
                   {f.mimeType.startsWith("image/") ? (
-                    <img src={resolveImageUrl(f.url)!} alt={f.filename} className="w-full h-full object-cover"
-                      onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
+                    <img src={resolveImageUrl(f.url) || f.url} alt={f.filename} className="w-full h-full object-cover" />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center text-3xl text-gray-300">📄</div>
                   )}
                 </div>
                 <div className="p-2">
-                  <p className="text-[10px] text-gray-600 truncate mb-1.5" title={f.filename}>{f.filename}</p>
+                  <p className="text-[10px] text-gray-600 truncate mb-0.5" title={f.filename}>{f.filename}</p>
                   <div className="flex items-center justify-between">
-                    <button onClick={() => navigator.clipboard.writeText(f.url)} className="text-[10px] text-[var(--color-primary)] hover:underline">Copy</button>
+                    <button onClick={() => navigator.clipboard.writeText(resolveImageUrl(f.url) || f.url)} className="text-[10px] text-[var(--color-primary)] hover:underline">Copy</button>
                     <button onClick={() => handleDelete(f.id)} className="text-[10px] text-red-500 hover:underline">Del</button>
                   </div>
                 </div>
