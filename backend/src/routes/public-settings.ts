@@ -1,5 +1,6 @@
 import { Router, Response } from "express";
 import prisma from "../lib/prisma";
+import { cached } from "../lib/cache";
 
 const router = Router();
 
@@ -16,11 +17,14 @@ const PUBLIC_KEYS = [
 
 router.get("/", async (_req, res: Response) => {
   try {
-    const rows = await prisma.siteSettings.findMany();
-    const map: Record<string, string> = {};
-    for (const r of rows) {
-      if (PUBLIC_KEYS.includes(r.key)) map[r.key] = r.value;
-    }
+    const map = await cached("settings:public", 300, async () => {
+      const rows = await prisma.siteSettings.findMany();
+      const m: Record<string, string> = {};
+      for (const r of rows) {
+        if (PUBLIC_KEYS.includes(r.key)) m[r.key] = r.value;
+      }
+      return m;
+    });
     res.json({ settings: map });
   } catch {
     res.json({ settings: {} });

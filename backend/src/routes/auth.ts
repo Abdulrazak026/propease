@@ -212,9 +212,30 @@ router.post("/refresh", async (req, res: Response) => {
 
 router.post("/logout", authenticate, async (req: AuthRequest, res: Response) => {
   try {
+    const authHeader = req.headers.authorization!;
+    const accessToken = authHeader.split(" ")[1];
+    const payload = jwt.decode(accessToken) as any;
+
+    // Blacklist the access token until its natural expiry
+    if (payload?.jti && payload?.exp) {
+      const ttl = payload.exp - Math.floor(Date.now() / 1000);
+      if (ttl > 0) {
+        await prisma.blacklistedToken.create({
+          data: {
+            jti: payload.jti,
+            userId: req.user!.id,
+            expiresAt: new Date(Date.now() + ttl * 1000),
+          },
+        });
+      }
+    }
+
     const token = req.cookies?.refreshToken;
     if (token) {
-      await prisma.refreshToken.deleteMany({ where: { token } });
+      await prisma.refreshToken.updateMany({
+        where: { token },
+        data: { revoked: true },
+      });
     }
 
     res.clearCookie("refreshToken", { path: "/", secure: true, sameSite: "none" });

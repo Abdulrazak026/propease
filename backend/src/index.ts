@@ -56,6 +56,9 @@ app.use(cors({
 }));
 app.use(cookieParser());
 
+// Serve uploaded files
+app.use("/uploads", express.static("uploads"));
+
 // Rate limiting
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,

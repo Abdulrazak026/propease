@@ -6,6 +6,7 @@ import { authorize } from "../middleware/rbac";
 import { validate } from "../middleware/validate";
 import { createListingSchema } from "../validators";
 import { logger } from "../lib/logger";
+import { invalidate } from "../lib/cache";
 const router = Router();
 
 router.get("/", async (req, res: Response) => {
@@ -117,6 +118,8 @@ router.post("/", authenticate, authorize("head", "ambassador"), validate(createL
       },
     });
 
+    invalidate("listings:*");
+    invalidate("dashboard:stats");
     res.status(201).json({ listing });
   } catch (error) {
     logger.error({ err: error }, "Create listing error:");
@@ -142,6 +145,8 @@ router.put("/:id", authenticate, authorize("head", "ambassador"), async (req: Au
       include: { photos: true, postedBy: { select: { id: true, name: true } } },
     });
 
+    invalidate("listings:*");
+    invalidate("dashboard:stats");
     res.json({ listing: updated });
   } catch (error) {
     logger.error({ err: error }, "Update listing error:");
@@ -155,6 +160,8 @@ router.post("/:id/submit", authenticate, async (req: AuthRequest, res: Response)
     if (!listing || listing.postedById !== req.user!.id) return res.status(403).json({ error: "Not your listing" });
     if (listing.status !== "draft") return res.status(400).json({ error: "Only draft listings can be submitted" });
     const updated = await prisma.listing.update({ where: { id: req.params.id as string }, data: { status: "review" } });
+    invalidate("listings:*");
+    invalidate("dashboard:stats");
     res.json({ listing: updated });
   } catch (error) {
     res.status(500).json({ error: "Failed to submit for review" });
@@ -198,7 +205,8 @@ router.post("/:id/approve", authenticate, authorize("head"), async (req: AuthReq
         data: { status: "approved" },
       });
     });
-
+    invalidate("listings:*");
+    invalidate("dashboard:stats");
     res.json({ listing: { ...listing, status: "approved" }, message: "Listing approved and published" });
   } catch (error) {
     logger.error({ err: error }, "Failed to approve listing");
@@ -211,6 +219,8 @@ router.post("/:id/reject", authenticate, authorize("head"), async (req: AuthRequ
     const listing = await prisma.listing.findUnique({ where: { id: req.params.id as string } });
     if (!listing) return res.status(404).json({ error: "Listing not found" });
     const updated = await prisma.listing.update({ where: { id: req.params.id as string }, data: { status: "draft" } });
+    invalidate("listings:*");
+    invalidate("dashboard:stats");
     res.json({ listing: updated });
   } catch (error) {
     res.status(500).json({ error: "Failed to reject listing" });

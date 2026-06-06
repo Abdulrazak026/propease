@@ -744,3 +744,25 @@ model PaymentEvent {
   @@index([reference])
   @@index([eventType])
 }
+
+model BlacklistedToken {
+  id        String   @id @default(cuid())
+  jti       String   @unique
+  userId    String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([jti])
+  @@index([expiresAt])
+}
+
+model MediaFile {
+  id         String   @id @default(cuid())
+  key        String
+  url        String
+  filename   String
+  mimeType   String
+  size       Int
+  uploadedBy String
+  createdAt  DateTime @default(now())
+}

@@ -2,6 +2,7 @@ import { Router, Response } from "express";
 import prisma from "../lib/prisma";
 import { authenticate } from "../middleware/auth";
 import { authorize } from "../middleware/rbac";
+import { invalidate } from "../lib/cache";
 
 const router = Router();
 
@@ -28,6 +29,7 @@ router.put("/", authenticate, authorize("head"), async (req, res: Response) => {
         create: { key, value },
       });
     }
+    invalidate("settings:public");
     res.json({ success: true });
   } catch (error) {
     res.status(500).json({ error: "Failed to save settings" });

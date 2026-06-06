@@ -5,23 +5,23 @@ import { authorize } from "../middleware/rbac";
 import { validate } from "../middleware/validate";
 import { updateUserSchema } from "../validators";
 import { logger } from "../lib/logger";
+import { cached, invalidate } from "../lib/cache";
 const router = Router();
 
 router.get("/dashboard", authenticate, authorize("head"), async (req: AuthRequest, res: Response) => {
   try {
-    const [totalUsers, totalListings, availableListings, totalTasks, openTasks, totalCommissions, totalCommissionsPaid] =
-      await Promise.all([
-        prisma.user.count(),
-        prisma.listing.count(),
-        prisma.listing.count({ where: { status: "available" } }),
-        prisma.task.count(),
-        prisma.task.count({ where: { status: "open" } }),
-        prisma.commission.aggregate({ _sum: { companyCut: true } }),
-        prisma.commission.aggregate({ _sum: { ambassadorCut: true, agentCut: true } }),
-      ]);
-
-    res.json({
-      stats: {
+    const stats = await cached("dashboard:stats", 30, async () => {
+      const [totalUsers, totalListings, availableListings, totalTasks, openTasks, totalCommissions, totalCommissionsPaid] =
+        await Promise.all([
+          prisma.user.count(),
+          prisma.listing.count(),
+          prisma.listing.count({ where: { status: "available" } }),
+          prisma.task.count(),
+          prisma.task.count({ where: { status: "open" } }),
+          prisma.commission.aggregate({ _sum: { companyCut: true } }),
+          prisma.commission.aggregate({ _sum: { ambassadorCut: true, agentCut: true } }),
+        ]);
+      return {
         totalUsers,
         totalListings,
         availableListings,
@@ -29,8 +29,10 @@ router.get("/dashboard", authenticate, authorize("head"), async (req: AuthReques
         openTasks,
         totalRevenue: totalCommissions._sum.companyCut || 0,
         totalCommissionsPaid: (totalCommissionsPaid._sum.ambassadorCut || 0) + (totalCommissionsPaid._sum.agentCut || 0),
-      },
+      };
     });
+
+    res.json({ stats });
   } catch (error) {
     logger.error({ err: error }, "Dashboard error:");
     res.status(500).json({ error: "Failed to fetch dashboard" });
