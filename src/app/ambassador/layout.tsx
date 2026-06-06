@@ -6,17 +6,21 @@ import { useEffect } from "react";
 import OnboardingModal from "@/components/onboarding/OnboardingModal";
 
 export default function AmbassadorLayout({ children }: { children: React.ReactNode }) {
-  const { role, isAuthenticated } = useRole();
+  const { role, isAuthenticated, loading } = useRole();
   const router = useRouter();
 
   useEffect(() => {
-    if (isAuthenticated && role !== "ambassador") {
+    if (!loading && !isAuthenticated) {
+      router.push("/login?redirect=/ambassador");
+    } else if (!loading && isAuthenticated && role !== "ambassador") {
       router.push(`/${role}`);
     }
-  }, [role, isAuthenticated, router]);
+  }, [loading, isAuthenticated, role, router]);
 
   if (!isAuthenticated) {
-    return <>{children}</>;
+    return (
+      <DashboardLayout>{children}</DashboardLayout>
+    );
   }
 
   return (

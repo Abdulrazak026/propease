@@ -40,7 +40,7 @@ function toUser(a: ApiUser): User {
 
 export function RoleProvider({ children }: { children: ReactNode }) {
   const [currentUser, setCurrentUserState] = useState<User | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     let cancelled = false;
@@ -53,6 +53,7 @@ export function RoleProvider({ children }: { children: ReactNode }) {
       } catch {
         // no backend or invalid session — stay logged out
       }
+      if (!cancelled) setLoading(false);
     })();
     return () => { cancelled = true; };
   }, []);

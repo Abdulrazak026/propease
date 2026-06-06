@@ -122,9 +122,6 @@ export default function BottomNav() {
   const { isAuthenticated, currentUser } = useRole();
   const [sheetOpen, setSheetOpen] = useState(false);
 
-  const isDashboard = pathname.startsWith("/admin") || pathname.startsWith("/agent") || pathname.startsWith("/ambassador");
-  if (isDashboard) return null;
-
   return (
     <>
       <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-200 pb-safe">
