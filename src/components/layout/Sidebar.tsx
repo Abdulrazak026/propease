@@ -229,11 +229,7 @@ export default function Sidebar() {
                   </div>
                 </div>
               ) : (
-                <Link href="/login" className="flex justify-center py-2" title="Sign In">
-                  <div className="w-9 h-9 rounded-lg flex items-center justify-center text-gray-400 hover:text-[var(--color-primary)] hover:bg-[var(--color-primary)]/5 transition-all">
-                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9" /></svg>
-                  </div>
-                </Link>
+                <div className="flex justify-center py-2" />
               )}
               <button
                 onClick={() => setCollapsed(false)}
@@ -258,12 +254,7 @@ export default function Sidebar() {
                   </div>
                 </div>
               ) : (
-                <div className="px-3 py-1.5">
-                  <Link href="/login" className="flex items-center gap-2 text-xs text-gray-500 hover:text-[var(--color-primary)] hover:bg-[var(--color-primary)]/5 rounded-lg px-2 py-1.5 w-full transition-all">
-                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9" /></svg>
-                    Sign In
-                  </Link>
-                </div>
+                <div />
               )}
               <button
                 onClick={() => { setCollapsed(true); }}

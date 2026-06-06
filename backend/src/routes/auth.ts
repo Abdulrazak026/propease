@@ -52,7 +52,7 @@ router.post("/register", validate(registerSchema), async (req, res: Response) =>
     await prisma.refreshToken.create({
       data: { token: refreshTokenValue, userId: user.id, expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) },
     });
-    res.cookie("refreshToken", refreshTokenValue, { httpOnly: true, secure: true, sameSite: "none", maxAge: 7 * 24 * 60 * 60 * 1000 });
+    res.cookie("refreshToken", refreshTokenValue, { httpOnly: true, secure: true, sameSite: "none", path: "/", maxAge: 7 * 24 * 60 * 60 * 1000 });
     res.status(201).json({ accessToken, user, message: "Registration successful" });
 
     const admins = await prisma.user.findMany({
@@ -111,6 +111,7 @@ router.post("/login", validate(loginSchema), async (req, res: Response) => {
       httpOnly: true,
       secure: true,
       sameSite: "none",
+      path: "/",
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
@@ -167,7 +168,7 @@ router.post("/logout", authenticate, async (req: AuthRequest, res: Response) => 
       await prisma.refreshToken.deleteMany({ where: { token } });
     }
 
-    res.clearCookie("refreshToken");
+    res.clearCookie("refreshToken", { path: "/", secure: true, sameSite: "none" });
     res.json({ message: "Logged out" });
   } catch (error) {
     console.error("Logout error:", error);
