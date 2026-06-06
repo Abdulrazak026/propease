@@ -79,12 +79,22 @@ router.patch("/:id/status", authenticate, async (req: AuthRequest, res: Response
       return res.status(400).json({ error: "Invalid status" });
     }
 
-    const inquiry = await prisma.inquiry.update({
+    const inquiry = await prisma.inquiry.findUnique({ where: { id: req.params.id as string } });
+    if (!inquiry) return res.status(404).json({ error: "Inquiry not found" });
+
+    // Ownership: only the assigned agent or a head can update the inquiry
+    const isHead = req.user!.role === "head";
+    const isOwner = inquiry.assignedAgentId === req.user!.id;
+    if (!isHead && !isOwner) {
+      return res.status(403).json({ error: "Not your inquiry" });
+    }
+
+    const updated = await prisma.inquiry.update({
       where: { id: req.params.id as string },
       data: { status },
     });
 
-    res.json({ inquiry });
+    res.json({ inquiry: updated });
   } catch (error) {
     console.error("Update inquiry error:", error);
     res.status(500).json({ error: "Failed to update inquiry" });

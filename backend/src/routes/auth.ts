@@ -25,7 +25,9 @@ function generateRefreshToken() {
 
 router.post("/register", validate(registerSchema), async (req, res: Response) => {
   try {
-    const { name, email, password, role, city } = req.body;
+    const { name, email, password, city } = req.body;
+    // Force role to "client" — staff roles assigned only by admin
+    const role = "client";
 
     const existing = await prisma.user.findUnique({ where: { email } });
     if (existing) {
@@ -39,7 +41,7 @@ router.post("/register", validate(registerSchema), async (req, res: Response) =>
         name,
         email,
         password: hashedPassword,
-        role: role || "client",
+        role,
         city,
         isApproved: true,
       },

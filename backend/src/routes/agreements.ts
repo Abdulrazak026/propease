@@ -114,15 +114,20 @@ router.get("/:id", authenticate, async (req: AuthRequest, res: Response) => {
 
 router.post("/:id/sign", authenticate, async (req: AuthRequest, res: Response) => {
   try {
-    const { role, signature } = req.body;
+    const { role } = req.body;
     const agId = req.params.id as string;
+    const signature = req.body.signature || "";
 
     const agreement = await prisma.rentAgreement.findUnique({ where: { id: agId } });
     if (!agreement) {
       return res.status(404).json({ error: "Agreement not found" });
     }
 
+    // Identity verification: signer must match the role they claim
     if (role === "landlord") {
+      if (agreement.agentId !== req.user!.id) {
+        return res.status(403).json({ error: "You are not authorized to sign as landlord for this agreement" });
+      }
       if (agreement.status !== "pending_landlord") {
         return res.status(400).json({ error: "Agreement is not pending landlord signature" });
       }
@@ -138,6 +143,9 @@ router.post("/:id/sign", authenticate, async (req: AuthRequest, res: Response) =
     }
 
     if (role === "tenant") {
+      if (agreement.tenantId && agreement.tenantId !== req.user!.id) {
+        return res.status(403).json({ error: "You are not the tenant on this agreement" });
+      }
       if (agreement.status !== "pending_tenant") {
         return res.status(400).json({ error: "Agreement is not pending tenant signature" });
       }
