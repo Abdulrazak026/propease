@@ -172,7 +172,7 @@ export default function Sidebar() {
                   <span className="text-white font-bold text-[10px]">P</span>
                 </div>
               )}
-              {!siteLogo && <span className="text-sm font-bold text-[var(--color-primary)]">{siteName}</span>}
+              {!siteLogo && <span className="text-sm font-bold text-[var(--color-primary)]">MBPP</span>}
             </Link>
           )}
         </div>
