@@ -62,12 +62,13 @@ router.delete("/:id", authenticate, authorize("head"), async (req: AuthRequest, 
       prisma.commission.deleteMany({ where: { OR: [{ ambassadorId: uid }, { agentId: uid }] } }),
       prisma.rentAgreement.deleteMany({ where: { OR: [{ tenantId: uid }, { agentId: uid }] } }),
       prisma.customOrder.deleteMany({ where: { task: { assignedToId: uid } } }),
-      prisma.listing.updateMany({ where: { postedById: uid }, data: { postedById: "" } }),
+      prisma.listing.updateMany({ where: { postedById: uid }, data: { postedById: req.user!.id as string } }),
       prisma.listing.updateMany({ where: { assignedAgentId: uid }, data: { assignedAgentId: null } }),
       prisma.conversationParticipant.deleteMany({ where: { userId: uid } }),
       prisma.refreshToken.deleteMany({ where: { userId: uid } }),
       prisma.passwordResetToken.deleteMany({ where: { userId: uid } }),
       prisma.userCity.deleteMany({ where: { userId: uid } }),
+      prisma.user.updateMany({ where: { ambassadorId: uid }, data: { ambassadorId: null } }),
     ]);
     await prisma.user.delete({ where: { id: uid } });
     res.json({ success: true });
