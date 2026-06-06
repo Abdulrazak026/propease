@@ -158,6 +158,7 @@ export default function BottomNav() {
               </Link>
             );
           })}
+          {!showDashboardNav && (
           <button
             onClick={() => setSheetOpen(true)}
             className="relative flex flex-col items-center justify-center gap-0.5 h-full px-3 text-gray-400 active:scale-95 transition-transform duration-150"
@@ -169,6 +170,7 @@ export default function BottomNav() {
             </svg>
             <span className="text-[10px] font-medium">More</span>
           </button>
+          )}
         </div>
       </nav>
 
