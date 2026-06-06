@@ -9,6 +9,12 @@ const nextConfig: NextConfig = {
   async headers() {
     return [
       {
+        source: "/((?!_next/static|_next/image|favicon).*)",
+        headers: [
+          { key: "Cache-Control", value: "no-cache" },
+        ],
+      },
+      {
         source: "/(.*)",
         headers: [
           {
