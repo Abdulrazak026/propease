@@ -36,7 +36,7 @@ const defaults: SettingsMap = {
   primary_color: "#0d6e4e", secondary_color: "#f97316", accent_color: "#facc15",
   heading_font: "Inter", body_font: "Inter",
   meta_title: "Mutual Benefit Premier Properties \u2014 Real Estate in Kano", meta_description: "Verified properties for rent and sale in Kano.",
-  site_logo: "", site_favicon: "",
+  site_logo: "", site_favicon: "", about_hero_image: "",
   team_members: defaultTeam,
   research_reports: defaultResearch,
   available_cities: "Kano Municipal, Kano State; Bichi, Kano State; Rano, Kano State; Wudil, Kano State; Gwarzo, Kano State; Dambatta, Kano State; Karaye, Kano State; Tudun Wada, Kano State; Doguwa, Kano State; Dawakin Tofa, Kano State; Dawakin Kudu, Kano State; Kura, Kano State; Madobi, Kano State; Gezawa, Kano State; Minjibir, Kano State; Fagge, Kano State; Dala, Kano State; Gwale, Kano State; Nasarawa, Kano State; Tarauni, Kano State; Ungogo, Kano State; Kumbotso, Kano State; Bebeji, Kano State; Bunkure, Kano State; Garko, Kano State; Garun Mallam, Kano State; Kibiya, Kano State; Kiru, Kano State; Rogo, Kano State; Sumaila, Kano State; Takai, Kano State; Ajingi, Kano State; Bagwai, Kano State; Gabasawa, Kano State; Kunchi, Kano State; Makoda, Kano State; Rimin Gado, Kano State; Shanono, Kano State; Tofa, Kano State; Tsanyawa, Kano State; Gaya, Kano State; Albasu, Kano State; Babura, Kano State",

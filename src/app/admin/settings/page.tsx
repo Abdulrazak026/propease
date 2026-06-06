@@ -40,7 +40,7 @@ function defaults(): SettingsMap {
     agent_dir_visible: "true", default_commission: "5",
     primary_color: "#0d6e4e", secondary_color: "#f97316", accent_color: "#facc15",
     heading_font: "Inter", body_font: "Inter",
-    hero_image: "", custom_css: "", custom_js: "",
+    hero_image: "", about_hero_image: "", custom_css: "", custom_js: "",
     recaptcha_site: "", recaptcha_secret: "",
     maintenance_mode: "false", timezone: "Africa/Lagos", date_format: "DD/MM/YYYY",
     team_members: JSON.stringify([
@@ -222,7 +222,8 @@ export default function AdminSettings() {
             <S label="Heading Font" v={s("heading_font")} onChange={(v) => set("heading_font", v)} opts={[["Inter","Inter"],["Poppins","Poppins"],["Merriweather","Merriweather"]]} />
             <S label="Body Font" v={s("body_font")} onChange={(v) => set("body_font", v)} opts={[["Inter","Inter"],["Roboto","Roboto"],["Lato","Lato"]]} />
           </div>
-          <F label="Hero Image URL" v={s("hero_image")} onChange={(v) => set("hero_image", v)} />
+          <F label="Homepage Hero Image URL" v={s("hero_image")} onChange={(v) => set("hero_image", v)} />
+          <F label="About Page Hero Image URL" v={s("about_hero_image")} onChange={(v) => set("about_hero_image", v)} />
           <MediaPicker label="Site Logo" current={s("site_logo")} onSelect={(url) => set("site_logo", url)} />
           <MediaPicker label="Favicon" current={s("site_favicon")} onSelect={(url) => set("site_favicon", url)} />
           <div className="grid grid-cols-2 gap-3">

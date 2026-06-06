@@ -28,7 +28,7 @@ export default function AboutPage() {
   return (
   <div className="flex-1">
   <section className="relative bg-[var(--color-primary)] py-24 px-4 overflow-hidden">
-  <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=1200&h=600&fit=crop')] bg-cover bg-center opacity-10" />
+  <div className="absolute inset-0 bg-cover bg-center opacity-10" style={{ backgroundImage: `url(${get("about_hero_image") || "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=1200&h=600&fit=crop"})` }} />
   <div className="relative max-w-3xl mx-auto text-center">
   <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 text-white/90 text-xs font-medium mb-6">
   About MBPP
