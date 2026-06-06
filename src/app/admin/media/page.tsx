@@ -98,21 +98,22 @@ export default function MediaPage() {
         ) : files.length === 0 ? (
           <div className="text-center py-12 text-gray-400 text-sm">No files uploaded yet</div>
         ) : (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
             {files.map(f => (
-              <div key={f.id} className="bg-white border border-gray-200 rounded-lg overflow-hidden group hover:shadow-md transition-shadow">
-                <div className="relative aspect-[4/3] bg-gray-50">
+              <div key={f.id} className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+                <div className="aspect-square bg-gray-50">
                   {f.mimeType.startsWith("image/") ? (
-                    <img src={resolveImageUrl(f.url)!} alt={f.filename} className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
+                    <img src={resolveImageUrl(f.url)!} alt={f.filename} className="w-full h-full object-cover"
+                      onError={(e) => { const t = e.target as HTMLImageElement; t.src = "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100'><rect fill='%23f1f5f9' width='100' height='100'/><text x='50' y='55' text-anchor='middle' fill='%2394a3b8' font-size='12'>Broken</text></svg>"; }} />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center text-4xl text-gray-300">\uD83D\uDCC4</div>
+                    <div className="w-full h-full flex items-center justify-center text-3xl text-gray-300">📄</div>
                   )}
                 </div>
-                <div className="p-3">
-                  <p className="text-xs text-gray-700 truncate mb-2" title={f.filename}>{f.filename}</p>
+                <div className="p-2">
+                  <p className="text-[10px] text-gray-600 truncate mb-1.5" title={f.filename}>{f.filename}</p>
                   <div className="flex items-center justify-between">
-                    <button onClick={() => navigator.clipboard.writeText(f.url)} className="text-xs text-[var(--color-primary)] hover:underline">Copy URL</button>
-                    <button onClick={() => handleDelete(f.id)} className="text-xs text-red-500 hover:underline">Delete</button>
+                    <button onClick={() => navigator.clipboard.writeText(f.url)} className="text-[10px] text-[var(--color-primary)] hover:underline">Copy</button>
+                    <button onClick={() => handleDelete(f.id)} className="text-[10px] text-red-500 hover:underline">Del</button>
                   </div>
                 </div>
               </div>
