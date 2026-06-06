@@ -6,7 +6,7 @@ import ClientBody from "@/components/layout/ClientBody";
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
 
-const API = process.env.NEXT_PUBLIC_API_URL || "https://propease-production.up.railway.app";
+const API = "https://propease-production.up.railway.app";
 
 async function getPublicSettings() {
   try {

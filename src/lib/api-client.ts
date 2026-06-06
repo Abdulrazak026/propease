@@ -1,4 +1,4 @@
-const BASE_URL = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000").replace(/\/+$/, "");
+const BASE_URL = "https://propease-production.up.railway.app";
 
 let accessToken: string | null = null;
 let refreshPromise: Promise<string | null> | null = null;

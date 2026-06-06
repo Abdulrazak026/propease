@@ -13,7 +13,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }));
 
   try {
-    const API = process.env.NEXT_PUBLIC_API_URL || "https://propease-production.up.railway.app";
+    const API = "https://propease-production.up.railway.app";
     const res = await fetch(`${API}/api/listings`);
     if (res.ok) {
       const data = await res.json();
