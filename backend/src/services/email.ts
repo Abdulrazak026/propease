@@ -1,17 +1,9 @@
 import { getResend, FROM_ADDRESS } from "../lib/resend";
 import { templates } from "./email-templates";
 
-function shouldSend(): boolean {
-  return !!process.env.RESEND_API_KEY;
-}
-
 async function send(to: string, subject: string, html: string) {
-  if (!shouldSend()) {
-    console.log(`[EMAIL SKIPPED] To: ${to}, Subject: ${subject}`);
-    return { data: null, error: null };
-  }
   try {
-    const resend = getResend();
+    const resend = await getResend();
     const { data, error } = await resend.emails.send({
       from: FROM_ADDRESS,
       to,
@@ -19,6 +11,7 @@ async function send(to: string, subject: string, html: string) {
       html,
     });
     if (error) console.error("[EMAIL ERROR]", error);
+    else console.log("[EMAIL SENT]", subject, "→", to, "id:", data?.id);
     return { data, error };
   } catch (err) {
     console.error("[EMAIL EXCEPTION]", err);
