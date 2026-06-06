@@ -59,5 +59,10 @@ const BACKEND_URL = "https://propease-production.up.railway.app";
 export function resolveImageUrl(url: string | undefined | null): string | null {
   if (!url) return null;
   if (url.startsWith("http://") || url.startsWith("https://")) return url;
+  // Convert old /uploads/ paths to API endpoint
+  if (url.startsWith("/uploads/")) {
+    const filename = url.replace("/uploads/", "");
+    return `${BACKEND_URL}/api/upload/file/${filename}`;
+  }
   return `${BACKEND_URL}${url.startsWith("/") ? "" : "/"}${url}`;
 }

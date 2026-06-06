@@ -45,6 +45,12 @@ export default function HomePage() {
       category: next.category || "",
       minPrice: next.minPrice?.toString() || "",
       maxPrice: next.maxPrice?.toString() || "",
+      minBeds: next.minBeds?.toString() || "",
+      maxBeds: next.maxBeds?.toString() || "",
+      minBaths: next.minBaths?.toString() || "",
+      maxBaths: next.maxBaths?.toString() || "",
+      minSqft: next.minSqft?.toString() || "",
+      maxSqft: next.maxSqft?.toString() || "",
       paymentOption: next.paymentOption || "",
     });
     setShowCount(INITIAL_SHOW);

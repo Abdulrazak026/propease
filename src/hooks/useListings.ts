@@ -6,12 +6,16 @@ import type { ApiListing } from "@/lib/api-types";
 interface ListingFilters {
   search: string; propertyType: string; listingType: string;
   rentTier: string; category: string; city: string;
-  minPrice: string; maxPrice: string; paymentOption: string;
+  minPrice: string; maxPrice: string; minBeds: string; maxBeds: string;
+  minBaths: string; maxBaths: string; minSqft: string; maxSqft: string;
+  paymentOption: string;
 }
 
 const defaultFilters: ListingFilters = {
   search: "", propertyType: "", listingType: "", rentTier: "",
-  category: "", city: "", minPrice: "", maxPrice: "", paymentOption: "",
+  category: "", city: "", minPrice: "", maxPrice: "",
+  minBeds: "", maxBeds: "", minBaths: "", maxBaths: "",
+  minSqft: "", maxSqft: "", paymentOption: "",
 };
 
 export function useListings() {
@@ -51,6 +55,12 @@ export function useListings() {
       if (filters.city && l.city !== filters.city) return false;
       if (filters.minPrice && l.price < parseInt(filters.minPrice)) return false;
       if (filters.maxPrice && l.price > parseInt(filters.maxPrice)) return false;
+      if (filters.minBeds && (l.bedrooms || 0) < parseInt(filters.minBeds)) return false;
+      if (filters.maxBeds && (l.bedrooms || 0) > parseInt(filters.maxBeds)) return false;
+      if (filters.minBaths && (l.bathrooms || 0) < parseInt(filters.minBaths)) return false;
+      if (filters.maxBaths && (l.bathrooms || 0) > parseInt(filters.maxBaths)) return false;
+      if (filters.minSqft && (l.sqft || 0) < parseInt(filters.minSqft)) return false;
+      if (filters.maxSqft && (l.sqft || 0) > parseInt(filters.maxSqft)) return false;
       return true;
     });
   }, [filters, listings]);
