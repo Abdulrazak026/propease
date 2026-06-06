@@ -1,7 +1,4 @@
-const CACHE = "mbpp-v2";
-const STATIC_CACHE = "mbpp-static-v2";
-
-const STATIC_EXTENSIONS = [".js", ".css", ".woff2", ".woff", ".png", ".jpg", ".svg", ".ico", ".webp"];
+const CACHE = "mbpp-v3";
 
 self.addEventListener("install", (e) => {
   e.waitUntil(self.skipWaiting());
@@ -9,26 +6,22 @@ self.addEventListener("install", (e) => {
 
 self.addEventListener("activate", (e) => {
   e.waitUntil(
-    caches.keys().then((keys) => Promise.all(keys.filter((k) => k !== CACHE && k !== STATIC_CACHE).map((k) => caches.delete(k))))
+    caches.keys().then((keys) => Promise.all(keys.filter((k) => k !== CACHE).map((k) => caches.delete(k))))
   );
   e.waitUntil(self.clients.claim());
 });
 
 self.addEventListener("fetch", (e) => {
   const url = new URL(e.request.url);
-  const isStatic = STATIC_EXTENSIONS.some((ext) => url.pathname.endsWith(ext));
-  const isSameOrigin = url.origin === self.location.origin;
-
-  if (isStatic && isSameOrigin) {
+  // Only cache same-origin JS and CSS — let everything else pass through
+  if (url.origin === self.location.origin && (url.pathname.endsWith(".js") || url.pathname.endsWith(".css"))) {
     e.respondWith(
       caches.match(e.request).then((cached) => cached || fetch(e.request).then((res) => {
         const clone = res.clone();
-        caches.open(STATIC_CACHE).then((c) => c.put(e.request, clone));
+        caches.open(CACHE).then((c) => c.put(e.request, clone));
         return res;
       }))
     );
-  } else {
-    // Never cache HTML — always fetch from network
-    e.respondWith(fetch(e.request).catch(() => caches.match("/offline")));
   }
+  // Images, fonts, API calls, cross-origin — pass through without SW
 });
