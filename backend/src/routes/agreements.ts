@@ -1,13 +1,13 @@
 import { Router, Response } from "express";
 import prisma from "../lib/prisma";
 import { authenticate, AuthRequest } from "../middleware/auth";
-import { authorize } from "../middleware/rbac";
+import { authorize, requirePermission } from "../middleware/rbac";
 import { calculateAndDistributeCommission } from "./commissions";
 import { logger } from "../lib/logger";
 
 const router = Router();
 
-router.post("/", authenticate, authorize("head", "ambassador", "agent"), async (req: AuthRequest, res: Response) => {
+router.post("/", authenticate, authorize("head", "ambassador", "agent"), requirePermission("canManageAgreements"), async (req: AuthRequest, res: Response) => {
   try {
     const {
       listingId, applicationId, tenantName, tenantEmail, tenantPhone,

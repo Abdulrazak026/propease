@@ -34,6 +34,11 @@ function toUser(a: ApiUser): User {
     walletBalance: a.walletBalance,
     canCloseDeals: a.canCloseDeals,
     canCreateTasks: a.canCreateTasks,
+    canCreateListings: a.canCreateListings,
+    canManageUsers: a.canManageUsers,
+    canManageContent: a.canManageContent,
+    canViewAnalytics: a.canViewAnalytics,
+    canManageAgreements: a.canManageAgreements,
     ambassadorId: a.ambassadorId ?? undefined,
   };
 }

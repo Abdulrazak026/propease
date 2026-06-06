@@ -1,34 +1,34 @@
 import { Router, Response } from "express";
 import prisma from "../lib/prisma";
 import { authenticate, AuthRequest } from "../middleware/auth";
-import { authorize } from "../middleware/rbac";
+import { authorize, requirePermission } from "../middleware/rbac";
 import { logger } from "../lib/logger";
 const router = Router();
 
-router.get("/", authenticate, authorize("head"), async (_req: AuthRequest, res: Response) => {
+router.get("/", authenticate, authorize("head"), requirePermission("canManageUsers"), async (_req: AuthRequest, res: Response) => {
   try {
     const users = await prisma.user.findMany({
-      select: { id: true, name: true, email: true, role: true, city: true, walletBalance: true, isApproved: true, isVerified: true, canCreateTasks: true, canCloseDeals: true, ambassadorId: true, whatsapp: true, createdAt: true },
+      select: { id: true, name: true, email: true, role: true, city: true, walletBalance: true, isApproved: true, isVerified: true, canCreateTasks: true, canCloseDeals: true, canCreateListings: true, canManageUsers: true, canManageContent: true, canViewAnalytics: true, canManageAgreements: true, ambassadorId: true, whatsapp: true, createdAt: true },
       orderBy: { createdAt: "desc" },
     });
     res.json({ users });
   } catch { res.status(500).json({ error: "Failed to fetch users" }); }
 });
 
-router.patch("/:id", authenticate, authorize("head"), async (req: AuthRequest, res: Response) => {
+router.patch("/:id", authenticate, authorize("head"), requirePermission("canManageUsers"), async (req: AuthRequest, res: Response) => {
   try {
-    const { isApproved, isVerified, canCreateTasks, canCloseDeals, role, ambassadorId } = req.body;
+    const { isApproved, isVerified, canCreateTasks, canCloseDeals, canCreateListings, canManageUsers, canManageContent, canViewAnalytics, canManageAgreements, role, ambassadorId } = req.body;
     const id = String(req.params.id);
     const user = await prisma.user.update({
       where: { id },
-      data: { isApproved, isVerified, canCreateTasks, canCloseDeals, role, ambassadorId },
-      select: { id: true, name: true, email: true, role: true, isApproved: true, canCreateTasks: true, canCloseDeals: true },
+      data: { isApproved, isVerified, canCreateTasks, canCloseDeals, canCreateListings, canManageUsers, canManageContent, canViewAnalytics, canManageAgreements, role, ambassadorId },
+      select: { id: true, name: true, email: true, role: true, isApproved: true, canCreateTasks: true, canCloseDeals: true, canCreateListings: true, canManageUsers: true, canManageContent: true, canViewAnalytics: true, canManageAgreements: true },
     });
     res.json({ user });
   } catch { res.status(500).json({ error: "Failed to update user" }); }
 });
 
-router.post("/", authenticate, authorize("head"), async (req: AuthRequest, res: Response) => {
+router.post("/", authenticate, authorize("head"), requirePermission("canManageUsers"), async (req: AuthRequest, res: Response) => {
   try {
     const bcrypt = (await import("bcryptjs")).default;
     const { name, email, password, role, city } = req.body;
@@ -41,7 +41,7 @@ router.post("/", authenticate, authorize("head"), async (req: AuthRequest, res: 
   } catch { res.status(500).json({ error: "Failed to create user" }); }
 });
 
-router.delete("/:id", authenticate, authorize("head"), async (req: AuthRequest, res: Response) => {
+router.delete("/:id", authenticate, authorize("head"), requirePermission("canManageUsers"), async (req: AuthRequest, res: Response) => {
   try {
     const uid = String(req.params.id);
     // Clean up ALL related records to avoid FK constraints

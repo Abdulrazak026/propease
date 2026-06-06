@@ -12,6 +12,11 @@ export interface ApiUser {
   walletBalance: number;
   canCreateTasks: boolean;
   canCloseDeals: boolean;
+  canCreateListings?: boolean;
+  canManageUsers?: boolean;
+  canManageContent?: boolean;
+  canViewAnalytics?: boolean;
+  canManageAgreements?: boolean;
   ambassadorId: string | null;
   isApproved: boolean;
   isVerified: boolean;

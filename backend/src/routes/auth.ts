@@ -11,9 +11,26 @@ import { emailService } from "../services/email";
 import { logger } from "../lib/logger";
 const router = Router();
 
-function generateAccessToken(user: { id: string; email: string; role: string; city?: string | null }) {
+interface UserWithPerms {
+  id: string; email: string; role: string; city?: string | null;
+  canCreateTasks?: boolean; canCloseDeals?: boolean;
+  canCreateListings?: boolean; canManageUsers?: boolean;
+  canManageContent?: boolean; canViewAnalytics?: boolean;
+  canManageAgreements?: boolean;
+}
+
+function generateAccessToken(user: UserWithPerms) {
   return jwt.sign(
-    { id: user.id, email: user.email, role: user.role, city: user.city, jti: uuidv4() },
+    {
+      id: user.id, email: user.email, role: user.role, city: user.city, jti: uuidv4(),
+      canCreateTasks: user.canCreateTasks,
+      canCloseDeals: user.canCloseDeals,
+      canCreateListings: user.canCreateListings,
+      canManageUsers: user.canManageUsers,
+      canManageContent: user.canManageContent,
+      canViewAnalytics: user.canViewAnalytics,
+      canManageAgreements: user.canManageAgreements,
+    },
     process.env.JWT_SECRET!,
     { expiresIn: "15m" }
   );
@@ -130,6 +147,11 @@ router.post("/login", validate(loginSchema), async (req, res: Response) => {
         walletBalance: user.walletBalance,
         canCreateTasks: user.canCreateTasks,
         canCloseDeals: user.canCloseDeals,
+        canCreateListings: user.canCreateListings,
+        canManageUsers: user.canManageUsers,
+        canManageContent: user.canManageContent,
+        canViewAnalytics: user.canViewAnalytics,
+        canManageAgreements: user.canManageAgreements,
         isVerified: user.isVerified,
         whatsapp: user.whatsapp,
       },
@@ -259,6 +281,11 @@ router.get("/me", authenticate, async (req: AuthRequest, res: Response) => {
         walletBalance: true,
         canCreateTasks: true,
         canCloseDeals: true,
+        canCreateListings: true,
+        canManageUsers: true,
+        canManageContent: true,
+        canViewAnalytics: true,
+        canManageAgreements: true,
         ambassadorId: true,
         isVerified: true,
         whatsapp: true,

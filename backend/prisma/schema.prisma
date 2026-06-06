@@ -115,6 +115,11 @@ model User {
   walletBalance  Int       @default(0)
   canCreateTasks Boolean   @default(false)
   canCloseDeals  Boolean   @default(false)
+  canCreateListings    Boolean @default(false)
+  canManageUsers       Boolean @default(false)
+  canManageContent     Boolean @default(false)
+  canViewAnalytics     Boolean @default(false)
+  canManageAgreements  Boolean @default(false)
   isApproved     Boolean   @default(false)
   isVerified     Boolean   @default(false)
   verifiedAt     DateTime?

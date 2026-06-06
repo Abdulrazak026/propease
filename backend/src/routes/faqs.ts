@@ -1,7 +1,7 @@
 import { Router, Response } from "express";
 import prisma from "../lib/prisma";
 import { authenticate, AuthRequest } from "../middleware/auth";
-import { authorize } from "../middleware/rbac";
+import { authorize, requirePermission } from "../middleware/rbac";
 
 const router = Router();
 
@@ -14,7 +14,7 @@ router.get("/", async (_req, res: Response) => {
 });
 
 // Admin: create FAQ
-router.post("/", authenticate, authorize("head"), async (req: AuthRequest, res: Response) => {
+router.post("/", authenticate, authorize("head"), requirePermission("canManageContent"), async (req: AuthRequest, res: Response) => {
   try {
     const { question, answer, order } = req.body;
     const faq = await prisma.faq.create({ data: { question, answer, order: order || 0 } });
@@ -23,7 +23,7 @@ router.post("/", authenticate, authorize("head"), async (req: AuthRequest, res: 
 });
 
 // Admin: update FAQ
-router.patch("/:id", authenticate, authorize("head"), async (req: AuthRequest, res: Response) => {
+router.patch("/:id", authenticate, authorize("head"), requirePermission("canManageContent"), async (req: AuthRequest, res: Response) => {
   try {
     const { question, answer, order } = req.body;
     const faq = await prisma.faq.update({
@@ -35,7 +35,7 @@ router.patch("/:id", authenticate, authorize("head"), async (req: AuthRequest, r
 });
 
 // Admin: delete FAQ
-router.delete("/:id", authenticate, authorize("head"), async (req: AuthRequest, res: Response) => {
+router.delete("/:id", authenticate, authorize("head"), requirePermission("canManageContent"), async (req: AuthRequest, res: Response) => {
   try {
     await prisma.faq.delete({ where: { id: req.params.id as string } });
     res.json({ success: true });

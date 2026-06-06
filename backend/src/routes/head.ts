@@ -1,14 +1,14 @@
 import { Router, Response } from "express";
 import prisma from "../lib/prisma";
 import { authenticate, AuthRequest } from "../middleware/auth";
-import { authorize } from "../middleware/rbac";
+import { authorize, requirePermission } from "../middleware/rbac";
 import { validate } from "../middleware/validate";
 import { updateUserSchema } from "../validators";
 import { logger } from "../lib/logger";
 import { cached, invalidate } from "../lib/cache";
 const router = Router();
 
-router.get("/dashboard", authenticate, authorize("head"), async (req: AuthRequest, res: Response) => {
+router.get("/dashboard", authenticate, authorize("head"), requirePermission("canViewAnalytics"), async (req: AuthRequest, res: Response) => {
   try {
     const stats = await cached("dashboard:stats", 30, async () => {
       const [totalUsers, totalListings, availableListings, totalTasks, openTasks, totalCommissions, totalCommissionsPaid] =

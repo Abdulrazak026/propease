@@ -41,6 +41,16 @@ async function main() {
     });
   }
 
+  // Always ensure admin has all permissions
+  await prisma.user.updateMany({
+    where: { email: "admin@mbpproperties.com" },
+    data: {
+      canCreateTasks: true, canCloseDeals: true,
+      canCreateListings: true, canManageUsers: true,
+      canManageContent: true, canViewAnalytics: true, canManageAgreements: true,
+    },
+  });
+
   // Skip user seeding if admin already exists
   const existing = await prisma.user.findFirst({ where: { email: "admin@mbpproperties.com" } });
   if (existing) {
@@ -76,6 +86,13 @@ async function main() {
       password,
       role: "head",
       isApproved: true,
+      canCreateTasks: true,
+      canCloseDeals: true,
+      canCreateListings: true,
+      canManageUsers: true,
+      canManageContent: true,
+      canViewAnalytics: true,
+      canManageAgreements: true,
     },
   });
 

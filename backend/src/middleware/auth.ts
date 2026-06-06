@@ -9,6 +9,13 @@ export interface AuthRequest extends Request {
     role: string;
     city?: string | null;
     jti?: string;
+    canCreateTasks?: boolean;
+    canCloseDeals?: boolean;
+    canCreateListings?: boolean;
+    canManageUsers?: boolean;
+    canManageContent?: boolean;
+    canViewAnalytics?: boolean;
+    canManageAgreements?: boolean;
   };
 }
 
@@ -34,6 +41,13 @@ export async function authenticate(req: AuthRequest, res: Response, next: NextFu
       role: string;
       city?: string;
       jti?: string;
+      canCreateTasks?: boolean;
+      canCloseDeals?: boolean;
+      canCreateListings?: boolean;
+      canManageUsers?: boolean;
+      canManageContent?: boolean;
+      canViewAnalytics?: boolean;
+      canManageAgreements?: boolean;
     };
     req.user = decoded;
 

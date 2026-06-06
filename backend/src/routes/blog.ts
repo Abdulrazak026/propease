@@ -1,7 +1,7 @@
 import { Router, Response } from "express";
 import prisma from "../lib/prisma";
 import { authenticate, AuthRequest } from "../middleware/auth";
-import { authorize } from "../middleware/rbac";
+import { authorize, requirePermission } from "../middleware/rbac";
 
 const router = Router();
 
@@ -30,7 +30,7 @@ router.get("/:slug", async (req, res: Response) => {
 });
 
 // Admin: list all posts
-router.get("/all", authenticate, authorize("head"), async (_req: AuthRequest, res: Response) => {
+router.get("/all", authenticate, authorize("head"), requirePermission("canManageContent"), async (_req: AuthRequest, res: Response) => {
   try {
     const posts = await prisma.blogPost.findMany({
       orderBy: { createdAt: "desc" },
@@ -41,7 +41,7 @@ router.get("/all", authenticate, authorize("head"), async (_req: AuthRequest, re
 });
 
 // Admin: create post
-router.post("/", authenticate, authorize("head"), async (req: AuthRequest, res: Response) => {
+router.post("/", authenticate, authorize("head"), requirePermission("canManageContent"), async (req: AuthRequest, res: Response) => {
   try {
     const { title, content, excerpt, coverImage, published } = req.body;
     const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
@@ -58,7 +58,7 @@ router.post("/", authenticate, authorize("head"), async (req: AuthRequest, res: 
 });
 
 // Admin: update post
-router.patch("/:id", authenticate, authorize("head"), async (req: AuthRequest, res: Response) => {
+router.patch("/:id", authenticate, authorize("head"), requirePermission("canManageContent"), async (req: AuthRequest, res: Response) => {
   try {
     const { title, content, excerpt, coverImage, published } = req.body;
     const data: any = { content, excerpt, coverImage };
@@ -79,7 +79,7 @@ router.patch("/:id", authenticate, authorize("head"), async (req: AuthRequest, r
 });
 
 // Admin: delete post
-router.delete("/:id", authenticate, authorize("head"), async (req: AuthRequest, res: Response) => {
+router.delete("/:id", authenticate, authorize("head"), requirePermission("canManageContent"), async (req: AuthRequest, res: Response) => {
   try {
     await prisma.blogPost.delete({ where: { id: req.params.id as string } });
     res.json({ success: true });

@@ -11,6 +11,11 @@ export interface User {
   ambassadorId?: string;
   canCloseDeals?: boolean;
   canCreateTasks?: boolean;
+  canCreateListings?: boolean;
+  canManageUsers?: boolean;
+  canManageContent?: boolean;
+  canViewAnalytics?: boolean;
+  canManageAgreements?: boolean;
   isVerified?: boolean;
   isApproved?: boolean;
   whatsapp?: string;

@@ -5,7 +5,7 @@ import path from "path";
 import fs from "fs";
 import prisma from "../lib/prisma";
 import { authenticate, AuthRequest } from "../middleware/auth";
-import { authorize } from "../middleware/rbac";
+import { authorize, requirePermission } from "../middleware/rbac";
 import { logger } from "../lib/logger";
 
 const router = Router();
@@ -68,7 +68,7 @@ async function uploadToR2(filePath: string, fileName: string, mimeType: string):
   }
 }
 
-router.post("/", authenticate, authorize("head"), upload.single("file"), async (req: AuthRequest, res: Response) => {
+router.post("/", authenticate, authorize("head"), requirePermission("canManageContent"), upload.single("file"), async (req: AuthRequest, res: Response) => {
   try {
     if (!req.file) return res.status(400).json({ error: "No file provided" });
 
@@ -95,7 +95,7 @@ router.post("/", authenticate, authorize("head"), upload.single("file"), async (
   }
 });
 
-router.get("/", authenticate, authorize("head"), async (_req: AuthRequest, res: Response) => {
+router.get("/", authenticate, authorize("head"), requirePermission("canManageContent"), async (_req: AuthRequest, res: Response) => {
   try {
     const files = await prisma.mediaFile.findMany({
       orderBy: { createdAt: "desc" },
@@ -107,7 +107,7 @@ router.get("/", authenticate, authorize("head"), async (_req: AuthRequest, res: 
   }
 });
 
-router.delete("/:id", authenticate, authorize("head"), async (req: AuthRequest, res: Response) => {
+router.delete("/:id", authenticate, authorize("head"), requirePermission("canManageContent"), async (req: AuthRequest, res: Response) => {
   try {
     const file = await prisma.mediaFile.findUnique({ where: { id: req.params.id as string } });
     if (!file) return res.status(404).json({ error: "File not found" });
