@@ -2,7 +2,7 @@ import { Router, Response } from "express";
 import prisma from "../lib/prisma";
 import { authenticate, AuthRequest } from "../middleware/auth";
 import { authorize } from "../middleware/rbac";
-
+import { logger } from "../lib/logger";
 const router = Router();
 
 router.get("/", authenticate, authorize("head"), async (_req: AuthRequest, res: Response) => {
@@ -73,9 +73,11 @@ router.delete("/:id", authenticate, authorize("head"), async (req: AuthRequest, 
     await prisma.user.delete({ where: { id: uid } });
     res.json({ success: true });
   } catch (err) { 
-    console.error("Delete user error:", err);
+    logger.error({ err: err }, "Delete user error:");
     res.status(500).json({ error: "Failed to delete user" }); 
   }
 });
 
 export default router;
+
+

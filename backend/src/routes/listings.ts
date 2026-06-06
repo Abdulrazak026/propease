@@ -4,7 +4,7 @@ import { authenticate, AuthRequest } from "../middleware/auth";
 import { authorize } from "../middleware/rbac";
 import { validate } from "../middleware/validate";
 import { createListingSchema } from "../validators";
-
+import { logger } from "../lib/logger";
 const router = Router();
 
 router.get("/", async (req, res: Response) => {
@@ -50,7 +50,7 @@ router.get("/", async (req, res: Response) => {
 
     res.json({ listings, total, limit: take, offset: skip });
   } catch (error) {
-    console.error("List listings error:", error);
+    logger.error({ err: error }, "List listings error:");
     res.status(500).json({ error: "Failed to fetch listings" });
   }
 });
@@ -73,7 +73,7 @@ router.get("/:id", async (req, res: Response) => {
 
     res.json({ listing });
   } catch (error) {
-    console.error("Get listing error:", error);
+    logger.error({ err: error }, "Get listing error:");
     res.status(500).json({ error: "Failed to fetch listing" });
   }
 });
@@ -118,7 +118,7 @@ router.post("/", authenticate, authorize("head", "ambassador"), validate(createL
 
     res.status(201).json({ listing });
   } catch (error) {
-    console.error("Create listing error:", error);
+    logger.error({ err: error }, "Create listing error:");
     res.status(500).json({ error: "Failed to create listing" });
   }
 });
@@ -143,7 +143,7 @@ router.put("/:id", authenticate, authorize("head", "ambassador"), async (req: Au
 
     res.json({ listing: updated });
   } catch (error) {
-    console.error("Update listing error:", error);
+    logger.error({ err: error }, "Update listing error:");
     res.status(500).json({ error: "Failed to update listing" });
   }
 });
@@ -187,9 +187,11 @@ router.delete("/:id", authenticate, authorize("head"), async (req: AuthRequest, 
     await prisma.listing.delete({ where: { id: req.params.id as string } });
     res.json({ message: "Listing deleted" });
   } catch (error) {
-    console.error("Delete listing error:", error);
+    logger.error({ err: error }, "Delete listing error:");
     res.status(500).json({ error: "Failed to delete listing" });
   }
 });
 
 export default router;
+
+

@@ -8,7 +8,7 @@ import { validate } from "../middleware/validate";
 import { registerSchema, loginSchema } from "../validators";
 import { v4 as uuidv4 } from "uuid";
 import { emailService } from "../services/email";
-
+import { logger } from "../lib/logger";
 const router = Router();
 
 function generateAccessToken(user: { id: string; email: string; role: string; city?: string | null }) {
@@ -75,7 +75,7 @@ router.post("/register", validate(registerSchema), async (req, res: Response) =>
     Promise.all(adminNotifications).catch(() => {});
     emailService.welcome(email, name).catch(() => {});
   } catch (error) {
-    console.error("Register error:", error);
+    logger.error({ err: error }, "Register error:");
     res.status(500).json({ error: "Registration failed" });
   }
 });
@@ -133,7 +133,7 @@ router.post("/login", validate(loginSchema), async (req, res: Response) => {
       },
     });
   } catch (error) {
-    console.error("Login error:", error);
+    logger.error({ err: error }, "Login error:");
     res.status(500).json({ error: "Login failed" });
   }
 });
@@ -158,7 +158,7 @@ router.post("/refresh", async (req, res: Response) => {
 
     res.json({ accessToken });
   } catch (error) {
-    console.error("Refresh error:", error);
+    logger.error({ err: error }, "Refresh error:");
     res.status(500).json({ error: "Token refresh failed" });
   }
 });
@@ -173,7 +173,7 @@ router.post("/logout", authenticate, async (req: AuthRequest, res: Response) => 
     res.clearCookie("refreshToken", { path: "/", secure: true, sameSite: "none" });
     res.json({ message: "Logged out" });
   } catch (error) {
-    console.error("Logout error:", error);
+    logger.error({ err: error }, "Logout error:");
     res.status(500).json({ error: "Logout failed" });
   }
 });
@@ -203,7 +203,7 @@ router.get("/me", authenticate, async (req: AuthRequest, res: Response) => {
 
     res.json({ user });
   } catch (error) {
-    console.error("Me error:", error);
+    logger.error({ err: error }, "Me error:");
     res.status(500).json({ error: "Failed to fetch user" });
   }
 });
@@ -229,7 +229,7 @@ router.post("/forgot-password", async (req, res: Response) => {
 
     res.json({ message: "If that email exists, a reset link has been sent" });
   } catch (error) {
-    console.error("Forgot password error:", error);
+    logger.error({ err: error }, "Forgot password error:");
     res.status(500).json({ error: "Failed to process request" });
   }
 });
@@ -255,9 +255,11 @@ router.post("/reset-password", async (req, res: Response) => {
 
     res.json({ message: "Password has been reset. You can now sign in." });
   } catch (error) {
-    console.error("Reset password error:", error);
+    logger.error({ err: error }, "Reset password error:");
     res.status(500).json({ error: "Failed to reset password" });
   }
 });
 
 export default router;
+
+

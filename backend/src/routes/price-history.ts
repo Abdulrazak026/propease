@@ -1,6 +1,6 @@
 import { Router, Response } from "express";
 import prisma from "../lib/prisma";
-
+import { logger } from "../lib/logger";
 const router = Router();
 
 router.get("/listing/:listingId", async (req, res: Response) => {
@@ -20,9 +20,11 @@ router.get("/listing/:listingId", async (req, res: Response) => {
 
     res.json({ changes, currentPrice: listing?.price || listing?.salePrice || listing?.annualRent || 0 });
   } catch (error) {
-    console.error("Price history error:", error);
+    logger.error({ err: error }, "Price history error:");
     res.status(500).json({ error: "Failed to fetch price history" });
   }
 });
 
 export default router;
+
+

@@ -2,7 +2,7 @@ import { Router, Response } from "express";
 import prisma from "../lib/prisma";
 import { authenticate, AuthRequest } from "../middleware/auth";
 import { authorize } from "../middleware/rbac";
-
+import { logger } from "../lib/logger";
 const router = Router();
 
 router.get("/dashboard", authenticate, authorize("ambassador"), async (req: AuthRequest, res: Response) => {
@@ -31,7 +31,7 @@ router.get("/dashboard", authenticate, authorize("ambassador"), async (req: Auth
       cities: cityNames,
     });
   } catch (error) {
-    console.error("Ambassador dashboard error:", error);
+    logger.error({ err: error }, "Ambassador dashboard error:");
     res.status(500).json({ error: "Failed to fetch dashboard" });
   }
 });
@@ -50,7 +50,7 @@ router.get("/agents", authenticate, authorize("ambassador"), async (req: AuthReq
 
     res.json({ agents });
   } catch (error) {
-    console.error("List agents error:", error);
+    logger.error({ err: error }, "List agents error:");
     res.status(500).json({ error: "Failed to fetch agents" });
   }
 });
@@ -74,9 +74,11 @@ router.get("/city-listings", authenticate, authorize("ambassador"), async (req: 
 
     res.json({ listings });
   } catch (error) {
-    console.error("City listings error:", error);
+    logger.error({ err: error }, "City listings error:");
     res.status(500).json({ error: "Failed to fetch listings" });
   }
 });
 
 export default router;
+
+

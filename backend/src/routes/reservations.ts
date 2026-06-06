@@ -1,7 +1,7 @@
 import { Router, Response } from "express";
 import prisma from "../lib/prisma";
 import { authenticate, AuthRequest } from "../middleware/auth";
-
+import { logger } from "../lib/logger";
 const router = Router();
 
 router.post("/:listingId", authenticate, async (req: AuthRequest, res: Response) => {
@@ -34,7 +34,7 @@ router.post("/:listingId", authenticate, async (req: AuthRequest, res: Response)
 
     res.status(201).json({ reservation });
   } catch (error) {
-    console.error("Create reservation error:", error);
+    logger.error({ err: error }, "Create reservation error:");
     res.status(500).json({ error: "Failed to create reservation" });
   }
 });
@@ -49,9 +49,11 @@ router.get("/my", authenticate, async (req: AuthRequest, res: Response) => {
 
     res.json({ reservations });
   } catch (error) {
-    console.error("List reservations error:", error);
+    logger.error({ err: error }, "List reservations error:");
     res.status(500).json({ error: "Failed to fetch reservations" });
   }
 });
 
 export default router;
+
+

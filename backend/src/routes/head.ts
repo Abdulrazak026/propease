@@ -4,7 +4,7 @@ import { authenticate, AuthRequest } from "../middleware/auth";
 import { authorize } from "../middleware/rbac";
 import { validate } from "../middleware/validate";
 import { updateUserSchema } from "../validators";
-
+import { logger } from "../lib/logger";
 const router = Router();
 
 router.get("/dashboard", authenticate, authorize("head"), async (req: AuthRequest, res: Response) => {
@@ -32,7 +32,7 @@ router.get("/dashboard", authenticate, authorize("head"), async (req: AuthReques
       },
     });
   } catch (error) {
-    console.error("Dashboard error:", error);
+    logger.error({ err: error }, "Dashboard error:");
     res.status(500).json({ error: "Failed to fetch dashboard" });
   }
 });
@@ -52,7 +52,7 @@ router.get("/users", authenticate, authorize("head"), async (req: AuthRequest, r
 
     res.json({ users });
   } catch (error) {
-    console.error("List users error:", error);
+    logger.error({ err: error }, "List users error:");
     res.status(500).json({ error: "Failed to fetch users" });
   }
 });
@@ -82,7 +82,7 @@ router.put("/users/:id", authenticate, authorize("head"), validate(updateUserSch
 
     res.json({ user });
   } catch (error) {
-    console.error("Update user error:", error);
+    logger.error({ err: error }, "Update user error:");
     res.status(500).json({ error: "Failed to update user" });
   }
 });
@@ -92,7 +92,7 @@ router.delete("/users/:id", authenticate, authorize("head"), async (req: AuthReq
     await prisma.user.delete({ where: { id: req.params.id as string } });
     res.json({ message: "User deleted" });
   } catch (error) {
-    console.error("Delete user error:", error);
+    logger.error({ err: error }, "Delete user error:");
     res.status(500).json({ error: "Failed to delete user" });
   }
 });
@@ -107,7 +107,7 @@ router.get("/audit-logs", authenticate, authorize("head"), async (req: AuthReque
 
     res.json({ logs });
   } catch (error) {
-    console.error("Audit logs error:", error);
+    logger.error({ err: error }, "Audit logs error:");
     res.status(500).json({ error: "Failed to fetch audit logs" });
   }
 });
@@ -125,9 +125,11 @@ router.get("/all-listings", authenticate, authorize("head"), async (req: AuthReq
 
     res.json({ listings });
   } catch (error) {
-    console.error("All listings error:", error);
+    logger.error({ err: error }, "All listings error:");
     res.status(500).json({ error: "Failed to fetch listings" });
   }
 });
 
 export default router;
+
+

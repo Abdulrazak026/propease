@@ -4,7 +4,7 @@ import { authenticate, AuthRequest } from "../middleware/auth";
 import { authorize } from "../middleware/rbac";
 import { validate } from "../middleware/validate";
 import { setCommissionRateSchema } from "../validators";
-
+import { logger } from "../lib/logger";
 const router = Router();
 
 router.get("/rates", authenticate, authorize("head"), async (req: AuthRequest, res: Response) => {
@@ -12,7 +12,7 @@ router.get("/rates", authenticate, authorize("head"), async (req: AuthRequest, r
     const rates = await prisma.commissionRate.findMany({ orderBy: { dealType: "asc" } });
     res.json({ rates });
   } catch (error) {
-    console.error("Get rates error:", error);
+    logger.error({ err: error }, "Get rates error:");
     res.status(500).json({ error: "Failed to fetch commission rates" });
   }
 });
@@ -47,7 +47,7 @@ router.put("/rates/:dealType", authenticate, authorize("head"), validate(setComm
 
     res.json({ rate });
   } catch (error) {
-    console.error("Set rate error:", error);
+    logger.error({ err: error }, "Set rate error:");
     res.status(500).json({ error: "Failed to set commission rate" });
   }
 });
@@ -64,7 +64,7 @@ router.get("/", authenticate, authorize("head"), async (req: AuthRequest, res: R
 
     res.json({ commissions });
   } catch (error) {
-    console.error("List commissions error:", error);
+    logger.error({ err: error }, "List commissions error:");
     res.status(500).json({ error: "Failed to fetch commissions" });
   }
 });
@@ -92,7 +92,7 @@ router.get("/my", authenticate, authorize("ambassador", "agent"), async (req: Au
 
     res.json({ commissions, totalEarned });
   } catch (error) {
-    console.error("My commissions error:", error);
+    logger.error({ err: error }, "My commissions error:");
     res.status(500).json({ error: "Failed to fetch commissions" });
   }
 });
@@ -108,7 +108,7 @@ export async function calculateAndDistributeCommission(
 ) {
   const rate = await prisma.commissionRate.findUnique({ where: { dealType } });
   if (!rate) {
-    console.error(`No commission rate found for deal type: ${dealType}`);
+    logger.error(`No commission rate found for deal type: ${dealType}`);
     return;
   }
 
@@ -166,3 +166,5 @@ export async function calculateAndDistributeCommission(
 }
 
 export default router;
+
+

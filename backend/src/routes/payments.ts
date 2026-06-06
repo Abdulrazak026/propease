@@ -1,5 +1,5 @@
 import { Router, Response } from "express";
-
+import { logger } from "../lib/logger";
 const router = Router();
 
 const PAYSTACK_SECRET_KEY = process.env.PAYSTACK_SECRET_KEY || "";
@@ -26,7 +26,7 @@ router.post("/initialize", async (req, res: Response) => {
     if (!data.status) return res.status(400).json({ error: data.message });
     res.json(data.data);
   } catch (error) {
-    console.error("Paystack init error:", error);
+    logger.error({ err: error }, "Paystack init error:");
     res.status(500).json({ error: "Payment initialization failed" });
   }
 });
@@ -45,3 +45,5 @@ router.get("/verify/:reference", async (req, res: Response) => {
 });
 
 export default router;
+
+

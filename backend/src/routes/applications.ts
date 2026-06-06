@@ -2,7 +2,7 @@ import { Router, Response } from "express";
 import prisma from "../lib/prisma";
 import { authenticate, AuthRequest } from "../middleware/auth";
 import { authorize } from "../middleware/rbac";
-
+import { logger } from "../lib/logger";
 const router = Router();
 
 router.post("/", async (req, res: Response) => {
@@ -49,7 +49,7 @@ router.post("/", async (req, res: Response) => {
 
     res.status(201).json({ application });
   } catch (error) {
-    console.error("Create application error:", error);
+    logger.error({ err: error }, "Create application error:");
     res.status(500).json({ error: "Failed to submit application" });
   }
 });
@@ -77,7 +77,7 @@ router.get("/", authenticate, authorize("head", "ambassador", "agent"), async (r
 
     res.json({ applications });
   } catch (error) {
-    console.error("List applications error:", error);
+    logger.error({ err: error }, "List applications error:");
     res.status(500).json({ error: "Failed to fetch applications" });
   }
 });
@@ -103,7 +103,7 @@ router.get("/:id", authenticate, authorize("head", "ambassador", "agent"), async
 
     res.json({ application });
   } catch (error) {
-    console.error("Get application error:", error);
+    logger.error({ err: error }, "Get application error:");
     res.status(500).json({ error: "Failed to fetch application" });
   }
 });
@@ -142,9 +142,11 @@ router.patch("/:id/status", authenticate, authorize("head", "ambassador", "agent
 
     res.json({ application: updated });
   } catch (error) {
-    console.error("Update application error:", error);
+    logger.error({ err: error }, "Update application error:");
     res.status(500).json({ error: "Failed to update application" });
   }
 });
 
 export default router;
+
+

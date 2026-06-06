@@ -3,7 +3,7 @@ import prisma from "../lib/prisma";
 import { authenticate, AuthRequest } from "../middleware/auth";
 import { validate } from "../middleware/validate";
 import { createCustomOrderSchema } from "../validators";
-
+import { logger } from "../lib/logger";
 const router = Router();
 
 router.post("/", validate(createCustomOrderSchema), async (req, res: Response) => {
@@ -43,7 +43,7 @@ router.post("/", validate(createCustomOrderSchema), async (req, res: Response) =
       res.status(201).json({ customOrder, message: "Submitted. An ambassador will be assigned." });
     }
   } catch (error) {
-    console.error("Create custom order error:", error);
+    logger.error({ err: error }, "Create custom order error:");
     res.status(500).json({ error: "Failed to submit custom order" });
   }
 });
@@ -63,9 +63,11 @@ router.get("/", authenticate, async (req: AuthRequest, res: Response) => {
 
     res.json({ orders });
   } catch (error) {
-    console.error("List custom orders error:", error);
+    logger.error({ err: error }, "List custom orders error:");
     res.status(500).json({ error: "Failed to fetch custom orders" });
   }
 });
 
 export default router;
+
+

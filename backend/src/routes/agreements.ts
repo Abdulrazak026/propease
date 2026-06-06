@@ -52,7 +52,7 @@ router.post("/", authenticate, authorize("head", "ambassador", "agent"), async (
 
     res.status(201).json({ agreement });
   } catch (error) {
-    console.error("Create agreement error:", error);
+    logger.error({ err: error }, "Create agreement error:");
     res.status(500).json({ error: "Failed to create agreement" });
   }
 });
@@ -85,7 +85,7 @@ router.get("/", authenticate, async (req: AuthRequest, res: Response) => {
 
     res.json({ agreements });
   } catch (error) {
-    console.error("List agreements error:", error);
+    logger.error({ err: error }, "List agreements error:");
     res.status(500).json({ error: "Failed to fetch agreements" });
   }
 });
@@ -108,7 +108,7 @@ router.get("/:id", authenticate, async (req: AuthRequest, res: Response) => {
 
     res.json({ agreement });
   } catch (error) {
-    console.error("Get agreement error:", error);
+    logger.error({ err: error }, "Get agreement error:");
     res.status(500).json({ error: "Failed to fetch agreement" });
   }
 });
@@ -229,7 +229,7 @@ router.post("/:id/sign", authenticate, async (req: AuthRequest, res: Response) =
 
     res.status(400).json({ error: "Invalid role. Must be 'landlord' or 'tenant'" });
   } catch (error) {
-    console.error("Sign agreement error:", error);
+    logger.error({ err: error }, "Sign agreement error:");
     res.status(500).json({ error: "Failed to sign agreement" });
   }
 });
@@ -246,9 +246,11 @@ router.patch("/:id/status", authenticate, authorize("head", "ambassador", "agent
 
     res.json({ agreement: updated });
   } catch (error) {
-    console.error("Update agreement status error:", error);
+    logger.error({ err: error }, "Update agreement status error:");
     res.status(500).json({ error: "Failed to update agreement" });
   }
 });
 
 export default router;
+
+

@@ -2,7 +2,7 @@ import { Router, Response } from "express";
 import prisma from "../lib/prisma";
 import { authenticate, AuthRequest } from "../middleware/auth";
 import { authorize } from "../middleware/rbac";
-
+import { logger } from "../lib/logger";
 const router = Router();
 
 router.get("/dashboard", authenticate, authorize("agent"), async (req: AuthRequest, res: Response) => {
@@ -27,9 +27,11 @@ router.get("/dashboard", authenticate, authorize("agent"), async (req: AuthReque
       walletBalance: user?.walletBalance || 0,
     });
   } catch (error) {
-    console.error("Agent dashboard error:", error);
+    logger.error({ err: error }, "Agent dashboard error:");
     res.status(500).json({ error: "Failed to fetch dashboard" });
   }
 });
 
 export default router;
+
+

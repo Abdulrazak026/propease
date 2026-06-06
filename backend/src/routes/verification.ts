@@ -2,7 +2,7 @@ import { Router, Response } from "express";
 import prisma from "../lib/prisma";
 import { authenticate, AuthRequest } from "../middleware/auth";
 import { authorize } from "../middleware/rbac";
-
+import { logger } from "../lib/logger";
 const router = Router();
 
 router.patch("/users/:id/verify", authenticate, authorize("head"), async (req: AuthRequest, res: Response) => {
@@ -42,7 +42,7 @@ router.patch("/users/:id/verify", authenticate, authorize("head"), async (req: A
 
     res.json({ user: updated });
   } catch (error) {
-    console.error("Verify user error:", error);
+    logger.error({ err: error }, "Verify user error:");
     res.status(500).json({ error: "Failed to verify user" });
   }
 });
@@ -68,7 +68,7 @@ router.patch("/users/:id/unverify", authenticate, authorize("head"), async (req:
 
     res.json({ user: updated });
   } catch (error) {
-    console.error("Unverify user error:", error);
+    logger.error({ err: error }, "Unverify user error:");
     res.status(500).json({ error: "Failed to unverify user" });
   }
 });
@@ -91,9 +91,11 @@ router.get("/users", authenticate, authorize("head"), async (_req: AuthRequest, 
     });
     res.json({ users });
   } catch (error) {
-    console.error("List users error:", error);
+    logger.error({ err: error }, "List users error:");
     res.status(500).json({ error: "Failed to fetch users" });
   }
 });
 
 export default router;
+
+

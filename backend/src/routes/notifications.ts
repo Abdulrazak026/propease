@@ -1,6 +1,7 @@
 import { Router, Response } from "express";
 import prisma from "../lib/prisma";
 import { authenticate, AuthRequest } from "../middleware/auth";
+import { authorize } from "../middleware/rbac";
 
 const router = Router();
 
@@ -43,11 +44,12 @@ router.patch("/read-all", authenticate, async (req: AuthRequest, res: Response) 
   }
 });
 
-router.post("/", authenticate, async (req: AuthRequest, res: Response) => {
+router.post("/", authenticate, authorize("head", "admin"), async (req: AuthRequest, res: Response) => {
   try {
-    const { type, title, body, link } = req.body;
+    const { type, title, body, link, userId } = req.body;
+    const targetUserId = (req.user!.role === "head" || req.user!.role === "admin") ? (userId || req.user!.id) : req.user!.id;
     const notif = await prisma.notification.create({
-      data: { type, title, body, link, userId: req.user!.id as string },
+      data: { type, title, body, link, userId: targetUserId },
     });
     res.status(201).json({ notification: notif });
   } catch (error) {

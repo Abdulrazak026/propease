@@ -2,7 +2,7 @@ import { Router, Response } from "express";
 import prisma from "../lib/prisma";
 import { authenticate, AuthRequest } from "../middleware/auth";
 import { authorize } from "../middleware/rbac";
-
+import { logger } from "../lib/logger";
 const router = Router();
 
 router.post("/", authenticate, async (req: AuthRequest, res: Response) => {
@@ -40,7 +40,7 @@ router.post("/", authenticate, async (req: AuthRequest, res: Response) => {
 
     res.status(201).json({ review });
   } catch (error) {
-    console.error("Create review error:", error);
+    logger.error({ err: error }, "Create review error:");
     res.status(500).json({ error: "Failed to submit review" });
   }
 });
@@ -71,7 +71,7 @@ router.get("/agent/:agentId", async (req, res: Response) => {
       totalReviews: aggregate._count.id,
     });
   } catch (error) {
-    console.error("Get reviews error:", error);
+    logger.error({ err: error }, "Get reviews error:");
     res.status(500).json({ error: "Failed to fetch reviews" });
   }
 });
@@ -94,7 +94,7 @@ router.get("/", authenticate, authorize("head"), async (req: AuthRequest, res: R
 
     res.json({ reviews });
   } catch (error) {
-    console.error("List reviews error:", error);
+    logger.error({ err: error }, "List reviews error:");
     res.status(500).json({ error: "Failed to fetch reviews" });
   }
 });
@@ -127,9 +127,11 @@ router.patch("/:id/moderate", authenticate, authorize("head"), async (req: AuthR
 
     res.json({ review });
   } catch (error) {
-    console.error("Moderate review error:", error);
+    logger.error({ err: error }, "Moderate review error:");
     res.status(500).json({ error: "Failed to moderate review" });
   }
 });
 
 export default router;
+
+

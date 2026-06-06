@@ -5,7 +5,7 @@ import { authorize } from "../middleware/rbac";
 import { emailService } from "../services/email";
 import { validate } from "../middleware/validate";
 import { createInquirySchema } from "../validators";
-
+import { logger } from "../lib/logger";
 const router = Router();
 
 router.post("/:listingId", validate(createInquirySchema), async (req, res: Response) => {
@@ -35,7 +35,7 @@ router.post("/:listingId", validate(createInquirySchema), async (req, res: Respo
     }
     emailService.inquiryConfirmation(req.body.clientContact || "", req.body.clientName || "", listing.title).catch(() => {});
   } catch (error) {
-    console.error("Create inquiry error:", error);
+    logger.error({ err: error }, "Create inquiry error:");
     res.status(500).json({ error: "Failed to submit inquiry" });
   }
 });
@@ -67,7 +67,7 @@ router.get("/my", authenticate, async (req: AuthRequest, res: Response) => {
 
     res.json({ inquiries });
   } catch (error) {
-    console.error("List inquiries error:", error);
+    logger.error({ err: error }, "List inquiries error:");
     res.status(500).json({ error: "Failed to fetch inquiries" });
   }
 });
@@ -96,7 +96,7 @@ router.patch("/:id/status", authenticate, async (req: AuthRequest, res: Response
 
     res.json({ inquiry: updated });
   } catch (error) {
-    console.error("Update inquiry error:", error);
+    logger.error({ err: error }, "Update inquiry error:");
     res.status(500).json({ error: "Failed to update inquiry" });
   }
 });
@@ -115,3 +115,5 @@ router.get("/all", authenticate, authorize("head"), async (_req: AuthRequest, re
 });
 
 export default router;
+
+
