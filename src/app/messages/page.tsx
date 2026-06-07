@@ -256,7 +256,7 @@ function ConversationDetail({ conversation, onBack }: { conversation: Conversati
         ) : messages.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-center px-4">
             <p className="text-sm font-medium text-gray-900 mb-1">Say hello</p>
-            <p className="text-xs text-gray-500 max-w-[260px]">Start the conversation — your message will arrive instantly.</p>
+            <p className="text-xs text-gray-500 max-w-[260px]">Start the conversation. Your message will arrive instantly.</p>
           </div>
         ) : (
           <div className="space-y-2 max-w-2xl mx-auto">

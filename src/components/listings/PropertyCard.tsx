@@ -51,11 +51,11 @@ export default function PropertyCard({ listing }: PropertyCardProps) {
   return (
     <Link
       href={`/listings/${listing.id}`}
-      className="group block bg-white rounded-xl border border-gray-200 overflow-hidden hover:border-gray-300 hover:shadow-md active:shadow-sm transition-all active:scale-[0.99]"
+      className="group block bg-white rounded-2xl border border-gray-200 overflow-hidden hover:border-gray-300 hover:shadow-lg active:shadow-sm transition-all duration-200 active:scale-[0.99]"
     >
-      <div className="relative h-48 bg-gray-100">
+      <div className="relative h-60 sm:h-64 bg-gray-100 overflow-hidden">
         {hasPhoto ? (
-          <img src={resolveImageUrl(listing.photos[0].url) || ""} alt={listing.photos[0].alt} className="w-full h-full object-cover" loading="lazy" />
+          <img src={resolveImageUrl(listing.photos[0].url) || ""} alt={listing.photos[0].alt} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" loading="lazy" />
         ) : (
           <div className="absolute inset-0 flex items-center justify-center text-gray-300 text-3xl">🏠</div>
         )}
@@ -90,24 +90,24 @@ export default function PropertyCard({ listing }: PropertyCardProps) {
         </div>
       </div>
 
-      <div className="p-3.5">
-        <h3 className="font-semibold text-gray-900 text-sm leading-snug group-hover:text-[var(--color-primary)] transition-colors line-clamp-2">
+      <div className="p-4">
+        <h3 className="font-semibold text-gray-900 text-base leading-snug group-hover:text-[var(--color-primary)] transition-colors line-clamp-2">
           {listing.title}
         </h3>
-        <p className="text-xs text-gray-500 mt-1.5 flex items-center gap-1">
-          <svg className="w-3 h-3 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <p className="text-sm text-gray-500 mt-2 flex items-center gap-1">
+          <svg className="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
             <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
           </svg>
           {listing.city}
         </p>
-        <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-100">
-          <div className="flex items-center gap-2 text-[11px] text-gray-400">
-            {listing.bedrooms && <span>{listing.bedrooms} bed</span>}
-            {listing.bathrooms && <span>{listing.bathrooms} bath</span>}
-            {listing.sqft && <span>{listing.sqft.toLocaleString()} sqft</span>}
+        <div className="flex items-center justify-between mt-3.5 pt-3 border-t border-gray-100">
+          <div className="flex items-center gap-2.5 text-xs text-gray-500">
+            {listing.bedrooms && <span className="font-medium">{listing.bedrooms} bed</span>}
+            {listing.bathrooms && <span className="font-medium">{listing.bathrooms} bath</span>}
+            {listing.sqft && <span className="font-medium">{listing.sqft.toLocaleString()} sqft</span>}
           </div>
-          <span className="text-[11px] text-gray-400 font-medium">
+          <span className="text-xs text-gray-500 font-medium">
             {listing.listingType === "rent" ? "For Rent" : "For Sale"}
           </span>
         </div>

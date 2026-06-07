@@ -8,21 +8,13 @@ import { EmptyState } from "@/components/ui/Skeleton";
 import Footer from "@/components/layout/Footer";
 import { useSettings } from "@/context/SettingsContext";
 import SoldPropertiesGallery from "@/components/listings/SoldPropertiesGallery";
-import AffordabilityCalculator from "@/components/listings/AffordabilityCalculator";
 
 interface City { id: string; name: string; }
 interface BlogPost { id: string; slug: string; title: string; excerpt?: string | null; content?: string | null; coverImage: string | null; publishedAt: string | null; author?: { name: string } | null; }
 interface ResearchReport { title: string; date: string; summary: string; metrics: string[]; }
 
-const INITIAL_SHOW = 8;
-const LOAD_MORE = 8;
-
-const FALLBACK_POSTS = [
-  { id: "f1", slug: "first-time-buyers-guide", title: "First-time Buyer's Guide to Kano Real Estate", excerpt: "Everything you need to know before buying your first home in Kano — from choosing a neighborhood to closing the deal.", coverImage: "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=800&h=500&fit=crop", publishedAt: "2026-05-22T00:00:00Z", author: { name: "Aisha Bello" } },
-  { id: "f2", slug: "renting-vs-buying-2026", title: "Renting vs Buying in 2026: What Makes More Sense?", excerpt: "A breakdown of the real costs, market trends, and lifestyle trade-offs of renting versus buying in Northern Nigeria.", coverImage: "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&h=500&fit=crop", publishedAt: "2026-05-10T00:00:00Z", author: { name: "Ahmad Abubakar" } },
-  { id: "f3", slug: "kano-neighborhood-spotlight", title: "Neighborhood Spotlight: Tarauni & Nassarawa", excerpt: "Two of the most in-demand areas for renters in Kano Municipal — what makes them tick, and what you'll pay.", coverImage: "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&h=500&fit=crop", publishedAt: "2026-04-28T00:00:00Z", author: { name: "Zahradden Aliyu" } },
-  { id: "f4", slug: "tenant-rights-nigeria", title: "Understanding Your Rights as a Tenant in Nigeria", excerpt: "From rent advance limits to eviction notice periods, here's what every tenant should know before signing.", coverImage: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&h=500&fit=crop", publishedAt: "2026-04-15T00:00:00Z", author: { name: "Barr. Sulaiman Usman" } },
-];
+const INITIAL_SHOW = 6;
+const LOAD_MORE = 6;
 
 const CATEGORY_PILLS = [
   { label: "All", value: "" },
@@ -30,6 +22,13 @@ const CATEGORY_PILLS = [
   { label: "Flats", value: "flat" },
   { label: "Land", value: "land" },
   { label: "Commercial", value: "commercial" },
+];
+
+const FALLBACK_POSTS = [
+  { id: "f1", slug: "first-time-buyers-guide", title: "First-time Buyer's Guide to Kano Real Estate", excerpt: "Everything you need to know before buying your first home in Kano, from choosing a neighborhood to closing the deal.", coverImage: "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=800&h=500&fit=crop", publishedAt: "2026-05-22T00:00:00Z", author: { name: "Aisha Bello" } },
+  { id: "f2", slug: "renting-vs-buying-2026", title: "Renting vs Buying in 2026: What Makes More Sense?", excerpt: "A breakdown of the real costs, market trends, and lifestyle trade-offs of renting versus buying in Northern Nigeria.", coverImage: "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&h=500&fit=crop", publishedAt: "2026-05-10T00:00:00Z", author: { name: "Ahmad Abubakar" } },
+  { id: "f3", slug: "kano-neighborhood-spotlight", title: "Neighborhood Spotlight: Tarauni & Nassarawa", excerpt: "Two of the most in-demand areas for renters in Kano Municipal. What makes them tick, and what you'll pay.", coverImage: "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&h=500&fit=crop", publishedAt: "2026-04-28T00:00:00Z", author: { name: "Zahradden Aliyu" } },
+  { id: "f4", slug: "tenant-rights-nigeria", title: "Understanding Your Rights as a Tenant in Nigeria", excerpt: "From rent advance limits to eviction notice periods, here's what every tenant should know before signing.", coverImage: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&h=500&fit=crop", publishedAt: "2026-04-15T00:00:00Z", author: { name: "Barr. Sulaiman Usman" } },
 ];
 
 export default function HomePage() {
@@ -90,7 +89,7 @@ export default function HomePage() {
 
   const visibleListings = listings.slice(0, showCount);
 
-  const isSearching = !!(filters.search || filters.propertyType || filters.listingType || filters.city || filters.minPrice || filters.maxPrice || filters.minBeds || filters.maxBeds || filters.minBaths || filters.maxBaths || filters.category || activeCategory);
+  const isSearching = !!(filters.search || filters.propertyType || filters.listingType || filters.city || filters.minPrice || filters.maxPrice || filters.minBeds || filters.maxBeds || filters.minBaths || filters.maxBaths || filters.category);
 
   return (
     <div className="flex flex-col">
@@ -131,12 +130,8 @@ export default function HomePage() {
         </div>
       </section>
 
-      <div className="lg:sticky lg:top-16 z-30 bg-white/95 backdrop-blur-md border-b border-gray-200 lg:shadow-sm" data-filter-search>
+      <div className="lg:sticky lg:top-14 z-30 bg-white/95 backdrop-blur-md border-b border-gray-200 lg:shadow-sm" data-filter-search>
         <PropertyFilters onFilterChange={handleFilterChange} />
-      </div>
-
-      <div className="max-w-[1400px] w-full mx-auto px-5 sm:px-6 lg:px-10 pt-8 sm:pt-10">
-        <AffordabilityCalculator />
       </div>
 
       <div className="max-w-[1400px] w-full mx-auto px-5 sm:px-6 lg:px-10 py-8 sm:py-10">
@@ -147,33 +142,35 @@ export default function HomePage() {
             </h2>
             <p className="text-sm text-gray-500 mt-1">{loading ? "Loading…" : listings.length > 0 ? `${listings.length} ${listings.length === 1 ? "property" : "properties"}` : ""}</p>
           </div>
-          {!isSearching && (
-            <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide -mx-1 px-1">
-              {CATEGORY_PILLS.map((p) => {
-                const active = activeCategory === p.value;
-                return (
-                  <button
-                    key={p.value}
-                    onClick={() => setActiveCategory(p.value)}
-                    className={`shrink-0 px-4 py-2 text-sm font-medium rounded-full transition-all ${
-                      active
-                        ? "bg-gray-900 text-white"
-                        : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-                    }`}
-                  >
-                    {p.label}
-                  </button>
-                );
-              })}
-            </div>
-          )}
+          <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide -mx-1 px-1 pb-1">
+            {CATEGORY_PILLS.map((p) => {
+              const active = activeCategory === p.value;
+              return (
+                <button
+                  key={p.value}
+                  onClick={() => {
+                    setActiveCategory(p.value);
+                    setFilters((prev: any) => ({ ...prev, propertyType: p.value }));
+                    setShowCount(INITIAL_SHOW);
+                  }}
+                  className={`shrink-0 px-4 py-2 text-sm font-medium rounded-full transition-all duration-200 active:scale-95 ${
+                    active
+                      ? "bg-gray-900 text-white shadow-md"
+                      : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                  }`}
+                >
+                  {p.label}
+                </button>
+              );
+            })}
+          </div>
         </div>
 
         {loading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-            {Array.from({ length: 8 }).map((_, i) => (
-              <div key={i} className="bg-white rounded-2xl border border-gray-100 p-3.5 animate-pulse">
-                <div className="h-48 bg-gray-100 rounded-xl mb-3" />
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="bg-white rounded-2xl border border-gray-100 p-4 animate-pulse">
+                <div className="h-56 bg-gray-100 rounded-xl mb-3" />
                 <div className="h-4 bg-gray-100 rounded w-3/4 mb-2" />
                 <div className="h-4 bg-gray-100 rounded w-1/2" />
               </div>
@@ -183,7 +180,7 @@ export default function HomePage() {
           <EmptyState title="Nothing matches" description="Try changing your filters." />
         ) : (
           <>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {visibleListings.map((l) => (
                 <PropertyCard key={l.id} listing={l as any} />
               ))}

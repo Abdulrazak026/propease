@@ -67,7 +67,7 @@ export default function AgentMyListingsPage() {
       ) : filtered.length === 0 ? (
         <div className="bg-white rounded-xl border border-gray-200 p-12 text-center">
           <p className="text-sm font-semibold text-gray-900 mb-1">No listings</p>
-          <p className="text-xs text-gray-500 max-w-sm mx-auto">Post your first property — it goes to review before going live.</p>
+          <p className="text-xs text-gray-500 max-w-sm mx-auto">Post your first property. It goes to review before going live.</p>
           <Link href="/ambassador/listings/new" className="inline-flex items-center justify-center mt-4 min-h-[40px] px-5 py-2 text-xs font-semibold rounded-full bg-gray-900 text-white hover:bg-gray-800">Post a property</Link>
         </div>
       ) : (

@@ -69,10 +69,10 @@ export default function AgentProfilePage() {
 
  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
  {[
- { label: "Rating", value: avgRating > 0 ? avgRating.toFixed(1) : "—", sub: `${reviewCount} reviews`, accent: "bg-emerald-100", color: "text-emerald-600" },
+ { label: "Rating", value: avgRating > 0 ? avgRating.toFixed(1) : "N/A", sub: `${reviewCount} reviews`, accent: "bg-emerald-100", color: "text-emerald-600" },
  { label: "Commissions Earned", value: formatNaira(totalEarned), sub: "from closed deals", accent: "bg-[var(--color-primary)]/10", color: "text-[var(--color-primary)]" },
- { label: "Inquiries Handled", value: "—", sub: "across listings", accent: "bg-blue-100", color: "text-blue-600" },
- { label: "Listings Managed", value: "—", sub: "active properties", accent: "bg-amber-100", color: "text-amber-600" },
+ { label: "Inquiries Handled", value: "0", sub: "across listings", accent: "bg-blue-100", color: "text-blue-600" },
+ { label: "Listings Managed", value: "0", sub: "active properties", accent: "bg-amber-100", color: "text-amber-600" },
  ].map((s) => (
  <div key={s.label} className="bg-white rounded-lg border border-gray-200 p-4 card-hover">
  <div className="flex items-center gap-3">

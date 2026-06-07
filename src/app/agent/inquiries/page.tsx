@@ -37,7 +37,7 @@ export default function AgentInquiriesPage() {
             </div>
             <p className="text-sm text-gray-600 mb-2">{i.message}</p>
             <div className="flex items-center justify-between">
-              <p className="text-xs text-gray-400">{i.listing?.title || "—"}</p>
+              <p className="text-xs text-gray-400">{i.listing?.title || "N/A"}</p>
               <p className="text-xs text-gray-400">{new Date(i.createdAt).toLocaleDateString()}</p>
             </div>
           </div>

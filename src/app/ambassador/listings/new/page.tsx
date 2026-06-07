@@ -149,7 +149,7 @@ export default function PostListingPage() {
  </select>
  </div>
  </div>
- <Button type="button" className="w-full" onClick={() => setStep(2)}>Next — Photos & Location</Button>
+ <Button type="button" className="w-full" onClick={() => setStep(2)}>Next: Photos & Location</Button>
  </>
  )}
 
@@ -173,7 +173,7 @@ export default function PostListingPage() {
       </div>
  <div className="flex gap-3">
  <Button variant="outline" className="w-1/2" onClick={() => setStep(1)}>← Back</Button>
- <Button className="w-1/2" onClick={() => setStep(3)}>Next — Pricing</Button>
+ <Button className="w-1/2" onClick={() => setStep(3)}>Next: Pricing</Button>
  </div>
  </>
  )}

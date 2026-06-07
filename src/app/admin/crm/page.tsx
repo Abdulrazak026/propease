@@ -36,7 +36,7 @@ export default function CrmPage() {
     <div className="space-y-6">
       <div className="flex items-center gap-3">
         <a href="/admin" className="text-gray-400 hover:text-[var(--color-primary)]"><svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg></a>
-        <div><h1 className="text-xl font-bold text-gray-900">CRM — Client Relationship</h1><p className="text-xs text-gray-500">Track leads, inquiries, and pipeline</p></div>
+        <div><h1 className="text-xl font-bold text-gray-900">CRM: Client Relationship</h1><p className="text-xs text-gray-500">Track leads, inquiries, and pipeline</p></div>
       </div>
 
       <div className="bg-white rounded-xl border border-gray-200 p-5">
@@ -67,7 +67,7 @@ export default function CrmPage() {
                 <tr key={l.id} className="border-b border-gray-50 hover:bg-gray-50/50">
                   <td className="px-4 py-3 font-medium text-gray-900 text-xs">{l.clientName}</td>
                   <td className="px-4 py-3 text-xs text-gray-600">{l.clientContact}</td>
-                  <td className="px-4 py-3 text-xs text-gray-600">{l.listing?.title || "—"}</td>
+                  <td className="px-4 py-3 text-xs text-gray-600">{l.listing?.title || "N/A"}</td>
                   <td className="px-4 py-3"><Badge variant={l.status === "new" ? "warning" : l.status === "responded" ? "success" : "default"}>{l.status}</Badge></td>
                   <td className="px-4 py-3 text-xs text-gray-500">{new Date(l.createdAt).toLocaleDateString()}</td>
                 </tr>

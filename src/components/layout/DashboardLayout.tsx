@@ -82,7 +82,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         <button onClick={() => setMobileOpen(true)} className="text-white p-1">
           <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"/></svg>
         </button>
-        <span className="text-sm font-bold text-white">{getSetting("site_name", "MBPP")} — {resolvedRole || "Dashboard"}</span>
+        <span className="text-sm font-bold text-white">{getSetting("site_name", "MBPP")} | {resolvedRole || "Dashboard"}</span>
         <Link href="/" className="text-white/60 text-xs">Exit</Link>
       </div>
 

@@ -19,9 +19,9 @@ async function getPost(slug: string) {
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
   const post = await getPost(slug);
-  if (!post) return { title: "Post not found — PropEase" };
+  if (!post) return { title: "Post not found | PropEase" };
   return {
-    title: `${post.title} — PropEase`,
+    title: `${post.title} | PropEase`,
     description: post.excerpt?.slice(0, 160),
     alternates: { canonical: `${SITE_URL}/news/${slug}` },
     openGraph: {

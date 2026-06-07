@@ -64,9 +64,9 @@ export default function CompareSheet() {
                     { l: "Price", r: (i: any) => `₦${fmt(i.price)}`, best: (a: any, b: any) => a.price - b.price },
                     { l: "Type", r: (i: any) => <span className="capitalize">{i.listingType} · {i.propertyType}</span> },
                     { l: "City", r: (i: any) => i.city },
-                    { l: "Bedrooms", r: (i: any) => i.bedrooms ?? "—" },
-                    { l: "Bathrooms", r: (i: any) => i.bathrooms ?? "—" },
-                    { l: "Size", r: (i: any) => i.sqft ? `${i.sqft.toLocaleString()} sqft` : "—" },
+                    { l: "Bedrooms", r: (i: any) => i.bedrooms ?? "N/A" },
+                    { l: "Bathrooms", r: (i: any) => i.bathrooms ?? "N/A" },
+                    { l: "Size", r: (i: any) => i.sqft ? `${i.sqft.toLocaleString()} sqft` : "N/A" },
                   ].map(row => (
                     <tr key={row.l}>
                       <td className="text-xs text-gray-500 p-3 sticky left-0 bg-white">{row.l}</td>

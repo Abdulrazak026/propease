@@ -63,10 +63,10 @@ export default function AdminOverview() {
 
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {[
-          { label: "Reservations", value: "—", color: "text-emerald-600", bg: "bg-emerald-50" },
-          { label: "Withdrawals", value: "—", color: "text-red-600", bg: "bg-red-50" },
-          { label: "Inquiries", value: "—", color: "text-blue-600", bg: "bg-blue-50" },
-          { label: "Custom Orders", value: "—", color: "text-purple-600", bg: "bg-purple-50" },
+          { label: "Reservations", value: "0", color: "text-emerald-600", bg: "bg-emerald-50" },
+          { label: "Withdrawals", value: "0", color: "text-red-600", bg: "bg-red-50" },
+          { label: "Inquiries", value: "0", color: "text-blue-600", bg: "bg-blue-50" },
+          { label: "Custom Orders", value: "0", color: "text-purple-600", bg: "bg-purple-50" },
         ].map((s) => (
           <div key={s.label} className="bg-white rounded-xl border border-gray-200 p-4">
             <div className={`w-10 h-10 ${s.bg} rounded-lg flex items-center justify-center mb-2`}>

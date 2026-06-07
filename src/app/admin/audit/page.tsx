@@ -36,7 +36,7 @@ export default function AuditPage() {
                 <tr key={l.id} className="border-b border-gray-50 hover:bg-gray-50/50">
                   <td className="px-4 py-3 text-xs font-medium text-gray-900">{l.action}</td>
                   <td className="px-4 py-3 text-xs text-gray-600">{l.entity}{l.entityId ? ` #${l.entityId.slice(0, 8)}` : ""}</td>
-                  <td className="px-4 py-3 text-xs text-gray-600">{l.user?.name || "—"}</td>
+                  <td className="px-4 py-3 text-xs text-gray-600">{l.user?.name || "System"}</td>
                   <td className="px-4 py-3 text-xs text-gray-500">{new Date(l.createdAt).toLocaleDateString()} {new Date(l.createdAt).toLocaleTimeString()}</td>
                 </tr>
               ))}

@@ -79,13 +79,13 @@ export default function FairHousingPage() {
             <h2 className="text-lg font-semibold text-gray-900 mb-2">Fair Housing Resources</h2>
             <ul className="space-y-2 text-sm">
               <li>
-                <a href="https://fha.gov.ng" target="_blank" rel="noopener noreferrer" className="text-[var(--color-primary)] hover:underline">Federal Housing Authority (FHA) — Affordable Housing Programmes</a>
+                <a href="https://fha.gov.ng" target="_blank" rel="noopener noreferrer" className="text-[var(--color-primary)] hover:underline">Federal Housing Authority (FHA): Affordable Housing Programmes</a>
               </li>
               <li>
                 <a href="https://esvarbon.gov.ng" target="_blank" rel="noopener noreferrer" className="text-[var(--color-primary)] hover:underline">Estate Surveyors and Valuers Registration Board of Nigeria (ESVARBON)</a>
               </li>
               <li>
-                <a href="https://kanostate.gov.ng" target="_blank" rel="noopener noreferrer" className="text-[var(--color-primary)] hover:underline">Kano State Government — Bureau for Land Management</a>
+                <a href="https://kanostate.gov.ng" target="_blank" rel="noopener noreferrer" className="text-[var(--color-primary)] hover:underline">Kano State Government: Bureau for Land Management</a>
               </li>
             </ul>
           </div>

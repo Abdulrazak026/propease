@@ -14,12 +14,12 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   try {
     const { id } = await params;
     const res = await fetch(`${API}/api/listings/${id}`);
-    if (!res.ok) return { title: "Property — MBPP" };
+    if (!res.ok) return { title: "Property | MBPP" };
     const data = await res.json();
     const l = data.listing || data;
     const imageUrl = l.photos?.[0]?.url ? [resolveImg(l.photos[0].url)] : [];
     return {
-      title: `${l.title} — MBPP`,
+      title: `${l.title} | MBPP`,
       description: l.description?.slice(0, 160) || "Property listing on MBPP",
       alternates: { canonical: `${SITE_URL}/listings/${id}` },
       openGraph: {
@@ -32,7 +32,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
       twitter: { card: "summary_large_image", title: l.title, description: l.description?.slice(0, 160), images: imageUrl },
     };
   } catch {
-    return { title: "Property — MBPP" };
+    return { title: "Property | MBPP" };
   }
 }
 

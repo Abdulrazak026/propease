@@ -29,8 +29,11 @@ export default function Navbar() {
   const { get: getSetting } = useSettings();
   const [moreOpen, setMoreOpen] = useState(false);
   const [userOpen, setUserOpen] = useState(false);
+  const [hidden, setHidden] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const moreRef = useRef<HTMLDivElement>(null);
   const userRef = useRef<HTMLDivElement>(null);
+  const lastScrollY = useRef(0);
 
   const siteLogo = getSetting("site_logo");
   const siteName = getSetting("site_name", "MBPP");
@@ -48,42 +51,66 @@ export default function Navbar() {
     return () => document.removeEventListener("mousedown", handleClick);
   }, []);
 
+  useEffect(() => {
+    const onScroll = () => {
+      const y = window.scrollY;
+      const delta = y - lastScrollY.current;
+      if (y < 8) { setHidden(false); setScrolled(false); }
+      else {
+        setScrolled(true);
+        if (delta > 4 && y > 80) setHidden(true);
+        else if (delta < -4) setHidden(false);
+      }
+      lastScrollY.current = y;
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
   if (isDashboard) return null;
 
   return (
     <>
-    <header className="lg:hidden sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-gray-200 h-14 flex items-center px-4">
-      <Link href="/" className="flex items-center gap-2 shrink-0">
+    <header
+      className={`lg:hidden sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b h-12 flex items-center px-3 sm:px-4 max-w-[100vw] overflow-hidden transition-transform duration-300 ${
+        scrolled ? "border-gray-200" : "border-transparent"
+      } ${hidden ? "-translate-y-full" : "translate-y-0"}`}
+    >
+      <Link href="/" className="flex items-center gap-2 shrink-0 min-w-0">
         {siteLogo ? (
-          <img src={siteLogo} alt={siteName} className="h-7 w-auto rounded-lg object-contain" />
+          <img src={siteLogo} alt={siteName} className="h-6 w-auto rounded-lg object-contain" />
         ) : (
           <>
-            <div className="w-7 h-7 rounded-lg bg-[var(--color-primary)] flex items-center justify-center">
-              <span className="text-white font-black text-[10px]">M</span>
+            <div className="w-6 h-6 rounded-md bg-[var(--color-primary)] flex items-center justify-center shrink-0">
+              <span className="text-white font-black text-[9px]">M</span>
             </div>
-            <span className="text-sm font-bold text-gray-900 tracking-tight">{siteName}</span>
+            <span className="text-sm font-bold text-gray-900 tracking-tight truncate">{siteName}</span>
           </>
         )}
       </Link>
-      <div className="flex-1" />
-      <div className="mr-2"><LangPill /></div>
+      <div className="flex-1 min-w-0" />
+      <div className="mr-1 shrink-0"><LangPill /></div>
       {isAuthenticated ? (
         <Link
           href={currentUser!.role === "head" ? "/admin" : `/${currentUser!.role}`}
-          className="w-9 h-9 rounded-full bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary-light)] flex items-center justify-center text-white text-xs font-bold shadow-sm"
+          className="w-8 h-8 rounded-full bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary-light)] flex items-center justify-center text-white text-[10px] font-bold shadow-sm shrink-0"
         >
           {currentUser!.name.split(" ").map(n => n[0]).join("").slice(0, 2)}
         </Link>
       ) : (
         <Link
           href="/login"
-          className="px-4 py-2 text-xs font-semibold text-white bg-[var(--color-primary)] hover:bg-[var(--color-primary)]/90 rounded-full transition-colors"
+          className="px-3 py-1.5 text-xs font-semibold text-white bg-[var(--color-primary)] hover:bg-[var(--color-primary)]/90 rounded-full transition-colors shrink-0"
         >
           Sign In
         </Link>
       )}
     </header>
-    <header className="hidden lg:flex sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-gray-200 h-16 items-center">
+    <header
+      className={`hidden lg:flex sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b h-14 items-center transition-transform duration-300 ${
+        scrolled ? "border-gray-200" : "border-transparent"
+      } ${hidden ? "-translate-y-full" : "translate-y-0"}`}
+    >
       <div className="w-full max-w-[1400px] mx-auto px-6 xl:px-10 flex items-center gap-8">
         <Link href="/" className="flex items-center gap-2.5 shrink-0">
           {siteLogo ? (

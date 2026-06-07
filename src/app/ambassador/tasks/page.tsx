@@ -43,7 +43,7 @@ export default function AmbassadorTasks() {
               <div><span className="text-gray-400">Area</span><p className="font-medium">{t.area}</p></div>
               <div><span className="text-gray-400">Budget</span><p className="font-medium">₦{t.budget.toLocaleString()}</p></div>
               <div><span className="text-gray-400">Deadline</span><p className="font-medium">{new Date(t.deadline).toLocaleDateString()}</p></div>
-              <div><span className="text-gray-400">Assignee</span><p className="font-medium">{t.assignedTo?.name || "—"}</p></div>
+              <div><span className="text-gray-400">Assignee</span><p className="font-medium">{t.assignedTo?.name || "Unassigned"}</p></div>
             </div>
           </div>
         ))}

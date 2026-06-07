@@ -47,8 +47,8 @@ export default function CommissionsPage() {
                   <td className="px-4 py-3 text-xs font-medium text-gray-900 max-w-[160px] truncate">{c.dealTitle}</td>
                   <td className="px-4 py-3 text-xs text-gray-600 capitalize">{c.dealType.replace(/_/g, " ")}</td>
                   <td className="px-4 py-3 text-xs font-medium text-gray-900">₦{c.totalAmount.toLocaleString()}</td>
-                  <td className="px-4 py-3 text-xs"><span className="text-gray-500 text-[10px]">{c.ambassador?.name||"—"}</span><span className="block text-emerald-600 font-medium text-[10px]">₦{c.ambassadorCut.toLocaleString()}</span></td>
-                  <td className="px-4 py-3 text-xs"><span className="text-gray-500 text-[10px]">{c.agent?.name||"—"}</span><span className="block text-blue-600 font-medium text-[10px]">₦{c.agentCut.toLocaleString()}</span></td>
+                  <td className="px-4 py-3 text-xs"><span className="text-gray-500 text-[10px]">{c.ambassador?.name||"N/A"}</span><span className="block text-emerald-600 font-medium text-[10px]">₦{c.ambassadorCut.toLocaleString()}</span></td>
+                  <td className="px-4 py-3 text-xs"><span className="text-gray-500 text-[10px]">{c.agent?.name||"N/A"}</span><span className="block text-blue-600 font-medium text-[10px]">₦{c.agentCut.toLocaleString()}</span></td>
                   <td className="px-4 py-3 text-xs font-medium text-gray-900">₦{c.companyCut.toLocaleString()}</td>
                 </tr>
               ))}

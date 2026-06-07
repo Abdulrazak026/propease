@@ -93,7 +93,7 @@ export default function ModerationPage() {
               {filtered.map(l => (
                 <tr key={l.id} className="border-b border-gray-50 hover:bg-gray-50/50">
                   <td className="px-4 py-3 text-xs font-medium text-gray-900 max-w-[200px] truncate">{l.title}</td>
-                  <td className="px-4 py-3 text-xs text-gray-600">{l.postedBy?.name || "—"}</td>
+                  <td className="px-4 py-3 text-xs text-gray-600">{l.postedBy?.name || "Unknown"}</td>
                   <td className="px-4 py-3 text-xs text-gray-600 capitalize">{l.propertyType} · {l.listingType}</td>
                   <td className="px-4 py-3 text-xs text-gray-600">{l.city}</td>
                   <td className="px-4 py-3 text-xs font-medium text-gray-900">₦{l.price.toLocaleString()}</td>
@@ -111,7 +111,7 @@ export default function ModerationPage() {
                         </button>
                       </div>
                     ) : (
-                      <span className="text-[10px] text-gray-400">{l.status === "approved" || l.status === "available" ? "Live" : "—"}</span>
+                      <span className="text-[10px] text-gray-400">{l.status === "approved" || l.status === "available" ? "Live" : "Pending"}</span>
                     )}
                   </td>
                 </tr>

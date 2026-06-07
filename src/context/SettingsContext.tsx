@@ -11,14 +11,14 @@ interface SettingsContextType {
 }
 
 const defaultResearch = JSON.stringify([
-  { title: "Kano Residential Market Report — Q1 2026", date: "April 2026", summary: "Average rents rose 12% year-on-year across Kano Municipal. Tarauni and Nassarawa saw the highest demand for 2-bedroom flats.", metrics: ["12% YoY rent increase", "340 active listings", "4.2 avg days on market", "₦850K avg annual rent"] },
+  { title: "Kano Residential Market Report: Q1 2026", date: "April 2026", summary: "Average rents rose 12% year-on-year across Kano Municipal. Tarauni and Nassarawa saw the highest demand for 2-bedroom flats.", metrics: ["12% YoY rent increase", "340 active listings", "4.2 avg days on market", "₦850K avg annual rent"] },
   { title: "Northern Nigeria Real Estate Outlook 2026", date: "January 2026", summary: "Comprehensive analysis of property trends across Kano, Kaduna, and Katsina states including urban migration patterns and infrastructure impact.", metrics: ["6 states covered", "2,100+ data points", "15 city districts", "3-year forecast"] },
-  { title: "Rental Affordability Index — Kano State", date: "March 2026", summary: "How rent-to-income ratios vary across Kano's eight local government areas. Fagge remains the most affordable district for young professionals.", metrics: ["28% avg rent-to-income", "₦180K median salary", "8 LGAs analysed", "5 property types"] },
+  { title: "Rental Affordability Index: Kano State", date: "March 2026", summary: "How rent-to-income ratios vary across Kano's eight local government areas. Fagge remains the most affordable district for young professionals.", metrics: ["28% avg rent-to-income", "₦180K median salary", "8 LGAs analysed", "5 property types"] },
   { title: "Commercial Property Trends in Kano", date: "February 2026", summary: "Demand for retail and office space is shifting toward the new Kano City Centre development. Industrial space in Fagge remains undersupplied.", metrics: ["22% vacancy rate", "₦2.1M avg annual rent", "3 new developments", "+8% commercial growth"] },
 ]);
 
 const defaultTeam = JSON.stringify([
-  { name: "Ahmad Abubakar", role: "MD \u2014 Managing Director", bio: "Overall leadership, final approvals, capital management, investor relations, and strategic direction.", photo: "" },
+  { name: "Ahmad Abubakar", role: "MD, Managing Director", bio: "Overall leadership, final approvals, capital management, investor relations, and strategic direction.", photo: "" },
   { name: "Barr. Sulaiman Usman", role: "Legal Adviser", bio: "Handles land titles, contracts, legal agreements, compliance, and dispute resolution.", photo: "" },
   { name: "Umar Nuhu", role: "Admin Officer", bio: "Manages sales records, expense tracking, compliance files, and media coordination.", photo: "" },
   { name: "Tasiu Sani", role: "Source & Procurement", bio: "Responsible for property sourcing, market research, negotiations, and acquisitions.", photo: "" },
@@ -35,7 +35,7 @@ const defaults: SettingsMap = {
   office_address: "", business_hours: "Mon-Fri 8AM-6PM",
   primary_color: "#0d6e4e", secondary_color: "#f97316", accent_color: "#facc15",
   heading_font: "Inter", body_font: "Inter",
-  meta_title: "Mutual Benefit Premier Properties \u2014 Real Estate in Kano", meta_description: "Verified properties for rent and sale in Kano.",
+  meta_title: "Mutual Benefit Premier Properties | Real Estate in Kano", meta_description: "Verified properties for rent and sale in Kano.",
   site_logo: "", site_favicon: "", about_hero_image: "",
   team_members: defaultTeam,
   research_reports: defaultResearch,

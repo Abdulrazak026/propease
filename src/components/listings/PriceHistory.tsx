@@ -61,14 +61,14 @@ export default function PriceHistory({ currentPrice, history, priceLabel }: Pric
  <div className="w-2 h-2 rounded-full bg-gray-300 shrink-0" />
  <span className="text-gray-400 w-16">{formatDate(p.date)}</span>
  <span className="font-medium text-gray-900">{formatNaira(p.price)}</span>
- {p.reason && <span className="text-gray-400">— {p.reason}</span>}
+ {p.reason && <span className="text-gray-400">| {p.reason}</span>}
  </div>
  ))}
  <div className="flex items-center gap-3 text-xs">
  <div className="w-2 h-2 rounded-full bg-[var(--color-primary)] shrink-0" />
  <span className="text-gray-400 w-16">Today</span>
  <span className="font-medium text-gray-900">{formatNaira(currentPrice)}</span>
- <span className="text-gray-400">— Current {priceLabel}</span>
+ <span className="text-gray-400">Current {priceLabel}</span>
  </div>
  </div>
  </div>

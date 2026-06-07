@@ -77,7 +77,7 @@ export default function AgentPage() {
                 <svg className="w-6 h-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21" /></svg>
               </div>
               <p className="text-sm font-semibold text-gray-900 mb-1">No listings yet</p>
-              <p className="text-xs text-gray-500 mb-4 max-w-sm mx-auto">Post your first property — it goes to review before going public, usually within a few hours.</p>
+              <p className="text-xs text-gray-500 mb-4 max-w-sm mx-auto">Post your first property. It goes to review before going public, usually within a few hours.</p>
               <Link href="/ambassador/listings/new" className="inline-flex items-center justify-center min-h-[40px] px-5 py-2 text-xs font-semibold rounded-full bg-gray-900 text-white hover:bg-gray-800 transition-colors">Post a property</Link>
             </div>
           ) : (
@@ -186,7 +186,7 @@ export default function AgentPage() {
                 </svg>
               </div>
               <h3 className="text-base font-semibold text-gray-900">Tenant records</h3>
-              <p className="text-sm text-gray-600 mt-1.5 leading-relaxed">Lease, ID, payment history — all in one place per tenant.</p>
+              <p className="text-sm text-gray-600 mt-1.5 leading-relaxed">Lease, ID, payment history. All in one place per tenant.</p>
             </div>
             <div className="bg-gradient-to-br from-sky-50 to-white rounded-2xl p-6 border border-sky-100">
               <div className="w-11 h-11 rounded-xl bg-white flex items-center justify-center shadow-sm mb-4">
@@ -195,7 +195,7 @@ export default function AgentPage() {
                 </svg>
               </div>
               <h3 className="text-base font-semibold text-gray-900">Maintenance</h3>
-              <p className="text-sm text-gray-600 mt-1.5 leading-relaxed">Tenants log issues. You assign, track, and pay — in the same screen.</p>
+              <p className="text-sm text-gray-600 mt-1.5 leading-relaxed">Tenants log issues. You assign, track, and pay in the same screen.</p>
             </div>
           </div>
         </div>

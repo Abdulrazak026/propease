@@ -83,7 +83,7 @@ export default function ListPropertyPage() {
         <div className="relative bg-[var(--color-primary)] rounded-3xl overflow-hidden p-8 sm:p-12 text-center sm:text-left">
           <div className="relative flex flex-col sm:flex-row items-center gap-6 sm:gap-8 justify-between">
             <div className="max-w-md">
-              <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight leading-[1.1]">Start now — it&apos;s free</h2>
+              <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight leading-[1.1]">Start now. It&apos;s free.</h2>
               <p className="text-white/85 mt-2 text-sm leading-relaxed">Tell us about your place. We&apos;ll come see it within 2 days.</p>
             </div>
             <div className="flex flex-wrap gap-3 justify-center sm:justify-end">

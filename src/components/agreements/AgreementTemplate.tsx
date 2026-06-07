@@ -94,7 +94,7 @@ export default function AgreementTemplate({ agreement, mode = "preview" }: Props
  <div className="flex items-center justify-between">
  <div>
  <h2 className="text-lg font-bold">TENANCY AGREEMENT</h2>
- <p className="text-white/70 text-xs mt-0.5">Residential Property Lease — Kano State, Nigeria</p>
+ <p className="text-white/70 text-xs mt-0.5">Residential Property Lease | Kano State, Nigeria</p>
  </div>
  {agreement.id && (
  <span className="text-[10px] bg-white/20 px-2.5 py-1 rounded-lg font-mono">

@@ -47,8 +47,8 @@ export default function DealsPage() {
                 <tr key={d.id} className="border-b border-gray-50 hover:bg-gray-50/50 cursor-pointer" onClick={() => setSelected(d)}>
                   <td className="px-4 py-3 text-xs font-medium text-gray-900 max-w-[180px] truncate">{d.dealTitle}</td>
                   <td className="px-4 py-3 text-xs font-medium text-gray-900">₦{d.totalAmount.toLocaleString()}</td>
-                  <td className="px-4 py-3 text-xs text-gray-600">{d.agent?.name || "—"}</td>
-                  <td className="px-4 py-3 text-xs text-gray-600">{d.ambassador?.name || "—"}</td>
+                  <td className="px-4 py-3 text-xs text-gray-600">{d.agent?.name || "Unassigned"}</td>
+                  <td className="px-4 py-3 text-xs text-gray-600">{d.ambassador?.name || "Unassigned"}</td>
                   <td className="px-4 py-3 text-xs font-medium text-emerald-600">₦{d.companyCut.toLocaleString()}</td>
                   <td className="px-4 py-3 text-xs text-gray-500">{new Date(d.paidAt).toLocaleDateString()}</td>
                 </tr>

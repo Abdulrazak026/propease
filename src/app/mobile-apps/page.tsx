@@ -24,7 +24,7 @@ export default function MobileAppsPage() {
             Take MBPP <span className="text-[var(--color-accent)]">Anywhere You Go</span>
           </h1>
           <p className="mt-4 text-lg text-white/70 max-w-2xl mx-auto">
-            Find homes, message agents, and manage your rentals — all from your phone.
+            Find homes, message agents, and manage your rentals, all from your phone.
           </p>
         </div>
       </section>
@@ -55,7 +55,7 @@ export default function MobileAppsPage() {
               Google Play
             </span>
           </div>
-          <p className="text-xs text-gray-400 mt-4">Coming soon — notify me when available</p>
+          <p className="text-xs text-gray-400 mt-4">Coming soon. Notify me when available</p>
         </div>
 
         <div className="bg-gray-50 rounded-lg border border-gray-200 p-8 text-center">

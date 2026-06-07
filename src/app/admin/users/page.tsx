@@ -64,7 +64,7 @@ export default function UsersPage() {
                 <tr key={u.id} className="border-b border-gray-50 hover:bg-gray-50/50">
                   <td className="px-4 py-3"><div className="flex items-center gap-2"><div className="w-8 h-8 rounded-full bg-[var(--color-primary)]/10 flex items-center justify-center text-xs font-bold text-[var(--color-primary)]">{u.name.split(" ").map(n=>n[0]).join("")}</div><div><p className="font-medium text-gray-900 text-xs">{u.name}</p><p className="text-[10px] text-gray-400">{u.email}</p></div></div></td>
                   <td className="px-4 py-3"><Badge>{u.role}</Badge></td>
-                  <td className="px-4 py-3 text-xs text-gray-600">{u.city||"—"}</td>
+                  <td className="px-4 py-3 text-xs text-gray-600">{u.city||"N/A"}</td>
                   <td className="px-4 py-3"><Badge variant={u.isApproved?"success":"warning"}>{u.isApproved?"Active":"Pending"}</Badge></td>
                   <td className="px-4 py-3 text-xs font-medium text-gray-900">₦{u.walletBalance.toLocaleString()}</td>
                   <td className="px-4 py-3">
@@ -85,7 +85,7 @@ export default function UsersPage() {
         <div className="grid grid-cols-2 gap-4 text-sm">
           <div><span className="text-gray-400 text-xs">Email</span><p className="font-medium">{viewUser.email}</p></div>
           <div><span className="text-gray-400 text-xs">Role</span><p className="font-medium capitalize">{viewUser.role}</p></div>
-          <div><span className="text-gray-400 text-xs">City</span><p className="font-medium">{viewUser.city||"—"}</p></div>
+          <div><span className="text-gray-400 text-xs">City</span><p className="font-medium">{viewUser.city||"N/A"}</p></div>
           <div><span className="text-gray-400 text-xs">Status</span><Badge variant={viewUser.isApproved?"success":"warning"}>{viewUser.isApproved?"Approved":"Pending"}</Badge></div>
           <div><span className="text-gray-400 text-xs">Wallet</span><p className="font-medium">₦{viewUser.walletBalance.toLocaleString()}</p></div>
           <div><span className="text-gray-400 text-xs">Verified</span><p className="font-medium">{viewUser.isVerified?"Yes":"No"}</p></div>

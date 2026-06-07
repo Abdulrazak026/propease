@@ -10,7 +10,7 @@ const roleContent: Record<string, { title: string; steps: { icon: string; text: 
  admin: {
  title: "Welcome to your Admin Dashboard",
  steps: [
- { icon: "📊", text: "Dashboard shows platform stats — users, listings, tasks, and revenue" },
+ { icon: "📊", text: "Dashboard shows platform stats: users, listings, tasks, and revenue" },
  { icon: "👥", text: "Users page to manage all accounts across the platform" },
  { icon: "💰", text: "Commissions page to configure rate splits and view earnings" },
  { icon: "⚙️", text: "Settings for API keys, preview mode, and security" },
@@ -21,7 +21,7 @@ const roleContent: Record<string, { title: string; steps: { icon: string; text: 
  title: "Welcome to your Agent Dashboard",
  steps: [
  { icon: "📈", text: "Performance metrics show your tasks completed and commissions earned" },
- { icon: "📋", text: "Task Board lists assignments from your ambassador — drag to update status" },
+ { icon: "📋", text: "Task Board lists assignments from your ambassador. Drag to update status" },
  { icon: "💬", text: "Inquiries section to respond to interested clients" },
  { icon: "💰", text: "Commissions page shows what you've earned on each deal" },
  { icon: "👛", text: "Wallet page to top up funds and request withdrawals" },
@@ -80,7 +80,7 @@ export default function OnboardingModal({ role }: OnboardingModalProps) {
  </div>
  <div>
  <h3 className="text-base font-semibold text-gray-900">{content.title}</h3>
- <p className="text-xs text-gray-500">Quick tour — {step + 1} of {steps.length}</p>
+ <p className="text-xs text-gray-500">Quick tour: {step + 1} of {steps.length}</p>
  </div>
  </div>
 

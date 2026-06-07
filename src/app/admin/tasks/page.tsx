@@ -80,7 +80,7 @@ export default function AdminTasksPage() {
                   <tr key={t.id} className="border-b border-gray-50 hover:bg-gray-50/50">
                     <td className="px-4 py-3 text-sm font-medium text-gray-900 max-w-[280px] truncate">{t.title}</td>
                     <td className="px-4 py-3 text-xs text-gray-600">{t.area}</td>
-                    <td className="px-4 py-3 text-xs text-gray-600">{t.assignedTo?.name || "—"}</td>
+                    <td className="px-4 py-3 text-xs text-gray-600">{t.assignedTo?.name || "Unassigned"}</td>
                     <td className="px-4 py-3 text-xs font-medium text-gray-900">₦{t.budget.toLocaleString()}</td>
                     <td className="px-4 py-3">
                       <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${statusStyles[t.status] || "bg-gray-100 text-gray-700"}`}>

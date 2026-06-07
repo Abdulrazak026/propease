@@ -141,15 +141,15 @@ export default function NewAgreementPage() {
  <div className="bg-white rounded-lg border border-gray-200 p-6 space-y-5">
  {/* Select Property */}
  <div>
- <label className="block text-xs font-medium text-gray-700 mb-2">Select Property (optional — pre-fills details)</label>
+ <label className="block text-xs font-medium text-gray-700 mb-2">Select Property (optional, pre-fills details)</label>
  <select
- value={form.listingId}
- onChange={(e) => handleListingSelect(e.target.value)}
- className="w-full rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-sm"
+  value={form.listingId}
+  onChange={(e) => handleListingSelect(e.target.value)}
+  className="w-full rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-sm"
 >
- <option value="">— Select a listing —</option>
+ <option value="">Select a listing</option>
  {listings.filter((l) => l.listingType === "rent").map((l) => (
- <option key={l.id} value={l.id}>{l.title} — {formatNaira(l.price)}/yr</option>
+  <option key={l.id} value={l.id}>{l.title} | {formatNaira(l.price)}/yr</option>
  ))}
  </select>
  </div>

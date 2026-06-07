@@ -45,7 +45,7 @@ export default function AmbassadorPage() {
           { label: "Active Listings", value: s.availableListings, sub: `${s.totalListings} total` },
           { label: "Agents", value: s.agentCount },
           { label: "Open Tasks", value: s.openTasks },
-          { label: "Revenue", value: "—" },
+          { label: "Revenue", value: "₦0" },
         ].map(c => (
           <div key={c.label} className="bg-white rounded-xl border border-gray-200 p-4">
             <p className="text-xs text-gray-500">{c.label}</p>

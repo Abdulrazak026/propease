@@ -14,7 +14,7 @@ export default function ResearchPage() {
           <span className="text-xs font-medium text-[var(--color-primary)] uppercase tracking-wider">Research</span>
           <h1 className="text-3xl font-bold text-gray-900 mt-2 mb-3">Market Research</h1>
           <p className="text-gray-500 max-w-lg mx-auto">
-            Data-driven insights into the Kano real estate market — powered by MBPP transaction data and local surveys.
+            Data-driven insights into the Kano real estate market, powered by MBPP transaction data and local surveys.
           </p>
         </div>
       </section>

@@ -48,7 +48,7 @@ const TOPICS = [
     title: "Account & security",
     desc: "Passwords, two-factor, deleting your account.",
     items: [
-      "I forgot my password — how do I reset it?",
+      "I forgot my password. How do I reset it?",
       "How do I enable two-factor authentication?",
       "How do I delete my account?",
       "Is my personal data shared with anyone?",
@@ -61,7 +61,7 @@ const TOPICS = [
       "Is my payment information secure?",
       "What happens if a deal falls through?",
       "How do refunds work?",
-      "I had a problem with a transaction — who do I contact?",
+      "I had a problem with a transaction. Who do I contact?",
     ],
   },
 ];
@@ -234,7 +234,7 @@ export default function HelpPage() {
                   ))}
                 </div>
                 <p className="text-sm font-medium text-gray-900">&quot;They picked up on a Saturday. Fixed my listing in 20 minutes.&quot;</p>
-                <p className="text-xs text-gray-500 mt-2">— Maryam I., Landlord</p>
+                <p className="text-xs text-gray-500 mt-2">Maryam I., Landlord</p>
               </div>
             </div>
           </div>
@@ -246,7 +246,7 @@ export default function HelpPage() {
           <div className="absolute top-0 right-0 w-96 h-96 bg-sky-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3" />
           <div className="relative max-w-2xl">
             <h2 className="text-3xl sm:text-4xl font-bold text-white tracking-tight leading-[1.15]">Still can&apos;t find what you need?</h2>
-            <p className="text-white/55 mt-4 text-base leading-relaxed">Send a message and we&apos;ll point you in the right direction — usually within a few hours.</p>
+            <p className="text-white/55 mt-4 text-base leading-relaxed">Send a message and we&apos;ll point you in the right direction, usually within a few hours.</p>
             <div className="mt-7 flex flex-wrap gap-3">
               <Link href="/contact" className="inline-flex items-center justify-center min-h-[52px] px-7 py-3.5 bg-white text-gray-950 text-sm font-semibold rounded-full hover:bg-gray-100 active:scale-[0.97] transition-all">
                 Send a message

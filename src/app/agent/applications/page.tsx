@@ -35,8 +35,8 @@ export default function AgentApplicationsPage() {
               {apps.map(a => (
                 <tr key={a.id} className="border-b border-gray-50 hover:bg-gray-50/50">
                   <td className="px-4 py-3"><p className="text-xs font-medium text-gray-900">{a.fullName}</p><p className="text-[10px] text-gray-400">{a.email}</p></td>
-                  <td className="px-4 py-3 text-xs text-gray-600">{a.listing?.title || "—"}</td>
-                  <td className="px-4 py-3 text-xs">{a.monthlyIncome ? `₦${a.monthlyIncome.toLocaleString()}` : "—"}</td>
+                  <td className="px-4 py-3 text-xs text-gray-600">{a.listing?.title || "N/A"}</td>
+                  <td className="px-4 py-3 text-xs">{a.monthlyIncome ? `₦${a.monthlyIncome.toLocaleString()}` : "N/A"}</td>
                   <td className="px-4 py-3"><Badge variant={a.status === "approved" ? "success" : a.status === "rejected" ? "danger" : "warning"}>{a.status}</Badge></td>
                   <td className="px-4 py-3"><Button size="sm" variant="ghost" onClick={() => setSelected(a)}>View</Button></td>
                 </tr>
@@ -54,8 +54,8 @@ export default function AgentApplicationsPage() {
             <div className="grid grid-cols-2 gap-4 text-sm">
               <div><span className="text-gray-400 text-xs">Email</span><p className="font-medium">{selected.email}</p></div>
               <div><span className="text-gray-400 text-xs">Phone</span><p className="font-medium">{selected.phone}</p></div>
-              <div><span className="text-gray-400 text-xs">Income</span><p className="font-medium">{selected.monthlyIncome ? `₦${selected.monthlyIncome.toLocaleString()}` : "—"}</p></div>
-              <div><span className="text-gray-400 text-xs">Employment</span><p className="font-medium">{selected.employmentStatus || "—"}</p></div>
+              <div><span className="text-gray-400 text-xs">Income</span><p className="font-medium">{selected.monthlyIncome ? `₦${selected.monthlyIncome.toLocaleString()}` : "N/A"}</p></div>
+              <div><span className="text-gray-400 text-xs">Employment</span><p className="font-medium">{selected.employmentStatus || "N/A"}</p></div>
               <div><span className="text-gray-400 text-xs">Status</span><Badge variant={selected.status === "approved" ? "success" : selected.status === "rejected" ? "danger" : "warning"}>{selected.status}</Badge></div>
               <div><span className="text-gray-400 text-xs">Date</span><p className="font-medium">{new Date(selected.createdAt).toLocaleDateString()}</p></div>
             </div>

@@ -124,7 +124,7 @@ export default function OutsourcingPage() {
                 <div><span className="text-gray-400 block text-xs">Price</span><span className="font-medium text-[var(--color-primary)]">{formatNaira(preview.price)}</span></div>
                 <div><span className="text-gray-400 block text-xs">Status</span><span className={`inline-block text-xs px-2 py-0.5 rounded-full font-medium ${preview.status==="available"?"bg-emerald-100 text-emerald-700":preview.status==="sold"?"bg-gray-100 text-gray-600":"bg-blue-100 text-blue-700"}`}>{preview.status}</span></div>
                 <div><span className="text-gray-400 block text-xs">City</span><span className="font-medium">{preview.city}</span></div>
-                <div><span className="text-gray-400 block text-xs">Address</span><span className="font-medium">{preview.address || "—"}</span></div>
+                <div><span className="text-gray-400 block text-xs">Address</span><span className="font-medium">{preview.address || "N/A"}</span></div>
                 {preview.bedrooms ? <div><span className="text-gray-400 block text-xs">Bedrooms</span><span className="font-medium">{preview.bedrooms}</span></div> : null}
                 {preview.bathrooms ? <div><span className="text-gray-400 block text-xs">Bathrooms</span><span className="font-medium">{preview.bathrooms}</span></div> : null}
                 {preview.sqft ? <div><span className="text-gray-400 block text-xs">Area</span><span className="font-medium">{preview.sqft} sqft</span></div> : null}
