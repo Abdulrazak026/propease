@@ -72,7 +72,7 @@ export default function Navbar() {
   return (
     <>
     <header
-      className={`lg:hidden sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b h-12 flex items-center px-3 sm:px-4 max-w-[100vw] overflow-hidden transition-transform duration-300 ${
+      className={`lg:hidden sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b h-12 flex items-center px-3 sm:px-4 max-w-[100vw] overflow-hidden rounded-b-2xl transition-transform duration-300 ${
         scrolled ? "border-gray-200" : "border-transparent"
       } ${hidden ? "-translate-y-full" : "translate-y-0"}`}
     >
@@ -93,21 +93,21 @@ export default function Navbar() {
       {isAuthenticated ? (
         <Link
           href={currentUser!.role === "head" ? "/admin" : `/${currentUser!.role}`}
-          className="w-8 h-8 rounded-full bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary-light)] flex items-center justify-center text-white text-[10px] font-bold shadow-sm shrink-0"
+          className="w-8 h-8 rounded-full bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary-light)] flex items-center justify-center text-white text-[10px] font-bold shadow-sm shrink-0 ml-2"
         >
           {currentUser!.name.split(" ").map(n => n[0]).join("").slice(0, 2)}
         </Link>
       ) : (
         <Link
           href="/login"
-          className="px-3 py-1.5 text-xs font-semibold text-white bg-[var(--color-primary)] hover:bg-[var(--color-primary)]/90 rounded-full transition-colors shrink-0"
+          className="ml-2 px-3 py-1.5 text-xs font-semibold text-white bg-[var(--color-primary)] hover:bg-[var(--color-primary)]/90 rounded-full transition-colors shrink-0"
         >
           Sign In
         </Link>
       )}
     </header>
     <header
-      className={`hidden lg:flex sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b h-14 items-center transition-transform duration-300 ${
+      className={`hidden lg:flex sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b h-14 items-center rounded-b-2xl transition-transform duration-300 ${
         scrolled ? "border-gray-200" : "border-transparent"
       } ${hidden ? "-translate-y-full" : "translate-y-0"}`}
     >
@@ -234,7 +234,7 @@ export default function Navbar() {
             <>
               <Link
                 href="/login"
-                className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors"
+                className="px-4 py-2 text-sm font-semibold text-gray-700 border border-gray-200 hover:border-gray-300 hover:bg-gray-50 rounded-lg transition-colors"
               >
                 Sign In
               </Link>

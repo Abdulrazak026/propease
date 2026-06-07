@@ -84,9 +84,9 @@ export default function PropertyCard({ listing }: PropertyCardProps) {
           </button>
         </div>
 
-        <div className="absolute bottom-2 left-3 backdrop-blur-sm bg-black/40 rounded-md px-1.5 py-0.5">
-          <p className="text-white font-bold text-base">{formatNaira(listing.price)}</p>
-          {listing.listingType === "rent" && <p className="text-white/70 text-[11px]">per year</p>}
+        <div className="absolute bottom-2 left-2 sm:left-3 backdrop-blur-sm bg-black/55 rounded-md px-2 py-1 max-w-[calc(100%-1rem)]">
+          <p className="text-white font-bold text-sm sm:text-base whitespace-nowrap">{formatNaira(listing.price)}</p>
+          {listing.listingType === "rent" && <p className="text-white/70 text-[10px] sm:text-[11px] -mt-0.5">per year</p>}
         </div>
       </div>
 

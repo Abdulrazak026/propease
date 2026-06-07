@@ -20,12 +20,12 @@ const defaultResearch = JSON.stringify([
 const defaultTeam = JSON.stringify([
   { name: "Ahmad Abubakar", role: "MD, Managing Director", bio: "Started MBPP in 2017 after buying and selling three properties the hard way. Now he focuses on capital, partnerships, and making sure the company does not lose its soul as it grows.", photo: "" },
   { name: "Barr. Sulaiman Usman", role: "Legal Adviser", bio: "Twenty years in Kano property law. He reads the contracts the rest of us skip, and he is the reason our agreements have held up in every dispute we have seen.", photo: "" },
-  { name: "Umar Nuhu", role: "Admin Officer", bio: "The person who actually keeps the lights on. Sales records, expense tracking, the filing cabinet nobody else wants to touch. That is Umar.", photo: "" },
-  { name: "Tasiu Sani", role: "Source & Procurement", bio: "Walks neighborhoods we have not listed in yet. If a property is about to come up for sale, Tasiu usually knows before the sign goes up.", photo: "" },
   { name: "Engr. Salisu Muhammad", role: "Operations Manager", bio: "Runs the ambassador network. Every field agent, every photographer, every viewing, coordinated from his desk or in person.", photo: "" },
   { name: "Abdulmalik Abubakar", role: "Finance & IT", bio: "Keeps the books honest and the servers up. If you have ever gotten a payout on time, you have Abdulmalik to thank.", photo: "" },
-  { name: "Zahradden Aliyu", role: "Project Manager", bio: "Our newest construction and renovation lead. If you are buying off-plan through us, Zahradden is the one making sure they actually build it.", photo: "" },
+  { name: "Tasiu Sani", role: "Source & Procurement", bio: "Walks neighborhoods we have not listed in yet. If a property is about to come up for sale, Tasiu usually knows before the sign goes up.", photo: "" },
   { name: "Engr. Sani Umar", role: "Platform Manager", bio: "Built the search, the filters, the owner dashboard. If something on the site works well, Sani probably wrote it. If it does not, he is already on it.", photo: "" },
+  { name: "Zahradden Aliyu", role: "Project Manager", bio: "Our newest construction and renovation lead. If you are buying off-plan through us, Zahradden is the one making sure they actually build it.", photo: "" },
+  { name: "Umar Nuhu", role: "Admin Officer", bio: "The person who actually keeps the lights on. Sales records, expense tracking, the filing cabinet nobody else wants to touch. That is Umar.", photo: "" },
   { name: "Ahmad Abubakar Ali", role: "Office Secretary", bio: "The first voice you hear when you call. Ahmad runs scheduling, internal coordination, and our social media. He does the latter better than any of us expected.", photo: "" },
 ]);
 

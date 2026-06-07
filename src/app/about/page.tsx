@@ -7,12 +7,12 @@ import Footer from "@/components/layout/Footer";
 const defaultTeam = [
   { name: "Ahmad Abubakar", role: "Managing Director", bio: "Started MBPP in 2017 after buying and selling three properties the hard way. Now he focuses on capital, partnerships, and making sure the company doesn't lose its soul as it grows.", photo: "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=400&h=400&fit=crop&crop=faces" },
   { name: "Barr. Sulaiman Usman", role: "Legal Adviser", bio: "Twenty years in Kano property law. He reads the contracts the rest of us skip, and he's the reason our agreements have held up in every dispute we've seen.", photo: "https://images.unsplash.com/photo-1556157382-97eda2d62296?w=400&h=400&fit=crop&crop=faces" },
-  { name: "Umar Nuhu", role: "Admin Officer", bio: "The person who actually keeps the lights on. Sales records, expense tracking, the filing cabinet nobody else wants to touch. That's Umar.", photo: "https://images.unsplash.com/photo-1531427186611-ecfd6d936c79?w=400&h=400&fit=crop&crop=faces" },
-  { name: "Tasiu Sani", role: "Source & Procurement", bio: "Walks neighborhoods we haven't listed in yet. If a property is about to come up for sale, Tasiu usually knows before the sign goes up.", photo: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=faces" },
   { name: "Engr. Salisu Muhammad", role: "Operations Manager", bio: "Runs the ambassador network. Every field agent, every photographer, every viewing, coordinated from his desk or in person.", photo: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&crop=faces" },
   { name: "Abdulmalik Abubakar", role: "Finance & IT", bio: "Keeps the books honest and the servers up. If you've ever gotten a payout on time, you have Abdulmalik to thank.", photo: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop&crop=faces" },
-  { name: "Zahradden Aliyu", role: "Project Manager", bio: "Our newest construction and renovation lead. If you're buying off-plan through us, Zahradden is the one making sure they actually build it.", photo: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=400&h=400&fit=crop&crop=faces" },
+  { name: "Tasiu Sani", role: "Source & Procurement", bio: "Walks neighborhoods we haven't listed in yet. If a property is about to come up for sale, Tasiu usually knows before the sign goes up.", photo: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=faces" },
   { name: "Engr. Sani Umar", role: "Platform Manager", bio: "Built the search, the filters, the owner dashboard. If something on the site works well, Sani probably wrote it. If it doesn't, he's already on it.", photo: "https://images.unsplash.com/photo-1463453091185-61582044d556?w=400&h=400&fit=crop&crop=faces" },
+  { name: "Zahradden Aliyu", role: "Project Manager", bio: "Our newest construction and renovation lead. If you're buying off-plan through us, Zahradden is the one making sure they actually build it.", photo: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=400&h=400&fit=crop&crop=faces" },
+  { name: "Umar Nuhu", role: "Admin Officer", bio: "The person who actually keeps the lights on. Sales records, expense tracking, the filing cabinet nobody else wants to touch. That's Umar.", photo: "https://images.unsplash.com/photo-1531427186611-ecfd6d936c79?w=400&h=400&fit=crop&crop=faces" },
   { name: "Ahmad Abubakar Ali", role: "Office Secretary", bio: "The first voice you hear when you call. Ahmad runs scheduling, internal coordination, and our social media. He does the latter better than any of us expected.", photo: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&h=400&fit=crop&crop=faces" },
 ];
 
@@ -49,11 +49,11 @@ export default function AboutPage() {
           <div className="max-w-3xl">
             <p className="text-xs font-semibold text-emerald-400 uppercase tracking-[0.15em] mb-5">Since 2017 · Kano</p>
             <h1 className="text-4xl sm:text-5xl lg:text-7xl font-bold text-white leading-[1.02] tracking-tight">
-              We started because<br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-300 to-teal-200">renting in Kano was broken.</span>
+              A Kano property company<br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-300 to-teal-200">that does the basics properly.</span>
             </h1>
             <p className="text-base sm:text-lg text-white/55 mt-6 leading-relaxed">
-              Fake listings. Agents who disappear after the first deposit. Agreements written on a serviette. We&apos;d been burned ourselves, so we built the marketplace we wished we&apos;d had.
+              MBPP is a registered property company in Kano. We list and sell real estate, draw up and witness agreements, and run a small ambassador network that visits every property before it goes on the site. We have been doing this in Kano since 2017.
             </p>
           </div>
         </div>
@@ -79,20 +79,20 @@ export default function AboutPage() {
         <div className="grid lg:grid-cols-12 gap-10 lg:gap-16">
           <div className="lg:col-span-5">
             <p className="text-xs font-semibold text-[var(--color-primary)] uppercase tracking-[0.15em] mb-3">Our story</p>
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 tracking-tight leading-[1.15]">From a WhatsApp group to a platform.</h2>
+            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 tracking-tight leading-[1.15]">A small Kano office that got tired of bad deals.</h2>
           </div>
           <div className="lg:col-span-7 space-y-5 text-base text-gray-600 leading-relaxed">
             <p>
-              MBPP started as a side project in 2017. Our founder had just sold a duplex in Nassarawa and lost a chunk of the proceeds to an agent who turned out to be working three other buyers. He posted a single message in a Kano real estate WhatsApp group asking who&apos;d had a similar experience. Forty people replied the same day.
+              MBPP is a Kano property company. We rent flats, sell houses, source land, and draw up agreements for clients who would rather not do those things over the phone with someone they cannot trace. We have been at it since 2017, mostly because we kept seeing the same problems come back: the same fake listings, the same disputed boundaries, the same agent who takes a deposit and stops replying.
             </p>
             <p>
-              We started with a Google Form and a shared spreadsheet. The first year, we listed 12 properties by hand, photographed them with a phone, and matched them with tenants from our personal networks. The second year, 80 properties. The third, we had to hire.
+              The company is registered in Kano, the team is in Kano, the disputes we mediate happen in Kano. We do not list properties in Lagos, Abuja, or Kaduna because we have not walked those streets. When a client asks for something outside our coverage, we say no and usually recommend someone we have worked with before. It is a smaller business than it could be. It is also one we can actually stand behind.
             </p>
             <p>
-              Today we&apos;re a registered property company in Kano with a small, tight team. We don&apos;t pretend to be a national platform. Kano is what we know, and Kano is what we do well. The agents in our network live in the neighborhoods they list. The agreements we draw up have been tested in Kano courts. The support number is answered by someone in Kano.
+              What you get when you work with us is a property someone from our office has visited, an agent whose name and number are in our records, a written agreement that has held up in the disputes we have seen, and a split of any commission that is visible to all the parties involved. None of that is unique to Kano. We just do it here, and we are not in a hurry to be anywhere else.
             </p>
             <p>
-              That&apos;s the whole pitch. We&apos;re local, we&apos;re accountable, and we&apos;d rather do fewer things properly than be everywhere and do them badly.
+              If you are buying, renting, or selling in Kano and you want a straight answer from someone who will still be in the office next year, give us a call or stop by. The door is open.
             </p>
           </div>
         </div>
@@ -102,18 +102,18 @@ export default function AboutPage() {
         <div className="max-w-[1400px] mx-auto w-full px-5 sm:px-6 lg:px-10 py-20 sm:py-28">
           <div className="max-w-2xl">
             <p className="text-xs font-semibold text-[var(--color-primary)] uppercase tracking-[0.15em] mb-3">What we stand for</p>
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 tracking-tight leading-[1.15]">Three commitments we don&apos;t bend on.</h2>
+            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 tracking-tight leading-[1.15]">Three things we will not compromise on.</h2>
           </div>
           <div className="grid sm:grid-cols-3 gap-5 mt-12">
             {[
-              { n: "01", t: "If we list it, we&apos;ve seen it", d: "Every property on MBPP has been visited by a local ambassador. No scraped photos, no copy-paste descriptions, no 'call for details' on a 4-bedroom asking ₦8M." },
-              { n: "02", t: "If we represent an agent, we&apos;ve met them", d: "Our ambassador network is personal. We know who they are, where they operate, and how they close. If something goes sideways, we&apos;re the ones you call, not a bot." },
-              { n: "03", t: "If we take a commission, you can see it", d: "The split is in the dashboard. Agent, ambassador, MBPP, all three lines visible to the parties who paid and received. No mystery percentages." },
+              { n: "01", t: "We have visited every property we list", d: "Photos are taken by our ambassadors, on site. Descriptions are written from what was seen during the visit, not from the landlord's text message. If we have not been to the property, we do not list it. The cost of skipping a visit is the cost of a bad tenant moving in, and we would rather lose the listing." },
+              { n: "02", t: "Every agent in our network is a person we have met", d: "We do not have a signup form for agents. New agents come through someone we already work with, and we meet them in person before they list their first property. If you have a problem with an agent we represent, you call our office and we handle it. The agent is the one we are accountable for, not the other way around." },
+              { n: "03", t: "Commission splits are shown to everyone involved", d: "The agent, the ambassador, and MBPP each get a line item in the deal record. Both the paying party and the receiving party can see the full split. We do not round numbers up, do not have side fees, and do not charge for things that are not on the agreement. If a client asks what we are paid, we answer in writing." },
             ].map((p) => (
               <div key={p.n} className="bg-white rounded-2xl border border-gray-100 p-7">
                 <p className="text-xs font-bold text-gray-300 tabular-nums mb-4">{p.n}</p>
-                <h3 className="text-lg font-semibold text-gray-900 mb-3 leading-snug" dangerouslySetInnerHTML={{ __html: p.t }} />
-                <p className="text-sm text-gray-500 leading-relaxed" dangerouslySetInnerHTML={{ __html: p.d }} />
+                <h3 className="text-lg font-semibold text-gray-900 mb-3 leading-snug">{p.t}</h3>
+                <p className="text-sm text-gray-500 leading-relaxed">{p.d}</p>
               </div>
             ))}
           </div>
@@ -124,32 +124,47 @@ export default function AboutPage() {
         <div className="grid lg:grid-cols-12 gap-10 lg:gap-16 items-start">
           <div className="lg:col-span-4">
             <p className="text-xs font-semibold text-[var(--color-primary)] uppercase tracking-[0.15em] mb-3">The team</p>
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 tracking-tight leading-[1.15]">Nine people. One office. All reachable.</h2>
+            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 tracking-tight leading-[1.15]">Nine people, one office, one phone number.</h2>
             <p className="text-sm text-gray-500 mt-4 leading-relaxed">
-              We&apos;re intentionally small. The agent who lists your property is two calls away from the legal adviser and one floor away from the platform engineer. Decisions happen in person, not in Jira.
+              Listed below in the order of who runs what. The legal adviser who reviews your agreement sits across the office from the operations manager who scheduled your viewing, and one floor below the platform manager who built the dashboard you are using. There is no support ticket queue, no offshore call center, no escalation matrix. You call the office, someone picks up.
             </p>
           </div>
           <div className="lg:col-span-8 grid sm:grid-cols-2 gap-x-6 gap-y-10">
-            {team.map((m, i) => (
-              <div
-                key={m.name}
-                className="group flex gap-4 p-3 -m-3 rounded-2xl transition-all duration-300 hover:bg-white hover:shadow-lg hover:shadow-gray-900/5 hover:-translate-y-0.5 cursor-default"
-                style={{ animation: `fadeUp 0.5s ease-out ${i * 60}ms both` }}
-              >
-                <div className="shrink-0 w-24 h-24 sm:w-28 sm:h-28 lg:w-32 lg:h-32 rounded-2xl bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center text-base font-bold text-gray-500 overflow-hidden ring-2 ring-white shadow-md shadow-gray-900/5 transition-transform duration-500 group-hover:scale-110 group-hover:shadow-xl group-hover:shadow-[var(--color-primary)]/20">
-                  {m.photo ? (
-                    <img src={resolveImageUrl(m.photo) || ""} alt={m.name} className="w-full h-full object-cover object-top" loading="lazy" />
-                  ) : (
-                    m.name.split(" ").map(n => n[0]).join("").slice(0, 2)
-                  )}
+            {team.map((m, i) => {
+              const isLead = i === 0;
+              return (
+                <div
+                  key={m.name}
+                  className={`group flex gap-4 p-3 -m-3 rounded-2xl transition-all duration-300 hover:bg-white hover:shadow-lg hover:shadow-gray-900/5 hover:-translate-y-0.5 cursor-default ${
+                    isLead ? "sm:col-span-2 sm:items-center bg-gradient-to-br from-emerald-50/60 to-white border border-emerald-100/60" : ""
+                  }`}
+                  style={{ animation: `fadeUp 0.5s ease-out ${i * 60}ms both` }}
+                >
+                  <div className={`shrink-0 rounded-2xl bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center font-bold text-gray-500 overflow-hidden ring-2 ring-white shadow-md shadow-gray-900/5 transition-transform duration-500 group-hover:scale-105 group-hover:shadow-xl group-hover:shadow-[var(--color-primary)]/20 ${
+                    isLead ? "w-24 h-24 sm:w-32 sm:h-32 text-lg" : "w-24 h-24 sm:w-28 sm:h-28 text-base"
+                  }`}>
+                    {m.photo ? (
+                      <img src={resolveImageUrl(m.photo) || ""} alt={m.name} className="w-full h-full object-cover object-top" loading="lazy" />
+                    ) : (
+                      m.name.split(" ").map(n => n[0]).join("").slice(0, 2)
+                    )}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <p className={`font-semibold text-gray-900 leading-tight transition-colors duration-300 group-hover:text-[var(--color-primary)] ${isLead ? "text-lg sm:text-xl" : "text-base"}`}>{m.name}</p>
+                      {isLead && (
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[var(--color-primary)]/10 text-[var(--color-primary)] text-[10px] font-semibold uppercase tracking-wider">
+                          <svg className="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.957a1 1 0 00.95.69h4.162c.969 0 1.371 1.24.588 1.81l-3.37 2.448a1 1 0 00-.364 1.118l1.287 3.957c.3.922-.755 1.688-1.539 1.118L10 14.347l-3.37 2.448c-.783.57-1.838-.196-1.539-1.118l1.287-3.957a1 1 0 00-.364-1.118L2.644 8.384c-.783-.57-.38-1.81.588-1.81h4.162a1 1 0 00.95-.69l1.286-3.957z" /></svg>
+                          Founder
+                        </span>
+                      )}
+                    </div>
+                    <p className={`text-[var(--color-primary)] font-medium mb-2 mt-0.5 ${isLead ? "text-sm" : "text-xs"}`}>{m.role}</p>
+                    <p className={`text-gray-500 leading-relaxed ${isLead ? "text-base" : "text-sm"}`}>{m.bio}</p>
+                  </div>
                 </div>
-                <div className="min-w-0 flex-1">
-                  <p className="text-base font-semibold text-gray-900 leading-tight transition-colors duration-300 group-hover:text-[var(--color-primary)]">{m.name}</p>
-                  <p className="text-xs text-[var(--color-primary)] font-medium mb-2 mt-0.5">{m.role}</p>
-                  <p className="text-sm text-gray-500 leading-relaxed">{m.bio}</p>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>
