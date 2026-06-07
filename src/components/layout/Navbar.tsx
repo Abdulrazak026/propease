@@ -72,7 +72,7 @@ export default function Navbar() {
   return (
     <>
     <header
-      className={`lg:hidden sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b h-12 flex items-center px-3 sm:px-4 max-w-[100vw] overflow-hidden rounded-b-2xl transition-transform duration-300 ${
+      className={`lg:hidden sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b h-12 flex items-center pl-4 pr-5 sm:pl-5 sm:pr-6 max-w-[100vw] overflow-hidden rounded-b-2xl transition-transform duration-300 ${
         scrolled ? "border-gray-200" : "border-transparent"
       } ${hidden ? "-translate-y-full" : "translate-y-0"}`}
     >
@@ -84,7 +84,7 @@ export default function Navbar() {
             <div className="w-6 h-6 rounded-md bg-[var(--color-primary)] flex items-center justify-center shrink-0">
               <span className="text-white font-black text-[9px]">M</span>
             </div>
-            <span className="text-sm font-bold text-gray-900 tracking-tight truncate">{siteName}</span>
+            <span className="text-sm font-bold text-gray-900 tracking-tight">MBPP</span>
           </>
         )}
       </Link>
@@ -93,14 +93,14 @@ export default function Navbar() {
       {isAuthenticated ? (
         <Link
           href={currentUser!.role === "head" ? "/admin" : `/${currentUser!.role}`}
-          className="w-8 h-8 rounded-full bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary-light)] flex items-center justify-center text-white text-[10px] font-bold shadow-sm shrink-0 ml-2"
+          className="w-8 h-8 rounded-full bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary-light)] flex items-center justify-center text-white text-[10px] font-bold shadow-sm shrink-0 ml-3"
         >
           {currentUser!.name.split(" ").map(n => n[0]).join("").slice(0, 2)}
         </Link>
       ) : (
         <Link
           href="/login"
-          className="ml-2 px-3 py-1.5 text-xs font-semibold text-white bg-[var(--color-primary)] hover:bg-[var(--color-primary)]/90 rounded-full transition-colors shrink-0"
+          className="ml-3 px-3.5 py-1.5 text-xs font-semibold text-white bg-[var(--color-primary)] hover:bg-[var(--color-primary)]/90 rounded-full transition-colors shrink-0"
         >
           Sign In
         </Link>
