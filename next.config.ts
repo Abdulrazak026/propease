@@ -4,6 +4,7 @@ const nextConfig: NextConfig = {
   env: {
     NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL || "https://propease-production.up.railway.app",
   },
+  output: "standalone",
   productionBrowserSourceMaps: false,
   // cache-buster: 2026-06-05T18:00
   async headers() {
