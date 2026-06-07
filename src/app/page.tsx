@@ -130,7 +130,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <div className="lg:sticky lg:top-14 z-30 bg-white/95 backdrop-blur-md border-b border-gray-200 lg:shadow-sm" data-filter-search>
+      <div className="bg-white border-b border-gray-200 shadow-sm" data-filter-search>
         <PropertyFilters onFilterChange={handleFilterChange} />
       </div>
 

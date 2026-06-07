@@ -22,9 +22,9 @@ export default function AboutPage() {
   try {
     const raw = get("team_members");
     const parsed = raw ? JSON.parse(raw) : null;
+    const defaultsByName: Record<string, (typeof defaultTeam)[number]> = {};
+    for (const m of defaultTeam) defaultsByName[m.name] = m;
     if (Array.isArray(parsed) && parsed.length > 0) {
-      const defaultsByName: Record<string, (typeof defaultTeam)[number]> = {};
-      for (const m of defaultTeam) defaultsByName[m.name] = m;
       team = parsed.map((m: (typeof defaultTeam)[number]) => ({
         ...m,
         photo: m.photo || defaultsByName[m.name]?.photo || "",

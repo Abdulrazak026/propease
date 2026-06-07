@@ -75,11 +75,17 @@ export default function PropertyFilters({ onFilterChange }: PropertyFiltersProps
       </div>
 
       <div className="flex items-center gap-2">
-        <input type="number" placeholder="Min price" value={filters.minPrice} onChange={(e) => update("minPrice", e.target.value)}
-          className="min-h-[44px] flex-1 rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)]" />
+        <div className="flex-1 relative">
+          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">&#8358;</span>
+          <input type="number" placeholder="Min price" value={filters.minPrice} onChange={(e) => update("minPrice", e.target.value)}
+            className="min-h-[44px] w-full rounded-lg border border-gray-300 bg-white pl-8 pr-3 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)]" />
+        </div>
         <span className="text-gray-300 text-sm">–</span>
-        <input type="number" placeholder="Max price" value={filters.maxPrice} onChange={(e) => update("maxPrice", e.target.value)}
-          className="min-h-[44px] flex-1 rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)]" />
+        <div className="flex-1 relative">
+          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">&#8358;</span>
+          <input type="number" placeholder="Max price" value={filters.maxPrice} onChange={(e) => update("maxPrice", e.target.value)}
+            className="min-h-[44px] w-full rounded-lg border border-gray-300 bg-white pl-8 pr-3 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)]" />
+        </div>
       </div>
 
       <button onClick={() => setShowMore(!showMore)}
@@ -135,11 +141,17 @@ export default function PropertyFilters({ onFilterChange }: PropertyFiltersProps
             className="rounded-md border border-gray-300 bg-white px-2 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)]">
             {cities.map((c) => <option key={c} value={c === "All Cities" ? "" : c}>{c}</option>)}
           </select>
-          <input type="number" placeholder="Min $" value={filters.minPrice} onChange={(e) => update("minPrice", e.target.value)}
-            className="w-20 rounded-md border border-gray-300 bg-white px-2 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)]" />
+          <div className="relative">
+            <span className="absolute left-2 top-1/2 -translate-y-1/2 text-gray-400 text-xs">&#8358;</span>
+            <input type="number" placeholder="Min" value={filters.minPrice} onChange={(e) => update("minPrice", e.target.value)}
+              className="w-24 rounded-md border border-gray-300 bg-white pl-6 pr-2 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)]" />
+          </div>
           <span className="text-gray-300 text-xs">–</span>
-          <input type="number" placeholder="Max $" value={filters.maxPrice} onChange={(e) => update("maxPrice", e.target.value)}
-            className="w-20 rounded-md border border-gray-300 bg-white px-2 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)]" />
+          <div className="relative">
+            <span className="absolute left-2 top-1/2 -translate-y-1/2 text-gray-400 text-xs">&#8358;</span>
+            <input type="number" placeholder="Max" value={filters.maxPrice} onChange={(e) => update("maxPrice", e.target.value)}
+              className="w-24 rounded-md border border-gray-300 bg-white pl-6 pr-2 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)]" />
+          </div>
           <button onClick={() => setShowMore(!showMore)}
             className="text-xs text-[var(--color-primary)] font-medium hover:underline ml-auto">{showMore ? "Less" : "More"}</button>
         </div>
