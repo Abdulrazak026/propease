@@ -90,20 +90,7 @@ export default function HomePage() {
             <span className="text-white/60">50+ Agents</span>
             <span className="text-white/60">4 Cities</span>
           </div>
-          {/* Quick search shortcut on mobile */}
-          <div className="mt-5 w-full max-w-md lg:hidden">
-            <div className="relative">
-              <svg className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-              <input type="text" placeholder="Search properties..."
-                onFocus={() => {
-                  document.querySelector<HTMLElement>('[data-filter-search]')?.scrollIntoView({ behavior: "smooth", block: "center" });
-                  setTimeout(() => document.querySelector<HTMLInputElement>('[data-filter-search]')?.focus(), 300);
-                }}
-                className="w-full rounded-xl border border-white/20 bg-white/10 backdrop-blur-md pl-10 pr-4 py-3 text-sm text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/30" />
-            </div>
-          </div>
+
         </div>
       </section>
 
