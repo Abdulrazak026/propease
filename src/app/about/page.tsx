@@ -50,10 +50,10 @@ export default function AboutPage() {
             <p className="text-xs font-semibold text-emerald-400 uppercase tracking-[0.15em] mb-5">Since 2017 · Kano</p>
             <h1 className="text-4xl sm:text-5xl lg:text-7xl font-bold text-white leading-[1.02] tracking-tight">
               A Kano property company<br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-300 to-teal-200">that does the basics properly.</span>
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-300 to-teal-200">since 2017.</span>
             </h1>
-            <p className="text-base sm:text-lg text-white/55 mt-6 leading-relaxed">
-              MBPP is a registered property company in Kano. We list and sell real estate, draw up and witness agreements, and run a small ambassador network that visits every property before it goes on the site. We have been doing this in Kano since 2017.
+            <p className="text-base sm:text-lg text-white/55 mt-6 leading-relaxed max-w-xl">
+              We list, sell, and rent property in Kano. We also draw up and witness the agreements.
             </p>
           </div>
         </div>
@@ -79,20 +79,14 @@ export default function AboutPage() {
         <div className="grid lg:grid-cols-12 gap-10 lg:gap-16">
           <div className="lg:col-span-5">
             <p className="text-xs font-semibold text-[var(--color-primary)] uppercase tracking-[0.15em] mb-3">Our story</p>
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 tracking-tight leading-[1.15]">A small Kano office that got tired of bad deals.</h2>
+            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 tracking-tight leading-[1.15]">A small Kano office that does the basics properly.</h2>
           </div>
-          <div className="lg:col-span-7 space-y-5 text-base text-gray-600 leading-relaxed">
+          <div className="lg:col-span-7 space-y-4 text-base text-gray-600 leading-relaxed">
             <p>
-              MBPP is a Kano property company. We rent flats, sell houses, source land, and draw up agreements for clients who would rather not do those things over the phone with someone they cannot trace. We have been at it since 2017, mostly because we kept seeing the same problems come back: the same fake listings, the same disputed boundaries, the same agent who takes a deposit and stops replying.
+              MBPP is a registered property company in Kano. We have been listing, renting, selling, and drawing up agreements here since 2017.
             </p>
             <p>
-              The company is registered in Kano, the team is in Kano, the disputes we mediate happen in Kano. We do not list properties in Lagos, Abuja, or Kaduna because we have not walked those streets. When a client asks for something outside our coverage, we say no and usually recommend someone we have worked with before. It is a smaller business than it could be. It is also one we can actually stand behind.
-            </p>
-            <p>
-              What you get when you work with us is a property someone from our office has visited, an agent whose name and number are in our records, a written agreement that has held up in the disputes we have seen, and a split of any commission that is visible to all the parties involved. None of that is unique to Kano. We just do it here, and we are not in a hurry to be anywhere else.
-            </p>
-            <p>
-              If you are buying, renting, or selling in Kano and you want a straight answer from someone who will still be in the office next year, give us a call or stop by. The door is open.
+              We only work in Kano. The team is in Kano, the agents we represent are in Kano, and the disputes we mediate happen in Kano. If a client asks for something outside the city, we say no and point them to someone we have worked with before.
             </p>
           </div>
         </div>
@@ -106,9 +100,9 @@ export default function AboutPage() {
           </div>
           <div className="grid sm:grid-cols-3 gap-5 mt-12">
             {[
-              { n: "01", t: "We have visited every property we list", d: "Photos are taken by our ambassadors, on site. Descriptions are written from what was seen during the visit, not from the landlord's text message. If we have not been to the property, we do not list it. The cost of skipping a visit is the cost of a bad tenant moving in, and we would rather lose the listing." },
-              { n: "02", t: "Every agent in our network is a person we have met", d: "We do not have a signup form for agents. New agents come through someone we already work with, and we meet them in person before they list their first property. If you have a problem with an agent we represent, you call our office and we handle it. The agent is the one we are accountable for, not the other way around." },
-              { n: "03", t: "Commission splits are shown to everyone involved", d: "The agent, the ambassador, and MBPP each get a line item in the deal record. Both the paying party and the receiving party can see the full split. We do not round numbers up, do not have side fees, and do not charge for things that are not on the agreement. If a client asks what we are paid, we answer in writing." },
+              { n: "01", t: "We have visited every property we list", d: "Photos are taken by our ambassadors, on site. Descriptions are written from what was seen during the visit. If we have not been to the property, we do not list it." },
+              { n: "02", t: "Every agent is someone we have met", d: "We do not have a signup form. New agents come through someone we already work with, and we meet them in person before they list their first property." },
+              { n: "03", t: "Commission splits are visible to everyone", d: "Agent, ambassador, and MBPP each get a line item in the deal record. The paying party and the receiving party can both see the full split." },
             ].map((p) => (
               <div key={p.n} className="bg-white rounded-2xl border border-gray-100 p-7">
                 <p className="text-xs font-bold text-gray-300 tabular-nums mb-4">{p.n}</p>
@@ -124,9 +118,9 @@ export default function AboutPage() {
         <div className="grid lg:grid-cols-12 gap-10 lg:gap-16 items-start">
           <div className="lg:col-span-4">
             <p className="text-xs font-semibold text-[var(--color-primary)] uppercase tracking-[0.15em] mb-3">The team</p>
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 tracking-tight leading-[1.15]">Nine people, one office, one phone number.</h2>
+            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 tracking-tight leading-[1.15]">Nine people. One office.</h2>
             <p className="text-sm text-gray-500 mt-4 leading-relaxed">
-              Listed below in the order of who runs what. The legal adviser who reviews your agreement sits across the office from the operations manager who scheduled your viewing, and one floor below the platform manager who built the dashboard you are using. There is no support ticket queue, no offshore call center, no escalation matrix. You call the office, someone picks up.
+              Listed below in the order of who runs what. Call the office and the person who picks up can usually help, or pass you to the one who can.
             </p>
           </div>
           <div className="lg:col-span-8 grid sm:grid-cols-2 gap-x-6 gap-y-10">
@@ -174,10 +168,10 @@ export default function AboutPage() {
           <div className="absolute top-0 left-0 w-72 h-72 bg-emerald-200/30 rounded-full blur-3xl -translate-y-1/2 -translate-x-1/3" />
           <div className="relative max-w-2xl mx-auto">
             <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 tracking-tight leading-[1.15]">
-              Got a property? Got a question? Either way, call us.
+              Got a property? Got a question? Call us.
             </h2>
             <p className="text-base text-gray-600 mt-5 leading-relaxed">
-              We&apos;d rather spend an hour on the phone with you than lose you to a bad experience. Real estate is a people business and we&apos;re not too cool to admit it.
+              Real estate is a people business, and we are not too cool to say that out loud.
             </p>
             <div className="mt-8 flex flex-wrap justify-center gap-3">
               <Link href="/contact" className="inline-flex items-center justify-center min-h-[52px] px-7 py-3.5 bg-gray-950 text-white text-sm font-semibold rounded-full hover:bg-gray-800 active:scale-[0.97] transition-all">
