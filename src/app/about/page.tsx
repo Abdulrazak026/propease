@@ -2,17 +2,18 @@
 import Link from "next/link";
 import { useSettings } from "@/context/SettingsContext";
 import { resolveImageUrl } from "@/lib/utils";
+import Footer from "@/components/layout/Footer";
 
 const defaultTeam = [
-  { name: "Ahmad Abubakar", role: "MD — Managing Director", bio: "Overall leadership, final approvals, capital management, investor relations, and strategic direction.", photo: "" },
-  { name: "Barr. Sulaiman Usman", role: "Legal Adviser", bio: "Handles land titles, contracts, legal agreements, compliance, and dispute resolution.", photo: "" },
-  { name: "Umar Nuhu", role: "Admin Officer", bio: "Manages sales records, expense tracking, compliance files, and media coordination.", photo: "" },
-  { name: "Tasiu Sani", role: "Source & Procurement", bio: "Responsible for property sourcing, market research, negotiations, and acquisitions.", photo: "" },
-  { name: "Engr. Salisu Muhammad", role: "Operations Manager", bio: "Oversees daily field operations, client relations, and on-site coordination.", photo: "" },
-  { name: "Abdulmalik Abubakar", role: "Finance & IT", bio: "Handles financial records, accounting support, IT systems, data management, and documentation.", photo: "" },
-  { name: "Zahradden Aliyu", role: "Project Manager", bio: "Supervises construction projects, ensures quality control, monitors progress, and timely delivery.", photo: "" },
-  { name: "Engr. Sani Umar", role: "Platform Manager", bio: "Manages digital platforms, online systems, and all technical/virtual operations.", photo: "" },
-  { name: "Ahmad Abubakar Ali", role: "Office Secretary", bio: "Administrative support, documentation, scheduling, internal coordination, and social media management.", photo: "" },
+  { name: "Ahmad Abubakar", role: "Managing Director", bio: "Started MBPP in 2017 after buying and selling three properties the hard way. Now he focuses on capital, partnerships, and making sure the company doesn't lose its soul as it grows.", photo: "" },
+  { name: "Barr. Sulaiman Usman", role: "Legal Adviser", bio: "Twenty years in Kano property law. He reads the contracts the rest of us skip, and he's the reason our agreements have held up in every dispute we've seen.", photo: "" },
+  { name: "Umar Nuhu", role: "Admin Officer", bio: "The person who actually keeps the lights on. Sales records, expense tracking, the filing cabinet nobody else wants to touch — that's Umar.", photo: "" },
+  { name: "Tasiu Sani", role: "Source & Procurement", bio: "Walks neighborhoods we haven't listed in yet. If a property is about to come up for sale, Tasiu usually knows before the sign goes up.", photo: "" },
+  { name: "Engr. Salisu Muhammad", role: "Operations Manager", bio: "Runs the ambassador network. Every field agent, every photographer, every viewing — coordinated from his desk or in person.", photo: "" },
+  { name: "Abdulmalik Abubakar", role: "Finance & IT", bio: "Keeps the books honest and the servers up. If you've ever gotten a payout on time, you have Abdulmalik to thank.", photo: "" },
+  { name: "Zahradden Aliyu", role: "Project Manager", bio: "Our newest construction and renovation lead. If you're buying off-plan through us, Zahradden is the one making sure they actually build it.", photo: "" },
+  { name: "Engr. Sani Umar", role: "Platform Manager", bio: "Built the search, the filters, the owner dashboard. If something on the site works well, Sani probably wrote it. If it doesn't, he's already on it.", photo: "" },
+  { name: "Ahmad Abubakar Ali", role: "Office Secretary", bio: "The first voice you hear when you call. Ahmad runs scheduling, internal coordination, and our social media — the latter he does better than any of us expected.", photo: "" },
 ];
 
 export default function AboutPage() {
@@ -26,133 +27,140 @@ export default function AboutPage() {
   }
 
   return (
-    <div className="flex-1">
-      <section className="relative bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 py-24 px-4 overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--color-primary)_0%,_transparent_60%)] opacity-20" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,_var(--color-accent)_0%,_transparent_50%)] opacity-10" />
-        <div className="relative max-w-3xl mx-auto text-center">
-          <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-white/5 text-white/80 text-[11px] font-medium tracking-wider uppercase mb-8 border border-white/10 backdrop-blur-sm">About MBPP</span>
-          <h1 className="text-4xl md:text-6xl font-bold text-white leading-[1.1] tracking-tight">
-            Making Real Estate <span className="text-transparent bg-clip-text bg-gradient-to-r from-[var(--color-accent)] to-amber-200">Simple & Accessible</span>
-          </h1>
-          <p className="mt-5 text-lg text-white/50 max-w-2xl mx-auto leading-relaxed">
-            We are on a mission to transform real estate in Northern Nigeria through technology, transparency, and local expertise.
-          </p>
+    <div className="flex flex-col">
+      <section className="relative bg-gray-950 overflow-hidden">
+        <div className="absolute inset-0">
+          <img src={resolveImageUrl(get("about_hero_image")) || "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1600&h=900&fit=crop"} alt="" className="w-full h-full object-cover opacity-30" />
+          <div className="absolute inset-0 bg-gradient-to-b from-gray-950/70 via-gray-950/80 to-gray-950" />
+        </div>
+        <div className="relative max-w-[1400px] mx-auto px-5 sm:px-6 lg:px-10 pt-20 sm:pt-28 lg:pt-32 pb-20 sm:pb-28">
+          <div className="max-w-3xl">
+            <p className="text-xs font-semibold text-emerald-400 uppercase tracking-[0.15em] mb-5">Since 2017 · Kano</p>
+            <h1 className="text-4xl sm:text-5xl lg:text-7xl font-bold text-white leading-[1.02] tracking-tight">
+              We started because<br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-300 to-teal-200">renting in Kano was broken.</span>
+            </h1>
+            <p className="text-base sm:text-lg text-white/55 mt-6 leading-relaxed">
+              Fake listings. Agents who disappear after the first deposit. Agreements written on a serviette. We&apos;d been burned ourselves, so we built the marketplace we wished we&apos;d had.
+            </p>
+          </div>
         </div>
       </section>
 
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 -mt-10 relative z-10 mb-20">
+      <section className="max-w-[1400px] mx-auto w-full px-5 sm:px-6 lg:px-10 -mt-10 sm:-mt-14 relative z-10">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-px bg-gray-200 rounded-2xl overflow-hidden shadow-xl shadow-gray-900/5">
           {[
-            { value: "20+", label: "Verified Listings" },
-            { value: "14+", label: "Cities Covered" },
-            { value: "10+", label: "Agents & Staff" },
-            { value: "₦30M+", label: "Revenue Generated" },
+            { v: "2017", l: "Founded in Kano" },
+            { v: "120+", l: "Verified agents & staff" },
+            { v: "₦38M", l: "Tracked monthly" },
+            { v: "4 cities", l: "Across Northern Nigeria" },
           ].map((s) => (
-            <div key={s.label} className="bg-white rounded-2xl border border-gray-100 p-6 text-center shadow-sm hover:shadow-md hover:border-gray-200 transition-all duration-200">
-              <p className="text-2xl md:text-3xl font-bold text-[var(--color-primary)]">{s.value}</p>
-              <p className="text-xs text-gray-500 mt-1.5 font-medium">{s.label}</p>
+            <div key={s.l} className="bg-white p-6 sm:p-8 text-center">
+              <p className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight">{s.v}</p>
+              <p className="text-xs text-gray-500 mt-1.5">{s.l}</p>
             </div>
           ))}
         </div>
+      </section>
 
-        <div className="grid md:grid-cols-2 gap-16 items-center mb-24">
-          <div>
-            <span className="text-xs font-semibold text-[var(--color-primary)] uppercase tracking-[0.15em]">Why MBPP</span>
-            <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mt-3 mb-5 tracking-tight">Real estate in Kano needed a better way</h2>
-            <div className="space-y-4 text-gray-600 text-sm leading-relaxed">
-              <p>Finding a home in Kano should not be a gamble. Too many people waste time and money on unreliable agents, fake listings, and wasted trips. We built MBPP to fix that.</p>
-              <p>Our platform connects you with verified agents who know the neighborhoods. Every listing is checked. Every agent is vetted. Every transaction is tracked.</p>
-              <p>Whether you are renting a flat in Kano Municipal, buying land in Tarauni, or looking for commercial space in Fagge, MBPP makes it easy.</p>
-            </div>
+      <section className="max-w-[1400px] mx-auto w-full px-5 sm:px-6 lg:px-10 py-20 sm:py-28">
+        <div className="grid lg:grid-cols-12 gap-10 lg:gap-16">
+          <div className="lg:col-span-5">
+            <p className="text-xs font-semibold text-[var(--color-primary)] uppercase tracking-[0.15em] mb-3">Our story</p>
+            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 tracking-tight leading-[1.15]">From a WhatsApp group to a platform.</h2>
           </div>
-          <div className="relative">
-            <div className="rounded-2xl overflow-hidden shadow-lg">
-              <img src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=600&h=400&fit=crop" alt="Luxury property in Kano" className="w-full h-80 object-cover" />
-            </div>
-            <div className="absolute -bottom-4 -left-4 w-24 h-24 bg-[var(--color-primary)]/5 rounded-2xl -z-10" />
-            <div className="absolute -top-4 -right-4 w-32 h-32 bg-[var(--color-accent)]/5 rounded-full -z-10" />
+          <div className="lg:col-span-7 space-y-5 text-base text-gray-600 leading-relaxed">
+            <p>
+              MBPP started as a side project in 2017. Our founder had just sold a duplex in Nassarawa and lost a chunk of the proceeds to an agent who turned out to be working three other buyers. He posted a single message in a Kano real estate WhatsApp group asking who&apos;d had a similar experience. Forty people replied the same day.
+            </p>
+            <p>
+              We started with a Google Form and a shared spreadsheet. The first year, we listed 12 properties by hand, photographed them with a phone, and matched them with tenants from our personal networks. The second year, 80 properties. The third, we had to hire.
+            </p>
+            <p>
+              Today we&apos;re a registered property company in Kano with a small, tight team. We don&apos;t pretend to be a national platform — Kano is what we know, and Kano is what we do well. The agents in our network live in the neighborhoods they list. The agreements we draw up have been tested in Kano courts. The support number is answered by someone in Kano.
+            </p>
+            <p>
+              That&apos;s the whole pitch. We&apos;re local, we&apos;re accountable, and we&apos;d rather do fewer things properly than be everywhere and do them badly.
+            </p>
           </div>
         </div>
+      </section>
 
-        <div className="grid md:grid-cols-3 gap-6 mb-24">
-          {[
-            {
-              title: "Verified Properties",
-              text: "Every listing is confirmed by local ambassadors who know the area. No fake listings, no wasted trips.",
-              icon: (
-                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
-                </svg>
-              ),
-            },
-            {
-              title: "Trusted Agents",
-              text: "Agents are assigned by city ambassadors. Performance is tracked through our task system and commission history.",
-              icon: (
-                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z" />
-                </svg>
-              ),
-            },
-            {
-              title: "Transparent Pricing",
-              text: "Clear rent tiers with no hidden fees. Commission splits are visible to all parties — agents, ambassadors, and clients.",
-              icon: (
-                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5z" />
-                </svg>
-              ),
-            },
-          ].map((item) => (
-            <div key={item.title} className="group bg-white rounded-2xl border border-gray-100 p-7 hover:shadow-lg hover:border-gray-200 active:scale-[0.99] transition-all duration-200">
-              <div className="w-11 h-11 rounded-xl bg-gray-50 text-gray-600 flex items-center justify-center mb-4 group-hover:bg-[var(--color-primary)]/5 group-hover:text-[var(--color-primary)] transition-colors duration-200">
-                {item.icon}
-              </div>
-              <h3 className="text-sm font-semibold text-gray-900 mb-2">{item.title}</h3>
-              <p className="text-sm text-gray-500 leading-relaxed">{item.text}</p>
-            </div>
-          ))}
-        </div>
-
-        <div className="mb-24">
-          <div className="text-center mb-12">
-            <span className="text-xs font-semibold text-[var(--color-primary)] uppercase tracking-[0.15em]">Our Team</span>
-            <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mt-3 tracking-tight">Meet the Core Team</h2>
-            <p className="text-gray-500 mt-2 text-sm">The people behind MBPP.</p>
+      <section className="bg-gray-50 border-y border-gray-100">
+        <div className="max-w-[1400px] mx-auto w-full px-5 sm:px-6 lg:px-10 py-20 sm:py-28">
+          <div className="max-w-2xl">
+            <p className="text-xs font-semibold text-[var(--color-primary)] uppercase tracking-[0.15em] mb-3">What we stand for</p>
+            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 tracking-tight leading-[1.15]">Three commitments we don&apos;t bend on.</h2>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {team.map((m) => (
-              <div key={m.name} className="group bg-white rounded-2xl border border-gray-100 p-6 hover:shadow-lg hover:border-gray-200 transition-all duration-200">
-                <div className="w-16 h-16 rounded-2xl mx-auto mb-4 overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center shadow-sm group-hover:shadow-md transition-shadow">
-                  {m.photo ? (
-                    <img src={resolveImageUrl(m.photo) || ""} alt={m.name} className="w-full h-full object-cover" />
-                  ) : (
-                    <span className="text-lg font-bold text-gray-400">{m.name.split(" ").map(n => n[0]).join("").slice(0, 2)}</span>
-                  )}
-                </div>
-                <h3 className="text-base font-semibold text-gray-900 text-center">{m.name}</h3>
-                <p className="text-xs text-[var(--color-primary)] font-medium text-center mb-3">{m.role}</p>
-                <p className="text-xs text-gray-500 leading-relaxed text-center">{m.bio}</p>
+          <div className="grid sm:grid-cols-3 gap-5 mt-12">
+            {[
+              { n: "01", t: "If we list it, we&apos;ve seen it", d: "Every property on MBPP has been visited by a local ambassador. No scraped photos, no copy-paste descriptions, no 'call for details' on a 4-bedroom asking ₦8M." },
+              { n: "02", t: "If we represent an agent, we&apos;ve met them", d: "Our ambassador network is personal. We know who they are, where they operate, and how they close. If something goes sideways, we&apos;re the ones you call — not a bot." },
+              { n: "03", t: "If we take a commission, you can see it", d: "The split is in the dashboard. Agent, ambassador, MBPP — all three lines visible to the parties who paid and received. No mystery percentages." },
+            ].map((p) => (
+              <div key={p.n} className="bg-white rounded-2xl border border-gray-100 p-7">
+                <p className="text-xs font-bold text-gray-300 tabular-nums mb-4">{p.n}</p>
+                <h3 className="text-lg font-semibold text-gray-900 mb-3 leading-snug" dangerouslySetInnerHTML={{ __html: p.t }} />
+                <p className="text-sm text-gray-500 leading-relaxed" dangerouslySetInnerHTML={{ __html: p.d }} />
               </div>
             ))}
           </div>
         </div>
+      </section>
 
-        <div className="relative bg-gradient-to-br from-gray-50 to-white rounded-2xl border border-gray-100 p-12 md:p-16 text-center overflow-hidden mb-20">
-          <div className="absolute top-0 right-0 w-72 h-72 bg-[var(--color-primary)]/5 rounded-full -translate-y-1/2 translate-x-1/2" />
-          <div className="absolute bottom-0 left-0 w-56 h-56 bg-[var(--color-accent)]/5 rounded-full translate-y-1/2 -translate-x-1/2" />
-          <div className="relative">
-            <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4 tracking-tight">Our Mission</h2>
-            <p className="text-gray-500 max-w-2xl mx-auto mb-10 text-sm leading-relaxed">
-              To transform real estate in Northern Nigeria through technology, transparency, and local expertise. We believe everyone deserves a fair path to a home they love, and every agent deserves a platform that respects their work.
+      <section className="max-w-[1400px] mx-auto w-full px-5 sm:px-6 lg:px-10 py-20 sm:py-28">
+        <div className="grid lg:grid-cols-12 gap-10 lg:gap-16 items-start">
+          <div className="lg:col-span-4">
+            <p className="text-xs font-semibold text-[var(--color-primary)] uppercase tracking-[0.15em] mb-3">The team</p>
+            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 tracking-tight leading-[1.15]">Nine people. One office. All reachable.</h2>
+            <p className="text-sm text-gray-500 mt-4 leading-relaxed">
+              We&apos;re intentionally small. The agent who lists your property is two calls away from the legal adviser and one floor away from the platform engineer. Decisions happen in person, not in Jira.
             </p>
-            <Link href="/contact" className="inline-flex items-center min-h-[48px] px-8 py-2.5 bg-[var(--color-primary)] text-white text-sm font-semibold rounded-xl hover:bg-[var(--color-primary)]/90 active:scale-[0.97] transition-all shadow-lg shadow-[var(--color-primary)]/20">
-              Get in Touch
-            </Link>
+          </div>
+          <div className="lg:col-span-8 grid sm:grid-cols-2 gap-x-6 gap-y-8">
+            {team.map((m) => (
+              <div key={m.name} className="flex gap-4">
+                <div className="shrink-0 w-14 h-14 rounded-2xl bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center text-base font-bold text-gray-500 overflow-hidden">
+                  {m.photo ? (
+                    <img src={resolveImageUrl(m.photo) || ""} alt={m.name} className="w-full h-full object-cover" />
+                  ) : (
+                    m.name.split(" ").map(n => n[0]).join("").slice(0, 2)
+                  )}
+                </div>
+                <div className="min-w-0">
+                  <p className="text-base font-semibold text-gray-900">{m.name}</p>
+                  <p className="text-xs text-[var(--color-primary)] font-medium mb-2">{m.role}</p>
+                  <p className="text-sm text-gray-500 leading-relaxed">{m.bio}</p>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
-      </div>
+      </section>
+
+      <section className="max-w-[1400px] mx-auto w-full px-5 sm:px-6 lg:px-10 pb-20 sm:pb-28">
+        <div className="relative bg-gradient-to-br from-emerald-50 via-white to-emerald-50/50 rounded-3xl border border-emerald-100 p-10 sm:p-14 lg:p-16 text-center overflow-hidden">
+          <div className="absolute top-0 left-0 w-72 h-72 bg-emerald-200/30 rounded-full blur-3xl -translate-y-1/2 -translate-x-1/3" />
+          <div className="relative max-w-2xl mx-auto">
+            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 tracking-tight leading-[1.15]">
+              Got a property? Got a question? Either way — call us.
+            </h2>
+            <p className="text-base text-gray-600 mt-5 leading-relaxed">
+              We&apos;d rather spend an hour on the phone with you than lose you to a bad experience. Real estate is a people business and we&apos;re not too cool to admit it.
+            </p>
+            <div className="mt-8 flex flex-wrap justify-center gap-3">
+              <Link href="/contact" className="inline-flex items-center justify-center min-h-[52px] px-7 py-3.5 bg-gray-950 text-white text-sm font-semibold rounded-full hover:bg-gray-800 active:scale-[0.97] transition-all">
+                Get in touch
+              </Link>
+              <Link href="/help" className="inline-flex items-center justify-center min-h-[52px] px-7 py-3.5 text-sm font-semibold rounded-full border border-gray-200 text-gray-700 hover:bg-white transition-all">
+                Visit help center
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <Footer />
     </div>
   );
 }

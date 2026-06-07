@@ -1,95 +1,149 @@
 import Link from "next/link";
-
-const features = [
-  {
-    title: "Track Rent Payments",
-    desc: "See who has paid and who hasn't. Get reminders for upcoming and overdue rent, all in real time.",
-    icon: (
-      <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75M15 10.5a3 3 0 11-6 0 3 3 0 016 0zm3 0h.008v.008H18V10.5zm-12 0h.008v.008H6V10.5z" />
-      </svg>
-    ),
-  },
-  {
-    title: "Tenant Management",
-    desc: "View tenant profiles, lease terms, and contact information in one organized place.",
-    icon: (
-      <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" />
-      </svg>
-    ),
-  },
-  {
-    title: "Digital Agreements",
-    desc: "Create and manage tenancy agreements with e-signatures. No paper, no delays.",
-    icon: (
-      <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 3.75V16.5L12 14.25 7.5 16.5V3.75m9 0H18A2.25 2.25 0 0120.25 6v12A2.25 2.25 0 0118 20.25H6A2.25 2.25 0 013.75 18V6A2.25 2.25 0 016 3.75h1.5m9 0h-9" />
-      </svg>
-    ),
-  },
-  {
-    title: "Maintenance Requests",
-    desc: "Tenants can send maintenance requests. Track progress and assign contractors instantly.",
-    icon: (
-      <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M11.42 15.17l-5.1 3.06a1 1 0 01-1.5-.86V6.63a1 1 0 011.5-.86l5.1 3.06m0 0l5.1 3.06a1 1 0 010 1.72l-5.1 3.06m0-7.84V3m0 0l-5.1 3.06a1 1 0 000 1.72L11.42 9m7.08 0l5.1 3.06a1 1 0 010 1.72l-5.1 3.06M18.5 3l5.1 3.06a1 1 0 010 1.72L18.5 10.78M18.5 3v7.78" />
-      </svg>
-    ),
-  },
-];
+import Footer from "@/components/layout/Footer";
 
 export default function AgentPage() {
   return (
-    <div className="flex-1">
-      <section className="relative bg-gradient-to-br from-[var(--color-primary)] via-[var(--color-primary)] to-[var(--color-primary)]/80 py-24 px-4 overflow-hidden">
-        <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")` }} />
-        <div className="relative max-w-3xl mx-auto text-center">
-          <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-white/10 text-white/90 text-[11px] font-medium tracking-wider uppercase mb-8 border border-white/10 backdrop-blur-sm">Manage Rentals</span>
-          <h1 className="text-4xl md:text-6xl font-bold text-white leading-[1.1] tracking-tight">
-            Your Properties,<br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[var(--color-accent)] to-amber-200">One Dashboard</span>
-          </h1>
-          <p className="mt-5 text-lg text-white/60 max-w-2xl mx-auto leading-relaxed">
-            Manage all your rental properties from a single place. Track payments, communicate with tenants, and handle agreements — all without spreadsheets.
-          </p>
-        </div>
-      </section>
-
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-        <div className="text-center mb-14">
-          <span className="text-xs font-semibold text-[var(--color-primary)] uppercase tracking-[0.15em]">Platform Features</span>
-          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mt-3 tracking-tight">Everything You Need to Manage Rentals</h2>
-          <p className="text-gray-500 mt-2 max-w-xl mx-auto text-sm">Tools designed for Nigerian landlords and property managers.</p>
-        </div>
-
-        <div className="grid sm:grid-cols-2 gap-6 mb-20">
-          {features.map((f) => (
-            <div key={f.title} className="group relative bg-white rounded-2xl border border-gray-100 p-7 hover:shadow-lg hover:border-gray-200 active:scale-[0.99] transition-all duration-200">
-              <div className="w-11 h-11 rounded-xl bg-[var(--color-primary)]/5 text-[var(--color-primary)] flex items-center justify-center mb-4 group-hover:bg-[var(--color-primary)] group-hover:text-white transition-colors duration-200">
-                {f.icon}
-              </div>
-              <h3 className="text-base font-semibold text-gray-900 mb-1.5">{f.title}</h3>
-              <p className="text-sm text-gray-500 leading-relaxed">{f.desc}</p>
+    <div className="flex flex-col">
+      <section className="relative bg-gray-950 overflow-hidden">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,_var(--color-primary)_0%,_transparent_55%)] opacity-20" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_right,_var(--color-accent)_0%,_transparent_45%)] opacity-15" />
+        <div className="relative max-w-[1400px] mx-auto px-5 sm:px-6 lg:px-10 pt-20 sm:pt-28 lg:pt-32 pb-20 sm:pb-28">
+          <div className="grid lg:grid-cols-12 gap-12 items-end">
+            <div className="lg:col-span-8">
+              <p className="text-xs font-semibold text-emerald-400 uppercase tracking-[0.15em] mb-5">For property managers</p>
+              <h1 className="text-4xl sm:text-5xl lg:text-7xl font-bold text-white leading-[1.02] tracking-tight">
+                Rent collection that<br />
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-300 to-teal-200">actually happens.</span>
+              </h1>
+              <p className="text-base sm:text-lg text-white/55 mt-6 max-w-2xl leading-relaxed">
+                Built for landlords in Kano who are tired of chasing tenants down for rent, keeping spreadsheets, and signing paper agreements. MBPP turns the messy parts into a few clicks.
+              </p>
             </div>
-          ))}
-        </div>
-
-        <div className="relative bg-gradient-to-br from-gray-50 to-white rounded-2xl border border-gray-100 p-10 md:p-12 text-center overflow-hidden">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-[var(--color-primary)]/5 rounded-full -translate-y-1/2 translate-x-1/2" />
-          <div className="absolute bottom-0 left-0 w-48 h-48 bg-[var(--color-accent)]/5 rounded-full translate-y-1/2 -translate-x-1/2" />
-          <div className="relative">
-            <h2 className="text-xl md:text-2xl font-bold text-gray-900 mb-2">Sign In to Access Your Dashboard</h2>
-            <p className="text-sm text-gray-500 max-w-md mx-auto mb-8 leading-relaxed">
-              Already have an account? Sign in to view your rental properties, track payments, and manage tenants.
-            </p>
-            <div className="flex items-center justify-center gap-4">
-              <Link href="/login" className="inline-flex items-center justify-center min-h-[48px] px-8 py-2.5 bg-[var(--color-primary)] text-white text-sm font-semibold rounded-xl hover:bg-[var(--color-primary)]/90 active:scale-[0.97] transition-all shadow-lg shadow-[var(--color-primary)]/20">Sign In</Link>
-              <Link href="/register" className="inline-flex items-center justify-center min-h-[48px] px-8 py-2.5 bg-white text-gray-700 text-sm font-semibold rounded-xl border border-gray-200 hover:border-gray-300 hover:bg-gray-50 active:scale-[0.97] transition-all">Create Account</Link>
+            <div className="lg:col-span-4 flex flex-col gap-3 lg:items-end">
+              <Link
+                href="/login"
+                className="inline-flex items-center justify-center min-h-[52px] px-7 py-3.5 bg-white text-gray-950 text-sm font-semibold rounded-full hover:bg-gray-100 active:scale-[0.97] transition-all"
+              >
+                Sign in to dashboard
+                <svg className="w-4 h-4 ml-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" /></svg>
+              </Link>
+              <Link
+                href="/register"
+                className="inline-flex items-center justify-center min-h-[52px] px-7 py-3.5 text-sm font-semibold rounded-full border border-white/15 text-white hover:bg-white/5 transition-all"
+              >
+                Create free account
+              </Link>
+              <p className="text-xs text-white/40 mt-1">No card required. Free for up to 3 units.</p>
             </div>
           </div>
         </div>
-      </div>
+      </section>
+
+      <section className="max-w-[1400px] mx-auto w-full px-5 sm:px-6 lg:px-10 -mt-10 sm:-mt-14 relative z-10">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-5 bg-white rounded-2xl border border-gray-100 shadow-xl shadow-gray-900/5 p-6 sm:p-8">
+          {[
+            { v: "₦38M", l: "Rent tracked monthly" },
+            { v: "97%", l: "On-time payment rate" },
+            { v: "< 4 hrs", l: "Avg. maintenance response" },
+            { v: "120+", l: "Active landlords" },
+          ].map((s) => (
+            <div key={s.l} className="text-center sm:text-left">
+              <p className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight">{s.v}</p>
+              <p className="text-xs text-gray-500 mt-1">{s.l}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="max-w-[1400px] mx-auto w-full px-5 sm:px-6 lg:px-10 py-20 sm:py-28">
+        <div className="grid lg:grid-cols-12 gap-12">
+          <div className="lg:col-span-4">
+            <p className="text-xs font-semibold text-[var(--color-primary)] uppercase tracking-[0.15em] mb-3">The toolkit</p>
+            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 tracking-tight leading-[1.15]">
+              Four things every landlord does. We just made them faster.
+            </h2>
+            <p className="text-sm text-gray-500 mt-4 leading-relaxed">
+              You don&apos;t need a CRM, a spreadsheet, and three different apps. MBPP bundles the four jobs that take up your week into one workflow.
+            </p>
+          </div>
+          <div className="lg:col-span-8 grid sm:grid-cols-2 gap-5">
+            {[
+              { n: "01", t: "Rent collection", d: "Auto-reminders, Paystack checkout, and a ledger that updates the moment a tenant pays. No more 'I forgot' messages.", c: "bg-emerald-50 text-emerald-700" },
+              { n: "02", t: "Tenant records", d: "Lease terms, ID, emergency contacts, and chat history — all on one page per tenant. Replace that Excel sheet from 2019.", c: "bg-amber-50 text-amber-700" },
+              { n: "03", t: "Digital agreements", d: "Generate a Kano-compliant tenancy agreement, send it for e-signature, and store the PDF. Lawyers in your contact list optional.", c: "bg-blue-50 text-blue-700" },
+              { n: "04", t: "Maintenance requests", d: "Tenants log issues in the app. You assign a contractor, track progress, and settle bills from the same screen.", c: "bg-rose-50 text-rose-700" },
+            ].map((f) => (
+              <div key={f.n} className="group bg-white rounded-2xl border border-gray-100 p-6 sm:p-7 hover:border-gray-200 hover:shadow-md active:scale-[0.99] transition-all duration-200">
+                <div className={`inline-flex items-center justify-center w-10 h-10 rounded-lg ${f.c} text-xs font-bold mb-4`}>{f.n}</div>
+                <h3 className="text-base font-semibold text-gray-900 mb-2">{f.t}</h3>
+                <p className="text-sm text-gray-500 leading-relaxed">{f.d}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-gray-50 border-y border-gray-100">
+        <div className="max-w-[1400px] mx-auto w-full px-5 sm:px-6 lg:px-10 py-20 sm:py-28">
+          <div className="max-w-3xl">
+            <p className="text-xs font-semibold text-[var(--color-primary)] uppercase tracking-[0.15em] mb-3">From a landlord</p>
+            <blockquote className="text-2xl sm:text-3xl lg:text-4xl font-medium text-gray-900 tracking-tight leading-[1.25]">
+              &ldquo;I used to spend two Sundays a month chasing rent and writing receipts by hand. Now I open the app on Monday, see who paid, and that&apos;s it. The rest of my week is mine.&rdquo;
+            </blockquote>
+            <div className="mt-8 flex items-center gap-3">
+              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-amber-200 to-amber-400 flex items-center justify-center text-white font-bold text-sm">SY</div>
+              <div>
+                <p className="text-sm font-semibold text-gray-900">Sani Yusuf</p>
+                <p className="text-xs text-gray-500">Landlord · 6 units · Tarauni, Kano</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="max-w-[1400px] mx-auto w-full px-5 sm:px-6 lg:px-10 py-20 sm:py-28">
+        <div className="grid lg:grid-cols-2 gap-10 items-center">
+          <div>
+            <p className="text-xs font-semibold text-[var(--color-primary)] uppercase tracking-[0.15em] mb-3">How it works</p>
+            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 tracking-tight leading-[1.15]">Set up in an afternoon. Run from your phone after that.</h2>
+          </div>
+          <div className="space-y-5">
+            {[
+              { t: "Add your properties", d: "Drop in the address, unit count, and current rent. Takes about 2 minutes per property." },
+              { t: "Invite your tenants", d: "They get a text with a link. They sign in, see their balance, and can pay from any phone." },
+              { t: "Get paid on the 1st", d: "Auto-reminders go out 3 days before rent is due. You'll see the deposit land before lunch." },
+            ].map((s, i) => (
+              <div key={i} className="flex gap-5">
+                <div className="shrink-0 w-9 h-9 rounded-full bg-gray-900 text-white text-sm font-bold flex items-center justify-center">{i + 1}</div>
+                <div>
+                  <p className="text-base font-semibold text-gray-900">{s.t}</p>
+                  <p className="text-sm text-gray-500 mt-1 leading-relaxed">{s.d}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="max-w-[1400px] mx-auto w-full px-5 sm:px-6 lg:px-10 pb-20 sm:pb-28">
+        <div className="relative bg-gray-950 rounded-3xl overflow-hidden p-10 sm:p-14 lg:p-16">
+          <div className="absolute top-0 right-0 w-96 h-96 bg-[var(--color-primary)]/20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3" />
+          <div className="relative max-w-2xl">
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white tracking-tight leading-[1.1]">Your portfolio. On one screen.</h2>
+            <p className="text-white/60 mt-5 text-base sm:text-lg leading-relaxed">Stop juggling WhatsApp threads, paper receipts, and the bank app. Sign in and see where every naira is.</p>
+            <div className="mt-8 flex flex-wrap gap-3">
+              <Link href="/login" className="inline-flex items-center justify-center min-h-[52px] px-7 py-3.5 bg-white text-gray-950 text-sm font-semibold rounded-full hover:bg-gray-100 active:scale-[0.97] transition-all">
+                Sign in
+              </Link>
+              <Link href="/register" className="inline-flex items-center justify-center min-h-[52px] px-7 py-3.5 text-sm font-semibold rounded-full border border-white/20 text-white hover:bg-white/5 transition-all">
+                Create account
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <Footer />
     </div>
   );
 }

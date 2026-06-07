@@ -1,7 +1,6 @@
 "use client";
 import { usePathname } from "next/navigation";
 import Navbar from "@/components/layout/Navbar";
-import Sidebar from "@/components/layout/Sidebar";
 import BottomNav from "@/components/layout/BottomNav";
 import { useSettings } from "@/context/SettingsContext";
 import { useRole } from "@/context/RoleContext";
@@ -44,12 +43,9 @@ export default function LayoutShell({ children }: { children: React.ReactNode })
   }
 
   return (
-    <div className="flex h-full">
-      <Sidebar />
-      <div className="flex-1 flex flex-col min-w-0">
-        <Navbar />
-        <main className="flex-1 overflow-y-auto pb-16 lg:pb-0">{children}</main>
-      </div>
+    <div className="flex flex-col min-h-full">
+      <Navbar />
+      <main className="flex-1 pb-16 lg:pb-0">{children}</main>
       <BottomNav />
     </div>
   );

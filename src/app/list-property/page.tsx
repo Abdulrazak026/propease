@@ -1,149 +1,150 @@
 import Link from "next/link";
-import Button from "@/components/ui/Button";
-
-const benefits = [
-  {
-    title: "Professional Photos",
-    desc: "Our ambassadors visit your property to take high-quality photos that attract serious tenants and buyers.",
-    icon: (
-      <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z" />
-        <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0z" />
-      </svg>
-    ),
-  },
-  {
-    title: "Wide Exposure",
-    desc: "Your listing reaches thousands of monthly visitors on MBPP and is shared across our social media channels.",
-    icon: (
-      <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 013 12c0-1.605.42-3.113 1.157-4.418" />
-      </svg>
-    ),
-  },
-  {
-    title: "Tenant Screening",
-    desc: "We pre-screen applicants so you only deal with qualified, serious tenants ready to move in.",
-    icon: (
-      <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
-      </svg>
-    ),
-  },
-  {
-    title: "Digital Agreements",
-    desc: "Generate legally compliant tenancy agreements with e-signatures. No paperwork, no delays.",
-    icon: (
-      <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
-      </svg>
-    ),
-  },
-  {
-    title: "Secure Payments",
-    desc: "Rent payments and holding deposits are processed securely through Paystack with full transaction records.",
-    icon: (
-      <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-      </svg>
-    ),
-  },
-  {
-    title: "Performance Dashboard",
-    desc: "Track views, inquiries, and applications for your property in real time from your owner dashboard.",
-    icon: (
-      <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" />
-      </svg>
-    ),
-  },
-];
-
-const steps = [
-  { num: "01", title: "Contact Us", desc: "Reach out through the form below or call us. We will discuss your property and pricing." },
-  { num: "02", title: "Property Visit", desc: "An MBPP ambassador visits your property to take photos, verify details, and assess the listing." },
-  { num: "03", title: "Listing Goes Live", desc: "Your property is published on MBPP with photos, description, and pricing. You will get a link to share." },
-  { num: "04", title: "Receive Inquiries", desc: "Interested tenants and buyers send inquiries. You can respond directly through our messaging system." },
-  { num: "05", title: "Close the Deal", desc: "Once a tenant or buyer is confirmed, we help with the agreement and payment processing." },
-];
+import Footer from "@/components/layout/Footer";
 
 export default function ListPropertyPage() {
   return (
-    <div className="flex-1">
-      <section className="relative bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 py-24 px-4 overflow-hidden">
-        <div className="absolute inset-0 opacity-5" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.4'%3E%3Cpath d='M0 0h40v40H0V0zm1 1v38h38V1H1z'/%3E%3C/g%3E%3C/svg%3E")` }} />
-        <div className="relative max-w-3xl mx-auto text-center">
-          <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-white/5 text-white/80 text-[11px] font-medium tracking-wider uppercase mb-8 border border-white/10 backdrop-blur-sm">List Your Property</span>
-          <h1 className="text-4xl md:text-6xl font-bold text-white leading-[1.1] tracking-tight">
-            Sell or Rent with <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-200 to-yellow-300">MBPP</span>
-          </h1>
-          <p className="mt-5 text-lg text-white/50 max-w-2xl mx-auto leading-relaxed">
-            Kano's fastest-growing real estate marketplace. List your property and reach thousands of serious buyers and tenants.
-          </p>
+    <div className="flex flex-col">
+      <section className="relative bg-gray-950 overflow-hidden">
+        <div className="absolute inset-0">
+          <img src="https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=1600&h=900&fit=crop" alt="" className="w-full h-full object-cover opacity-25" />
+          <div className="absolute inset-0 bg-gradient-to-r from-gray-950 via-gray-950/85 to-gray-950/40" />
         </div>
-      </section>
-
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-        <div className="text-center mb-14">
-          <span className="text-xs font-semibold text-[var(--color-primary)] uppercase tracking-[0.15em]">Why List With Us</span>
-          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mt-3 tracking-tight">Everything You Need to Sell or Rent</h2>
-          <p className="text-gray-500 mt-2 max-w-xl mx-auto text-sm">We handle the hard parts so you can focus on what matters.</p>
-        </div>
-
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 mb-24">
-          {benefits.map((b) => (
-            <div key={b.title} className="group relative bg-white rounded-2xl border border-gray-100 p-6 hover:shadow-lg hover:border-gray-200 active:scale-[0.99] transition-all duration-200">
-              <div className="w-10 h-10 rounded-lg bg-gray-50 text-gray-600 flex items-center justify-center mb-4 group-hover:bg-[var(--color-primary)]/5 group-hover:text-[var(--color-primary)] transition-colors duration-200">
-                {b.icon}
-              </div>
-              <h3 className="text-sm font-semibold text-gray-900 mb-1.5">{b.title}</h3>
-              <p className="text-xs text-gray-500 leading-relaxed">{b.desc}</p>
-            </div>
-          ))}
-        </div>
-
-        <div className="mb-24">
-          <div className="text-center mb-14">
-            <span className="text-xs font-semibold text-[var(--color-primary)] uppercase tracking-[0.15em]">How It Works</span>
-            <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mt-3 tracking-tight">Get Your Property Listed in 5 Steps</h2>
-          </div>
-          <div className="relative">
-            <div className="absolute left-[23px] md:left-1/2 top-0 bottom-0 w-px bg-gradient-to-b from-[var(--color-primary)]/30 via-[var(--color-primary)]/10 to-transparent md:-translate-x-px" />
-            <div className="space-y-12">
-              {steps.map((s, i) => (
-                <div key={s.num} className={`relative flex items-start gap-6 md:gap-0 ${i % 2 === 0 ? "md:flex-row" : "md:flex-row-reverse"}`}>
-                  <div className="hidden md:block md:w-1/2" />
-                  <div className="relative z-10 flex-shrink-0 w-12 h-12 rounded-full bg-[var(--color-primary)] text-white text-sm font-bold flex items-center justify-center shadow-lg shadow-[var(--color-primary)]/20">
-                    {s.num}
-                  </div>
-                  <div className={`flex-1 min-w-0 pt-2 ${i % 2 === 0 ? "md:pr-12 md:text-right" : "md:pl-12"}`}>
-                    <h3 className="text-base font-semibold text-gray-900 mb-1">{s.title}</h3>
-                    <p className="text-sm text-gray-500 leading-relaxed max-w-md">{s.desc}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        <div className="relative bg-gradient-to-br from-[var(--color-primary)]/5 via-white to-[var(--color-primary)]/5 rounded-2xl border border-[var(--color-primary)]/10 p-10 md:p-12 text-center overflow-hidden">
-          <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23000' fill-opacity='1'%3E%3Cpath d='M0 0h40v40H0V0zm1 1v38h38V1H1z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")` }} />
-          <div className="relative">
-            <h2 className="text-xl md:text-2xl font-bold text-gray-900 mb-2">Ready to Get Started?</h2>
-            <p className="text-sm text-gray-500 max-w-lg mx-auto mb-8 leading-relaxed">
-              Fill out the form below or call us directly. We will get back to you within 24 hours.
+        <div className="relative max-w-[1400px] mx-auto px-5 sm:px-6 lg:px-10 pt-20 sm:pt-28 lg:pt-32 pb-20 sm:pb-28">
+          <div className="max-w-2xl">
+            <p className="text-xs font-semibold text-amber-300 uppercase tracking-[0.15em] mb-5">List with MBPP</p>
+            <h1 className="text-4xl sm:text-5xl lg:text-7xl font-bold text-white leading-[1.02] tracking-tight">
+              The listing that<br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-200 to-orange-200">finds the tenant.</span>
+            </h1>
+            <p className="text-base sm:text-lg text-white/55 mt-6 leading-relaxed">
+              We send a photographer, write the description, push it to our network, and field the first round of inquiries. You show up to viewings with a serious shortlist.
             </p>
-            <div className="flex items-center justify-center gap-4 flex-wrap">
-              <Link href="/contact">
-                <Button size="lg">Contact Us</Button>
+            <div className="mt-8 flex flex-wrap gap-3">
+              <Link href="/contact" className="inline-flex items-center justify-center min-h-[52px] px-7 py-3.5 bg-white text-gray-950 text-sm font-semibold rounded-full hover:bg-gray-100 active:scale-[0.97] transition-all">
+                Talk to a listing agent
               </Link>
-              <a href="https://wa.me/2348000000000" target="_blank" rel="noopener noreferrer">
-                <Button variant="outline" size="lg">Chat on WhatsApp</Button>
+              <a href="https://wa.me/2348000000000" target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center min-h-[52px] px-7 py-3.5 text-sm font-semibold rounded-full border border-white/20 text-white hover:bg-white/5 transition-all">
+                WhatsApp us
               </a>
             </div>
           </div>
         </div>
-      </div>
+      </section>
+
+      <section className="max-w-[1400px] mx-auto w-full px-5 sm:px-6 lg:px-10 py-20 sm:py-28">
+        <div className="grid lg:grid-cols-12 gap-12 lg:gap-16">
+          <div className="lg:col-span-5 lg:sticky lg:top-24 lg:self-start">
+            <p className="text-xs font-semibold text-[var(--color-primary)] uppercase tracking-[0.15em] mb-3">What you get</p>
+            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 tracking-tight leading-[1.15]">
+              Six things we handle so you don&apos;t have to.
+            </h2>
+            <p className="text-sm text-gray-500 mt-4 leading-relaxed">
+              We&apos;ve been doing this since 2017. Here&apos;s what we noticed every landlord ends up paying for separately — bundled into one listing fee.
+            </p>
+          </div>
+          <div className="lg:col-span-7 divide-y divide-gray-100">
+            {[
+              { t: "A photographer at your door", d: "A trained ambassador visits, shoots with a wide lens, and writes the description. Most of our listings are photographed within 48 hours of you calling." },
+              { t: "Distribution where tenants actually are", d: "Your property goes on MBPP, gets pushed to our Instagram and WhatsApp broadcast lists, and shows up in our weekly email to registered seekers in your city." },
+              { t: "Pre-screened inquiries", d: "We ask the right questions before passing someone on. Serious tenants only — no tire-kickers calling about a 3-bedroom in Nassarawa when they need a room in Tarauni." },
+              { t: "Legally sound agreements", d: "Once someone is ready, we generate a Kano-compliant tenancy agreement. E-signature, PDF copy to both parties, no printouts." },
+              { t: "Paystack rent + deposit", d: "Holding deposits and the first year&apos;s rent go through Paystack. You get a clean record. No 'I sent it last week' messages." },
+              { t: "An owner dashboard that doesn&apos;t lie", d: "Real-time view count, inquiry source, and viewing schedule. When a tenant asks why you picked them, the data is there." },
+            ].map((b, i) => (
+              <div key={i} className="py-6 first:pt-0">
+                <div className="flex items-baseline gap-4">
+                  <span className="text-xs font-bold text-gray-300 tabular-nums shrink-0">0{i + 1}</span>
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-900">{b.t}</h3>
+                    <p className="text-sm text-gray-500 mt-2 leading-relaxed">{b.d}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-gray-50 border-y border-gray-100">
+        <div className="max-w-[1400px] mx-auto w-full px-5 sm:px-6 lg:px-10 py-20 sm:py-28">
+          <div className="max-w-3xl mx-auto">
+            <p className="text-xs font-semibold text-[var(--color-primary)] uppercase tracking-[0.15em] mb-3 text-center">How it works</p>
+            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 tracking-tight text-center leading-[1.15]">
+              From the phone call to a signed agreement — usually ten days.
+            </h2>
+            <div className="mt-14 relative">
+              <div className="absolute left-4 sm:left-1/2 top-0 bottom-0 w-px bg-gray-200 sm:-translate-x-px" />
+              <div className="space-y-12">
+                {[
+                  { d: "Day 1", t: "You reach out", b: "Call, WhatsApp, or fill the form. We&apos;ll ask about the property, your price expectations, and when you&apos;re free for a visit." },
+                  { d: "Day 2–3", t: "We visit and shoot", b: "A local ambassador comes over, takes wide-angle photos, checks the amenities, and writes the listing copy. You approve before it goes live." },
+                  { d: "Day 3", t: "Listing goes live", b: "We publish on MBPP, push to Instagram and our WhatsApp broadcast, and email the registered seekers whose filters match your property." },
+                  { d: "Day 4–8", t: "Inquiries and viewings", b: "We field the first round of messages and book viewings. You show up, we send reminders so no one ghosts you." },
+                  { d: "Day 8–10", t: "Signed and paid", b: "Once a tenant is confirmed, we generate the agreement, collect the deposit + first rent through Paystack, and hand you a clean PDF." },
+                ].map((s, i) => (
+                  <div key={i} className="relative flex items-start gap-6 sm:gap-0 sm:items-stretch">
+                    <div className="hidden sm:block sm:w-1/2 sm:pr-12 text-right">
+                      <p className="text-xs font-bold text-[var(--color-primary)] uppercase tracking-wider">{s.d}</p>
+                      <p className="text-lg font-semibold text-gray-900 mt-1">{s.t}</p>
+                      <p className="text-sm text-gray-500 mt-2 leading-relaxed">{s.b}</p>
+                    </div>
+                    <div className="absolute left-4 sm:left-1/2 top-0 -translate-x-1/2 w-3 h-3 rounded-full bg-[var(--color-primary)] border-4 border-gray-50 z-10" />
+                    <div className="sm:hidden pl-10 flex-1">
+                      <p className="text-xs font-bold text-[var(--color-primary)] uppercase tracking-wider">{s.d}</p>
+                      <p className="text-lg font-semibold text-gray-900 mt-1">{s.t}</p>
+                      <p className="text-sm text-gray-500 mt-2 leading-relaxed">{s.b}</p>
+                    </div>
+                    <div className="hidden sm:block sm:w-1/2 sm:pl-12" />
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="max-w-[1400px] mx-auto w-full px-5 sm:px-6 lg:px-10 py-20 sm:py-28">
+        <div className="max-w-2xl">
+          <p className="text-xs font-semibold text-[var(--color-primary)] uppercase tracking-[0.15em] mb-3">No surprises on fees</p>
+          <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 tracking-tight leading-[1.15]">One listing fee. No hidden percentages later.</h2>
+          <p className="text-sm text-gray-500 mt-4 leading-relaxed">
+            We charge a flat listing fee that depends on your property type. If we don&apos;t find a tenant within 60 days, we renew the listing for free. The commission we receive from a successful tenancy is split with you — it&apos;s in the dashboard, line by line.
+          </p>
+        </div>
+        <div className="grid sm:grid-cols-3 gap-4 mt-10">
+          {[
+            { t: "Studio / 1-bed", v: "₦25,000", d: "Flat listing fee. Renews free if no tenant in 60 days." },
+            { t: "2–3 bedroom", v: "₦40,000", d: "Most common. Includes 8 professional photos." },
+            { t: "4+ bed / commercial", v: "₦75,000+", d: "Priced per square meter. Quote on request." },
+          ].map((p) => (
+            <div key={p.t} className="bg-white rounded-2xl border border-gray-100 p-6">
+              <p className="text-xs font-semibold text-[var(--color-primary)] uppercase tracking-wider">{p.t}</p>
+              <p className="text-3xl font-bold text-gray-900 mt-3 tracking-tight">{p.v}</p>
+              <p className="text-xs text-gray-500 mt-3 leading-relaxed">{p.d}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="max-w-[1400px] mx-auto w-full px-5 sm:px-6 lg:px-10 pb-20 sm:pb-28">
+        <div className="relative bg-gray-950 rounded-3xl overflow-hidden p-10 sm:p-14 lg:p-16">
+          <div className="absolute top-0 left-0 w-96 h-96 bg-amber-500/15 rounded-full blur-3xl -translate-y-1/2 -translate-x-1/3" />
+          <div className="relative max-w-2xl">
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white tracking-tight leading-[1.1]">Got a property to list?</h2>
+            <p className="text-white/60 mt-5 text-base sm:text-lg leading-relaxed">We&apos;ll come over, see the place, and give you a realistic price — no obligation. Most properties get a call back within 2 hours.</p>
+            <div className="mt-8 flex flex-wrap gap-3">
+              <Link href="/contact" className="inline-flex items-center justify-center min-h-[52px] px-7 py-3.5 bg-white text-gray-950 text-sm font-semibold rounded-full hover:bg-gray-100 active:scale-[0.97] transition-all">
+                Book a free assessment
+              </Link>
+              <a href="https://wa.me/2348000000000" target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center min-h-[52px] px-7 py-3.5 text-sm font-semibold rounded-full border border-white/20 text-white hover:bg-white/5 transition-all">
+                WhatsApp us
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <Footer />
     </div>
   );
 }
