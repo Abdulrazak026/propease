@@ -772,3 +772,63 @@ model MediaFile {
   uploadedBy String
   createdAt  DateTime @default(now())
 }
+
+model Job {
+  id          String   @id @default(uuid())
+  title       String
+  department  String
+  location    String
+  type        String
+  description String
+  isPublished Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  postedById  String
+  applications JobApplication[]
+
+  @@index([isPublished])
+  @@index([department])
+}
+
+model JobApplication {
+  id         String   @id @default(uuid())
+  jobId      String
+  job        Job      @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  fullName   String
+  email      String
+  phone      String
+  coverNote  String?
+  cvUrl      String?
+  createdAt  DateTime @default(now())
+
+  @@index([jobId])
+  @@index([email])
+}
+
+model SoldProperty {
+  id          String   @id @default(uuid())
+  listingId   String?  @unique
+  title       String
+  city        String
+  salePrice   Int
+  coverPhoto  String?
+  soldAt      DateTime @default(now())
+  agentId     String?
+  agentName   String?
+  createdAt   DateTime @default(now())
+
+  @@index([city])
+  @@index([soldAt])
+}
+
+model NewsletterSubscriber {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  source    String?
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  @@index([email])
+  @@index([createdAt])
+}

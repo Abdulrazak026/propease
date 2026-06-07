@@ -7,21 +7,29 @@ import LayoutShell from "@/components/layout/LayoutShell";
 import PwaRegister from "@/components/pwa/PwaRegister";
 import WhatsAppButton from "@/components/ui/WhatsAppButton";
 import CookieConsent from "@/components/ui/CookieConsent";
+import { LangProvider } from "@/lib/i18n/LangContext";
+import { CompareProvider } from "@/lib/compare-context";
+import CompareSheet from "@/components/listings/CompareSheet";
 
 export default function ClientBody({ children }: { children: React.ReactNode }) {
   return (
     <SettingsProvider>
+      <LangProvider>
       <RoleProvider>
-        <ErrorBoundary>
-          <LayoutShell>
-            <PwaRegister />
-            {children}
-          </LayoutShell>
-        </ErrorBoundary>
+        <CompareProvider>
+          <ErrorBoundary>
+            <LayoutShell>
+              <PwaRegister />
+              {children}
+            </LayoutShell>
+          </ErrorBoundary>
+          <CompareSheet />
+        </CompareProvider>
       </RoleProvider>
       <WhatsAppButton />
       <CookieConsent />
       <AnalyticsInjector />
+      </LangProvider>
     </SettingsProvider>
   );
 }

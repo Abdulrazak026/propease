@@ -8,7 +8,7 @@ import { logger } from "../lib/logger";
 import { emailService } from "../services/email";
 const router = Router();
 
-router.get("/my", authenticate, authorize("agent"), async (req: AuthRequest, res: Response) => {
+router.get("/my", authenticate, authorize("agent", "ambassador", "head"), async (req: AuthRequest, res: Response) => {
   try {
     const tasks = await prisma.task.findMany({
       where: { assignedToId: req.user!.id },

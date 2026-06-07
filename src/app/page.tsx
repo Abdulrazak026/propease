@@ -7,6 +7,8 @@ import { useListings } from "@/hooks/useListings";
 import { EmptyState } from "@/components/ui/Skeleton";
 import Footer from "@/components/layout/Footer";
 import { useSettings } from "@/context/SettingsContext";
+import SoldPropertiesGallery from "@/components/listings/SoldPropertiesGallery";
+import AffordabilityCalculator from "@/components/listings/AffordabilityCalculator";
 
 interface City { id: string; name: string; }
 interface BlogPost { id: string; slug: string; title: string; excerpt?: string | null; content?: string | null; coverImage: string | null; publishedAt: string | null; author?: { name: string } | null; }
@@ -88,6 +90,8 @@ export default function HomePage() {
 
   const visibleListings = listings.slice(0, showCount);
 
+  const isSearching = !!(filters.search || filters.propertyType || filters.listingType || filters.city || filters.minPrice || filters.maxPrice || filters.minBeds || filters.maxBeds || filters.minBaths || filters.maxBaths || filters.category || activeCategory);
+
   return (
     <div className="flex flex-col">
       <section ref={heroRef} className="relative bg-gray-950 overflow-hidden">
@@ -131,30 +135,38 @@ export default function HomePage() {
         <PropertyFilters onFilterChange={handleFilterChange} />
       </div>
 
+      <div className="max-w-[1400px] w-full mx-auto px-5 sm:px-6 lg:px-10 pt-8 sm:pt-10">
+        <AffordabilityCalculator />
+      </div>
+
       <div className="max-w-[1400px] w-full mx-auto px-5 sm:px-6 lg:px-10 py-8 sm:py-10">
         <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-6">
           <div>
-            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight">Properties for you</h2>
-            <p className="text-sm text-gray-500 mt-1">{loading ? "Loading listings…" : listings.length > 0 ? `${listings.length} ${listings.length === 1 ? "property" : "properties"} available` : "No listings match your filters"}</p>
+            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight">
+              {isSearching ? "Search results" : "Properties for you"}
+            </h2>
+            <p className="text-sm text-gray-500 mt-1">{loading ? "Loading…" : listings.length > 0 ? `${listings.length} ${listings.length === 1 ? "property" : "properties"}` : ""}</p>
           </div>
-          <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide -mx-1 px-1">
-            {CATEGORY_PILLS.map((p) => {
-              const active = activeCategory === p.value;
-              return (
-                <button
-                  key={p.value}
-                  onClick={() => setActiveCategory(p.value)}
-                  className={`shrink-0 px-4 py-2 text-sm font-medium rounded-full transition-all ${
-                    active
-                      ? "bg-gray-900 text-white"
-                      : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-                  }`}
-                >
-                  {p.label}
-                </button>
-              );
-            })}
-          </div>
+          {!isSearching && (
+            <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide -mx-1 px-1">
+              {CATEGORY_PILLS.map((p) => {
+                const active = activeCategory === p.value;
+                return (
+                  <button
+                    key={p.value}
+                    onClick={() => setActiveCategory(p.value)}
+                    className={`shrink-0 px-4 py-2 text-sm font-medium rounded-full transition-all ${
+                      active
+                        ? "bg-gray-900 text-white"
+                        : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                    }`}
+                  >
+                    {p.label}
+                  </button>
+                );
+              })}
+            </div>
+          )}
         </div>
 
         {loading ? (
@@ -168,7 +180,7 @@ export default function HomePage() {
             ))}
           </div>
         ) : visibleListings.length === 0 ? (
-          <EmptyState title="Oops! No listing found" description="Try changing your filters or check back later — new properties are added every week." />
+          <EmptyState title="Nothing matches" description="Try changing your filters." />
         ) : (
           <>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
@@ -186,6 +198,8 @@ export default function HomePage() {
           </>
         )}
       </div>
+
+      <SoldPropertiesGallery />
 
       {!postsLoading && posts.length > 0 && (
         <div className="bg-gray-50 border-y border-gray-100">

@@ -120,7 +120,7 @@ export default function AboutPage() {
           <div className="lg:col-span-8 grid sm:grid-cols-2 gap-x-6 gap-y-10">
             {team.map((m) => (
               <div key={m.name} className="flex gap-4">
-                <div className="shrink-0 w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center text-base font-bold text-gray-500 overflow-hidden ring-2 ring-white shadow-md shadow-gray-900/5">
+                <div className="shrink-0 w-24 h-24 sm:w-28 sm:h-28 lg:w-32 lg:h-32 rounded-2xl bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center text-base font-bold text-gray-500 overflow-hidden ring-2 ring-white shadow-md shadow-gray-900/5">
                   {m.photo ? (
                     <img src={resolveImageUrl(m.photo) || ""} alt={m.name} className="w-full h-full object-cover" loading="lazy" />
                   ) : (

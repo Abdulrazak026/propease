@@ -1,113 +1,198 @@
+"use client";
+import { useState, useEffect } from "react";
 import Link from "next/link";
-import Button from "@/components/ui/Button";
-
-const roles = [
-  {
-    title: "Field Agent — Kano Municipal",
-    type: "Full-time",
-    location: "Kano Municipal",
-    desc: "Show properties to prospective tenants, complete tasks assigned by the ambassador, and close rental agreements. Commission-based with monthly minimum guarantee.",
-  },
-  {
-    title: "Field Agent — Fagge",
-    type: "Full-time",
-    location: "Fagge",
-    desc: "Cover commercial and residential properties in Fagge district. Must know the local market well and have reliable transportation.",
-  },
-  {
-    title: "Ambassador — Tarauni",
-    type: "Full-time",
-    location: "Tarauni",
-    desc: "Manage all operations in Tarauni district — onboard agents, verify listings, assign tasks, and grow market share. Previous real estate experience required.",
-  },
-  {
-    title: "Ambassador — Nassarawa",
-    type: "Full-time",
-    location: "Nassarawa",
-    desc: "Lead the Nassarawa expansion. Hire and train local agents, establish relationships with landlords, and hit growth targets.",
-  },
-  {
-    title: "Software Engineer (Frontend)",
-    type: "Remote",
-    location: "Remote / Kano",
-    desc: "Build and maintain our Next.js frontend. Strong React skills and eye for UI/UX required. Experience with TypeScript and Tailwind CSS preferred.",
-  },
-  {
-    title: "Customer Support Lead",
-    type: "Full-time",
-    location: "Kano Municipal",
-    desc: "Manage our support team, handle escalations, and ensure every user gets prompt help. Experience in property or fintech support is a plus.",
-  },
-];
-
-const values = [
-  { icon: "🎯", title: "Local First", text: "We build for Kano. Every decision starts with understanding our users and their neighbourhoods." },
-  { icon: "🔍", title: "Transparency", text: "No hidden fees, no fake listings, no surprises. What you see is what you get." },
-  { icon: "📈", title: "Growth", text: "We invest in our people. Agents get training, ambassadors get leadership development, and everyone shares in the success." },
-  { icon: "🤝", title: "Community", text: "Real estate is about people. We foster trust between tenants, landlords, agents, and the platform." },
-];
+import { api } from "@/lib/api-client";
+import { ApiJob } from "@/lib/api-types";
+import Footer from "@/components/layout/Footer";
 
 export default function CareersPage() {
+  const [jobs, setJobs] = useState<ApiJob[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [departmentFilter, setDepartmentFilter] = useState("all");
+  const [typeFilter, setTypeFilter] = useState("all");
+  const [applyingJob, setApplyingJob] = useState<ApiJob | null>(null);
+  const [appForm, setAppForm] = useState({ fullName: "", email: "", phone: "", coverNote: "" });
+  const [appState, setAppState] = useState<"idle" | "sending" | "sent" | "error">("idle");
+  const [appMsg, setAppMsg] = useState("");
+
+  useEffect(() => {
+    setLoading(true);
+    api.get<{ jobs: ApiJob[] }>("/api/careers")
+      .then(r => setJobs(r.data?.jobs || []))
+      .catch(() => setJobs([]))
+      .finally(() => setLoading(false));
+  }, []);
+
+  const departments = ["all", ...Array.from(new Set(jobs.map(j => j.department)))];
+  const types = ["all", ...Array.from(new Set(jobs.map(j => j.type)))];
+
+  const filtered = jobs.filter(j =>
+    (departmentFilter === "all" || j.department === departmentFilter) &&
+    (typeFilter === "all" || j.type === typeFilter)
+  );
+
+  const openApply = (job: ApiJob) => {
+    setApplyingJob(job);
+    setAppForm({ fullName: "", email: "", phone: "", coverNote: "" });
+    setAppState("idle");
+    setAppMsg("");
+  };
+
+  const submitApply = async () => {
+    if (!applyingJob) return;
+    if (!appForm.fullName || !appForm.email || !appForm.phone) {
+      setAppState("error");
+      setAppMsg("Please fill in name, email and phone");
+      return;
+    }
+    setAppState("sending");
+    const r = await api.post<{ application: unknown }>(`/api/careers/${applyingJob.id}/apply`, appForm);
+    if (r.status < 400) {
+      setAppState("sent");
+      setAppMsg("Application received! We'll get back to you.");
+    } else {
+      setAppState("error");
+      setAppMsg(r.error || "Failed to submit");
+    }
+  };
+
   return (
-    <div className="flex-1">
-      <section className="relative bg-[var(--color-primary)] py-20 px-4 overflow-hidden">
-        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1521791136064-7986c2920216?w=1200&h=600&fit=crop')] bg-cover bg-center opacity-10" />
-        <div className="relative max-w-3xl mx-auto text-center">
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 text-white/90 text-xs font-medium mb-6">
-            Careers
-          </span>
-          <h1 className="text-4xl md:text-5xl font-bold text-white leading-tight">
-            Join the Team That Is <span className="text-[var(--color-accent)]">Transforming Kano Real Estate</span>
-          </h1>
-          <p className="mt-4 text-lg text-white/70 max-w-2xl mx-auto">
-            Help us build the future of property in Northern Nigeria.
-          </p>
+    <div className="flex flex-col">
+      <section className="bg-white border-b border-gray-100">
+        <div className="max-w-[1100px] mx-auto px-5 sm:px-6 lg:px-10 pt-12 sm:pt-16 pb-12 sm:pb-16">
+          <div className="max-w-2xl">
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 leading-[1.1] tracking-tight">
+              Work with us
+            </h1>
+            <p className="text-base text-gray-600 mt-4 leading-relaxed max-w-xl">
+              We&apos;re building the future of property in Kano. Join us.
+            </p>
+          </div>
         </div>
       </section>
 
-      <div className="max-w-5xl mx-auto px-4 py-16">
-        <div className="grid md:grid-cols-4 gap-6 mb-20">
-          {values.map((v) => (
-            <div key={v.title} className="bg-white rounded-lg border border-gray-200 p-5 text-center">
-              <span className="text-2xl mb-3 block">{v.icon}</span>
-              <h3 className="text-sm font-semibold text-gray-900 mb-1">{v.title}</h3>
-              <p className="text-xs text-gray-500 leading-relaxed">{v.text}</p>
-            </div>
-          ))}
-        </div>
-
-        <div className="mb-12">
-          <h2 className="text-2xl font-bold text-gray-900 mb-1">Open Positions</h2>
-          <p className="text-sm text-gray-500 mb-8">
-            {roles.length} roles available. We review applications on a rolling basis.
-          </p>
-          <div className="grid md:grid-cols-2 gap-4">
-            {roles.map((role) => (
-              <div key={role.title} className="bg-white rounded-lg border border-gray-200 p-5 hover:shadow-sm transition-shadow">
-                <div className="flex items-start justify-between mb-2">
-                  <h3 className="text-sm font-semibold text-gray-900">{role.title}</h3>
-                  <span className="text-[10px] font-medium text-[var(--color-primary)] bg-[var(--color-primary)]/5 px-2 py-0.5 rounded-full">
-                    {role.type}
-                  </span>
-                </div>
-                <p className="text-xs text-gray-400 mb-2">{role.location}</p>
-                <p className="text-xs text-gray-500 leading-relaxed mb-4">{role.desc}</p>
-                <a href="mailto:careers@mbpproperties.com?subject=Application%20for%20${encodeURIComponent(role.title)}"><Button size="sm">Apply Now</Button></a>
+      <section className="max-w-[1100px] mx-auto w-full px-5 sm:px-6 lg:px-10 py-12 sm:py-16">
+        {loading ? (
+          <div className="text-center py-12 text-sm text-gray-400">Loading jobs…</div>
+        ) : jobs.length === 0 ? (
+          <div className="bg-gray-50 rounded-2xl border border-gray-100 p-12 text-center">
+            <h2 className="text-xl font-semibold text-gray-900 mb-2">No openings right now</h2>
+            <p className="text-sm text-gray-500 max-w-md mx-auto mb-6">
+              We don&apos;t have any open roles at the moment. Send us your CV and we&apos;ll keep you in mind.
+            </p>
+            <Link href="/contact" className="inline-flex items-center justify-center min-h-[44px] px-6 py-2.5 bg-gray-900 text-white text-sm font-semibold rounded-full hover:bg-gray-800 transition-colors">
+              Send your CV
+            </Link>
+          </div>
+        ) : (
+          <>
+            <div className="flex flex-wrap items-center gap-2 mb-6">
+              <div className="flex items-center gap-1.5">
+                <span className="text-xs text-gray-500 mr-1">Department:</span>
+                {departments.map(d => (
+                  <button
+                    key={d}
+                    onClick={() => setDepartmentFilter(d)}
+                    className={`text-xs font-medium px-3 py-1.5 rounded-full transition-colors ${departmentFilter === d ? "bg-gray-900 text-white" : "bg-white border border-gray-200 text-gray-600 hover:border-gray-300"}`}
+                  >
+                    {d === "all" ? "All" : d}
+                  </button>
+                ))}
               </div>
-            ))}
+              <div className="flex items-center gap-1.5">
+                <span className="text-xs text-gray-500 mr-1">Type:</span>
+                {types.map(t => (
+                  <button
+                    key={t}
+                    onClick={() => setTypeFilter(t)}
+                    className={`text-xs font-medium px-3 py-1.5 rounded-full transition-colors ${typeFilter === t ? "bg-gray-900 text-white" : "bg-white border border-gray-200 text-gray-600 hover:border-gray-300"}`}
+                  >
+                    {t === "all" ? "All" : t}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {filtered.length === 0 ? (
+              <div className="bg-gray-50 rounded-2xl border border-gray-100 p-10 text-center">
+                <p className="text-sm text-gray-500">No roles match those filters.</p>
+              </div>
+            ) : (
+              <div className="grid md:grid-cols-2 gap-4">
+                {filtered.map(j => (
+                  <div key={j.id} className="bg-white rounded-2xl border border-gray-200 p-5 hover:border-gray-300 hover:shadow-sm transition-all">
+                    <div className="flex items-start justify-between gap-3 mb-2">
+                      <h3 className="text-base font-semibold text-gray-900">{j.title}</h3>
+                      <span className="shrink-0 text-[10px] font-medium text-[var(--color-primary)] bg-[var(--color-primary)]/10 px-2 py-0.5 rounded-full">
+                        {j.type}
+                      </span>
+                    </div>
+                    <p className="text-xs text-gray-500 mb-3">{j.department} · {j.location}</p>
+                    <p className="text-sm text-gray-600 leading-relaxed mb-4 line-clamp-3">{j.description}</p>
+                    <button onClick={() => openApply(j)} className="inline-flex items-center justify-center min-h-[40px] px-5 py-2 text-xs font-semibold rounded-full bg-gray-900 text-white hover:bg-gray-800 transition-colors">
+                      Apply
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </>
+        )}
+      </section>
+
+      {applyingJob && (
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/50">
+          <div className="bg-white w-full sm:max-w-md sm:rounded-2xl rounded-t-2xl p-6 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-start justify-between gap-3 mb-4">
+              <div>
+                <p className="text-xs text-gray-500 uppercase tracking-wider">{applyingJob.department}</p>
+                <h2 className="text-lg font-semibold text-gray-900">{applyingJob.title}</h2>
+              </div>
+              <button onClick={() => setApplyingJob(null)} className="text-gray-400 hover:text-gray-600 p-1">
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+              </button>
+            </div>
+            {appState === "sent" ? (
+              <div className="text-center py-6">
+                <div className="w-14 h-14 rounded-full bg-emerald-100 flex items-center justify-center mx-auto mb-3">
+                  <svg className="w-6 h-6 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
+                </div>
+                <p className="text-sm font-semibold text-gray-900 mb-1">Application sent</p>
+                <p className="text-xs text-gray-500 mb-5">{appMsg}</p>
+                <button onClick={() => setApplyingJob(null)} className="text-xs font-semibold px-4 py-2 rounded-full bg-gray-900 text-white">Close</button>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                <div>
+                  <label className="block text-xs font-medium text-gray-600 mb-1">Full name *</label>
+                  <input value={appForm.fullName} onChange={e => setAppForm({ ...appForm, fullName: e.target.value })} className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/30" />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-gray-600 mb-1">Email *</label>
+                  <input type="email" value={appForm.email} onChange={e => setAppForm({ ...appForm, email: e.target.value })} className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/30" />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-gray-600 mb-1">Phone *</label>
+                  <input type="tel" value={appForm.phone} onChange={e => setAppForm({ ...appForm, phone: e.target.value })} className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/30" />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-gray-600 mb-1">A few words about you</label>
+                  <textarea value={appForm.coverNote} onChange={e => setAppForm({ ...appForm, coverNote: e.target.value })} rows={3} className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/30" />
+                </div>
+                {appState === "error" && <p className="text-xs text-red-600">{appMsg}</p>}
+                <div className="flex gap-2 pt-1">
+                  <button onClick={() => setApplyingJob(null)} className="flex-1 text-sm font-semibold py-2.5 rounded-lg border border-gray-200 text-gray-700 hover:bg-gray-50">Cancel</button>
+                  <button onClick={submitApply} disabled={appState === "sending"} className="flex-1 text-sm font-semibold py-2.5 rounded-lg bg-[var(--color-primary)] text-white hover:bg-[var(--color-primary)]/90 disabled:opacity-50">
+                    {appState === "sending" ? "Sending…" : "Submit"}
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
+      )}
 
-        <div className="bg-gray-50 rounded-lg border border-gray-200 p-8 text-center">
-          <h2 className="text-lg font-bold text-gray-900 mb-2">Do Not See a Role That Fits?</h2>
-          <p className="text-sm text-gray-500 max-w-md mx-auto mb-6">
-            We are always looking for talented people. Send us your CV and we will keep you in mind for future openings.
-          </p>
-          <Link href="/contact">
-            <Button variant="outline">Send Your CV</Button>
-          </Link>
-        </div>
-      </div>
+      <Footer />
     </div>
   );
 }

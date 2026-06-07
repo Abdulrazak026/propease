@@ -129,3 +129,42 @@ export interface ApiPaginatedResponse<T> {
   page: number;
   limit: number;
 }
+
+export interface ApiJob {
+  id: string;
+  title: string;
+  department: string;
+  location: string;
+  type: string;
+  description: string;
+  isPublished: boolean;
+  createdAt: string;
+}
+
+export interface ApiJobApplication {
+  id: string;
+  jobId: string;
+  fullName: string;
+  email: string;
+  phone: string;
+  coverNote?: string;
+  cvUrl?: string;
+  createdAt: string;
+}
+
+export interface ApiSoldProperty {
+  id: string;
+  listingId?: string;
+  title: string;
+  city: string;
+  salePrice: number;
+  coverPhoto?: string;
+  soldAt: string;
+  agentId?: string;
+  agentName?: string;
+}
+
+export interface ApiAgentDashboard {
+  stats: { total: number; inReview: number; live: number; closed: number };
+  recent: ApiListing[];
+}

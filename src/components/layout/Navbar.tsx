@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { useRole } from "@/context/RoleContext";
 import { useSettings } from "@/context/SettingsContext";
+import LangPill from "@/components/layout/LangPill";
 
 const PRIMARY_LINKS = [
   { label: "Buy", href: "/?type=buy" },
@@ -65,6 +66,7 @@ export default function Navbar() {
         )}
       </Link>
       <div className="flex-1" />
+      <div className="mr-2"><LangPill /></div>
       {isAuthenticated ? (
         <Link
           href={currentUser!.role === "head" ? "/admin" : `/${currentUser!.role}`}
@@ -151,6 +153,7 @@ export default function Navbar() {
         <div className="flex-1" />
 
         <div className="flex items-center gap-2">
+          <div className="mr-1"><LangPill /></div>
           {isAuthenticated ? (
             <div ref={userRef} className="relative">
               <button

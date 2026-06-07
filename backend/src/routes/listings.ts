@@ -80,17 +80,17 @@ router.get("/:id", async (req, res: Response) => {
   }
 });
 
-router.post("/", authenticate, authorize("head", "ambassador"), validate(createListingSchema), async (req: AuthRequest, res: Response) => {
+router.post("/", authenticate, authorize("head", "ambassador", "agent"), validate(createListingSchema), async (req: AuthRequest, res: Response) => {
   try {
     const data = req.body;
 
-    if (req.user!.role === "ambassador") {
+    if (req.user!.role === "ambassador" || req.user!.role === "agent") {
       const userCities = await prisma.userCity.findMany({
         where: { userId: req.user!.id },
         include: { city: true },
       });
       const cityNames = userCities.map((uc) => uc.city.name);
-      if (!cityNames.includes(data.city)) {
+      if (userCities.length > 0 && !cityNames.includes(data.city)) {
         return res.status(403).json({ error: "You can only post listings in your assigned cities" });
       }
     }
@@ -127,7 +127,7 @@ router.post("/", authenticate, authorize("head", "ambassador"), validate(createL
   }
 });
 
-router.put("/:id", authenticate, authorize("head", "ambassador"), async (req: AuthRequest, res: Response) => {
+router.put("/:id", authenticate, authorize("head", "ambassador", "agent"), async (req: AuthRequest, res: Response) => {
   try {
     const listingId = req.params.id as string;
     const listing = await prisma.listing.findUnique({ where: { id: listingId } });
@@ -135,7 +135,7 @@ router.put("/:id", authenticate, authorize("head", "ambassador"), async (req: Au
       return res.status(404).json({ error: "Listing not found" });
     }
 
-    if (req.user!.role === "ambassador" && listing.postedById !== req.user!.id) {
+    if ((req.user!.role === "ambassador" || req.user!.role === "agent") && listing.postedById !== req.user!.id) {
       return res.status(403).json({ error: "You can only edit your own listings" });
     }
 
@@ -185,7 +185,7 @@ router.post("/:id/submit", authenticate, async (req: AuthRequest, res: Response)
   }
 });
 
-router.post("/:id/approve", authenticate, authorize("head"), async (req: AuthRequest, res: Response) => {
+router.post("/:id/approve", authenticate, authorize("head", "ambassador"), async (req: AuthRequest, res: Response) => {
   try {
     const listing = await prisma.listing.findUnique({
       where: { id: req.params.id as string },
@@ -231,7 +231,7 @@ router.post("/:id/approve", authenticate, authorize("head"), async (req: AuthReq
   }
 });
 
-router.post("/:id/reject", authenticate, authorize("head"), async (req: AuthRequest, res: Response) => {
+router.post("/:id/reject", authenticate, authorize("head", "ambassador"), async (req: AuthRequest, res: Response) => {
   try {
     const listing = await prisma.listing.findUnique({ where: { id: req.params.id as string } });
     if (!listing) return res.status(404).json({ error: "Listing not found" });
@@ -271,6 +271,60 @@ router.delete("/:id", authenticate, authorize("head"), async (req: AuthRequest, 
   } catch (error) {
     logger.error({ err: error }, "Delete listing error:");
     res.status(500).json({ error: "Failed to delete listing" });
+  }
+});
+
+router.get("/agent/my-listings", authenticate, authorize("agent", "ambassador", "head"), async (req: AuthRequest, res: Response) => {
+  try {
+    const { status, limit, offset } = req.query;
+    const where: any = { postedById: req.user!.id };
+    if (status) where.status = status;
+    const take = Math.min(parseInt(limit as string) || 50, 100);
+    const skip = parseInt(offset as string) || 0;
+    const [listings, total] = await Promise.all([
+      prisma.listing.findMany({
+        where,
+        take,
+        skip,
+        include: {
+          photos: { orderBy: { order: "asc" } },
+          postedBy: { select: { id: true, name: true, role: true, isVerified: true } },
+        },
+        orderBy: { createdAt: "desc" },
+      }),
+      prisma.listing.count({ where }),
+    ]);
+    res.json({ listings, total, limit: take, offset: skip });
+  } catch (error) {
+    logger.error({ err: error }, "Agent listings error:");
+    res.status(500).json({ error: "Failed to fetch agent listings" });
+  }
+});
+
+router.get("/agent/dashboard", authenticate, authorize("agent", "ambassador", "head"), async (req: AuthRequest, res: Response) => {
+  try {
+    const userId = req.user!.id;
+    const [total, inReview, live, closed] = await Promise.all([
+      prisma.listing.count({ where: { postedById: userId } }),
+      prisma.listing.count({ where: { postedById: userId, status: "review" } }),
+      prisma.listing.count({ where: { postedById: userId, status: { in: ["approved", "available"] } } }),
+      prisma.listing.count({ where: { postedById: userId, status: { in: ["sold", "rented"] } } }),
+    ]);
+    const recent = await prisma.listing.findMany({
+      where: { postedById: userId },
+      take: 5,
+      orderBy: { createdAt: "desc" },
+      include: {
+        photos: { orderBy: { order: "asc" }, take: 1 },
+      },
+    });
+    res.json({
+      stats: { total, inReview, live, closed },
+      recent,
+    });
+  } catch (error) {
+    logger.error({ err: error }, "Agent dashboard error:");
+    res.status(500).json({ error: "Failed to fetch dashboard" });
   }
 });
 

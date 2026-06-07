@@ -7,6 +7,7 @@ import { resolveImageUrl } from "@/lib/utils";
 import { Listing } from "@/lib/types";
 import { formatNaira, propertyTypeLabels } from "@/lib/utils";
 import { isFavorite, toggleFavorite } from "@/lib/favorites";
+import { useCompare } from "@/lib/compare-context";
 
 interface PropertyCardProps {
   listing: Listing;
@@ -15,6 +16,8 @@ interface PropertyCardProps {
 export default function PropertyCard({ listing }: PropertyCardProps) {
   const hasPhoto = listing.photos.length > 0;
   const [fav, setFav] = useState(false);
+  const compare = useCompare();
+  const inCompare = compare.has(listing.id);
 
   useEffect(() => { setFav(isFavorite(listing.id)); }, [listing.id]);
 
@@ -22,6 +25,27 @@ export default function PropertyCard({ listing }: PropertyCardProps) {
     e.preventDefault();
     e.stopPropagation();
     setFav(toggleFavorite(listing.id));
+  };
+
+  const handleCompare = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (inCompare) {
+      compare.remove(listing.id);
+    } else {
+      compare.add({
+        id: listing.id,
+        title: listing.title,
+        city: listing.city,
+        price: listing.price,
+        listingType: listing.listingType,
+        propertyType: listing.propertyType,
+        bedrooms: listing.bedrooms,
+        bathrooms: listing.bathrooms,
+        sqft: listing.sqft,
+        photo: listing.photos?.[0]?.url,
+      });
+    }
   };
 
   return (
@@ -45,11 +69,20 @@ export default function PropertyCard({ listing }: PropertyCardProps) {
           {listing.postedBy?.isVerified && <VerifiedBadge />}
         </div>
 
-        <button onClick={handleFav} className="absolute top-2 right-2 w-9 h-9 rounded-full bg-white/80 flex items-center justify-center hover:bg-white hover:shadow-md active:scale-90 transition-all">
-          <svg className={`w-4 h-4 ${fav ? "text-red-500 fill-red-500" : "text-gray-600"}`} viewBox="0 0 24 24" fill={fav ? "currentColor" : "none"} stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-          </svg>
-        </button>
+        <div className="absolute top-2 right-2 flex flex-col gap-1.5">
+          <button onClick={handleFav} className="w-9 h-9 rounded-full bg-white/80 flex items-center justify-center hover:bg-white hover:shadow-md active:scale-90 transition-all">
+            <svg className={`w-4 h-4 ${fav ? "text-red-500 fill-red-500" : "text-gray-600"}`} viewBox="0 0 24 24" fill={fav ? "currentColor" : "none"} stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+            </svg>
+          </button>
+          <button
+            onClick={handleCompare}
+            aria-label="Add to compare"
+            className={`w-9 h-9 rounded-full flex items-center justify-center hover:shadow-md active:scale-90 transition-all ${inCompare ? "bg-[var(--color-primary)] text-white" : "bg-white/80 text-gray-600 hover:bg-white"}`}
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}><path strokeLinecap="round" strokeLinejoin="round" d="M3 7.5L7.5 3m0 0L12 7.5M7.5 3v13.5m13.5-9L16.5 3m0 0L12 7.5m4.5-4.5v13.5" /></svg>
+          </button>
+        </div>
 
         <div className="absolute bottom-2 left-3 backdrop-blur-sm bg-black/40 rounded-md px-1.5 py-0.5">
           <p className="text-white font-bold text-base">{formatNaira(listing.price)}</p>

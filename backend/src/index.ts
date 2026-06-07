@@ -41,6 +41,9 @@ import faqRoutes from "./routes/faqs";
 import uploadRoutes from "./routes/upload";
 import contactRoutes from "./routes/contact";
 import agentSettingsRoutes from "./routes/agent-settings";
+import careerRoutes from "./routes/careers";
+import soldPropertiesRoutes from "./routes/sold-properties";
+import newsletterRoutes from "./routes/newsletter";
 import prisma from "./lib/prisma";
 import { logger } from "./lib/logger";
 
@@ -124,6 +127,9 @@ app.use("/api/faqs", faqRoutes);
 app.use("/api/upload", uploadRoutes);
 app.use("/api/contact", contactRoutes);
 app.use("/api/agent/settings", agentSettingsRoutes);
+app.use("/api/careers", careerRoutes);
+app.use("/api/sold-properties", soldPropertiesRoutes);
+app.use("/api/newsletter", newsletterRoutes);
 
 // 404 handler
 app.use((_req, res) => {

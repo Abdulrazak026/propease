@@ -41,11 +41,11 @@ export default function AgentPage() {
       rented: listings.filter(l => l.status === "rented" || l.status === "sold").length,
     };
     return (
-      <div className="space-y-6">
+      <div className="space-y-6 pt-2">
         <div className="flex items-center justify-between gap-3 flex-wrap">
           <div>
-            <h1 className="text-xl font-bold text-gray-900">Welcome back, {currentUser?.name?.split(" ")[0] || ""}</h1>
-            <p className="text-xs text-gray-500">Manage your listings and inquiries</p>
+            <h1 className="text-2xl font-bold text-gray-900">Welcome back, {currentUser?.name?.split(" ")[0] || ""}</h1>
+            <p className="text-sm text-gray-500">Manage your listings and inquiries</p>
           </div>
           <Link href="/ambassador/listings/new" className="text-xs font-semibold px-3.5 py-2.5 bg-[var(--color-primary)] text-white rounded-lg hover:bg-[var(--color-primary)]/90 transition-colors">+ New Listing</Link>
         </div>
