@@ -34,6 +34,7 @@ export const dashboardNav: Record<string, NavItem[]> = {
  ambassador: [
  { label: "City Overview", href: "/ambassador", icon: "city-overview" },
  { label: "Post Listing", href: "/ambassador/listings/new", icon: "post-listing" },
+ { label: "Review Listings", href: "/ambassador/moderation", icon: "agreements" },
  { label: "Create Task", href: "/ambassador/tasks", icon: "create-task" },
  { label: "Commissions", href: "/ambassador/commissions", icon: "commissions" },
  { label: "Wallet", href: "/wallet", icon: "wallet" },
