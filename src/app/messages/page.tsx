@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { formatDate } from "@/lib/utils";
 import { api } from "@/lib/api-client";
@@ -15,92 +15,173 @@ interface Conversation {
   unread: number;
 }
 
+function avatarColor(name: string) {
+  const colors = [
+    "from-rose-400 to-rose-600",
+    "from-amber-400 to-amber-600",
+    "from-emerald-400 to-emerald-600",
+    "from-sky-400 to-sky-600",
+    "from-violet-400 to-violet-600",
+    "from-orange-400 to-orange-600",
+    "from-teal-400 to-teal-600",
+  ];
+  let h = 0;
+  for (let i = 0; i < name.length; i++) h = name.charCodeAt(i) + ((h << 5) - h);
+  return colors[Math.abs(h) % colors.length];
+}
+
+function timeAgo(iso?: string) {
+  if (!iso) return "";
+  const d = new Date(iso).getTime();
+  const diff = Date.now() - d;
+  const m = Math.floor(diff / 60000);
+  const h = Math.floor(diff / 3600000);
+  const days = Math.floor(diff / 86400000);
+  if (m < 1) return "now";
+  if (m < 60) return `${m}m`;
+  if (h < 24) return `${h}h`;
+  if (days < 7) return `${days}d`;
+  return new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric" });
+}
+
 export default function MessagesPage() {
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [query, setQuery] = useState("");
 
-  const fetchConversations = () => {
+  useEffect(() => {
     api.get<{ conversations: Conversation[] }>("/api/messages/conversations").then(r => {
       if (r.data?.conversations) setConversations(r.data.conversations);
       setLoading(false);
     }).catch(() => setLoading(false));
-  };
-
-  useEffect(() => { fetchConversations(); }, []);
+  }, []);
 
   const selected = conversations.find((c) => c.id === selectedId);
-
-  if (loading) return <div className="flex items-center justify-center h-64"><div className="h-8 w-8 border-2 border-[var(--color-primary)] border-t-transparent rounded-full animate-spin" /></div>;
+  const filtered = query
+    ? conversations.filter(c => {
+        const name = c.participants[0]?.user.name || "";
+        const subj = c.subject || "";
+        const lst = c.listing?.title || "";
+        return [name, subj, lst].some(s => s.toLowerCase().includes(query.toLowerCase()));
+      })
+    : conversations;
 
   return (
     <div className="h-full flex flex-col">
       <div className="flex-1 flex overflow-hidden min-h-0">
         {/* List */}
-        <div className={`w-full lg:w-80 xl:w-96 border-r border-gray-200 bg-white flex flex-col ${selectedId ? "hidden lg:flex" : "flex"}`}>
-          <div className="px-5 py-4 border-b border-gray-200">
-            <h1 className="text-lg font-bold text-gray-900">Messages</h1>
-            <p className="text-xs text-gray-500 mt-0.5">{conversations.length} conversations</p>
+        <div className={`w-full lg:w-96 border-r border-gray-100 bg-white flex flex-col ${selectedId ? "hidden lg:flex" : "flex"}`}>
+          <div className="px-5 pt-5 pb-3 border-b border-gray-100">
+            <div className="flex items-end justify-between mb-3">
+              <div>
+                <h1 className="text-xl font-bold text-gray-900 tracking-tight">Inbox</h1>
+                <p className="text-xs text-gray-500 mt-0.5">{conversations.length} {conversations.length === 1 ? "conversation" : "conversations"}</p>
+              </div>
+            </div>
+            {conversations.length > 0 && (
+              <div className="relative">
+                <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+                </svg>
+                <input
+                  type="text"
+                  value={query}
+                  onChange={e => setQuery(e.target.value)}
+                  placeholder="Search messages…"
+                  className="w-full pl-9 pr-3 py-2 text-sm rounded-lg bg-gray-50 border border-gray-100 focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)] focus:bg-white"
+                />
+              </div>
+            )}
           </div>
           <div className="flex-1 overflow-y-auto">
-            {conversations.length === 0 ? (
-              <div className="text-center py-16 px-4">
-                <svg className="w-10 h-10 text-gray-300 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                </svg>
-                <h3 className="text-sm font-semibold text-gray-900 mb-1">No messages</h3>
-                <p className="text-xs text-gray-500">Inquire about a property to start a conversation</p>
+            {loading ? (
+              <div className="p-3 space-y-1">
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <div key={i} className="flex items-center gap-3 p-3 animate-pulse">
+                    <div className="w-11 h-11 rounded-full bg-gray-100" />
+                    <div className="flex-1">
+                      <div className="h-3 bg-gray-100 rounded w-2/3 mb-2" />
+                      <div className="h-3 bg-gray-100 rounded w-1/2" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : filtered.length === 0 ? (
+              <div className="text-center py-20 px-6">
+                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center mx-auto mb-4">
+                  <svg className="w-7 h-7 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                  </svg>
+                </div>
+                <h3 className="text-sm font-semibold text-gray-900 mb-1">
+                  {query ? "No matches" : "No messages yet"}
+                </h3>
+                <p className="text-xs text-gray-500 max-w-[220px] mx-auto">
+                  {query ? "Try a different name or subject." : "When you inquire about a property, the conversation shows up here."}
+                </p>
               </div>
             ) : (
-              <div>
-                {conversations.map((conv) => (
-                  <button
-                    key={conv.id}
-                    onClick={() => setSelectedId(conv.id)}
-                    className={`w-full flex items-start gap-3 px-5 py-4 text-left transition-colors hover:bg-gray-50 ${
-                      selectedId === conv.id ? "bg-[var(--color-primary)]/5 border-l-2 border-[var(--color-primary)]" : "border-l-2 border-transparent"
-                    }`}
-                  >
-                    <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-xs font-bold text-gray-600 shrink-0 mt-0.5">
-                      {conv.participants[0]?.user.name.split(" ").map(n => n[0]).join("").slice(0, 2)}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm font-semibold text-gray-900 truncate">{conv.participants[0]?.user.name}</span>
-                        {conv.unread > 0 && <span className="w-2 h-2 rounded-full bg-[var(--color-primary)] shrink-0" />}
+              <div className="divide-y divide-gray-50">
+                {filtered.map((conv) => {
+                  const name = conv.participants[0]?.user.name || "Unknown";
+                  const isActive = selectedId === conv.id;
+                  return (
+                    <button
+                      key={conv.id}
+                      onClick={() => setSelectedId(conv.id)}
+                      className={`w-full flex items-start gap-3 px-4 py-3.5 text-left transition-colors ${
+                        isActive ? "bg-[var(--color-primary)]/5" : "hover:bg-gray-50"
+                      }`}
+                    >
+                      <div className="relative shrink-0">
+                        <div className={`w-11 h-11 rounded-full bg-gradient-to-br ${avatarColor(name)} flex items-center justify-center text-white text-xs font-bold ring-2 ring-white`}>
+                          {name.split(" ").map(n => n[0]).join("").slice(0, 2).toUpperCase()}
+                        </div>
+                        {conv.unread > 0 && (
+                          <span className="absolute -top-0.5 -right-0.5 w-3.5 h-3.5 bg-[var(--color-primary)] border-2 border-white rounded-full" />
+                        )}
                       </div>
-                      {conv.subject && <p className="text-xs text-gray-500 truncate">{conv.subject}</p>}
-                      {conv.lastMessage && <p className="text-xs text-gray-400 truncate mt-0.5">{conv.lastMessage}</p>}
-                    </div>
-                    <div className="text-right shrink-0">
-                      <p className="text-[10px] text-gray-400">{conv.lastMessageAt ? formatDate(conv.lastMessageAt) : ""}</p>
-                      {conv.unread > 0 && (
-                        <span className="inline-flex items-center justify-center min-w-[18px] h-[18px] bg-[var(--color-primary)] text-white text-[10px] font-bold rounded-full px-1 mt-1">
-                          {conv.unread}
-                        </span>
-                      )}
-                    </div>
-                  </button>
-                ))}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between gap-2 mb-0.5">
+                          <span className={`text-sm truncate ${conv.unread > 0 ? "font-bold text-gray-900" : "font-semibold text-gray-800"}`}>{name}</span>
+                          <span className={`text-[10px] shrink-0 ${conv.unread > 0 ? "text-[var(--color-primary)] font-semibold" : "text-gray-400"}`}>{timeAgo(conv.lastMessageAt)}</span>
+                        </div>
+                        {conv.subject && (
+                          <p className="text-[11px] text-gray-500 truncate mb-0.5">{conv.subject}</p>
+                        )}
+                        <p className={`text-xs truncate ${conv.unread > 0 ? "text-gray-700 font-medium" : "text-gray-500"}`}>
+                          {conv.lastMessage || (conv.listing ? `Re: ${conv.listing.title}` : "No messages yet")}
+                        </p>
+                      </div>
+                    </button>
+                  );
+                })}
               </div>
             )}
           </div>
         </div>
 
         {/* Detail / Placeholder */}
-        <div className={`flex-1 flex flex-col bg-gray-50 min-h-0 ${!selectedId ? "hidden lg:flex" : "flex"}`}>
+        <div className={`flex-1 flex flex-col bg-gradient-to-br from-gray-50 to-white min-h-0 ${!selectedId ? "hidden lg:flex" : "flex"}`}>
           {selected ? (
             <ConversationDetail conversation={selected} onBack={() => setSelectedId(null)} />
           ) : (
-            <div className="flex-1 flex items-center justify-center">
-              <div className="text-center">
-                <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm">
-                  <svg className="w-8 h-8 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                  </svg>
+            <div className="flex-1 flex items-center justify-center p-6">
+              <div className="text-center max-w-sm">
+                <div className="relative w-24 h-24 mx-auto mb-5">
+                  <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-[var(--color-primary)]/15 to-emerald-100 rotate-6" />
+                  <div className="absolute inset-0 rounded-3xl bg-white border border-gray-100 shadow-sm flex items-center justify-center">
+                    <svg className="w-10 h-10 text-[var(--color-primary)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                    </svg>
+                  </div>
                 </div>
-                <h3 className="text-sm font-semibold text-gray-900 mb-1">Select a conversation</h3>
-                <p className="text-xs text-gray-500">Choose a conversation from the left to view messages</p>
+                <h3 className="text-base font-semibold text-gray-900 mb-1.5">Your inbox is empty</h3>
+                <p className="text-sm text-gray-500 mb-5">Pick a conversation from the list to read it, or start a new one by inquiring on a property.</p>
+                <Link href="/" className="inline-flex items-center justify-center min-h-[40px] px-5 py-2 text-sm font-semibold rounded-full bg-gray-900 text-white hover:bg-gray-800 transition-colors">
+                  Browse properties
+                </Link>
               </div>
             </div>
           )}
@@ -114,82 +195,117 @@ function ConversationDetail({ conversation, onBack }: { conversation: Conversati
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [sending, setSending] = useState(false);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const name = conversation.participants[0]?.user.name || "Unknown";
+  const myId = "me";
 
   useEffect(() => {
+    setLoading(true);
     api.get<any>(`/api/messages/conversations/${conversation.id}`).then(r => {
       if ((r.data as any)?.messages) setMessages((r.data as any).messages);
       setLoading(false);
     }).catch(() => setLoading(false));
   }, [conversation.id]);
 
+  useEffect(() => {
+    setTimeout(() => {
+      if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }, 50);
+  }, [messages.length]);
+
   const handleSend = async () => {
-    if (!input.trim()) return;
+    const txt = input.trim();
+    if (!txt || sending) return;
+    setSending(true);
     try {
-      const r = await api.post(`/api/messages/conversations/${conversation.id}`, { content: input.trim() });
+      const r = await api.post(`/api/messages/conversations/${conversation.id}`, { content: txt });
       if (r.data) {
-        const newMsg = (r.data as any).message || { id: crypto.randomUUID(), content: input.trim(), senderId: "me", createdAt: new Date().toISOString() };
+        const newMsg = (r.data as any).message || { id: crypto.randomUUID(), content: txt, senderId: myId, createdAt: new Date().toISOString() };
         setMessages(prev => [...prev, newMsg]);
       }
     } catch {}
     setInput("");
+    setSending(false);
   };
 
   return (
     <div className="flex flex-col flex-1 min-h-0">
-      <div className="flex items-center gap-3 px-5 py-3 bg-white border-b border-gray-200 shrink-0">
-        <button onClick={onBack} className="lg:hidden text-gray-400 hover:text-gray-600">
+      <div className="flex items-center gap-3 px-5 py-3.5 bg-white/80 backdrop-blur-md border-b border-gray-100 shrink-0">
+        <button onClick={onBack} className="lg:hidden -ml-1 p-1.5 text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded-lg">
           <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
           </svg>
         </button>
-        <div className="w-9 h-9 rounded-full bg-[var(--color-primary)] flex items-center justify-center text-white text-xs font-bold">
-          {conversation.participants[0]?.user.name.split(" ").map(n => n[0]).join("").slice(0, 2)}
+        <div className={`w-10 h-10 rounded-full bg-gradient-to-br ${avatarColor(name)} flex items-center justify-center text-white text-xs font-bold ring-2 ring-white shadow-sm`}>
+          {name.split(" ").map(n => n[0]).join("").slice(0, 2).toUpperCase()}
         </div>
-        <div>
-          <p className="text-sm font-semibold text-gray-900">{conversation.participants[0]?.user.name}</p>
-          <p className="text-[11px] text-gray-400">
-            {conversation.listing ? `Re: ${conversation.listing.title}` : "General inquiry"}
+        <div className="flex-1 min-w-0">
+          <p className="text-sm font-semibold text-gray-900 truncate">{name}</p>
+          <p className="text-[11px] text-gray-500 truncate">
+            {conversation.listing ? `About: ${conversation.listing.title}` : "General inquiry"}
           </p>
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-5 py-4 space-y-3 min-h-0">
-        {loading ? <p className="text-xs text-gray-400 text-center">Loading...</p> :
-          messages.map((msg: any) => {
-            const isMe = msg.senderId !== conversation.participants[0]?.user.id;
-            return (
-          <div key={msg.id} className={`flex ${isMe ? "justify-end" : "justify-start"}`}>
-            <div className={`max-w-[70%]`}>
-              <div className={`px-4 py-2.5 rounded-lg text-sm leading-relaxed ${
-                isMe ? "bg-[var(--color-primary)] text-white rounded-br-md" : "bg-white border border-gray-200 text-gray-900 rounded-bl-md"
-              }`}>
-                {msg.content}
-              </div>
-              <p className={`text-[10px] text-gray-400 mt-1 ${isMe ? "text-right" : "text-left"}`}>{formatDate(msg.createdAt)}</p>
-            </div>
+      <div ref={scrollRef} className="flex-1 overflow-y-auto px-5 py-6 min-h-0">
+        {loading ? (
+          <div className="flex items-center justify-center h-full">
+            <div className="w-8 h-8 border-2 border-[var(--color-primary)] border-t-transparent rounded-full animate-spin" />
           </div>
-          );
-          })}
+        ) : messages.length === 0 ? (
+          <div className="flex flex-col items-center justify-center h-full text-center px-4">
+            <p className="text-sm font-medium text-gray-900 mb-1">Say hello</p>
+            <p className="text-xs text-gray-500 max-w-[260px]">Start the conversation — your message will arrive instantly.</p>
+          </div>
+        ) : (
+          <div className="space-y-2 max-w-2xl mx-auto">
+            {messages.map((msg: any) => {
+              const isMe = msg.senderId !== conversation.participants[0]?.user.id;
+              return (
+                <div key={msg.id} className={`flex ${isMe ? "justify-end" : "justify-start"}`}>
+                  <div className={`max-w-[75%]`}>
+                    <div className={`px-4 py-2.5 text-sm leading-relaxed shadow-sm ${
+                      isMe
+                        ? "bg-[var(--color-primary)] text-white rounded-2xl rounded-br-md"
+                        : "bg-white border border-gray-100 text-gray-900 rounded-2xl rounded-bl-md"
+                    }`}>
+                      {msg.content}
+                    </div>
+                    <p className={`text-[10px] text-gray-400 mt-1 px-1 ${isMe ? "text-right" : "text-left"}`}>{formatDate(msg.createdAt)}</p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
       </div>
 
-      <div className="shrink-0 border-t border-gray-200 px-5 py-3 bg-white">
-        <div className="flex items-center gap-2">
-          <input
-            type="text"
+      <div className="shrink-0 border-t border-gray-100 px-4 sm:px-5 py-3 bg-white/80 backdrop-blur-md">
+        <div className="flex items-end gap-2 max-w-2xl mx-auto">
+          <textarea
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSend(); } }}
-            placeholder="Type a message..."
-            className="flex-1 px-4 py-2.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)] placeholder:text-gray-400"
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSend(); }
+            }}
+            placeholder="Type a message…"
+            rows={1}
+            className="flex-1 px-4 py-2.5 text-sm border border-gray-200 rounded-2xl resize-none focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)] focus:border-[var(--color-primary)] placeholder:text-gray-400 max-h-32"
+            style={{ minHeight: "44px" }}
           />
           <button
             onClick={handleSend}
-            disabled={!input.trim()}
-            className="w-10 h-10 bg-[var(--color-primary)] text-white rounded-lg hover:bg-[var(--color-primary-light)] transition-all disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center"
+            disabled={!input.trim() || sending}
+            className="shrink-0 w-11 h-11 bg-[var(--color-primary)] text-white rounded-full hover:bg-[var(--color-primary)]/90 transition-all disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center shadow-md shadow-[var(--color-primary)]/20"
           >
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-            </svg>
+            {sending ? (
+              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+            ) : (
+              <svg className="w-4 h-4 -ml-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+              </svg>
+            )}
           </button>
         </div>
       </div>

@@ -104,14 +104,14 @@ export default function HomePage() {
               Now serving 4 cities across Kano
             </div>
             <h1 className="text-4xl sm:text-5xl lg:text-7xl font-bold text-white leading-[1.05] tracking-tight">
-              Find a place<br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-300 via-teal-200 to-emerald-400">you&apos;d love to live.</span>
+              Find Your Home<br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-300 via-teal-200 to-emerald-400">in Kano.</span>
             </h1>
             <p className="text-base sm:text-lg text-white/60 mt-5 sm:mt-6 max-w-xl leading-relaxed">{siteTagline}</p>
 
             <div className="mt-8 sm:mt-10 grid grid-cols-3 gap-4 sm:gap-8 max-w-md">
               <div>
-                <p className="text-2xl sm:text-3xl font-bold text-white">500+</p>
+                <p className="text-2xl sm:text-3xl font-bold text-white">30+</p>
                 <p className="text-xs text-white/40 mt-0.5">Verified properties</p>
               </div>
               <div>
@@ -127,7 +127,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <div className="sticky top-16 z-30 bg-white/95 backdrop-blur-md border-b border-gray-200 shadow-sm" data-filter-search>
+      <div className="lg:sticky lg:top-16 z-30 bg-white/95 backdrop-blur-md border-b border-gray-200 lg:shadow-sm" data-filter-search>
         <PropertyFilters onFilterChange={handleFilterChange} />
       </div>
 
@@ -135,7 +135,7 @@ export default function HomePage() {
         <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-6">
           <div>
             <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight">Properties for you</h2>
-            <p className="text-sm text-gray-500 mt-1">{listings.length > 0 ? `${listings.length} ${listings.length === 1 ? "property" : "properties"} available` : "Loading listings…"}</p>
+            <p className="text-sm text-gray-500 mt-1">{loading ? "Loading listings…" : listings.length > 0 ? `${listings.length} ${listings.length === 1 ? "property" : "properties"} available` : "No listings match your filters"}</p>
           </div>
           <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide -mx-1 px-1">
             {CATEGORY_PILLS.map((p) => {
@@ -168,7 +168,7 @@ export default function HomePage() {
             ))}
           </div>
         ) : visibleListings.length === 0 ? (
-          <EmptyState title="No listings match your filters" description="Try adjusting your filters or check back later." />
+          <EmptyState title="Oops! No listing found" description="Try changing your filters or check back later — new properties are added every week." />
         ) : (
           <>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">

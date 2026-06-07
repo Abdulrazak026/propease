@@ -9,7 +9,6 @@ const PRIMARY_LINKS = [
   { label: "Buy", href: "/?type=buy" },
   { label: "Rent", href: "/?type=rent" },
   { label: "Sell", href: "/list-property" },
-  { label: "Agent Tools", href: "/agent" },
   { label: "Research", href: "/research" },
 ];
 
@@ -51,6 +50,37 @@ export default function Navbar() {
   if (isDashboard) return null;
 
   return (
+    <>
+    <header className="lg:hidden sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-gray-200 h-14 flex items-center px-4">
+      <Link href="/" className="flex items-center gap-2 shrink-0">
+        {siteLogo ? (
+          <img src={siteLogo} alt={siteName} className="h-7 w-auto rounded-lg object-contain" />
+        ) : (
+          <>
+            <div className="w-7 h-7 rounded-lg bg-[var(--color-primary)] flex items-center justify-center">
+              <span className="text-white font-black text-[10px]">M</span>
+            </div>
+            <span className="text-sm font-bold text-gray-900 tracking-tight">{siteName}</span>
+          </>
+        )}
+      </Link>
+      <div className="flex-1" />
+      {isAuthenticated ? (
+        <Link
+          href={currentUser!.role === "head" ? "/admin" : `/${currentUser!.role}`}
+          className="w-9 h-9 rounded-full bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary-light)] flex items-center justify-center text-white text-xs font-bold shadow-sm"
+        >
+          {currentUser!.name.split(" ").map(n => n[0]).join("").slice(0, 2)}
+        </Link>
+      ) : (
+        <Link
+          href="/login"
+          className="px-4 py-2 text-xs font-semibold text-white bg-[var(--color-primary)] hover:bg-[var(--color-primary)]/90 rounded-full transition-colors"
+        >
+          Sign In
+        </Link>
+      )}
+    </header>
     <header className="hidden lg:flex sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-gray-200 h-16 items-center">
       <div className="w-full max-w-[1400px] mx-auto px-6 xl:px-10 flex items-center gap-8">
         <Link href="/" className="flex items-center gap-2.5 shrink-0">
@@ -178,16 +208,17 @@ export default function Navbar() {
               >
                 Sign In
               </Link>
-              <Link
-                href="/list-property"
-                className="px-4 py-2 text-sm font-semibold text-white bg-[var(--color-primary)] hover:bg-[var(--color-primary)]/90 rounded-lg transition-colors"
-              >
-                List Property
-              </Link>
-            </>
-          )}
-        </div>
+          <Link
+            href="/list-property"
+            className="px-4 py-2 text-sm font-semibold text-white bg-[var(--color-primary)] hover:bg-[var(--color-primary)]/90 rounded-lg transition-colors"
+          >
+            List Property
+          </Link>
+        </>
+      )}
+    </div>
       </div>
     </header>
+    </>
   );
 }

@@ -81,11 +81,10 @@ export default function Footer() {
             <h4 className="text-xs font-semibold text-white uppercase tracking-[0.12em] mb-4">Services</h4>
             <ul className="space-y-2.5">
               {[
-                { l: "Manage Rentals", h: "/agent" },
                 { l: "Advertise", h: "/list-property" },
-                { l: "Apply as Agent", h: "/apply-as-agent" },
                 { l: "Custom Request", h: "/custom-order" },
                 { l: "Research", h: "/research" },
+                { l: "Sign In", h: "/login" },
               ].map(link => (
                 <li key={link.h}><Link href={link.h} className="text-sm hover:text-white transition-colors inline-block min-h-[32px]">{link.l}</Link></li>
               ))}
@@ -149,13 +148,13 @@ export default function Footer() {
             Copyright &copy; {new Date().getFullYear()} {brand}. All rights reserved.
           </p>
           <a
-            href="https://savanix.com"
+            href="https://savannix.com"
             target="_blank"
             rel="noopener noreferrer"
             className="text-xs text-gray-500 hover:text-white transition-colors inline-flex items-center gap-1.5 group"
           >
             <span>Designed by</span>
-            <span className="font-semibold text-gray-300 group-hover:text-white">Savanix</span>
+            <span className="font-semibold text-gray-300 group-hover:text-white">Savannix Tech ltd.</span>
             <svg className="w-3 h-3 opacity-50 group-hover:opacity-100 transition-opacity" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
             </svg>

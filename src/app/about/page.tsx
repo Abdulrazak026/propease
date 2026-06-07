@@ -5,15 +5,15 @@ import { resolveImageUrl } from "@/lib/utils";
 import Footer from "@/components/layout/Footer";
 
 const defaultTeam = [
-  { name: "Ahmad Abubakar", role: "Managing Director", bio: "Started MBPP in 2017 after buying and selling three properties the hard way. Now he focuses on capital, partnerships, and making sure the company doesn't lose its soul as it grows.", photo: "" },
-  { name: "Barr. Sulaiman Usman", role: "Legal Adviser", bio: "Twenty years in Kano property law. He reads the contracts the rest of us skip, and he's the reason our agreements have held up in every dispute we've seen.", photo: "" },
-  { name: "Umar Nuhu", role: "Admin Officer", bio: "The person who actually keeps the lights on. Sales records, expense tracking, the filing cabinet nobody else wants to touch — that's Umar.", photo: "" },
-  { name: "Tasiu Sani", role: "Source & Procurement", bio: "Walks neighborhoods we haven't listed in yet. If a property is about to come up for sale, Tasiu usually knows before the sign goes up.", photo: "" },
-  { name: "Engr. Salisu Muhammad", role: "Operations Manager", bio: "Runs the ambassador network. Every field agent, every photographer, every viewing — coordinated from his desk or in person.", photo: "" },
-  { name: "Abdulmalik Abubakar", role: "Finance & IT", bio: "Keeps the books honest and the servers up. If you've ever gotten a payout on time, you have Abdulmalik to thank.", photo: "" },
-  { name: "Zahradden Aliyu", role: "Project Manager", bio: "Our newest construction and renovation lead. If you're buying off-plan through us, Zahradden is the one making sure they actually build it.", photo: "" },
-  { name: "Engr. Sani Umar", role: "Platform Manager", bio: "Built the search, the filters, the owner dashboard. If something on the site works well, Sani probably wrote it. If it doesn't, he's already on it.", photo: "" },
-  { name: "Ahmad Abubakar Ali", role: "Office Secretary", bio: "The first voice you hear when you call. Ahmad runs scheduling, internal coordination, and our social media — the latter he does better than any of us expected.", photo: "" },
+  { name: "Ahmad Abubakar", role: "Managing Director", bio: "Started MBPP in 2017 after buying and selling three properties the hard way. Now he focuses on capital, partnerships, and making sure the company doesn't lose its soul as it grows.", photo: "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=400&h=400&fit=crop&crop=faces" },
+  { name: "Barr. Sulaiman Usman", role: "Legal Adviser", bio: "Twenty years in Kano property law. He reads the contracts the rest of us skip, and he's the reason our agreements have held up in every dispute we've seen.", photo: "https://images.unsplash.com/photo-1556157382-97eda2d62296?w=400&h=400&fit=crop&crop=faces" },
+  { name: "Umar Nuhu", role: "Admin Officer", bio: "The person who actually keeps the lights on. Sales records, expense tracking, the filing cabinet nobody else wants to touch — that's Umar.", photo: "https://images.unsplash.com/photo-1531427186611-ecfd6d936c79?w=400&h=400&fit=crop&crop=faces" },
+  { name: "Tasiu Sani", role: "Source & Procurement", bio: "Walks neighborhoods we haven't listed in yet. If a property is about to come up for sale, Tasiu usually knows before the sign goes up.", photo: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=faces" },
+  { name: "Engr. Salisu Muhammad", role: "Operations Manager", bio: "Runs the ambassador network. Every field agent, every photographer, every viewing — coordinated from his desk or in person.", photo: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&crop=faces" },
+  { name: "Abdulmalik Abubakar", role: "Finance & IT", bio: "Keeps the books honest and the servers up. If you've ever gotten a payout on time, you have Abdulmalik to thank.", photo: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop&crop=faces" },
+  { name: "Zahradden Aliyu", role: "Project Manager", bio: "Our newest construction and renovation lead. If you're buying off-plan through us, Zahradden is the one making sure they actually build it.", photo: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=400&h=400&fit=crop&crop=faces" },
+  { name: "Engr. Sani Umar", role: "Platform Manager", bio: "Built the search, the filters, the owner dashboard. If something on the site works well, Sani probably wrote it. If it doesn't, he's already on it.", photo: "https://images.unsplash.com/photo-1463453091185-61582044d556?w=400&h=400&fit=crop&crop=faces" },
+  { name: "Ahmad Abubakar Ali", role: "Office Secretary", bio: "The first voice you hear when you call. Ahmad runs scheduling, internal coordination, and our social media — the latter he does better than any of us expected.", photo: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&h=400&fit=crop&crop=faces" },
 ];
 
 export default function AboutPage() {
@@ -117,19 +117,19 @@ export default function AboutPage() {
               We&apos;re intentionally small. The agent who lists your property is two calls away from the legal adviser and one floor away from the platform engineer. Decisions happen in person, not in Jira.
             </p>
           </div>
-          <div className="lg:col-span-8 grid sm:grid-cols-2 gap-x-6 gap-y-8">
+          <div className="lg:col-span-8 grid sm:grid-cols-2 gap-x-6 gap-y-10">
             {team.map((m) => (
               <div key={m.name} className="flex gap-4">
-                <div className="shrink-0 w-14 h-14 rounded-2xl bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center text-base font-bold text-gray-500 overflow-hidden">
+                <div className="shrink-0 w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center text-base font-bold text-gray-500 overflow-hidden ring-2 ring-white shadow-md shadow-gray-900/5">
                   {m.photo ? (
-                    <img src={resolveImageUrl(m.photo) || ""} alt={m.name} className="w-full h-full object-cover" />
+                    <img src={resolveImageUrl(m.photo) || ""} alt={m.name} className="w-full h-full object-cover" loading="lazy" />
                   ) : (
                     m.name.split(" ").map(n => n[0]).join("").slice(0, 2)
                   )}
                 </div>
-                <div className="min-w-0">
-                  <p className="text-base font-semibold text-gray-900">{m.name}</p>
-                  <p className="text-xs text-[var(--color-primary)] font-medium mb-2">{m.role}</p>
+                <div className="min-w-0 flex-1">
+                  <p className="text-base font-semibold text-gray-900 leading-tight">{m.name}</p>
+                  <p className="text-xs text-[var(--color-primary)] font-medium mb-2 mt-0.5">{m.role}</p>
                   <p className="text-sm text-gray-500 leading-relaxed">{m.bio}</p>
                 </div>
               </div>
