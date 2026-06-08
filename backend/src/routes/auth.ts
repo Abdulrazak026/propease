@@ -42,9 +42,10 @@ function generateRefreshToken() {
 
 router.post("/register", validate(registerSchema), async (req, res: Response) => {
   try {
-    const { name, email, password, city } = req.body;
-    // Force role to "client" — staff roles assigned only by admin
-    const role = "client";
+    const { name, email, password, city, role: requestedRole } = req.body;
+    // Allow "agent" role from apply-as-agent form, force everything else to "client"
+    const role = requestedRole === "agent" ? "agent" : "client";
+    const isApproved = role === "agent" ? false : true;
 
     const existing = await prisma.user.findUnique({ where: { email } });
     if (existing) {
@@ -60,7 +61,7 @@ router.post("/register", validate(registerSchema), async (req, res: Response) =>
         password: hashedPassword,
         role,
         city,
-        isApproved: true,
+        isApproved,
       },
       select: { id: true, name: true, email: true, role: true, city: true, isApproved: true },
     });
@@ -83,14 +84,20 @@ router.post("/register", validate(registerSchema), async (req, res: Response) =>
         data: {
           userId: admin.id,
           type: "application_status",
-          title: "New User Registration",
-          body: `${name} (${email}) registered as ${user.role}.`,
-          link: "/admin/users",
+          title: role === "agent" ? "New Agent Application" : "New User Registration",
+          body: role === "agent"
+            ? `${name} (${email}) applied to become an agent.`
+            : `${name} (${email}) registered as ${user.role}.`,
+          link: role === "agent" ? "/admin/users" : "/admin/users",
         },
       })
     );
     Promise.all(adminNotifications).catch(() => {});
-    emailService.welcome(email, name).catch(() => {});
+    if (role === "agent") {
+      emailService.agentApplicationSubmitted(email, name).catch(() => {});
+    } else {
+      emailService.welcome(email, name).catch(() => {});
+    }
   } catch (error) {
     logger.error({ err: error }, "Register error:");
     res.status(500).json({ error: "Registration failed" });
@@ -112,6 +119,9 @@ router.post("/login", validate(loginSchema), async (req, res: Response) => {
     }
 
     if (!user.isApproved && user.role !== "head") {
+      if ((user as any).suspendedAt) {
+        return res.status(403).json({ error: "Your account has been suspended. Please contact support for more information." });
+      }
       return res.status(403).json({ error: "Account pending approval" });
     }
 

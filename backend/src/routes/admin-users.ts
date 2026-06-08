@@ -17,11 +17,11 @@ router.get("/", authenticate, authorize("head"), requirePermission("canManageUse
 
 router.patch("/:id", authenticate, authorize("head"), requirePermission("canManageUsers"), async (req: AuthRequest, res: Response) => {
   try {
-    const { isApproved, isVerified, canCreateTasks, canCloseDeals, canCreateListings, canManageUsers, canManageContent, canViewAnalytics, canManageAgreements, role, ambassadorId } = req.body;
+    const { isApproved, isVerified, suspendedAt, canCreateTasks, canCloseDeals, canCreateListings, canManageUsers, canManageContent, canViewAnalytics, canManageAgreements, role, ambassadorId } = req.body;
     const id = String(req.params.id);
     const user = await prisma.user.update({
       where: { id },
-      data: { isApproved, isVerified, canCreateTasks, canCloseDeals, canCreateListings, canManageUsers, canManageContent, canViewAnalytics, canManageAgreements, role, ambassadorId },
+      data: { isApproved, isVerified, suspendedAt: suspendedAt !== undefined ? (suspendedAt ? new Date(suspendedAt) : null) : undefined, canCreateTasks, canCloseDeals, canCreateListings, canManageUsers, canManageContent, canViewAnalytics, canManageAgreements, role, ambassadorId },
       select: { id: true, name: true, email: true, role: true, isApproved: true, canCreateTasks: true, canCloseDeals: true, canCreateListings: true, canManageUsers: true, canManageContent: true, canViewAnalytics: true, canManageAgreements: true },
     });
     res.json({ user });

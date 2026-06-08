@@ -122,6 +122,7 @@ model User {
   canManageAgreements  Boolean @default(false)
   isApproved     Boolean   @default(false)
   isVerified     Boolean   @default(false)
+  suspendedAt    DateTime?
   verifiedAt     DateTime?
   verificationDoc String?
   whatsapp       String?
