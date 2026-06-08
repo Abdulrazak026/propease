@@ -11,6 +11,10 @@ export default function UsersPage() {
   const [viewUser, setViewUser] = useState<ApiUser | null>(null);
   const [saving, setSaving] = useState<string | null>(null);
   const [deleting, setDeleting] = useState<string | null>(null);
+  const [showCreate, setShowCreate] = useState(false);
+  const [createForm, setCreateForm] = useState({ name: "", email: "", password: "", role: "client" as string, city: "" });
+  const [creating, setCreating] = useState(false);
+  const [createError, setCreateError] = useState("");
 
   const fetchUsers = () => {
     api.get<{ users: ApiUser[] }>("/api/admin/users").then(r => { if (r.data?.users) setUsers(r.data.users); });
@@ -32,6 +36,30 @@ export default function UsersPage() {
     setViewUser(null);
   };
 
+  const createUser = async () => {
+    setCreateError("");
+    if (!createForm.name || !createForm.email || !createForm.password) {
+      setCreateError("Name, email, and password are required");
+      return;
+    }
+    if (createForm.password.length < 8) {
+      setCreateError("Password must be at least 8 characters");
+      return;
+    }
+    setCreating(true);
+    const { status, error } = await api.post("/api/admin/users", createForm);
+    setCreating(false);
+    if (status === 201 || status === 200) {
+      setShowCreate(false);
+      setCreateForm({ name: "", email: "", password: "", role: "client", city: "" });
+      fetchUsers();
+    } else if (status === 409) {
+      setCreateError("Email already exists");
+    } else {
+      setCreateError(error || "Failed to create user");
+    }
+  };
+
   const filtered = users;
 
   return (
@@ -41,7 +69,48 @@ export default function UsersPage() {
           <a href="/admin" className="text-gray-400 hover:text-[var(--color-primary)]"><svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg></a>
           <div><h1 className="text-xl font-bold text-gray-900">Users</h1><p className="text-xs text-gray-500">Manage all platform users</p></div>
         </div>
+        <Button onClick={() => setShowCreate(true)} size="sm">+ Add User</Button>
       </div>
+
+      {/* Create User Modal */}
+      {showCreate && (
+        <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4" onClick={() => setShowCreate(false)}>
+          <div className="bg-white rounded-xl p-6 max-w-md w-full shadow-2xl" onClick={e => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-bold text-gray-900">Create New User</h3>
+              <button onClick={() => setShowCreate(false)} className="text-gray-400 hover:text-gray-600"><svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12"/></svg></button>
+            </div>
+            <div className="space-y-3">
+              <div>
+                <label className="block text-xs font-medium text-gray-600 mb-1">Full Name *</label>
+                <input value={createForm.name} onChange={e => setCreateForm(p => ({ ...p, name: e.target.value }))} className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm" placeholder="e.g. Ahmad Ibrahim" />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-600 mb-1">Email *</label>
+                <input type="email" value={createForm.email} onChange={e => setCreateForm(p => ({ ...p, email: e.target.value }))} className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm" placeholder="user@email.com" />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-600 mb-1">Password *</label>
+                <input type="password" value={createForm.password} onChange={e => setCreateForm(p => ({ ...p, password: e.target.value }))} className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm" placeholder="Min 8 characters" />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-600 mb-1">Role</label>
+                <select value={createForm.role} onChange={e => setCreateForm(p => ({ ...p, role: e.target.value }))} className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm">
+                  <option value="client">Client</option>
+                  <option value="agent">Agent</option>
+                  <option value="ambassador">Ambassador</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-600 mb-1">City</label>
+                <input value={createForm.city} onChange={e => setCreateForm(p => ({ ...p, city: e.target.value }))} className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm" placeholder="e.g. Kano Municipal" />
+              </div>
+              {createError && <div className="bg-red-50 border border-red-200 text-red-700 text-xs px-3 py-2 rounded-lg">{createError}</div>}
+              <Button className="w-full" onClick={createUser} disabled={creating}>{creating ? "Creating..." : "Create User"}</Button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="hidden md:block bg-white rounded-xl border border-gray-200 overflow-hidden">
         <div className="overflow-x-auto">
