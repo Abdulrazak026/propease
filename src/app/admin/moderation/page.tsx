@@ -113,21 +113,23 @@ export default function ModerationPage() {
                       <td className="px-4 py-3 text-xs text-gray-600">{l.city}</td>
                       <td className="px-4 py-3 text-xs font-medium text-gray-900">₦{l.price.toLocaleString()}</td>
                       <td className="px-4 py-3"><span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${statusStyles[l.status] || ""}`}>{l.status}</span></td>
-                      <td className="px-4 py-3">
-                        <div className="flex gap-1 items-center flex-wrap">
-                          <button onClick={() => setPreview(l)} className="text-[10px] font-medium px-2 py-1 rounded bg-blue-100 text-blue-700 hover:bg-blue-200">View</button>
-                          <Link href={`/admin/listings/${l.id}/edit`} className="text-[10px] font-medium px-2 py-1 rounded bg-gray-100 text-gray-700 hover:bg-gray-200">Edit</Link>
-                          {l.status === "review" && perms.canManageContent && (
-                            <>
-                              <button onClick={() => approve(l.id)} disabled={busy === l.id} className="text-[10px] font-medium px-2 py-1 rounded bg-emerald-100 text-emerald-700 hover:bg-emerald-200 disabled:opacity-50">{busy === l.id ? "..." : "Approve"}</button>
-                              <button onClick={() => reject(l.id)} disabled={busy === l.id} className="text-[10px] font-medium px-2 py-1 rounded bg-red-100 text-red-600 hover:bg-red-200 disabled:opacity-50">{busy === l.id ? "..." : "Reject"}</button>
-                            </>
-                          )}
-                          {perms.canManageContent && (
-                            <button onClick={() => remove(l.id)} disabled={busy === l.id} className="text-[10px] font-medium px-2 py-1 rounded bg-red-50 text-red-500 hover:bg-red-100 disabled:opacity-50">Delete</button>
-                          )}
-                        </div>
-                      </td>
+                       <td className="px-4 py-3">
+                         <div className="flex gap-1 items-center flex-wrap">
+                           <button onClick={() => setPreview(l)} className="text-[10px] font-medium px-2 py-1 rounded bg-blue-100 text-blue-700 hover:bg-blue-200">View</button>
+                           <Link href={`/admin/listings/${l.id}/edit`} className="text-[10px] font-medium px-2 py-1 rounded bg-gray-100 text-gray-700 hover:bg-gray-200">Edit</Link>
+                           {perms.canManageContent && (
+                             <>
+                               {l.status !== "approved" && l.status !== "available" && (
+                                 <button onClick={() => approve(l.id)} disabled={busy === l.id} className="text-[10px] font-medium px-2 py-1 rounded bg-emerald-100 text-emerald-700 hover:bg-emerald-200 disabled:opacity-50">{busy === l.id ? "..." : "Approve"}</button>
+                               )}
+                               {l.status !== "draft" && l.status !== "rejected" && (
+                                 <button onClick={() => reject(l.id)} disabled={busy === l.id} className="text-[10px] font-medium px-2 py-1 rounded bg-red-100 text-red-600 hover:bg-red-200 disabled:opacity-50">{busy === l.id ? "..." : "Reject"}</button>
+                               )}
+                               <button onClick={() => remove(l.id)} disabled={busy === l.id} className="text-[10px] font-medium px-2 py-1 rounded bg-red-50 text-red-500 hover:bg-red-100 disabled:opacity-50">Delete</button>
+                             </>
+                           )}
+                         </div>
+                       </td>
                     </tr>
                   ))}
                   {filtered.length === 0 && <tr><td colSpan={7} className="px-4 py-8 text-center text-gray-400 text-sm">No listings found</td></tr>}
@@ -153,14 +155,16 @@ export default function ModerationPage() {
                 <div className="flex gap-2 flex-wrap">
                   <button onClick={() => setPreview(l)} className="text-[10px] font-medium px-2.5 py-1.5 rounded bg-blue-100 text-blue-700 hover:bg-blue-200">View</button>
                   <Link href={`/admin/listings/${l.id}/edit`} className="text-[10px] font-medium px-2.5 py-1.5 rounded bg-gray-100 text-gray-700 hover:bg-gray-200">Edit</Link>
-                  {l.status === "review" && perms.canManageContent && (
-                    <>
-                      <button onClick={() => approve(l.id)} disabled={busy === l.id} className="text-[10px] font-medium px-2.5 py-1.5 rounded bg-emerald-100 text-emerald-700 hover:bg-emerald-200 disabled:opacity-50">Approve</button>
-                      <button onClick={() => reject(l.id)} disabled={busy === l.id} className="text-[10px] font-medium px-2.5 py-1.5 rounded bg-red-100 text-red-600 hover:bg-red-200 disabled:opacity-50">Reject</button>
-                    </>
-                  )}
                   {perms.canManageContent && (
-                    <button onClick={() => remove(l.id)} disabled={busy === l.id} className="text-[10px] font-medium px-2.5 py-1.5 rounded bg-red-50 text-red-500 hover:bg-red-100 disabled:opacity-50">Delete</button>
+                    <>
+                      {l.status !== "approved" && l.status !== "available" && (
+                        <button onClick={() => approve(l.id)} disabled={busy === l.id} className="text-[10px] font-medium px-2.5 py-1.5 rounded bg-emerald-100 text-emerald-700 hover:bg-emerald-200 disabled:opacity-50">Approve</button>
+                      )}
+                      {l.status !== "draft" && l.status !== "rejected" && (
+                        <button onClick={() => reject(l.id)} disabled={busy === l.id} className="text-[10px] font-medium px-2.5 py-1.5 rounded bg-red-100 text-red-600 hover:bg-red-200 disabled:opacity-50">Reject</button>
+                      )}
+                      <button onClick={() => remove(l.id)} disabled={busy === l.id} className="text-[10px] font-medium px-2.5 py-1.5 rounded bg-red-50 text-red-500 hover:bg-red-100 disabled:opacity-50">Delete</button>
+                    </>
                   )}
                 </div>
               </div>
@@ -213,10 +217,14 @@ export default function ModerationPage() {
               <div className="flex gap-2 pt-2 border-t border-gray-100">
                 <Link href={`/listings/${preview.id}`} target="_blank" className="text-xs font-medium px-3 py-2 rounded-lg bg-blue-100 text-blue-700 hover:bg-blue-200">Open Public Page ↗</Link>
                 <Link href={`/admin/listings/${preview.id}/edit`} className="text-xs font-medium px-3 py-2 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200">Edit</Link>
-                {preview.status === "review" && perms.canManageContent && (
+                {perms.canManageContent && (
                   <>
-                    <button onClick={() => { approve(preview.id); setPreview(null); }} className="text-xs font-medium px-3 py-2 rounded-lg bg-emerald-100 text-emerald-700 hover:bg-emerald-200">Approve</button>
-                    <button onClick={() => { reject(preview.id); setPreview(null); }} className="text-xs font-medium px-3 py-2 rounded-lg bg-red-100 text-red-600 hover:bg-red-200">Reject</button>
+                    {preview.status !== "approved" && preview.status !== "available" && (
+                      <button onClick={() => { approve(preview.id); setPreview(null); }} className="text-xs font-medium px-3 py-2 rounded-lg bg-emerald-100 text-emerald-700 hover:bg-emerald-200">Approve</button>
+                    )}
+                    {preview.status !== "draft" && preview.status !== "rejected" && (
+                      <button onClick={() => { reject(preview.id); setPreview(null); }} className="text-xs font-medium px-3 py-2 rounded-lg bg-red-100 text-red-600 hover:bg-red-200">Reject</button>
+                    )}
                   </>
                 )}
               </div>

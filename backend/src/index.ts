@@ -57,7 +57,11 @@ app.set("trust proxy", 1);
 // Security
 app.use(helmet({ crossOriginResourcePolicy: false }));
 app.use(cors({
-  origin: process.env.FRONTEND_URL || ["https://mbpproperties.com", "http://localhost:3000"],
+  origin: process.env.FRONTEND_URL || [
+    "https://mbpproperties.com",
+    "https://propease.white-king-bd7d.workers.dev",
+    "http://localhost:3000",
+  ],
   credentials: true,
 }));
 app.use(cookieParser());
@@ -71,6 +75,7 @@ const limiter = rateLimit({
   max: 100,
   standardHeaders: true,
   legacyHeaders: false,
+  validate: { xForwardedForHeader: false },
 });
 app.use("/api/", limiter);
 
@@ -79,6 +84,7 @@ const authLimiter = rateLimit({
   max: 5,
   standardHeaders: true,
   legacyHeaders: false,
+  validate: { xForwardedForHeader: false },
 });
 app.use("/api/auth/login", authLimiter);
 app.use("/api/auth/register", authLimiter);

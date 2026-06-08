@@ -11,7 +11,6 @@ export const dashboardNav: Record<string, NavItem[]> = {
   admin: [
     { label: "Dashboard", href: "/admin", icon: "dashboard", group: "Overview" },
     { label: "Submissions", href: "/admin/submissions", icon: "inquiries", group: "Inbox" },
-    { label: "Notifications", href: "/notifications", icon: "notifications", group: "Inbox" },
     { label: "Users", href: "/admin/users", icon: "users", permission: "canManageUsers", group: "People" },
     { label: "Staffs", href: "/admin/staffs", icon: "tasks", permission: "canManageUsers", group: "People" },
     { label: "Moderation", href: "/admin/moderation", icon: "agreements", permission: "canManageContent", group: "Content" },
@@ -38,7 +37,6 @@ export const dashboardNav: Record<string, NavItem[]> = {
     { label: "Commissions", href: "/agent/commissions", icon: "commissions" },
     { label: "Wallet", href: "/wallet", icon: "wallet" },
     { label: "Messages", href: "/messages", icon: "messages" },
-    { label: "Notifications", href: "/notifications", icon: "notifications" },
   ],
   ambassador: [
     { label: "City Overview", href: "/ambassador", icon: "city-overview" },
@@ -49,6 +47,5 @@ export const dashboardNav: Record<string, NavItem[]> = {
     { label: "Wallet", href: "/wallet", icon: "wallet" },
     { label: "Settings", href: "/ambassador/settings", icon: "settings" },
     { label: "Messages", href: "/messages", icon: "messages" },
-    { label: "Notifications", href: "/notifications", icon: "notifications" },
   ],
 };
