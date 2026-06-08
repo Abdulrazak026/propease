@@ -11,7 +11,8 @@ export default function AgentLayout({ children }: { children: React.ReactNode })
 
  useEffect(() => {
  if (isAuthenticated && role !== "agent") {
- router.push(`/${role}`);
+ const roleRoutes: Record<string, string> = { head: "/admin", client: "/", agent: "/agent", ambassador: "/ambassador" };
+ router.push(roleRoutes[role || "client"] || "/");
  }
  }, [role, isAuthenticated, router]);
 

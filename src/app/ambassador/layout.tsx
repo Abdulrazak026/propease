@@ -13,7 +13,8 @@ export default function AmbassadorLayout({ children }: { children: React.ReactNo
     if (!loading && !isAuthenticated) {
       router.push("/login?redirect=/ambassador");
     } else if (!loading && isAuthenticated && role !== "ambassador") {
-      router.push(`/${role}`);
+      const roleRoutes: Record<string, string> = { head: "/admin", client: "/", agent: "/agent", ambassador: "/ambassador" };
+      router.push(roleRoutes[role || "client"] || "/");
     }
   }, [loading, isAuthenticated, role, router]);
 

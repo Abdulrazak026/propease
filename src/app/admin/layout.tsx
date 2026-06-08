@@ -13,7 +13,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     if (!loading && !isAuthenticated) {
       router.push("/login?redirect=/admin");
     } else if (!loading && isAuthenticated && !["admin", "head", "supervisor", "manager"].includes(role || "")) {
-      router.push(`/${role}`);
+      const roleRoutes: Record<string, string> = { head: "/admin", client: "/", agent: "/agent", ambassador: "/ambassador" };
+      router.push(roleRoutes[role || "client"] || "/");
     }
   }, [loading, isAuthenticated, role, router]);
 

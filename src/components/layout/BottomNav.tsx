@@ -94,7 +94,6 @@ export default function BottomNav() {
   if (loading) return null;
   const isStaff = isAuthenticated && ["head", "admin", "ambassador", "agent"].includes(role || "");
   if (isStaff) return null;
-  if (!isAuthenticated) return null;
 
   const tabs = TABS;
 
