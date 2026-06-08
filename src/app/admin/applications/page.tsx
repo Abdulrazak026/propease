@@ -6,9 +6,14 @@ import Button from "@/components/ui/Button";
 
 interface App {
   id: string; fullName: string; email: string; phone: string; status: string;
-  monthlyIncome: number | null; employmentStatus: string | null; createdAt: string;
-  listing?: { title: string } | null;
-  assignedAgent?: { id: string; name: string } | null;
+  dateOfBirth: string | null; employmentStatus: string | null; employer: string | null;
+  jobTitle: string | null; workAddress: string | null; monthlyIncome: number | null;
+  idType: string | null; idNumber: string | null;
+  refName: string | null; refPhone: string | null; refEmail: string | null; refRelation: string | null;
+  nokName: string | null; nokPhone: string | null; nokEmail: string | null; nokRelation: string | null;
+  agentNotes: string | null; createdAt: string;
+  listing?: { id: string; title: string; address?: string; price?: number } | null;
+  assignedAgent?: { id: string; name: string; email?: string } | null;
 }
 
 const statusStyles: Record<string, string> = {
@@ -23,13 +28,24 @@ export default function AdminApplicationsPage() {
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState<App | null>(null);
   const [filter, setFilter] = useState("all");
+  const [updating, setUpdating] = useState(false);
 
-  useEffect(() => {
+  const fetchApps = () => {
     api.get<{ applications: App[] }>("/api/applications").then(r => {
       if (r.data?.applications) setApps(r.data.applications);
       setLoading(false);
     }).catch(() => setLoading(false));
-  }, []);
+  };
+
+  useEffect(() => { fetchApps(); }, []);
+
+  const updateStatus = async (id: string, status: string) => {
+    setUpdating(true);
+    await api.patch(`/api/applications/${id}/status`, { status });
+    fetchApps();
+    setSelected(null);
+    setUpdating(false);
+  };
 
   const filtered = filter === "all" ? apps : apps.filter(a => a.status === filter);
   const counts = {
@@ -109,19 +125,100 @@ export default function AdminApplicationsPage() {
         {filtered.length === 0 && <div className="bg-white rounded-xl border border-gray-200 p-8 text-center text-gray-400 text-sm">No applications found</div>}
       </div>
 
+      {/* Full Application Detail Modal */}
       {selected && (
         <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4" onClick={() => setSelected(null)}>
-          <div className="bg-white rounded-xl p-6 max-w-lg w-full shadow-2xl max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
-            <div className="flex items-center justify-between mb-4"><h3 className="text-lg font-bold text-gray-900">{selected.fullName}</h3><button onClick={() => setSelected(null)} className="text-gray-400 hover:text-gray-600"><svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12"/></svg></button></div>
-            <div className="grid grid-cols-2 gap-4 text-sm">
-              <div><span className="text-gray-400 text-xs">Email</span><p className="font-medium">{selected.email}</p></div>
-              <div><span className="text-gray-400 text-xs">Phone</span><p className="font-medium">{selected.phone}</p></div>
-              <div><span className="text-gray-400 text-xs">Income</span><p className="font-medium">{selected.monthlyIncome ? `₦${selected.monthlyIncome.toLocaleString()}` : "N/A"}</p></div>
-              <div><span className="text-gray-400 text-xs">Employment</span><p className="font-medium">{selected.employmentStatus || "N/A"}</p></div>
-              <div><span className="text-gray-400 text-xs">Property</span><p className="font-medium">{selected.listing?.title || "N/A"}</p></div>
-              <div><span className="text-gray-400 text-xs">Agent</span><p className="font-medium">{selected.assignedAgent?.name || "Unassigned"}</p></div>
-              <div><span className="text-gray-400 text-xs">Status</span><span className={`inline-block text-[10px] font-medium px-2 py-0.5 rounded-full ${statusStyles[selected.status] || "bg-gray-100 text-gray-700"}`}>{selected.status.replace(/_/g, " ")}</span></div>
-              <div><span className="text-gray-400 text-xs">Date</span><p className="font-medium">{new Date(selected.createdAt).toLocaleDateString()}</p></div>
+          <div className="bg-white rounded-xl p-6 max-w-2xl w-full shadow-2xl max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h3 className="text-lg font-bold text-gray-900">{selected.fullName}</h3>
+                <p className="text-xs text-gray-500">Application submitted {new Date(selected.createdAt).toLocaleDateString()}</p>
+              </div>
+              <button onClick={() => setSelected(null)} className="text-gray-400 hover:text-gray-600"><svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12"/></svg></button>
+            </div>
+
+            <div className="space-y-4">
+              {/* Status */}
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-gray-500">Status:</span>
+                <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${statusStyles[selected.status] || "bg-gray-100 text-gray-700"}`}>{selected.status.replace(/_/g, " ")}</span>
+              </div>
+
+              {/* Personal Info */}
+              <div className="bg-gray-50 rounded-lg p-4">
+                <h4 className="text-xs font-semibold text-gray-700 mb-3">Personal Information</h4>
+                <div className="grid grid-cols-2 gap-3 text-sm">
+                  <div><span className="text-gray-400 text-xs">Full Name</span><p className="font-medium">{selected.fullName}</p></div>
+                  <div><span className="text-gray-400 text-xs">Email</span><p className="font-medium">{selected.email}</p></div>
+                  <div><span className="text-gray-400 text-xs">Phone</span><p className="font-medium">{selected.phone}</p></div>
+                  <div><span className="text-gray-400 text-xs">Date of Birth</span><p className="font-medium">{selected.dateOfBirth || "N/A"}</p></div>
+                </div>
+              </div>
+
+              {/* Employment */}
+              <div className="bg-gray-50 rounded-lg p-4">
+                <h4 className="text-xs font-semibold text-gray-700 mb-3">Employment Details</h4>
+                <div className="grid grid-cols-2 gap-3 text-sm">
+                  <div><span className="text-gray-400 text-xs">Status</span><p className="font-medium">{selected.employmentStatus || "N/A"}</p></div>
+                  <div><span className="text-gray-400 text-xs">Employer</span><p className="font-medium">{selected.employer || "N/A"}</p></div>
+                  <div><span className="text-gray-400 text-xs">Job Title</span><p className="font-medium">{selected.jobTitle || "N/A"}</p></div>
+                  <div><span className="text-gray-400 text-xs">Work Address</span><p className="font-medium">{selected.workAddress || "N/A"}</p></div>
+                  <div><span className="text-gray-400 text-xs">Monthly Income</span><p className="font-medium">{selected.monthlyIncome ? `₦${selected.monthlyIncome.toLocaleString()}` : "N/A"}</p></div>
+                </div>
+              </div>
+
+              {/* ID Verification */}
+              <div className="bg-gray-50 rounded-lg p-4">
+                <h4 className="text-xs font-semibold text-gray-700 mb-3">ID Verification</h4>
+                <div className="grid grid-cols-2 gap-3 text-sm">
+                  <div><span className="text-gray-400 text-xs">ID Type</span><p className="font-medium">{selected.idType || "N/A"}</p></div>
+                  <div><span className="text-gray-400 text-xs">ID Number</span><p className="font-medium">{selected.idNumber || "N/A"}</p></div>
+                </div>
+              </div>
+
+              {/* References */}
+              <div className="bg-gray-50 rounded-lg p-4">
+                <h4 className="text-xs font-semibold text-gray-700 mb-3">Reference</h4>
+                <div className="grid grid-cols-2 gap-3 text-sm">
+                  <div><span className="text-gray-400 text-xs">Name</span><p className="font-medium">{selected.refName || "N/A"}</p></div>
+                  <div><span className="text-gray-400 text-xs">Phone</span><p className="font-medium">{selected.refPhone || "N/A"}</p></div>
+                  <div><span className="text-gray-400 text-xs">Email</span><p className="font-medium">{selected.refEmail || "N/A"}</p></div>
+                  <div><span className="text-gray-400 text-xs">Relationship</span><p className="font-medium">{selected.refRelation || "N/A"}</p></div>
+                </div>
+              </div>
+
+              {/* Next of Kin */}
+              <div className="bg-gray-50 rounded-lg p-4">
+                <h4 className="text-xs font-semibold text-gray-700 mb-3">Next of Kin</h4>
+                <div className="grid grid-cols-2 gap-3 text-sm">
+                  <div><span className="text-gray-400 text-xs">Name</span><p className="font-medium">{selected.nokName || "N/A"}</p></div>
+                  <div><span className="text-gray-400 text-xs">Phone</span><p className="font-medium">{selected.nokPhone || "N/A"}</p></div>
+                  <div><span className="text-gray-400 text-xs">Email</span><p className="font-medium">{selected.nokEmail || "N/A"}</p></div>
+                  <div><span className="text-gray-400 text-xs">Relationship</span><p className="font-medium">{selected.nokRelation || "N/A"}</p></div>
+                </div>
+              </div>
+
+              {/* Property & Agent */}
+              <div className="bg-gray-50 rounded-lg p-4">
+                <h4 className="text-xs font-semibold text-gray-700 mb-3">Property & Agent</h4>
+                <div className="grid grid-cols-2 gap-3 text-sm">
+                  <div><span className="text-gray-400 text-xs">Property</span><p className="font-medium">{selected.listing?.title || "N/A"}</p></div>
+                  <div><span className="text-gray-400 text-xs">Agent</span><p className="font-medium">{selected.assignedAgent?.name || "Unassigned"}</p></div>
+                </div>
+              </div>
+
+              {/* Status Actions */}
+              <div className="flex gap-2 pt-2">
+                <Button variant="outline" className="flex-1" disabled={updating} onClick={() => updateStatus(selected.id, "under_review")}>
+                  {updating ? "..." : "Under Review"}
+                </Button>
+                <Button variant="primary" className="flex-1" disabled={updating} onClick={() => updateStatus(selected.id, "approved")}>
+                  {updating ? "..." : "Approve"}
+                </Button>
+                <Button variant="danger" className="flex-1" disabled={updating} onClick={() => updateStatus(selected.id, "rejected")}>
+                  {updating ? "..." : "Reject"}
+                </Button>
+              </div>
             </div>
           </div>
         </div>

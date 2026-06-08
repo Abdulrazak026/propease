@@ -111,7 +111,8 @@ router.post("/apply-agent", async (req, res: Response) => {
 
     const user = await prisma.user.findUnique({ where: { email } });
     if (!user) return res.status(404).json({ error: "No account found with this email. Please register first." });
-    if (user.role === "agent") return res.status(400).json({ error: "You are already an agent." });
+    if (user.role === "agent" && user.isApproved) return res.status(400).json({ error: "You already have an active agent account." });
+    if (user.role === "agent" && !user.isApproved) return res.status(400).json({ error: "You have a pending agent application. Please wait for admin approval." });
 
     await prisma.user.update({
       where: { id: user.id },
