@@ -13,9 +13,11 @@ export default function LayoutShell({ children }: { children: React.ReactNode })
   const isAuth = NO_SIDEBAR_PATHS.some((p) => pathname.startsWith(p));
   const isDashboard = DASHBOARD_PATHS.some((p) => pathname.startsWith(p));
   const { get } = useSettings();
-  const { role } = useRole();
+  const { role, isAuthenticated } = useRole();
   const maintenance = get("maintenance_mode") === "true";
   const isAdmin = role === "head";
+  const isStaff = isAuthenticated && ["head", "admin", "ambassador", "agent"].includes(role || "");
+  const effectiveDashboard = isDashboard || (isStaff && !isAuth);
 
   if (maintenance && !isAdmin && !isAuth) {
     return (
@@ -33,7 +35,7 @@ export default function LayoutShell({ children }: { children: React.ReactNode })
 
   if (isAuth) return <>{children}</>;
 
-  if (isDashboard) {
+  if (effectiveDashboard) {
     return (
       <>
         <div className="flex h-full">{children}</div>

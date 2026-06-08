@@ -1,10 +1,10 @@
 "use client";
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useRole } from "@/context/RoleContext";
 import { useSettings } from "@/context/SettingsContext";
-import { dashboardNav } from "@/lib/nav-config";
+import { dashboardNav, NavItem } from "@/lib/nav-config";
 import { api } from "@/lib/api-client";
 
 const icons: Record<string, React.ReactNode> = {
@@ -25,12 +25,33 @@ const icons: Record<string, React.ReactNode> = {
   notifications: <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" /></svg>,
 };
 
+const NOTIF_ICONS: Record<string, string> = {
+  saved_search_match: "🔍", review_response: "⭐", agreement_signed: "📝",
+  application_status: "📋", price_change: "💰", message_received: "💬",
+};
+
+function timeAgo(iso?: string) {
+  if (!iso) return "";
+  const diff = Date.now() - new Date(iso).getTime();
+  const m = Math.floor(diff / 60000);
+  if (m < 1) return "now";
+  if (m < 60) return `${m}m`;
+  const h = Math.floor(diff / 3600000);
+  if (h < 24) return `${h}h`;
+  return `${Math.floor(diff / 86400000)}d`;
+}
+
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const { role, currentUser, loading, isAuthenticated, logout } = useRole();
   const { get: getSetting } = useSettings();
   const pathname = usePathname();
   const router = useRouter();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [notifOpen, setNotifOpen] = useState(false);
+  const [notifs, setNotifs] = useState<{ id: string; type: string; title: string; body: string; link: string | null; read: boolean; createdAt: string }[]>([]);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({});
+  const notifRef = useRef<HTMLDivElement>(null);
 
   const resolvedRole = role === "head" ? "admin" : role;
   const logo = getSetting("site_logo");
@@ -40,99 +61,229 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     if (role === "head") return true;
     return (currentUser as any)?.[item.permission] === true;
   });
-  const [counts, setCounts] = useState<Record<string, number>>({});
 
+  // Group items for admin
+  const groups: Record<string, NavItem[]> = {};
+  if (resolvedRole === "admin") {
+    items.forEach(item => {
+      const g = item.group || "Other";
+      if (!groups[g]) groups[g] = [];
+      groups[g].push(item);
+    });
+  }
+
+  // Fetch notifications
   useEffect(() => {
     if (!isAuthenticated) return;
-    api.get<{ unread: number }>("/api/notifications").then(r => {
-      if (r.data?.unread) setCounts(c => ({ ...c, notifications: r.data!.unread }));
+    api.get<{ notifications: any[]; unread: number }>("/api/notifications").then(r => {
+      if (r.data?.notifications) setNotifs(r.data.notifications.slice(0, 8));
+      if (r.data?.unread !== undefined) setUnreadCount(r.data.unread);
     }).catch(() => {});
   }, [isAuthenticated]);
 
-  const badgeCount = (badge: string | undefined): number => {
-    if (!badge) return 0;
-    return counts[badge] || 0;
+  // Auto-expand groups with active items
+  useEffect(() => {
+    if (resolvedRole !== "admin") return;
+    const newExpanded: Record<string, boolean> = {};
+    Object.entries(groups).forEach(([groupName, groupItems]) => {
+      if (groupItems.some(item => pathname === item.href || pathname.startsWith(item.href + "/"))) {
+        newExpanded[groupName] = true;
+      }
+    });
+    setExpandedGroups(prev => ({ ...prev, ...newExpanded }));
+  }, [pathname, resolvedRole]);
+
+  // Close notif dropdown on outside click
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (notifRef.current && !notifRef.current.contains(e.target as Node)) setNotifOpen(false);
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
+  const toggleGroup = (g: string) => setExpandedGroups(prev => ({ ...prev, [g]: !prev[g] }));
+
+  const markRead = async (id: string) => {
+    await api.patch(`/api/notifications/${id}/read`);
+    setNotifs(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));
+    setUnreadCount(prev => Math.max(0, prev - 1));
   };
 
-  const NavItems = () => <>
-    {loading ? (
-      Array.from({ length: 6 }).map((_, i) => (
-        <div key={i} className="flex items-center gap-2 px-3 py-2 rounded-lg">
-          <div className="w-4 h-4 rounded bg-slate-700 animate-pulse shrink-0" />
-          <div className="h-3 bg-slate-700 rounded animate-pulse flex-1" />
+  const bellIcon = (
+    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" />
+    </svg>
+  );
+
+  const NotificationDropdown = ({ mobile }: { mobile?: boolean }) => (
+    <div className={`${mobile ? "w-full" : "absolute right-0 top-full mt-2 w-80"} bg-white rounded-xl shadow-xl border border-gray-200 z-50 overflow-hidden`}>
+      <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
+        <span className="text-sm font-semibold text-gray-900">Notifications</span>
+        {unreadCount > 0 && <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-red-500 text-white">{unreadCount}</span>}
+      </div>
+      <div className="max-h-80 overflow-y-auto">
+        {notifs.length === 0 ? (
+          <div className="px-4 py-8 text-center text-gray-400 text-xs">No notifications yet</div>
+        ) : notifs.map(n => (
+          <button key={n.id} onClick={() => { if (!n.read) markRead(n.id); if (n.link) router.push(n.link); setNotifOpen(false); }} className={`w-full text-left px-4 py-3 flex items-start gap-3 hover:bg-gray-50 transition-colors border-b border-gray-50 ${!n.read ? "bg-blue-50/40" : ""}`}>
+            <span className="text-base mt-0.5 shrink-0">{NOTIF_ICONS[n.type] || "🔔"}</span>
+            <div className="min-w-0 flex-1">
+              <p className="text-xs font-medium text-gray-900 truncate">{n.title}</p>
+              <p className="text-[11px] text-gray-500 truncate mt-0.5">{n.body}</p>
+              <p className="text-[10px] text-gray-400 mt-1">{timeAgo(n.createdAt)}</p>
+            </div>
+            {!n.read && <span className="w-2 h-2 rounded-full bg-[var(--color-primary)] shrink-0 mt-1.5" />}
+          </button>
+        ))}
+      </div>
+      <Link href="/notifications" onClick={() => setNotifOpen(false)} className="block px-4 py-2.5 text-xs font-medium text-[var(--color-primary)] hover:bg-gray-50 text-center border-t border-gray-100">
+        View all notifications →
+      </Link>
+    </div>
+  );
+
+  // Desktop sidebar nav — grouped for admin, flat for others
+  const DesktopNavItems = () => {
+    if (resolvedRole !== "admin") {
+      return <>{items.map(item => <NavLink key={item.href} item={item} />)}</>;
+    }
+    return <>
+      {Object.entries(groups).map(([groupName, groupItems]) => {
+        const expanded = expandedGroups[groupName] !== false;
+        const hasActive = groupItems.some(i => pathname === i.href || pathname.startsWith(i.href + "/"));
+        return (
+          <div key={groupName} className="mb-1">
+            <button onClick={() => toggleGroup(groupName)} className={`flex items-center justify-between w-full px-3 py-1.5 text-[10px] font-semibold uppercase tracking-wider transition-colors ${hasActive ? "text-white/80" : "text-slate-500 hover:text-slate-300"}`}>
+              <span>{groupName}</span>
+              <svg className={`w-3 h-3 transition-transform ${expanded ? "rotate-90" : ""}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg>
+            </button>
+            {expanded && <div className="space-y-0.5 mt-0.5">{groupItems.map(item => <NavLink key={item.href} item={item} />)}</div>}
+          </div>
+        );
+      })}
+    </>;
+  };
+
+  // Mobile nav — grouped for admin, flat for others
+  const MobileNavItems = () => {
+    if (resolvedRole !== "admin") {
+      return <>{items.map(item => <MobileNavLink key={item.href} item={item} />)}</>;
+    }
+    return <>
+      {Object.entries(groups).map(([groupName, groupItems]) => (
+        <div key={groupName} className="mb-3">
+          <p className="px-4 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-gray-400">{groupName}</p>
+          <div className="space-y-0.5">{groupItems.map(item => <MobileNavLink key={item.href} item={item} />)}</div>
         </div>
-      ))
-    ) : (items.map((item) => {
-      const active = pathname === item.href || pathname.startsWith(item.href + "/");
-      const count = badgeCount(item.badge);
-      return (
-        <Link
-          key={item.href}
-          href={item.href}
-          onClick={() => setMobileOpen(false)}
-          className={`flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium transition-all ${active ? "bg-white/10 text-white" : "text-slate-400 hover:bg-slate-800 hover:text-slate-200"}`}
-        >
-          <span className="shrink-0">{icons[item.icon] || null}</span>
-          <span className="truncate">{item.label}</span>
-          {count > 0 && (
-            <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full min-w-[16px] text-center bg-[var(--color-accent)] text-white ml-auto">{count > 9 ? "9+" : count}</span>
-          )}
-        </Link>
-      );
-    }))}
-  </>;
+      ))}
+    </>;
+  };
+
+  const NavLink = ({ item }: { item: NavItem }) => {
+    const active = pathname === item.href || pathname.startsWith(item.href + "/");
+    return (
+      <Link href={item.href} className={`flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium transition-all ${active ? "bg-white/10 text-white" : "text-slate-400 hover:bg-slate-800 hover:text-slate-200"}`}>
+        <span className="shrink-0">{icons[item.icon] || null}</span>
+        <span className="truncate">{item.label}</span>
+      </Link>
+    );
+  };
+
+  const MobileNavLink = ({ item }: { item: NavItem }) => {
+    const active = pathname === item.href || pathname.startsWith(item.href + "/");
+    return (
+      <Link href={item.href} onClick={() => setMobileOpen(false)} className={`flex items-center gap-3 px-4 py-2.5 mx-2 rounded-lg text-sm transition-all ${active ? "bg-gray-100 text-gray-900 font-semibold border-l-2 border-[var(--color-primary)]" : "text-gray-600 hover:bg-gray-50"}`}>
+        <span className="shrink-0 text-gray-400">{icons[item.icon] || null}</span>
+        <span className="truncate">{item.label}</span>
+      </Link>
+    );
+  };
+
+  const quickActions = [
+    { label: "Dashboard", href: `/${resolvedRole}`, icon: icons.dashboard },
+    { label: "Messages", href: "/messages", icon: icons.messages },
+    { label: "Notifications", href: "/notifications", icon: icons.notifications },
+    { label: "Settings", href: resolvedRole === "admin" ? "/admin/settings" : `/${resolvedRole}/settings`, icon: icons.settings },
+  ];
 
   return (
     <div className="flex h-full w-full">
       {/* Mobile top bar */}
-      <div className="md:hidden fixed top-0 left-0 right-0 z-40 bg-slate-900 flex items-center justify-between px-4 h-12">
-        <button onClick={() => setMobileOpen(true)} className="text-white p-1">
-          <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"/></svg>
+      <div className="md:hidden fixed top-0 left-0 right-0 z-40 bg-white border-b border-gray-200 flex items-center justify-between px-4 h-14">
+        <button onClick={() => setMobileOpen(true)} className="text-gray-600 p-1">
+          <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" /></svg>
         </button>
-        <span className="text-sm font-bold text-white">{getSetting("site_name", "MBPP")} | {resolvedRole || "Dashboard"}</span>
         <div className="flex items-center gap-2">
-          <Link href="/notifications" className="relative text-white/70 hover:text-white p-1">
-            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" /></svg>
-            {counts.notifications > 0 && <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-red-500 text-white text-[8px] font-bold rounded-full flex items-center justify-center">{counts.notifications > 9 ? "9+" : counts.notifications}</span>}
-          </Link>
-          <Link href="/" className="text-white/60 text-xs">Exit</Link>
+          {logo && <img src={logo} alt="" className="h-6 w-auto rounded" />}
+          <span className="text-sm font-bold text-gray-900">{getSetting("site_name", "MBPP")}</span>
+        </div>
+        <div className="flex items-center gap-1" ref={notifRef}>
+          <button onClick={() => setNotifOpen(!notifOpen)} className="relative text-gray-500 hover:text-gray-700 p-2">
+            {bellIcon}
+            {unreadCount > 0 && <span className="absolute top-1 right-1 w-4 h-4 bg-red-500 text-white text-[8px] font-bold rounded-full flex items-center justify-center">{unreadCount > 9 ? "9+" : unreadCount}</span>}
+          </button>
+          {notifOpen && <div className="absolute top-full right-2 mt-1"><NotificationDropdown /></div>}
         </div>
       </div>
 
-      {/* Mobile slide-out nav */}
+      {/* Mobile full-screen nav overlay */}
       {mobileOpen && (
         <div className="md:hidden fixed inset-0 z-50">
-          <div className="absolute inset-0 bg-black/50" onClick={() => setMobileOpen(false)} />
-          <div className="absolute left-0 top-0 bottom-0 w-56 bg-slate-900 flex flex-col">
-            <div className="p-4 border-b border-slate-700 flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-[var(--color-primary)] flex items-center justify-center text-white text-xs font-bold shrink-0">
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setMobileOpen(false)} />
+          <div className="absolute inset-x-0 bottom-0 bg-white rounded-t-2xl shadow-2xl max-h-[85vh] flex flex-col animate-slide-up-bottom" style={{ animation: "slideUpBottom 0.25s ease-out" }}>
+            {/* Header */}
+            <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-[var(--color-primary)]/10 flex items-center justify-center text-sm font-bold text-[var(--color-primary)]">
                   {currentUser?.name?.split(" ").map(n => n[0]).join("").slice(0, 2) || "P"}
                 </div>
-                <div className="min-w-0">
-                  <p className="text-xs font-semibold text-white truncate capitalize">{resolvedRole}</p>
-                  <p className="text-[10px] text-slate-400 capitalize truncate">{currentUser?.city || ""}</p>
+                <div>
+                  <p className="text-sm font-semibold text-gray-900">{currentUser?.name || "User"}</p>
+                  <p className="text-xs text-gray-500 capitalize">{resolvedRole}{currentUser?.city ? ` · ${currentUser.city}` : ""}</p>
                 </div>
               </div>
-              <button onClick={() => setMobileOpen(false)} className="text-white/60 p-1"><svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12"/></svg></button>
+              <button onClick={() => setMobileOpen(false)} className="text-gray-400 hover:text-gray-600 p-1">
+                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+              </button>
             </div>
-            <nav className="flex-1 p-2 space-y-0.5 overflow-y-auto"><NavItems /></nav>
-            <div className="p-2 border-t border-slate-700 space-y-0.5">
-              <button
-                onClick={async () => { await logout(); setMobileOpen(false); router.push("/"); }}
-                className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs text-red-400 hover:bg-red-900/30 hover:text-red-300 transition-all w-full text-left"
-              >
+
+            {/* Scrollable content */}
+            <div className="flex-1 overflow-y-auto pb-4">
+              {/* Quick actions */}
+              <div className="px-4 pt-4 pb-2">
+                <div className="grid grid-cols-4 gap-2">
+                  {quickActions.map(qa => (
+                    <Link key={qa.href} href={qa.href} onClick={() => setMobileOpen(false)} className="flex flex-col items-center gap-1.5 p-3 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors">
+                      <span className="text-gray-500">{qa.icon}</span>
+                      <span className="text-[10px] font-medium text-gray-700">{qa.label}</span>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+
+              {/* Nav items */}
+              <div className="mt-2">
+                <MobileNavItems />
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="border-t border-gray-100 px-4 py-3 flex gap-2">
+              <button onClick={async () => { await logout(); setMobileOpen(false); router.push("/"); }} className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-red-50 text-red-600 text-sm font-medium hover:bg-red-100 transition-colors">
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75" /></svg>
                 Sign Out
               </button>
-              <Link href="/" onClick={() => setMobileOpen(false)} className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs text-slate-500 hover:bg-slate-800 hover:text-slate-300">← Back to Site</Link>
+              <Link href="/" onClick={() => setMobileOpen(false)} className="flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl border border-gray-200 text-gray-600 text-sm font-medium hover:bg-gray-50 transition-colors">
+                ← Site
+              </Link>
             </div>
           </div>
         </div>
       )}
 
       {/* Desktop sidebar */}
-      <aside className="w-44 bg-slate-900 hidden md:flex md:flex-col shrink-0">
+      <aside className="w-48 bg-slate-900 hidden md:flex md:flex-col shrink-0">
         {logo && (
           <div className="p-3 border-b border-slate-700">
             <Link href="/"><img src={logo} alt="" className="h-6 w-auto mx-auto rounded" /></Link>
@@ -147,18 +298,18 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               <p className="text-xs font-semibold text-white truncate capitalize">{resolvedRole}</p>
               <p className="text-[10px] text-slate-400 capitalize truncate">{currentUser?.city || ""}</p>
             </div>
-            <Link href="/notifications" className="relative text-slate-400 hover:text-white p-1 transition-colors">
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" /></svg>
-              {counts.notifications > 0 && <span className="absolute -top-0.5 -right-0.5 w-3.5 h-3.5 bg-red-500 text-white text-[7px] font-bold rounded-full flex items-center justify-center">{counts.notifications > 9 ? "9+" : counts.notifications}</span>}
-            </Link>
+            <div className="relative" ref={notifRef}>
+              <button onClick={() => setNotifOpen(!notifOpen)} className="relative text-slate-400 hover:text-white p-1 transition-colors">
+                {bellIcon}
+                {unreadCount > 0 && <span className="absolute -top-0.5 -right-0.5 w-3.5 h-3.5 bg-red-500 text-white text-[7px] font-bold rounded-full flex items-center justify-center">{unreadCount > 9 ? "9+" : unreadCount}</span>}
+              </button>
+              {notifOpen && <div className="absolute left-full ml-2 top-0"><NotificationDropdown /></div>}
+            </div>
           </div>
         </div>
-        <nav className="flex-1 p-2 space-y-0.5 overflow-y-auto"><NavItems /></nav>
+        <nav className="flex-1 p-2 space-y-0.5 overflow-y-auto"><DesktopNavItems /></nav>
         <div className="p-2 border-t border-slate-700 space-y-0.5">
-          <button
-            onClick={async () => { await logout(); router.push("/"); }}
-            className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs text-red-400 hover:bg-red-900/30 hover:text-red-300 transition-all w-full text-left"
-          >
+          <button onClick={async () => { await logout(); router.push("/"); }} className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs text-red-400 hover:bg-red-900/30 hover:text-red-300 transition-all w-full text-left">
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75" /></svg>
             Sign Out
           </button>
@@ -170,7 +321,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       </aside>
 
       {/* Content area */}
-      <div className="flex-1 min-w-0 bg-gray-50 overflow-y-auto pt-12 md:pt-0">
+      <div className="flex-1 min-w-0 bg-gray-50 overflow-y-auto pt-14 md:pt-0">
         <div className="p-4 sm:p-6">{children}</div>
       </div>
     </div>

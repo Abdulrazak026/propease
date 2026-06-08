@@ -29,6 +29,18 @@ export default function OutsourcingPage() {
     setUpdating("");
   };
 
+  const approve = async (id: string) => {
+    setUpdating(id);
+    try { await api.post(`/api/listings/${id}/approve`); fetchListings(); } catch {}
+    setUpdating("");
+  };
+
+  const reject = async (id: string) => {
+    setUpdating(id);
+    try { await api.post(`/api/listings/${id}/reject`); fetchListings(); } catch {}
+    setUpdating("");
+  };
+
   const deleteListing = async (id: string) => {
     if (!confirm("Delete this listing permanently?")) return;
     try { await api.delete(`/api/listings/${id}`); fetchListings(); } catch {}
@@ -92,6 +104,12 @@ export default function OutsourcingPage() {
                   <td className="px-4 py-3">
                     <div className="flex gap-2">
                       <button onClick={() => setPreview(p)} className="text-xs px-3 py-1.5 rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200 font-medium">View</button>
+                      {p.status === "review" && perms.canManageContent && (
+                        <>
+                          <button onClick={() => approve(p.id)} disabled={updating === p.id} className="text-xs px-3 py-1.5 rounded-lg bg-emerald-100 text-emerald-700 hover:bg-emerald-200 font-medium disabled:opacity-50">{updating === p.id ? "..." : "Approve"}</button>
+                          <button onClick={() => reject(p.id)} disabled={updating === p.id} className="text-xs px-3 py-1.5 rounded-lg bg-red-100 text-red-600 hover:bg-red-200 font-medium disabled:opacity-50">{updating === p.id ? "..." : "Reject"}</button>
+                        </>
+                      )}
                       {perms.canCreateListings && <a href={`/admin/listings/${p.id}/edit`} className="text-xs px-3 py-1.5 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 font-medium">Edit</a>}
                       {perms.canCreateListings && <button onClick={() => deleteListing(p.id)} className="text-xs px-3 py-1.5 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 font-medium">Delete</button>}
                     </div>
@@ -129,6 +147,12 @@ export default function OutsourcingPage() {
             </div>
             <div className="flex gap-2 pt-1">
               <button onClick={() => setPreview(p)} className="text-xs px-3 py-1.5 rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200 font-medium">View</button>
+              {p.status === "review" && perms.canManageContent && (
+                <>
+                  <button onClick={() => approve(p.id)} disabled={updating === p.id} className="text-xs px-3 py-1.5 rounded-lg bg-emerald-100 text-emerald-700 hover:bg-emerald-200 font-medium disabled:opacity-50">Approve</button>
+                  <button onClick={() => reject(p.id)} disabled={updating === p.id} className="text-xs px-3 py-1.5 rounded-lg bg-red-100 text-red-600 hover:bg-red-200 font-medium disabled:opacity-50">Reject</button>
+                </>
+              )}
               {perms.canCreateListings && <a href={`/admin/listings/${p.id}/edit`} className="text-xs px-3 py-1.5 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 font-medium">Edit</a>}
               {perms.canCreateListings && <button onClick={() => deleteListing(p.id)} className="text-xs px-3 py-1.5 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 font-medium">Delete</button>}
             </div>

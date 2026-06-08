@@ -93,6 +93,51 @@ function RichTextArea({ label, value, onChange, rows = 6 }: { label: string; val
   );
 }
 
+function EmailTemplateSection({ label, settingKey, settings, set }: { label: string; settingKey: string; settings: SettingsMap; set: (k: string, v: string) => void }) {
+  const [previewHtml, setPreviewHtml] = useState<string | null>(null);
+  const [loadingPreview, setLoadingPreview] = useState(false);
+  const [showPreview, setShowPreview] = useState(false);
+
+  const loadPreview = async () => {
+    setLoadingPreview(true);
+    try {
+      const r = await api.get<{ html: string }>(`/api/admin/settings/email-preview/${settingKey}`);
+      if (r.data?.html) {
+        setPreviewHtml(r.data.html);
+        setShowPreview(true);
+      }
+    } catch {}
+    setLoadingPreview(false);
+  };
+
+  return (
+    <div className="border border-gray-200 rounded-lg overflow-hidden">
+      <div className="flex items-center justify-between px-4 py-3 bg-gray-50">
+        <span className="text-xs font-medium text-gray-700">{label}</span>
+        <button type="button" onClick={loadPreview} disabled={loadingPreview} className="text-[10px] font-medium px-2.5 py-1 rounded bg-[var(--color-primary)] text-white hover:opacity-90 disabled:opacity-50">
+          {loadingPreview ? "Loading..." : "Preview Full Email"}
+        </button>
+      </div>
+      <div className="p-3">
+        <textarea value={settings[settingKey] || ""} onChange={(e) => set(settingKey, e.target.value)} rows={4} className="w-full rounded border border-gray-200 bg-white px-3 py-2 text-xs font-mono focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20 resize-y" placeholder="Leave empty to use the default template..." />
+      </div>
+      {showPreview && previewHtml && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={() => setShowPreview(false)}>
+          <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden" onClick={e => e.stopPropagation()}>
+            <div className="flex items-center justify-between px-5 py-3 border-b border-gray-200">
+              <h3 className="text-sm font-semibold text-gray-900">Email Preview: {label}</h3>
+              <button onClick={() => setShowPreview(false)} className="text-gray-400 hover:text-gray-600 text-lg">&times;</button>
+            </div>
+            <div className="overflow-y-auto max-h-[calc(90vh-60px)]">
+              <iframe srcDoc={previewHtml} className="w-full h-[600px] border-0" title="Email Preview" />
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 interface TeamMember { name: string; role: string; bio: string; photo: string; }
 interface ResearchReport { title: string; date: string; summary: string; metrics: string[]; }
 
@@ -362,15 +407,37 @@ export default function AdminSettings() {
         {/* Email Templates */}
         {tab === "Email Templates" && (<>
           <h3 className="text-sm font-semibold text-gray-900">Email Templates</h3>
-          <p className="text-xs text-gray-500">Use variables like <code>{`{{name}}`}</code>, <code>{`{{role}}`}</code>, <code>{`{{property_title}}`}</code> etc.</p>
-          <RichTextArea label="Welcome Email (on registration)" value={s("welcome_template")} onChange={(v) => set("welcome_template", v)} rows={5} />
-          <RichTextArea label="Account Approved" value={s("approved_template")} onChange={(v) => set("approved_template", v)} rows={5} />
-          <RichTextArea label="Password Reset" value={s("reset_template")} onChange={(v) => set("reset_template", v)} rows={5} />
-          <RichTextArea label="New Inquiry Notification" value={s("inquiry_template")} onChange={(v) => set("inquiry_template", v)} rows={5} />
-          <RichTextArea label="Application Status Change" value={s("application_template")} onChange={(v) => set("application_template", v)} rows={5} />
-          <RichTextArea label="Agreement Ready" value={s("agreement_template")} onChange={(v) => set("agreement_template", v)} rows={5} />
-          <RichTextArea label="Payment Receipt" value={s("payment_template")} onChange={(v) => set("payment_template", v)} rows={5} />
-          <RichTextArea label="Agent Application Received" value={s("agent_application_template")} onChange={(v) => set("agent_application_template", v)} rows={5} />
+          <p className="text-xs text-gray-500">Customize the body of each email. The branded header, footer, and styling are added automatically. Use <code>{`{{name}}`}</code>, <code>{`{{role}}`}</code>, <code>{`{{propertyTitle}}`}</code> etc. as variables.</p>
+          <EmailTemplateSection label="Welcome Email (on registration)" settingKey="welcome_template" settings={settings} set={set} />
+          <EmailTemplateSection label="Agent Application Received" settingKey="agent_application_template" settings={settings} set={set} />
+          <EmailTemplateSection label="Account Approved" settingKey="approved_template" settings={settings} set={set} />
+          <EmailTemplateSection label="Account Suspended" settingKey="account_suspended_template" settings={settings} set={set} />
+          <EmailTemplateSection label="Password Reset" settingKey="reset_template" settings={settings} set={set} />
+          <EmailTemplateSection label="Password Changed" settingKey="password_changed_template" settings={settings} set={set} />
+          <EmailTemplateSection label="New Inquiry Notification" settingKey="inquiry_template" settings={settings} set={set} />
+          <EmailTemplateSection label="Application Received" settingKey="application_received_template" settings={settings} set={set} />
+          <EmailTemplateSection label="Application Status Change" settingKey="application_template" settings={settings} set={set} />
+          <EmailTemplateSection label="Agreement Ready" settingKey="agreement_template" settings={settings} set={set} />
+          <EmailTemplateSection label="Agreement Signed" settingKey="agreement_signed_template" settings={settings} set={set} />
+          <EmailTemplateSection label="Agreement Cancelled" settingKey="agreement_cancelled_template" settings={settings} set={set} />
+          <EmailTemplateSection label="Listing Submitted for Review" settingKey="listing_submitted_template" settings={settings} set={set} />
+          <EmailTemplateSection label="Listing Published" settingKey="listing_published_template" settings={settings} set={set} />
+          <EmailTemplateSection label="Listing Rejected" settingKey="listing_rejected_template" settings={settings} set={set} />
+          <EmailTemplateSection label="Verification Received" settingKey="verification_template" settings={settings} set={set} />
+          <EmailTemplateSection label="Task Assigned" settingKey="task_assigned_template" settings={settings} set={set} />
+          <EmailTemplateSection label="Task Status Changed" settingKey="task_status_template" settings={settings} set={set} />
+          <EmailTemplateSection label="Task Comment Added" settingKey="task_comment_template" settings={settings} set={set} />
+          <EmailTemplateSection label="Commission Earned" settingKey="commission_template" settings={settings} set={set} />
+          <EmailTemplateSection label="Wallet Funded" settingKey="wallet_template" settings={settings} set={set} />
+          <EmailTemplateSection label="Payment Receipt" settingKey="payment_template" settings={settings} set={set} />
+          <EmailTemplateSection label="Withdrawal Requested" settingKey="withdrawal_requested_template" settings={settings} set={set} />
+          <EmailTemplateSection label="Withdrawal Approved" settingKey="withdrawal_approved_template" settings={settings} set={set} />
+          <EmailTemplateSection label="Withdrawal Rejected" settingKey="withdrawal_rejected_template" settings={settings} set={set} />
+          <EmailTemplateSection label="Price Drop Alert" settingKey="price_drop_template" settings={settings} set={set} />
+          <EmailTemplateSection label="New Message" settingKey="message_template" settings={settings} set={set} />
+          <EmailTemplateSection label="Review Submitted" settingKey="review_submitted_template" settings={settings} set={set} />
+          <EmailTemplateSection label="Review Moderated" settingKey="review_moderated_template" settings={settings} set={set} />
+          <EmailTemplateSection label="Newsletter" settingKey="newsletter_template" settings={settings} set={set} />
         </>)}
 
         {/* Staff & Roles */}

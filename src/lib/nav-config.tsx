@@ -4,29 +4,30 @@ export interface NavItem {
   icon: string;
   badge?: "inquiries" | "tasks" | "withdrawals";
   permission?: string;
+  group?: string;
 }
 
 export const dashboardNav: Record<string, NavItem[]> = {
   admin: [
-    { label: "Dashboard", href: "/admin", icon: "dashboard" },
-    { label: "Submissions", href: "/admin/submissions", icon: "inquiries" },
-    { label: "Users", href: "/admin/users", icon: "users", permission: "canManageUsers" },
-    { label: "Staffs", href: "/admin/staffs", icon: "tasks", permission: "canManageUsers" },
-    { label: "Moderation", href: "/admin/moderation", icon: "agreements", permission: "canManageContent" },
-    { label: "Media", href: "/admin/media", icon: "post-listing", permission: "canManageContent" },
-    { label: "Blog", href: "/admin/blog", icon: "agreements", permission: "canManageContent" },
-    { label: "FAQs", href: "/admin/faqs", icon: "inquiries" },
-    { label: "Newsletter", href: "/admin/newsletter", icon: "inquiries" },
-    { label: "Tasks", href: "/admin/tasks", icon: "tasks", badge: "tasks", permission: "canCreateTasks" },
-    { label: "Agreements", href: "/admin/agreements", icon: "agreements", permission: "canManageAgreements" },
-    { label: "Deals", href: "/admin/deals", icon: "audit", permission: "canCloseDeals" },
-    { label: "Commissions", href: "/admin/commissions", icon: "commissions" },
-    { label: "Outsourcing", href: "/admin/outsourcing", icon: "users" },
-    { label: "Careers", href: "/admin/careers", icon: "agreements" },
-    { label: "CRM Settings", href: "/admin/crm", icon: "settings" },
-    { label: "Settings", href: "/admin/settings", icon: "settings" },
-    { label: "Messages", href: "/messages", icon: "messages" },
-    { label: "Notifications", href: "/notifications", icon: "notifications" },
+    { label: "Dashboard", href: "/admin", icon: "dashboard", group: "Overview" },
+    { label: "Submissions", href: "/admin/submissions", icon: "inquiries", group: "Inbox" },
+    { label: "Messages", href: "/messages", icon: "messages", group: "Inbox" },
+    { label: "Notifications", href: "/notifications", icon: "notifications", group: "Inbox" },
+    { label: "Users", href: "/admin/users", icon: "users", permission: "canManageUsers", group: "People" },
+    { label: "Staffs", href: "/admin/staffs", icon: "tasks", permission: "canManageUsers", group: "People" },
+    { label: "Moderation", href: "/admin/moderation", icon: "agreements", permission: "canManageContent", group: "Content" },
+    { label: "Media", href: "/admin/media", icon: "post-listing", permission: "canManageContent", group: "Content" },
+    { label: "Blog", href: "/admin/blog", icon: "agreements", permission: "canManageContent", group: "Content" },
+    { label: "FAQs", href: "/admin/faqs", icon: "inquiries", group: "Content" },
+    { label: "Newsletter", href: "/admin/newsletter", icon: "inquiries", group: "Content" },
+    { label: "Tasks", href: "/admin/tasks", icon: "tasks", badge: "tasks", permission: "canCreateTasks", group: "Operations" },
+    { label: "Agreements", href: "/admin/agreements", icon: "agreements", permission: "canManageAgreements", group: "Operations" },
+    { label: "Deals", href: "/admin/deals", icon: "audit", permission: "canCloseDeals", group: "Operations" },
+    { label: "Commissions", href: "/admin/commissions", icon: "commissions", group: "Operations" },
+    { label: "Outsourcing", href: "/admin/outsourcing", icon: "users", group: "Operations" },
+    { label: "Careers", href: "/admin/careers", icon: "agreements", group: "Operations" },
+    { label: "CRM Settings", href: "/admin/crm", icon: "settings", group: "Config" },
+    { label: "Settings", href: "/admin/settings", icon: "settings", group: "Config" },
   ],
   agent: [
     { label: "Dashboard", href: "/agent", icon: "dashboard" },
