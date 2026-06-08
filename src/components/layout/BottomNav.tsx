@@ -90,18 +90,18 @@ export default function BottomNav() {
   const [sheetOpen, setSheetOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
 
+  const handleTabClick = useCallback((href: string) => {
+    if (href === pathname) {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  }, [pathname]);
+
   // Never render while loading or for staff users
   if (loading) return null;
   const isStaff = isAuthenticated && ["head", "admin", "ambassador", "agent"].includes(role || "");
   if (isStaff) return null;
 
   const tabs = TABS;
-
-  const handleTabClick = useCallback((href: string) => {
-    if (href === pathname) {
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    }
-  }, [pathname]);
 
   return (
     <>
