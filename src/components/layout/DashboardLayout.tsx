@@ -225,12 +225,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   return (
     <div className="flex h-full w-full">
       {/* Mobile top bar */}
-      <div className="md:hidden fixed top-0 left-0 right-0 z-40 bg-white border-b border-gray-200 flex items-center justify-between px-4 h-14">
-        <button onClick={() => setMobileOpen(true)} className="text-gray-600 p-1">
+      <div className="md:hidden fixed top-0 left-0 right-0 z-40 bg-white border-b border-gray-200 flex items-center justify-between px-3 h-16">
+        <button onClick={() => setMobileOpen(true)} className="text-gray-600 p-1 shrink-0">
           <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" /></svg>
         </button>
         <Link href="/" className="flex-1 flex items-center justify-center px-1">
-          {logo && <img src={logo} alt={getSetting("site_name", "MBPP")} className="h-full w-auto max-w-full object-contain" />}
+          {logo && <img src={logo} alt={getSetting("site_name", "MBPP")} className="h-full w-[50vw] max-h-16 object-contain" />}
         </Link>
         <div className="flex items-center gap-1" ref={notifRef}>
           <button onClick={() => setNotifOpen(!notifOpen)} className="relative text-gray-500 hover:text-gray-700 p-2">
@@ -311,7 +311,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       </aside>
 
         {/* Content area */}
-        <div className="flex-1 min-w-0 bg-gradient-to-br from-gray-50 via-gray-50 to-gray-100 overflow-y-auto pt-14 md:pt-0">
+        <div className="flex-1 min-w-0 bg-gradient-to-br from-gray-50 via-gray-50 to-gray-100 overflow-y-auto pt-16 md:pt-0">
           {/* Content top bar with logo + notification bell */}
           <div className="hidden md:flex items-center justify-between px-6 py-2 border-b border-gray-200/60 bg-white/70 backdrop-blur-xl sticky top-0 z-30">
             <div className="flex items-center gap-3">

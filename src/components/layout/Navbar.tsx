@@ -72,13 +72,13 @@ export default function Navbar() {
   return (
     <>
     <header
-      className={`lg:hidden sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b h-14 flex items-center pl-4 pr-5 sm:pl-5 sm:pr-6 max-w-[100vw] overflow-hidden rounded-b-2xl transition-transform duration-300 ${
+      className={`lg:hidden sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b h-16 flex items-center pl-4 pr-5 sm:pl-5 sm:pr-6 max-w-[100vw] overflow-hidden rounded-b-2xl transition-transform duration-300 ${
         scrolled ? "border-gray-200" : "border-transparent"
       } ${hidden ? "-translate-y-full" : "translate-y-0"}`}
     >
       <Link href="/" className="flex-1 flex items-center justify-center px-1">
         {siteLogo ? (
-          <img src={siteLogo} alt={siteName} className="h-full w-auto max-w-full object-contain" />
+          <img src={siteLogo} alt={siteName} className="h-full w-[50vw] max-h-16 object-contain" />
         ) : (
           <div className="flex items-center gap-2">
             <div className="w-10 h-10 rounded-lg bg-[var(--color-primary)] flex items-center justify-center shrink-0">
