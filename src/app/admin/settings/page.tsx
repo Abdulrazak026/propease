@@ -29,7 +29,7 @@ function defaults(): SettingsMap {
     auto_responder: "true", agent_notify_email: "true",
     google_maps_key: "", resend_api_key: "",
     smtp_host: "", smtp_port: "", smtp_user: "", smtp_pass: "", smtp_enc: "tls",
-    facebook_url: "", instagram_url: "", linkedin_url: "", youtube_url: "", twitter_url: "",
+    facebook_url: "", instagram_url: "", linkedin_url: "", youtube_url: "", twitter_url: "", tiktok_url: "",
     welcome_template: "<h2>Welcome to MBPP!</h2><p>Hello <strong>{{name}}</strong>,</p><p>Your account has been created and is ready to use. You can now browse properties, contact agents, and manage your listings.</p><p>If you have any questions, reach out to us at support@mbpproperties.com.</p>",
     approved_template: "<h2>Account Approved!</h2><p>Hello <strong>{{name}}</strong>,</p><p>Your <strong>{{role}}</strong> account has been approved. You now have full access to your dashboard and all platform features.</p><p><a href='{{login_url}}'>Sign in to your account</a></p>",
     reset_template: "<h2>Reset Your Password</h2><p>Hello <strong>{{name}}</strong>,</p><p>We received a request to reset your password. Click the button below to create a new password. This link expires in 15 minutes.</p><p><a href='{{reset_url}}'>Reset Password</a></p><p>If you did not request this, please ignore this email.</p>",
@@ -408,6 +408,7 @@ export default function AdminSettings() {
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <F label="Facebook" v={s("facebook_url")} onChange={(v) => set("facebook_url", v)} />
             <F label="Instagram" v={s("instagram_url")} onChange={(v) => set("instagram_url", v)} />
+            <F label="TikTok" v={s("tiktok_url")} onChange={(v) => set("tiktok_url", v)} />
             <F label="LinkedIn" v={s("linkedin_url")} onChange={(v) => set("linkedin_url", v)} />
             <F label="YouTube" v={s("youtube_url")} onChange={(v) => set("youtube_url", v)} />
             <F label="X / Twitter" v={s("twitter_url")} onChange={(v) => set("twitter_url", v)} />

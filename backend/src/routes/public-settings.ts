@@ -12,7 +12,7 @@ const PUBLIC_KEYS = [
   "terms_of_service", "privacy_policy", "cookie_text",
   "measurement", "currency", "currency_pos", "property_statuses", "property_types", "amenities",
   "agent_dir_visible", "maintenance_mode",
-  "facebook_url", "instagram_url", "linkedin_url", "youtube_url", "twitter_url",
+  "facebook_url", "instagram_url", "linkedin_url", "youtube_url", "twitter_url", "tiktok_url",
   "site_logo", "site_favicon",
   "available_cities", "about_hero_image",
   "team_members", "research_reports",
