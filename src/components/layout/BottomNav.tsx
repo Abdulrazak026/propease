@@ -90,19 +90,11 @@ export default function BottomNav() {
   const [sheetOpen, setSheetOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
 
-  useEffect(() => {
-    if (!isAuthenticated) { setUnreadCount(0); return; }
-    api.get<{ notifications: any[] }>("/api/notifications").then(r => {
-      if (r.data?.notifications) {
-        setUnreadCount(r.data.notifications.filter((n: any) => !n.read).length);
-      }
-    }).catch(() => {});
-  }, [isAuthenticated]);
-
-  // Staff users never see the bottom nav - they use the sidebar
-  const isStaff = isAuthenticated && (role === "head" || role === "admin" || role === "ambassador" || role === "agent");
-  if (isStaff) return null;
+  // Never render while loading or for staff users
   if (loading) return null;
+  const isStaff = isAuthenticated && ["head", "admin", "ambassador", "agent"].includes(role || "");
+  if (isStaff) return null;
+  if (!isAuthenticated) return null;
 
   const tabs = TABS;
 

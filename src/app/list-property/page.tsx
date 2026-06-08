@@ -1,7 +1,11 @@
+"use client";
 import Link from "next/link";
 import Footer from "@/components/layout/Footer";
+import { useSettings } from "@/context/SettingsContext";
 
 export default function ListPropertyPage() {
+  const { get: g } = useSettings();
+  const whatsapp = (g("support_whatsapp") || "2348000000000").replace(/[^0-9]/g, "");
   return (
     <div className="flex flex-col">
       <section className="bg-white border-b border-gray-100">
@@ -87,10 +91,10 @@ export default function ListPropertyPage() {
               <p className="text-white/85 mt-2 text-sm leading-relaxed">Tell us about your place. We&apos;ll come see it within 2 days.</p>
             </div>
             <div className="flex flex-wrap gap-3 justify-center sm:justify-end">
-              <Link href="/contact" className="inline-flex items-center justify-center min-h-[52px] px-7 py-3.5 bg-white text-[var(--color-primary)] text-sm font-semibold rounded-full hover:bg-gray-100 active:scale-[0.97] transition-all">
+              <Link href="/register" className="inline-flex items-center justify-center min-h-[52px] px-7 py-3.5 bg-white text-[var(--color-primary)] text-sm font-semibold rounded-full hover:bg-gray-100 active:scale-[0.97] transition-all">
                 Get started
               </Link>
-              <a href="https://wa.me/2348000000000" target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center min-h-[52px] px-7 py-3.5 text-sm font-semibold rounded-full border border-white/30 text-white hover:bg-white/10 transition-all">
+              <a href={`https://wa.me/${whatsapp}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center min-h-[52px] px-7 py-3.5 text-sm font-semibold rounded-full border border-white/30 text-white hover:bg-white/10 transition-all">
                 WhatsApp us
               </a>
             </div>

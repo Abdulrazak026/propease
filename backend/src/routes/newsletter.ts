@@ -26,6 +26,13 @@ router.post("/subscribe", async (req, res: Response) => {
     await prisma.newsletterSubscriber.create({
       data: { email, source: source || "footer" },
     });
+
+    const { templates } = await import("../services/email-templates");
+    const welcomeHtml = (templates as any).welcome
+      ? (templates as any).welcome(email.split("@")[0])
+      : `<p>Thanks for subscribing to MBPP updates! We'll send you new properties and news.</p>`;
+    emailService.sendNewsletter(email, "Welcome to MBPP Newsletter!", welcomeHtml).catch(() => {});
+
     res.json({ ok: true, message: "Thanks! We'll send you new properties." });
   } catch (error) {
     logger.error({ err: error }, "Subscribe error:");
