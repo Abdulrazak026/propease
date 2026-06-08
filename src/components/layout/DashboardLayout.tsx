@@ -233,7 +233,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           {logo ? (
             <img src={logo} alt={getSetting("site_name", "MBPP")} width="900" height="229" style={{ height: "100%", width: "auto", objectFit: "contain" }} />
           ) : (
-            <span className="text-sm font-bold text-gray-900">{getSetting("site_name", "MBPP")}</span>
+            <span className="text-sm font-bold text-gray-900 tracking-tight">{getSetting("site_name", "MBPP")}</span>
           )}
         </Link>
         <div className="flex items-center shrink-0" ref={notifRef}>
