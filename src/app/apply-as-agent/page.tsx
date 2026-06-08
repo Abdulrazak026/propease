@@ -49,18 +49,33 @@ export default function ApplyAsAgentPage() {
     setSubmitting(true);
     setError("");
     const tempPassword = `Agent${form.phone.replace(/[^0-9]/g, "")}2026!`;
-    const { status, data, error: apiError } = await api.post("/api/auth/register", {
+
+    // Try registering first
+    let { status, data, error: apiError } = await api.post("/api/auth/register", {
       name: form.fullName,
       email: form.email,
       password: tempPassword,
       role: "agent",
       city: form.location,
     });
+
+    // If email already exists, try apply-agent endpoint
+    if (status === 409) {
+      const result = await api.post("/api/auth/apply-agent", {
+        email: form.email,
+        name: form.fullName,
+        city: form.location,
+      });
+      status = result.status;
+      data = result.data;
+      apiError = result.error;
+    }
+
     setSubmitting(false);
     if (status === 201 || status === 200) {
       setStep("done");
     } else if (status === 409) {
-      setError("This email is already registered");
+      setError("You are already registered as an agent.");
     } else {
       setError((data as any)?.error || apiError || "Submission failed. Please try again.");
     }

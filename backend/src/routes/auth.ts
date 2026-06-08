@@ -104,6 +104,42 @@ router.post("/register", validate(registerSchema), async (req, res: Response) =>
   }
 });
 
+router.post("/apply-agent", async (req, res: Response) => {
+  try {
+    const { email, name, city } = req.body;
+    if (!email) return res.status(400).json({ error: "Email is required" });
+
+    const user = await prisma.user.findUnique({ where: { email } });
+    if (!user) return res.status(404).json({ error: "No account found with this email. Please register first." });
+    if (user.role === "agent") return res.status(400).json({ error: "You are already an agent." });
+
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { role: "agent", isApproved: false, city: city || user.city },
+    });
+
+    const admins = await prisma.user.findMany({ where: { role: "head" }, select: { id: true } });
+    for (const admin of admins) {
+      await prisma.notification.create({
+        data: {
+          userId: admin.id,
+          type: "application_status",
+          title: "New Agent Application",
+          body: `${name || user.name} (${email}) applied to become an agent.`,
+          link: "/admin/submissions",
+        },
+      }).catch(() => {});
+    }
+
+    emailService.agentApplicationSubmitted(email, name || user.name).catch(() => {});
+
+    res.json({ success: true, message: "Agent application submitted. Awaiting approval." });
+  } catch (error) {
+    logger.error({ err: error }, "Apply agent error:");
+    res.status(500).json({ error: "Failed to submit application" });
+  }
+});
+
 router.post("/login", validate(loginSchema), async (req, res: Response) => {
   try {
     const { email, password } = req.body;
