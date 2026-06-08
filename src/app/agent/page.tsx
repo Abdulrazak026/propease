@@ -49,7 +49,7 @@ export default function AgentPage() {
             <h1 className="text-2xl font-bold text-gray-900">Welcome back, {currentUser?.name?.split(" ")[0] || ""}</h1>
             <p className="text-sm text-gray-500">Manage your listings and inquiries</p>
           </div>
-          {perms.canCreateListings && <Link href="/ambassador/listings/new" className="text-xs font-semibold px-3.5 py-2.5 bg-[var(--color-primary)] text-white rounded-lg hover:bg-[var(--color-primary)]/90 transition-colors">+ New Listing</Link>}
+          {perms.canCreateListings && <Link href="/agent/listings/new" className="text-xs font-semibold px-3.5 py-2.5 bg-[var(--color-primary)] text-white rounded-lg hover:bg-[var(--color-primary)]/90 transition-colors">+ New Listing</Link>}
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -80,10 +80,11 @@ export default function AgentPage() {
               </div>
               <p className="text-sm font-semibold text-gray-900 mb-1">No listings yet</p>
               <p className="text-xs text-gray-500 mb-4 max-w-sm mx-auto">Post your first property. It goes to review before going public, usually within a few hours.</p>
-              {perms.canCreateListings && <Link href="/ambassador/listings/new" className="inline-flex items-center justify-center min-h-[40px] px-5 py-2 text-xs font-semibold rounded-full bg-gray-900 text-white hover:bg-gray-800 transition-colors">Post a property</Link>}
+              {perms.canCreateListings && <Link href="/agent/listings/new" className="inline-flex items-center justify-center min-h-[40px] px-5 py-2 text-xs font-semibold rounded-full bg-gray-900 text-white hover:bg-gray-800 transition-colors">Post a property</Link>}
             </div>
           ) : (
-            <div className="overflow-x-auto">
+            <>
+            <div className="hidden md:block overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-gray-100 bg-gray-50 text-left">
@@ -109,6 +110,22 @@ export default function AgentPage() {
                 </tbody>
               </table>
             </div>
+            <div className="md:hidden space-y-3 p-4">
+              {listings.slice(0, 10).map(l => (
+                <div key={l.id} className="bg-white rounded-xl border border-gray-200 p-4 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm font-medium text-gray-900 truncate max-w-[70%]">{l.title}</p>
+                    <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${statusStyles[l.status] || "bg-gray-100 text-gray-700"}`}>{l.status}</span>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2 text-xs">
+                    <div><span className="text-gray-400">Type</span><p className="font-medium text-gray-900 capitalize">{l.propertyType} · {l.listingType}</p></div>
+                    <div><span className="text-gray-400">City</span><p className="font-medium text-gray-900">{l.city}</p></div>
+                    <div className="col-span-2"><span className="text-gray-400">Price</span><p className="font-medium text-gray-900">₦{l.price.toLocaleString()}</p></div>
+                  </div>
+                </div>
+              ))}
+            </div>
+            </>
           )}
         </div>
       </div>

@@ -31,13 +31,13 @@ export default function CommissionsPage() {
         <div><h1 className="text-xl font-bold text-gray-900">Commissions</h1><p className="text-xs text-gray-500">Track earnings across all deals</p></div>
       </div>
 
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="bg-white rounded-xl border border-gray-200 p-4"><p className="text-xs text-gray-500">Total Earned</p><p className="text-2xl font-bold text-gray-900 mt-1">₦{companyTotal.toLocaleString()}</p></div>
         <div className="bg-white rounded-xl border border-gray-200 p-4"><p className="text-xs text-gray-500">All Deals</p><p className="text-2xl font-bold text-gray-900 mt-1">{commissions.length}</p></div>
         <div className="bg-white rounded-xl border border-gray-200 p-4"><p className="text-xs text-gray-500">Total Volume</p><p className="text-2xl font-bold text-gray-900 mt-1">₦{commissions.reduce((s,c)=>s+c.totalAmount,0).toLocaleString()}</p></div>
       </div>
 
-      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+      <div className="hidden md:block bg-white rounded-xl border border-gray-200 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead><tr className="border-b border-gray-100 bg-gray-50 text-left"><th className="px-4 py-3 text-xs font-medium text-gray-600">Deal</th><th className="px-4 py-3 text-xs font-medium text-gray-600">Type</th><th className="px-4 py-3 text-xs font-medium text-gray-600">Amount</th><th className="px-4 py-3 text-xs font-medium text-gray-600">Ambassador</th><th className="px-4 py-3 text-xs font-medium text-gray-600">Agent</th><th className="px-4 py-3 text-xs font-medium text-gray-600">Company</th></tr></thead>
@@ -56,6 +56,22 @@ export default function CommissionsPage() {
             </tbody>
           </table>
         </div>
+      </div>
+
+      <div className="md:hidden space-y-3">
+        {commissions.map((c) => (
+          <div key={c.id} className="bg-white rounded-xl border border-gray-200 p-4">
+            <p className="text-sm font-medium text-gray-900 mb-2">{c.dealTitle}</p>
+            <span className="text-[10px] bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded capitalize">{c.dealType.replace(/_/g, " ")}</span>
+            <div className="grid grid-cols-2 gap-2 text-xs mt-3">
+              <div><span className="text-gray-400">Total</span><p className="font-medium">₦{c.totalAmount.toLocaleString()}</p></div>
+              <div><span className="text-gray-400">Company</span><p className="font-medium text-emerald-600">₦{c.companyCut.toLocaleString()}</p></div>
+              <div><span className="text-gray-400">Ambassador</span><p className="font-medium">{c.ambassador?.name||"N/A"} <span className="text-emerald-600">₦{c.ambassadorCut.toLocaleString()}</span></p></div>
+              <div><span className="text-gray-400">Agent</span><p className="font-medium">{c.agent?.name||"N/A"} <span className="text-blue-600">₦{c.agentCut.toLocaleString()}</span></p></div>
+            </div>
+          </div>
+        ))}
+        {commissions.length === 0 && <div className="bg-white rounded-xl border border-gray-200 p-8 text-center text-gray-400 text-sm">No commissions yet.</div>}
       </div>
     </div>
   );

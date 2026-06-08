@@ -37,7 +37,7 @@ export default function AdminAgreementsPage() {
         <div><h1 className="text-xl font-bold text-gray-900">Agreements</h1><p className="text-xs text-gray-500">Tenancy agreements and contracts</p></div>
       </div>
 
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {[{ label: "Total", value: stats.total, bg: "bg-gray-50" },{ label: "Pending Signature", value: stats.pending, bg: "bg-amber-50" },{ label: "Completed", value: stats.completed, bg: "bg-emerald-50" }].map(s => (
           <div key={s.label} className={`${s.bg} rounded-xl border border-gray-200 p-4 text-center cursor-pointer`} onClick={() => setFilter(filter === s.label.toLowerCase().replace(" ","_") ? "all" : s.label.toLowerCase().replace(" ","_"))}>
             <p className="text-xs text-gray-500">{s.label}</p><p className="text-2xl font-bold text-gray-900 mt-1">{s.value}</p>

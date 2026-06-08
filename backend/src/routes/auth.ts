@@ -351,12 +351,15 @@ router.post("/reset-password", async (req, res: Response) => {
     }
 
     const hashedPassword = await bcrypt.hash(password, 12);
-    await prisma.user.update({
+    const updatedUser = await prisma.user.update({
       where: { id: resetRecord.userId },
       data: { password: hashedPassword },
+      select: { name: true, email: true },
     });
 
     await prisma.passwordResetToken.delete({ where: { id: resetRecord.id } });
+
+    emailService.passwordChanged(updatedUser.email, updatedUser.name).catch(() => {});
 
     res.json({ message: "Password has been reset. You can now sign in." });
   } catch (error) {

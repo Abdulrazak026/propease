@@ -1,33 +1,73 @@
 const BASE_URL = "https://propease-production.up.railway.app";
 
-let accessToken: string | null = null;
+const STORAGE_KEY = "mbpp_at";
+
+function getStoredToken(): string | null {
+  if (typeof window === "undefined") return null;
+  try { return localStorage.getItem(STORAGE_KEY); } catch { return null; }
+}
+
+function setStoredToken(token: string | null) {
+  if (typeof window === "undefined") return;
+  try {
+    if (token) localStorage.setItem(STORAGE_KEY, token);
+    else localStorage.removeItem(STORAGE_KEY);
+  } catch {}
+}
+
+let accessToken: string | null = getStoredToken();
 let refreshPromise: Promise<string | null> | null = null;
+
+export function initAccessToken() {
+  if (!accessToken) {
+    const stored = getStoredToken();
+    if (stored) accessToken = stored;
+  }
+}
 
 export function setAccessToken(token: string | null) {
   accessToken = token;
+  setStoredToken(token);
 }
 
 export function getAccessToken() {
   return accessToken;
 }
 
-async function refreshAccessToken(): Promise<string | null> {
+export async function refreshAccessToken(): Promise<string | null> {
+  const stored = getStoredToken();
+  if (stored && stored !== accessToken) {
+    accessToken = stored;
+    return accessToken;
+  }
+
   try {
     const res = await fetch(`${BASE_URL}/api/auth/refresh`, {
       method: "POST",
       credentials: "include",
     });
     if (!res.ok) {
-      accessToken = null;
+      if (res.status === 401 || res.status === 403) {
+        accessToken = null;
+        setStoredToken(null);
+      }
       return null;
     }
     const data = await res.json();
     accessToken = data.accessToken;
+    setStoredToken(data.accessToken);
     return accessToken;
   } catch {
-    accessToken = null;
     return null;
   }
+}
+
+if (typeof window !== "undefined") {
+  window.addEventListener("storage", (e) => {
+    if (e.key === STORAGE_KEY) {
+      accessToken = e.newValue || null;
+    }
+  });
 }
 
 export async function apiFetch<T>(

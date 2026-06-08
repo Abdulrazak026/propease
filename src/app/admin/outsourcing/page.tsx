@@ -61,7 +61,7 @@ export default function OutsourcingPage() {
         {["all","available","sold","rented","draft","review","sale","rent"].map(f=><button key={f} onClick={()=>setFilterType(f)} className={`px-4 py-2 text-sm font-medium rounded-lg border capitalize transition-all ${filterType===f?"bg-[var(--color-primary)] text-white border-[var(--color-primary)]":"bg-white text-gray-600 border-gray-200 hover:border-gray-300"}`}>{f}</button>)}
       </div>
 
-      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+      <div className="hidden md:block bg-white rounded-xl border border-gray-200 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead><tr className="border-b border-gray-100 bg-gray-50 text-left"><th className="px-4 py-3 text-sm font-medium text-gray-600">Property</th><th className="px-4 py-3 text-sm font-medium text-gray-600">Type</th><th className="px-4 py-3 text-sm font-medium text-gray-600">City</th><th className="px-4 py-3 text-sm font-medium text-gray-600">Price</th><th className="px-4 py-3 text-sm font-medium text-gray-600">Status</th><th className="px-4 py-3 text-sm font-medium text-gray-600 w-[220px]">Actions</th></tr></thead>
@@ -102,6 +102,39 @@ export default function OutsourcingPage() {
             </tbody>
           </table>
         </div>
+      </div>
+
+      <div className="md:hidden space-y-3">
+        {filtered.map(p => (
+          <div key={p.id} className="bg-white rounded-xl border border-gray-200 p-4 space-y-2">
+            <div className="flex items-center gap-3">
+              {resolveImageUrl(p.photos?.[0]?.url) ? (
+                <img src={resolveImageUrl(p.photos?.[0]?.url)!} alt="" className="w-10 h-10 rounded-lg object-cover shrink-0 border border-gray-100" />
+              ) : (
+                <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center shrink-0 text-gray-300 text-xs">N/A</div>
+              )}
+              <div className="min-w-0 flex-1">
+                <button onClick={() => setPreview(p)} className="text-sm font-medium text-gray-900 hover:text-[var(--color-primary)] transition-colors truncate block max-w-full text-left">{p.title}</button>
+                <p className="text-xs text-gray-400 capitalize">{p.propertyType} · {p.listingType}</p>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-2 text-xs">
+              <div><span className="text-gray-400">City</span><p className="font-medium text-gray-900">{p.city}</p></div>
+              <div><span className="text-gray-400">Price</span><p className="font-medium text-gray-900">{formatNaira(p.price)}</p></div>
+              <div><span className="text-gray-400">Status</span>
+                <select value={p.status} onChange={e => updateStatus(p.id, e.target.value)} disabled={updating === p.id} className="mt-0.5 text-xs rounded-lg border border-gray-200 px-2 py-1 focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)]">
+                  <option value="draft">Draft</option><option value="review">Review</option><option value="approved">Approved</option><option value="available">Available</option><option value="reserved">Reserved</option><option value="sold">Sold</option><option value="rented">Rented</option>
+                </select>
+              </div>
+            </div>
+            <div className="flex gap-2 pt-1">
+              <button onClick={() => setPreview(p)} className="text-xs px-3 py-1.5 rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200 font-medium">View</button>
+              {perms.canCreateListings && <a href={`/admin/listings/${p.id}/edit`} className="text-xs px-3 py-1.5 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 font-medium">Edit</a>}
+              {perms.canCreateListings && <button onClick={() => deleteListing(p.id)} className="text-xs px-3 py-1.5 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 font-medium">Delete</button>}
+            </div>
+          </div>
+        ))}
+        {filtered.length === 0 && <div className="bg-white rounded-xl border border-gray-200 p-8 text-center text-gray-400 text-sm">No listings found</div>}
       </div>
 
       {/* Preview Modal */}

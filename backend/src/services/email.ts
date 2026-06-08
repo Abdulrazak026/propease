@@ -44,12 +44,20 @@ export const emailService = {
   async accountApproved(email: string, name: string, role: string) {
     const tpl = await getTemplate("approved_template", name, role);
     const html = tpl || defaultTemplates.accountApproved(name, role);
-    return send(email, "Your MBPP account has been approved!", html);
+    return send(email, `🎉 Your MBPP ${role} account has been approved!`, html);
+  },
+  async accountSuspended(email: string, name: string, reason?: string) {
+    const html = defaultTemplates.accountSuspended(name, reason);
+    return send(email, "Your MBPP account has been suspended", html);
   },
   async passwordReset(email: string, name: string, token: string) {
     const tpl = await getTemplate("reset_template", name, token);
     const html = tpl || defaultTemplates.passwordReset(name, token);
-    return send(email, "Reset your MBPP password", html);
+    return send(email, "🔐 Reset your MBPP password", html);
+  },
+  async passwordChanged(email: string, name: string) {
+    const html = defaultTemplates.passwordChanged(name);
+    return send(email, "✅ Your MBPP password has been changed", html);
   },
   async inquiryNotification(agentEmail: string, agentName: string, clientName: string, propertyTitle: string, message: string) {
     const tpl = await getTemplate("inquiry_template", agentName, clientName, propertyTitle, message);

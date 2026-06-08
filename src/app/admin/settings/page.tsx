@@ -209,7 +209,7 @@ export default function AdminSettings() {
         {/* Branding */}
         {tab === "Branding" && (<>
           <h3 className="text-sm font-semibold text-gray-900">Brand Identity</h3>
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             {[["primary_color", "Primary"], ["secondary_color", "Secondary"], ["accent_color", "Accent"]].map(([k, l]) => (
               <div key={k}>
                 <label className="block text-xs font-medium text-gray-700 mb-1">{l}</label>
@@ -240,7 +240,7 @@ export default function AdminSettings() {
           <F label="Meta Title" v={s("meta_title")} onChange={(v) => set("meta_title", v)} />
           <TA label="Meta Description" v={s("meta_description")} onChange={(v) => set("meta_description", v)} rows={2} />
           <MediaPicker label="OG Image (social share preview)" current={s("og_image")} onSelect={(url) => set("og_image", url)} />
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <F label="Google Analytics" v={s("ga_id")} onChange={(v) => set("ga_id", v)} placeholder="G-XXXXX" />
             <F label="Google Tag Manager" v={s("gtm_id")} onChange={(v) => set("gtm_id", v)} placeholder="GTM-XXXXX" />
             <F label="Facebook Pixel" v={s("fb_pixel")} onChange={(v) => set("fb_pixel", v)} />
@@ -350,7 +350,7 @@ export default function AdminSettings() {
           </div>
           <hr className="border-gray-100" />
           <h3 className="text-sm font-semibold text-gray-900">Social Media</h3>
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <F label="Facebook" v={s("facebook_url")} onChange={(v) => set("facebook_url", v)} />
             <F label="Instagram" v={s("instagram_url")} onChange={(v) => set("instagram_url", v)} />
             <F label="LinkedIn" v={s("linkedin_url")} onChange={(v) => set("linkedin_url", v)} />

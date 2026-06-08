@@ -59,7 +59,7 @@ export default function CrmPage() {
             {stages.map((s) => <option key={s.stage} value={s.stage.toLowerCase()}>{s.stage}</option>)}
           </select>
         </div>
-        <div className="overflow-x-auto">
+        <div className="hidden md:block overflow-x-auto">
           <table className="w-full text-sm">
             <thead><tr className="border-b border-gray-100 bg-gray-50 text-left"><th className="px-4 py-3 text-xs font-medium text-gray-600">Client</th><th className="px-4 py-3 text-xs font-medium text-gray-600">Contact</th><th className="px-4 py-3 text-xs font-medium text-gray-600">Property</th><th className="px-4 py-3 text-xs font-medium text-gray-600">Status</th><th className="px-4 py-3 text-xs font-medium text-gray-600">Date</th></tr></thead>
             <tbody>
@@ -75,6 +75,22 @@ export default function CrmPage() {
               {filtered.length === 0 && <tr><td colSpan={5} className="px-4 py-8 text-center text-gray-400 text-sm">No leads found</td></tr>}
             </tbody>
           </table>
+        </div>
+        <div className="md:hidden space-y-3 p-4">
+          {filtered.map((l) => (
+            <div key={l.id} className="bg-white rounded-xl border border-gray-200 p-4 space-y-2">
+              <div className="flex items-center justify-between">
+                <p className="text-sm font-medium text-gray-900">{l.clientName}</p>
+                <Badge variant={l.status === "new" ? "warning" : l.status === "responded" ? "success" : "default"}>{l.status}</Badge>
+              </div>
+              <div className="grid grid-cols-2 gap-2 text-xs">
+                <div><span className="text-gray-400">Contact</span><p className="font-medium text-gray-900">{l.clientContact}</p></div>
+                <div><span className="text-gray-400">Date</span><p className="font-medium text-gray-900">{new Date(l.createdAt).toLocaleDateString()}</p></div>
+                <div className="col-span-2"><span className="text-gray-400">Property</span><p className="font-medium text-gray-900">{l.listing?.title || "N/A"}</p></div>
+              </div>
+            </div>
+          ))}
+          {filtered.length === 0 && <div className="text-center text-gray-400 text-sm py-8">No leads found</div>}
         </div>
       </div>
     </div>

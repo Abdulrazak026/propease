@@ -175,7 +175,7 @@ export default function AdminNewListingPage() {
 
         {form.listingType === "rent" && (
           <>
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div>
                 <label className="block text-xs font-medium text-gray-700 mb-1">Annual Rent (NGN)</label>
                 <input type="number" value={form.annualRent} onChange={tf("annualRent")} placeholder="e.g. 1200000" className="w-full rounded-lg border border-gray-200 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20" />

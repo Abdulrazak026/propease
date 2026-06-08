@@ -48,7 +48,7 @@ export default function AgentMyListingsPage() {
         </div>
         <div className="flex items-center gap-2">
           <Link href="/agent" className="text-xs font-semibold text-gray-600 hover:text-gray-900">← Back</Link>
-          {perms.canCreateListings && <Link href="/ambassador/listings/new" className="text-xs font-semibold px-3.5 py-2.5 bg-[var(--color-primary)] text-white rounded-lg hover:bg-[var(--color-primary)]/90">+ New Listing</Link>}
+          {perms.canCreateListings && <Link href="/agent/listings/new" className="text-xs font-semibold px-3.5 py-2.5 bg-[var(--color-primary)] text-white rounded-lg hover:bg-[var(--color-primary)]/90">+ New Listing</Link>}
         </div>
       </div>
 
@@ -70,7 +70,7 @@ export default function AgentMyListingsPage() {
         <div className="bg-white rounded-xl border border-gray-200 p-12 text-center">
           <p className="text-sm font-semibold text-gray-900 mb-1">No listings</p>
           <p className="text-xs text-gray-500 max-w-sm mx-auto">Post your first property. It goes to review before going live.</p>
-          <Link href="/ambassador/listings/new" className="inline-flex items-center justify-center mt-4 min-h-[40px] px-5 py-2 text-xs font-semibold rounded-full bg-gray-900 text-white hover:bg-gray-800">Post a property</Link>
+          <Link href="/agent/listings/new" className="inline-flex items-center justify-center mt-4 min-h-[40px] px-5 py-2 text-xs font-semibold rounded-full bg-gray-900 text-white hover:bg-gray-800">Post a property</Link>
         </div>
       ) : (
         <div className="space-y-2">

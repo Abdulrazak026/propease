@@ -3,6 +3,7 @@ import prisma from "../lib/prisma";
 import { authenticate, AuthRequest } from "../middleware/auth";
 import { authorize, requirePermission } from "../middleware/rbac";
 import { logger } from "../lib/logger";
+import { emailService } from "../services/email";
 const router = Router();
 
 router.get("/", authenticate, authorize("head"), requirePermission("canManageUsers"), async (_req: AuthRequest, res: Response) => {
@@ -19,11 +20,22 @@ router.patch("/:id", authenticate, authorize("head"), requirePermission("canMana
   try {
     const { isApproved, isVerified, suspendedAt, canCreateTasks, canCloseDeals, canCreateListings, canManageUsers, canManageContent, canViewAnalytics, canManageAgreements, role, ambassadorId } = req.body;
     const id = String(req.params.id);
+    
+    const existingUser = await prisma.user.findUnique({ where: { id }, select: { isApproved: true, suspendedAt: true } });
+    
     const user = await prisma.user.update({
       where: { id },
       data: { isApproved, isVerified, suspendedAt: suspendedAt !== undefined ? (suspendedAt ? new Date(suspendedAt) : null) : undefined, canCreateTasks, canCloseDeals, canCreateListings, canManageUsers, canManageContent, canViewAnalytics, canManageAgreements, role, ambassadorId },
       select: { id: true, name: true, email: true, role: true, isApproved: true, canCreateTasks: true, canCloseDeals: true, canCreateListings: true, canManageUsers: true, canManageContent: true, canViewAnalytics: true, canManageAgreements: true },
     });
+    
+    if (isApproved === true && existingUser && !existingUser.isApproved) {
+      emailService.accountApproved(user.email, user.name, user.role).catch(() => {});
+    }
+    if (suspendedAt && !existingUser?.suspendedAt) {
+      emailService.accountSuspended(user.email, user.name).catch(() => {});
+    }
+    
     res.json({ user });
   } catch (error) { logger.error({ err: error }, "Failed to update user"); res.status(500).json({ error: "Failed to update user" }); }
 });

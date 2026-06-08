@@ -26,6 +26,7 @@ export interface ApiUser {
 export interface ApiAuthResponse {
   accessToken: string;
   user: ApiUser;
+  error?: string;
 }
 
 export interface ApiListing {

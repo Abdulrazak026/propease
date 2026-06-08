@@ -33,7 +33,7 @@ export default function AgentCommissionsPage() {
         <p className="text-xs text-gray-400 mt-1">{commissions.length} deals</p>
       </div>
 
-      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+      <div className="hidden md:block bg-white rounded-xl border border-gray-200 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead><tr className="border-b border-gray-100 bg-gray-50 text-left"><th className="px-4 py-3 text-xs font-medium text-gray-600">Deal</th><th className="px-4 py-3 text-xs font-medium text-gray-600">Type</th><th className="px-4 py-3 text-xs font-medium text-gray-600">Amount</th><th className="px-4 py-3 text-xs font-medium text-gray-600">Your Cut</th></tr></thead>
@@ -50,6 +50,20 @@ export default function AgentCommissionsPage() {
             </tbody>
           </table>
         </div>
+      </div>
+
+      <div className="md:hidden space-y-3">
+        {commissions.map(c => (
+          <div key={c.id} className="bg-white rounded-xl border border-gray-200 p-4 space-y-2">
+            <p className="text-sm font-medium text-gray-900">{c.dealTitle}</p>
+            <div className="grid grid-cols-2 gap-2 text-xs">
+              <div><span className="text-gray-400">Type</span><p className="font-medium text-gray-900 capitalize">{c.dealType.replace(/_/g, " ")}</p></div>
+              <div><span className="text-gray-400">Amount</span><p className="font-medium text-gray-900">₦{c.totalAmount.toLocaleString()}</p></div>
+              <div className="col-span-2"><span className="text-gray-400">Your Cut</span><p className="font-medium text-emerald-600">₦{c.agentCut.toLocaleString()}</p></div>
+            </div>
+          </div>
+        ))}
+        {commissions.length === 0 && <div className="bg-white rounded-xl border border-gray-200 p-8 text-center text-gray-400 text-sm">No commissions yet</div>}
       </div>
     </div>
   );

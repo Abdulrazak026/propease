@@ -43,7 +43,7 @@ export default function UsersPage() {
         </div>
       </div>
 
-      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+      <div className="hidden md:block bg-white rounded-xl border border-gray-200 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead><tr className="border-b border-gray-100 bg-gray-50 text-left"><th className="px-4 py-3 text-xs font-medium text-gray-600">User</th><th className="px-4 py-3 text-xs font-medium text-gray-600">Role</th><th className="px-4 py-3 text-xs font-medium text-gray-600">City</th><th className="px-4 py-3 text-xs font-medium text-gray-600">Status</th><th className="px-4 py-3 text-xs font-medium text-gray-600">Wallet</th><th className="px-4 py-3 text-xs font-medium text-gray-600">Actions</th></tr></thead>
@@ -66,6 +66,32 @@ export default function UsersPage() {
             </tbody>
           </table>
         </div>
+      </div>
+
+      <div className="md:hidden space-y-3">
+        {filtered.map(u => (
+          <div key={u.id} className="bg-white rounded-xl border border-gray-200 p-4">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="w-10 h-10 rounded-full bg-[var(--color-primary)]/10 flex items-center justify-center text-sm font-bold text-[var(--color-primary)]">{u.name.split(" ").map(n=>n[0]).join("")}</div>
+              <div className="min-w-0 flex-1">
+                <p className="font-medium text-gray-900 text-sm truncate">{u.name}</p>
+                <p className="text-xs text-gray-400 truncate">{u.email}</p>
+              </div>
+              <Badge variant={u.isApproved?"success":"warning"}>{u.isApproved?"Active":"Pending"}</Badge>
+            </div>
+            <div className="grid grid-cols-2 gap-2 text-xs mb-3">
+              <div><span className="text-gray-400">Role</span><p className="font-medium capitalize">{u.role}</p></div>
+              <div><span className="text-gray-400">City</span><p className="font-medium">{u.city||"N/A"}</p></div>
+              <div><span className="text-gray-400">Wallet</span><p className="font-medium">₦{u.walletBalance.toLocaleString()}</p></div>
+              <div><span className="text-gray-400">Joined</span><p className="font-medium">{new Date(u.createdAt).toLocaleDateString()}</p></div>
+            </div>
+            <div className="flex gap-2">
+              <Button size="sm" variant="ghost" className="flex-1" onClick={() => setViewUser(u)}>View</Button>
+              {u.role!=="head"&&<Button size="sm" variant={u.isApproved?"outline":"primary"} className="flex-1" onClick={()=>toggleApprove(u)} disabled={saving===u.id}>{u.isApproved?"Suspend":"Approve"}</Button>}
+            </div>
+          </div>
+        ))}
+        {filtered.length === 0 && <div className="bg-white rounded-xl border border-gray-200 p-8 text-center text-gray-400 text-sm">No users found.</div>}
       </div>
 
       {viewUser && <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4" onClick={()=>setViewUser(null)}><div className="bg-white rounded-xl p-6 max-w-lg w-full shadow-2xl" onClick={e=>e.stopPropagation()}>

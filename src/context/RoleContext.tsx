@@ -1,7 +1,7 @@
 "use client";
 import { createContext, useContext, useState, useEffect, ReactNode, useCallback } from "react";
 import type { User } from "@/lib/types";
-import { api, setAccessToken } from "@/lib/api-client";
+import { api, setAccessToken, initAccessToken, refreshAccessToken } from "@/lib/api-client";
 import type { ApiAuthResponse, ApiUser } from "@/lib/api-types";
 
 interface RoleContextType {
@@ -51,7 +51,17 @@ export function RoleProvider({ children }: { children: ReactNode }) {
     let cancelled = false;
     (async () => {
       try {
-        const { data } = await api.get<{ user: ApiUser }>("/api/auth/me");
+        initAccessToken();
+
+        let { data } = await api.get<{ user: ApiUser }>("/api/auth/me");
+
+        if (!data?.user && !cancelled) {
+          const newToken = await refreshAccessToken();
+          if (newToken && !cancelled) {
+            ({ data } = await api.get<{ user: ApiUser }>("/api/auth/me"));
+          }
+        }
+
         if (!cancelled && data?.user) {
           setCurrentUserState(toUser(data.user));
         }
@@ -72,6 +82,9 @@ export function RoleProvider({ children }: { children: ReactNode }) {
     const { data, status, error } = await api.post<ApiAuthResponse>("/api/auth/login", { email, password });
     if (status === 0 || error) {
       return error || "Network error. Check your connection.";
+    }
+    if (status === 403 && data?.error) {
+      return data.error;
     }
     if (status !== 200 || !data) {
       return "Invalid email or password";

@@ -32,13 +32,13 @@ export default function DealsPage() {
         <div><h1 className="text-xl font-bold text-gray-900">Deals</h1><p className="text-xs text-gray-500">All property transactions</p></div>
       </div>
 
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="bg-white rounded-xl border border-gray-200 p-4"><p className="text-xs text-gray-500">Total Value</p><p className="text-2xl font-bold text-gray-900 mt-1">₦{totalValue.toLocaleString()}</p></div>
         <div className="bg-white rounded-xl border border-gray-200 p-4"><p className="text-xs text-gray-500">Company Revenue</p><p className="text-2xl font-bold text-gray-900 mt-1">₦{companyValue.toLocaleString()}</p></div>
         <div className="bg-white rounded-xl border border-gray-200 p-4"><p className="text-xs text-gray-500">Total Deals</p><p className="text-2xl font-bold text-gray-900 mt-1">{deals.length}</p></div>
       </div>
 
-      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+      <div className="hidden md:block bg-white rounded-xl border border-gray-200 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead><tr className="border-b border-gray-100 bg-gray-50 text-left"><th className="px-4 py-3 text-xs font-medium text-gray-600">Deal</th><th className="px-4 py-3 text-xs font-medium text-gray-600">Amount</th><th className="px-4 py-3 text-xs font-medium text-gray-600">Agent</th><th className="px-4 py-3 text-xs font-medium text-gray-600">Ambassador</th><th className="px-4 py-3 text-xs font-medium text-gray-600">Company</th><th className="px-4 py-3 text-xs font-medium text-gray-600">Date</th></tr></thead>
@@ -56,6 +56,21 @@ export default function DealsPage() {
             </tbody>
           </table>
         </div>
+      </div>
+
+      <div className="md:hidden space-y-3">
+        {filtered.map((d) => (
+          <div key={d.id} className="bg-white rounded-xl border border-gray-200 p-4 cursor-pointer" onClick={() => setSelected(d)}>
+            <p className="text-sm font-medium text-gray-900 mb-2">{d.dealTitle}</p>
+            <div className="grid grid-cols-2 gap-2 text-xs">
+              <div><span className="text-gray-400">Amount</span><p className="font-medium">₦{d.totalAmount.toLocaleString()}</p></div>
+              <div><span className="text-gray-400">Company</span><p className="font-medium text-emerald-600">₦{d.companyCut.toLocaleString()}</p></div>
+              <div><span className="text-gray-400">Agent</span><p className="font-medium">{d.agent?.name || "Unassigned"}</p></div>
+              <div><span className="text-gray-400">Ambassador</span><p className="font-medium">{d.ambassador?.name || "Unassigned"}</p></div>
+            </div>
+            <p className="text-[10px] text-gray-400 mt-2">{new Date(d.paidAt).toLocaleDateString()}</p>
+          </div>
+        ))}
       </div>
 
       {selected && (

@@ -60,7 +60,7 @@ export default function StaffsPage() {
         {perms.canManageUsers && <Button size="sm" onClick={() => setEditUser("new")}>+ Add Staff</Button>}
       </div>
 
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {([
           { key: "heads" as RoleTab, label: "Admins", count: heads.length },
           { key: "ambassadors" as RoleTab, label: "Ambassadors", count: ambassadors.length },
@@ -73,7 +73,7 @@ export default function StaffsPage() {
         ))}
       </div>
 
-      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+      <div className="hidden md:block bg-white rounded-xl border border-gray-200 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead><tr className="border-b border-gray-100 bg-gray-50 text-left"><th className="px-4 py-3 text-xs font-medium text-gray-600">Name</th><th className="px-4 py-3 text-xs font-medium text-gray-600">City</th><th className="px-4 py-3 text-xs font-medium text-gray-600">Status</th><th className="px-4 py-3 text-xs font-medium text-gray-600">Permissions</th><th className="px-4 py-3 text-xs font-medium text-gray-600">Actions</th></tr></thead>
@@ -90,6 +90,27 @@ export default function StaffsPage() {
             </tbody>
           </table>
         </div>
+      </div>
+
+      <div className="md:hidden space-y-3">
+        {list.map(user => (
+          <div key={user.id} className="bg-white rounded-xl border border-gray-200 p-4">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="w-10 h-10 rounded-full bg-[var(--color-primary)]/10 flex items-center justify-center text-sm font-bold text-[var(--color-primary)]">{user.name.split(" ").map(n => n[0]).join("")}</div>
+              <div className="min-w-0 flex-1">
+                <p className="font-medium text-gray-900 text-sm truncate">{user.name}</p>
+                <p className="text-xs text-gray-400 truncate">{user.email}</p>
+              </div>
+              <Badge variant={user.isApproved ? "success" : "warning"}>{user.isApproved ? "Active" : "Pending"}</Badge>
+            </div>
+            <div className="grid grid-cols-2 gap-2 text-xs mb-3">
+              <div><span className="text-gray-400">City</span><p className="font-medium">{user.city || "N/A"}</p></div>
+              <div><span className="text-gray-400">Permissions</span><p className="font-medium">{permTrue(user)}/{PERMISSIONS.length} active</p></div>
+            </div>
+            {perms.canManageUsers && <Button size="sm" variant="outline" className="w-full" onClick={() => setEditUser(user.id)}>Edit Permissions</Button>}
+          </div>
+        ))}
+        {list.length === 0 && <div className="bg-white rounded-xl border border-gray-200 p-8 text-center text-gray-400 text-sm">No staff found.</div>}
       </div>
 
       {editUser && editUser === "new" ? (

@@ -27,7 +27,7 @@ export default function AuditPage() {
         <div><h1 className="text-xl font-bold text-gray-900">Audit Log</h1><p className="text-xs text-gray-500">Platform activity and approvals</p></div>
       </div>
 
-      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+      <div className="hidden md:block bg-white rounded-xl border border-gray-200 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead><tr className="border-b border-gray-100 bg-gray-50 text-left"><th className="px-4 py-3 text-xs font-medium text-gray-600">Action</th><th className="px-4 py-3 text-xs font-medium text-gray-600">Entity</th><th className="px-4 py-3 text-xs font-medium text-gray-600">User</th><th className="px-4 py-3 text-xs font-medium text-gray-600">Date</th></tr></thead>
@@ -44,6 +44,20 @@ export default function AuditPage() {
             </tbody>
           </table>
         </div>
+      </div>
+
+      <div className="md:hidden space-y-3">
+        {logs.map((l) => (
+          <div key={l.id} className="bg-white rounded-xl border border-gray-200 p-4 space-y-2">
+            <p className="text-xs font-medium text-gray-900">{l.action}</p>
+            <div className="grid grid-cols-2 gap-2 text-xs">
+              <div><span className="text-gray-400">Entity</span><p className="font-medium text-gray-900">{l.entity}{l.entityId ? ` #${l.entityId.slice(0, 8)}` : ""}</p></div>
+              <div><span className="text-gray-400">User</span><p className="font-medium text-gray-900">{l.user?.name || "System"}</p></div>
+              <div className="col-span-2"><span className="text-gray-400">Timestamp</span><p className="font-medium text-gray-900">{new Date(l.createdAt).toLocaleDateString()} {new Date(l.createdAt).toLocaleTimeString()}</p></div>
+            </div>
+          </div>
+        ))}
+        {logs.length === 0 && <div className="bg-white rounded-xl border border-gray-200 p-8 text-center text-gray-400 text-sm">No activity recorded yet</div>}
       </div>
     </div>
   );
