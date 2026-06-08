@@ -22,7 +22,7 @@ router.get("/", authenticate, authorize("head"), async (_req, res: Response) => 
 
 router.get("/email-preview/:key", authenticate, authorize("head"), async (req, res: Response) => {
   try {
-    const settingKey = req.params.key;
+    const settingKey = req.params.key as string;
 
     const keyMap: Record<string, string> = {
       welcome_template: "welcome",
