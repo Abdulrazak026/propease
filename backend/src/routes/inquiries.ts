@@ -149,6 +149,47 @@ router.get("/:id/conversation", authenticate, authorize("head"), async (req: Aut
   }
 });
 
+router.post("/:id/reply", authenticate, authorize("head"), async (req: AuthRequest, res: Response) => {
+  try {
+    const { message } = req.body;
+    if (!message) return res.status(400).json({ error: "Message is required" });
+
+    const inquiry = await prisma.inquiry.findUnique({
+      where: { id: req.params.id as string },
+      include: { listing: { select: { id: true, title: true } }, assignedAgent: { select: { id: true, name: true, email: true } } },
+    });
+    if (!inquiry) return res.status(404).json({ error: "Inquiry not found" });
+
+    let conversation: any = null;
+    if (inquiry.listingId && inquiry.clientContact) {
+      conversation = await prisma.conversation.findFirst({
+        where: {
+          listingId: inquiry.listingId,
+          participants: { some: { user: { email: inquiry.clientContact } } },
+        },
+      });
+    }
+
+    if (conversation) {
+      await prisma.message.create({
+        data: { content: message, conversationId: conversation.id, senderId: req.user!.id },
+      });
+      await prisma.conversation.update({ where: { id: conversation.id }, data: { updatedAt: new Date() } });
+    }
+
+    await prisma.inquiry.update({ where: { id: inquiry.id }, data: { status: "responded" } });
+
+    if (inquiry.clientContact) {
+      emailService.inquiryConfirmation(inquiry.clientContact, inquiry.clientName, inquiry.listing?.title || "your inquiry").catch(() => {});
+    }
+
+    res.json({ success: true, message: "Reply sent" });
+  } catch (error) {
+    logger.error({ err: error }, "Reply to inquiry error:");
+    res.status(500).json({ error: "Failed to send reply" });
+  }
+});
+
 export default router;
 
 

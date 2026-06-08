@@ -70,7 +70,7 @@ export default function OutsourcingPage() {
       </a>}
 
       <div className="flex gap-2 flex-wrap">
-        {["all","available","sold","rented","draft","review","sale","rent"].map(f=><button key={f} onClick={()=>setFilterType(f)} className={`px-4 py-2 text-sm font-medium rounded-lg border capitalize transition-all ${filterType===f?"bg-[var(--color-primary)] text-white border-[var(--color-primary)]":"bg-white text-gray-600 border-gray-200 hover:border-gray-300"}`}>{f}</button>)}
+        {["all","available","sold","rented","draft","review","sale","rent","partnership"].map(f=><button key={f} onClick={()=>setFilterType(f)} className={`px-4 py-2 text-sm font-medium rounded-lg border capitalize transition-all ${filterType===f?"bg-[var(--color-primary)] text-white border-[var(--color-primary)]":"bg-white text-gray-600 border-gray-200 hover:border-gray-300"}`}>{f}</button>)}
       </div>
 
       <div className="hidden md:block bg-white rounded-xl border border-gray-200 overflow-hidden">
