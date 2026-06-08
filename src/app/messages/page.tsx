@@ -56,7 +56,6 @@ export default function MessagesPageWrapper() {
 
 function MessagesPage() {
   const searchParams = useSearchParams();
-  const newConversationId = searchParams.get("id");
   const newListingId = searchParams.get("listing");
   const newAgentId = searchParams.get("agent");
 
@@ -110,156 +109,141 @@ function MessagesPage() {
       })
     : conversations;
 
-  return (
-    <div className="h-full flex flex-col">
-      <div className="flex-1 flex overflow-hidden min-h-0">
-        {/* List */}
-        <div className={`w-full lg:w-1/2 border-r border-gray-100 bg-white flex flex-col ${(selectedId || newConvo) ? "hidden lg:flex" : "flex"}`}>
-          <div className="px-5 pt-5 pb-3 border-b border-gray-100">
-            <div className="flex items-end justify-between mb-3">
-              <div>
-                <h1 className="text-xl font-bold text-gray-900 tracking-tight">Inbox</h1>
-                <p className="text-xs text-gray-500 mt-0.5">{conversations.length} {conversations.length === 1 ? "conversation" : "conversations"}</p>
-              </div>
-            </div>
-            {conversations.length > 0 && (
-              <div className="relative">
-                <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
-                </svg>
-                <input
-                  type="text"
-                  value={query}
-                  onChange={e => setQuery(e.target.value)}
-                  placeholder="Search messages…"
-                  className="w-full pl-9 pr-3 py-2 text-sm rounded-lg bg-gray-50 border border-gray-100 focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)] focus:bg-white"
-                />
-              </div>
-            )}
-          </div>
-          <div className="flex-1 overflow-y-auto">
-            {loading ? (
-              <div className="p-3 space-y-1">
-                {Array.from({ length: 6 }).map((_, i) => (
-                  <div key={i} className="flex items-center gap-3 p-3 animate-pulse">
-                    <div className="w-11 h-11 rounded-full bg-gray-100" />
-                    <div className="flex-1">
-                      <div className="h-3 bg-gray-100 rounded w-2/3 mb-2" />
-                      <div className="h-3 bg-gray-100 rounded w-1/2" />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : filtered.length === 0 ? (
-              <div className="text-center py-20 px-6">
-                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center mx-auto mb-4">
-                  <svg className="w-7 h-7 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-                  </svg>
-                </div>
-                <h3 className="text-sm font-semibold text-gray-900 mb-1">
-                  {query ? "No matches" : "No messages yet"}
-                </h3>
-                <p className="text-xs text-gray-500 max-w-[220px] mx-auto">
-                  {query ? "Try a different name or subject." : "When you inquire about a property, the conversation shows up here."}
-                </p>
-              </div>
-            ) : (
-              <div className="divide-y divide-gray-50">
-                {filtered.map((conv) => {
-                  const name = conv.participants[0]?.user.name || "Unknown";
-                  const isActive = selectedId === conv.id;
-                  return (
-                    <button
-                      key={conv.id}
-                      onClick={() => setSelectedId(conv.id)}
-                      className={`w-full flex items-start gap-3 px-4 py-3.5 text-left transition-colors ${
-                        isActive ? "bg-[var(--color-primary)]/5" : "hover:bg-gray-50"
-                      }`}
-                    >
-                      <div className="relative shrink-0">
-                        <div className={`w-11 h-11 rounded-full bg-gradient-to-br ${avatarColor(name)} flex items-center justify-center text-white text-xs font-bold ring-2 ring-white`}>
-                          {name.split(" ").map(n => n[0]).join("").slice(0, 2).toUpperCase()}
-                        </div>
-                        {conv.unread > 0 && (
-                          <span className="absolute -top-0.5 -right-0.5 w-3.5 h-3.5 bg-[var(--color-primary)] border-2 border-white rounded-full" />
-                        )}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center justify-between gap-2 mb-0.5">
-                          <span className={`text-sm truncate ${conv.unread > 0 ? "font-bold text-gray-900" : "font-semibold text-gray-800"}`}>{name}</span>
-                          <span className={`text-[10px] shrink-0 ${conv.unread > 0 ? "text-[var(--color-primary)] font-semibold" : "text-gray-400"}`}>{timeAgo(conv.lastMessageAt)}</span>
-                        </div>
-                        {conv.subject && (
-                          <p className="text-[11px] text-gray-500 truncate mb-0.5">{conv.subject}</p>
-                        )}
-                        <p className={`text-xs truncate ${conv.unread > 0 ? "text-gray-700 font-medium" : "text-gray-500"}`}>
-                          {conv.lastMessage || (conv.listing ? `Re: ${conv.listing.title}` : "No messages yet")}
-                        </p>
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-        </div>
+  // Show conversation detail full-screen
+  if (selectedId && selected) {
+    return (
+      <div className="h-full flex flex-col min-h-0">
+        <ConversationDetail conversation={selected} onBack={() => setSelectedId(null)} />
+      </div>
+    );
+  }
 
-        {/* Detail / Placeholder */}
-        <div className={`flex-1 flex flex-col bg-gradient-to-br from-gray-50 to-white min-h-0 ${!selectedId && !newConvo ? "hidden lg:flex" : "flex"}`}>
-          {newConvo ? (
-            <div className="flex flex-col flex-1 min-h-0">
-              <div className="flex items-center gap-3 px-5 py-3.5 bg-white/80 backdrop-blur-md border-b border-gray-100 shrink-0">
-                <button onClick={() => { setNewConvo(null); setNewMessage(""); }} className="lg:hidden -ml-1 p-1.5 text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded-lg">
-                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" /></svg>
-                </button>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-gray-900 truncate">New Conversation</p>
-                  <p className="text-[11px] text-gray-500 truncate">Start a new message thread</p>
-                </div>
-              </div>
-              <div className="flex-1 flex flex-col items-center justify-center p-6">
-                <div className="w-full max-w-md space-y-3">
-                  <input
-                    type="text"
-                    placeholder="Subject (optional)"
-                    value={newConvo.subject}
-                    onChange={(e) => setNewConvo({ ...newConvo, subject: e.target.value })}
-                    className="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)]"
-                  />
-                  <textarea
-                    value={newMessage}
-                    onChange={(e) => setNewMessage(e.target.value)}
-                    placeholder="Type your first message..."
-                    rows={4}
-                    className="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-lg resize-none focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)]"
-                  />
-                  <Button className="w-full" onClick={handleSendNewConversation} disabled={!newMessage.trim()}>Send Message</Button>
-                </div>
-              </div>
-            </div>
-          ) : selected ? (
-            <ConversationDetail conversation={selected} onBack={() => setSelectedId(null)} />
-          ) : (
-            <div className="flex-1 flex items-center justify-center p-6">
-              <div className="text-center max-w-sm">
-                <div className="relative w-24 h-24 mx-auto mb-5">
-                  <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-[var(--color-primary)]/15 to-emerald-100 rotate-6" />
-                  <div className="absolute inset-0 rounded-3xl bg-white border border-gray-100 shadow-sm flex items-center justify-center">
-                    <svg className="w-10 h-10 text-[var(--color-primary)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-                    </svg>
-                  </div>
-                </div>
-                <h3 className="text-base font-semibold text-gray-900 mb-1.5">Your inbox is empty</h3>
-                <p className="text-sm text-gray-500 mb-5">Pick a conversation from the list to read it, or start a new one by inquiring on a property.</p>
-                <Link href="/" className="inline-flex items-center justify-center min-h-[40px] px-5 py-2 text-sm font-semibold rounded-full bg-gray-900 text-white hover:bg-gray-800 transition-colors">
-                  Browse properties
-                </Link>
-              </div>
-            </div>
-          )}
+  // Show new conversation form full-screen
+  if (newConvo) {
+    return (
+      <div className="h-full flex flex-col min-h-0">
+        <div className="flex items-center gap-3 px-5 py-3.5 bg-white border-b border-gray-100 shrink-0">
+          <button onClick={() => { setNewConvo(null); setNewMessage(""); }} className="p-1.5 text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded-lg">
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" /></svg>
+          </button>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-semibold text-gray-900">New Conversation</p>
+            <p className="text-[11px] text-gray-500">Start a new message thread</p>
+          </div>
         </div>
+        <div className="flex-1 flex flex-col items-center justify-center p-6">
+          <div className="w-full max-w-md space-y-3">
+            <input
+              type="text"
+              placeholder="Subject (optional)"
+              value={newConvo.subject}
+              onChange={(e) => setNewConvo({ ...newConvo, subject: e.target.value })}
+              className="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)]"
+            />
+            <textarea
+              value={newMessage}
+              onChange={(e) => setNewMessage(e.target.value)}
+              placeholder="Type your first message..."
+              rows={4}
+              className="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-lg resize-none focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)]"
+            />
+            <Button className="w-full" onClick={handleSendNewConversation} disabled={!newMessage.trim()}>Send Message</Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Show inbox list
+  return (
+    <div className="h-full flex flex-col min-h-0">
+      <div className="px-5 pt-5 pb-3 border-b border-gray-100 bg-white shrink-0">
+        <div className="flex items-end justify-between mb-3">
+          <div>
+            <h1 className="text-xl font-bold text-gray-900 tracking-tight">Inbox</h1>
+            <p className="text-xs text-gray-500 mt-0.5">{conversations.length} {conversations.length === 1 ? "conversation" : "conversations"}</p>
+          </div>
+        </div>
+        {conversations.length > 0 && (
+          <div className="relative">
+            <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+            </svg>
+            <input
+              type="text"
+              value={query}
+              onChange={e => setQuery(e.target.value)}
+              placeholder="Search messages…"
+              className="w-full pl-9 pr-3 py-2 text-sm rounded-lg bg-gray-50 border border-gray-100 focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)] focus:bg-white"
+            />
+          </div>
+        )}
+      </div>
+      <div className="flex-1 overflow-y-auto">
+        {loading ? (
+          <div className="p-3 space-y-1">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="flex items-center gap-3 p-3 animate-pulse">
+                <div className="w-11 h-11 rounded-full bg-gray-100" />
+                <div className="flex-1">
+                  <div className="h-3 bg-gray-100 rounded w-2/3 mb-2" />
+                  <div className="h-3 bg-gray-100 rounded w-1/2" />
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : filtered.length === 0 ? (
+          <div className="text-center py-20 px-6">
+            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center mx-auto mb-4">
+              <svg className="w-7 h-7 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+              </svg>
+            </div>
+            <h3 className="text-sm font-semibold text-gray-900 mb-1">
+              {query ? "No matches" : "No messages yet"}
+            </h3>
+            <p className="text-xs text-gray-500 max-w-[220px] mx-auto">
+              {query ? "Try a different name or subject." : "When you inquire about a property, the conversation shows up here."}
+            </p>
+          </div>
+        ) : (
+          <div className="divide-y divide-gray-50">
+            {filtered.map((conv) => {
+              const name = conv.participants[0]?.user.name || "Unknown";
+              return (
+                <button
+                  key={conv.id}
+                  onClick={() => setSelectedId(conv.id)}
+                  className="w-full flex items-start gap-3 px-4 py-3.5 text-left transition-colors hover:bg-gray-50"
+                >
+                  <div className="relative shrink-0">
+                    <div className={`w-11 h-11 rounded-full bg-gradient-to-br ${avatarColor(name)} flex items-center justify-center text-white text-xs font-bold ring-2 ring-white`}>
+                      {name.split(" ").map(n => n[0]).join("").slice(0, 2).toUpperCase()}
+                    </div>
+                    {conv.unread > 0 && (
+                      <span className="absolute -top-0.5 -right-0.5 w-3.5 h-3.5 bg-[var(--color-primary)] border-2 border-white rounded-full" />
+                    )}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between gap-2 mb-0.5">
+                      <span className={`text-sm truncate ${conv.unread > 0 ? "font-bold text-gray-900" : "font-semibold text-gray-800"}`}>{name}</span>
+                      <span className={`text-[10px] shrink-0 ${conv.unread > 0 ? "text-[var(--color-primary)] font-semibold" : "text-gray-400"}`}>{timeAgo(conv.lastMessageAt)}</span>
+                    </div>
+                    {conv.subject && (
+                      <p className="text-[11px] text-gray-500 truncate mb-0.5">{conv.subject}</p>
+                    )}
+                    <p className={`text-xs truncate ${conv.unread > 0 ? "text-gray-700 font-medium" : "text-gray-500"}`}>
+                      {conv.lastMessage || (conv.listing ? `Re: ${conv.listing.title}` : "No messages yet")}
+                    </p>
+                  </div>
+                  <svg className="w-4 h-4 text-gray-300 shrink-0 mt-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                  </svg>
+                </button>
+              );
+            })}
+          </div>
+        )}
       </div>
     </div>
   );
@@ -272,7 +256,6 @@ function ConversationDetail({ conversation, onBack }: { conversation: Conversati
   const [sending, setSending] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const name = conversation.participants[0]?.user.name || "Unknown";
-  const myId = "me";
 
   useEffect(() => {
     setLoading(true);
@@ -295,7 +278,7 @@ function ConversationDetail({ conversation, onBack }: { conversation: Conversati
     try {
       const r = await api.post(`/api/messages/conversations/${conversation.id}`, { content: txt });
       if (r.data) {
-        const newMsg = (r.data as any).message || { id: crypto.randomUUID(), content: txt, senderId: myId, createdAt: new Date().toISOString() };
+        const newMsg = (r.data as any).message || { id: crypto.randomUUID(), content: txt, senderId: "me", createdAt: new Date().toISOString() };
         setMessages(prev => [...prev, newMsg]);
       }
     } catch {}
@@ -305,8 +288,8 @@ function ConversationDetail({ conversation, onBack }: { conversation: Conversati
 
   return (
     <div className="flex flex-col flex-1 min-h-0">
-      <div className="flex items-center gap-3 px-5 py-3.5 bg-white/80 backdrop-blur-md border-b border-gray-100 shrink-0">
-        <button onClick={onBack} className="lg:hidden -ml-1 p-1.5 text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded-lg">
+      <div className="flex items-center gap-3 px-4 py-3 bg-white border-b border-gray-100 shrink-0">
+        <button onClick={onBack} className="p-1.5 text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded-lg">
           <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
           </svg>
@@ -322,7 +305,7 @@ function ConversationDetail({ conversation, onBack }: { conversation: Conversati
         </div>
       </div>
 
-      <div ref={scrollRef} className="flex-1 overflow-y-auto px-5 py-6 min-h-0">
+      <div ref={scrollRef} className="flex-1 overflow-y-auto px-4 py-5 min-h-0 bg-gray-50">
         {loading ? (
           <div className="flex items-center justify-center h-full">
             <div className="w-8 h-8 border-2 border-[var(--color-primary)] border-t-transparent rounded-full animate-spin" />
@@ -338,7 +321,7 @@ function ConversationDetail({ conversation, onBack }: { conversation: Conversati
               const isMe = msg.senderId !== conversation.participants[0]?.user.id;
               return (
                 <div key={msg.id} className={`flex ${isMe ? "justify-end" : "justify-start"}`}>
-                  <div className={`max-w-[75%]`}>
+                  <div className="max-w-[80%]">
                     <div className={`px-4 py-2.5 text-sm leading-relaxed shadow-sm ${
                       isMe
                         ? "bg-[var(--color-primary)] text-white rounded-2xl rounded-br-md"
@@ -355,7 +338,7 @@ function ConversationDetail({ conversation, onBack }: { conversation: Conversati
         )}
       </div>
 
-      <div className="shrink-0 border-t border-gray-100 px-4 sm:px-5 py-3 bg-white/80 backdrop-blur-md">
+      <div className="shrink-0 border-t border-gray-100 px-4 py-3 bg-white">
         <div className="flex items-end gap-2 max-w-2xl mx-auto">
           <textarea
             value={input}

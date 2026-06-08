@@ -1,6 +1,7 @@
 import { Router, Response } from "express";
 import prisma from "../lib/prisma";
 import { authenticate, AuthRequest } from "../middleware/auth";
+import { emailService } from "../services/email";
 import { logger } from "../lib/logger";
 
 const router = Router();
@@ -18,7 +19,13 @@ router.get("/conversations", authenticate, async (req: AuthRequest, res: Respons
         listing: { select: { id: true, title: true } },
       },
     });
-    res.json(conversations);
+    const result = conversations.map(c => ({
+      ...c,
+      lastMessage: c.messages[0]?.content || null,
+      lastMessageAt: c.messages[0]?.createdAt?.toISOString() || null,
+      unread: c.messages.filter(m => !m.read && m.senderId !== userId).length,
+    }));
+    res.json({ conversations: result });
   } catch (error) { logger.error({ err: error }, "Failed to fetch conversations"); res.status(500).json({ error: "Failed to fetch conversations" }); }
 });
 
@@ -35,7 +42,7 @@ router.get("/conversations/:id/messages", authenticate, async (req: AuthRequest,
       where: { conversationId: convId, senderId: { not: uid }, read: false },
       data: { read: true },
     });
-    res.json(messages);
+    res.json({ messages });
   } catch (error) { logger.error({ err: error }, "Failed to fetch messages"); res.status(500).json({ error: "Failed to fetch messages" }); }
 });
 
@@ -53,7 +60,7 @@ router.post("/conversations/:id/messages", authenticate, async (req: AuthRequest
       where: { id: convId },
       data: { updatedAt: new Date() },
     });
-    res.status(201).json(message);
+    res.status(201).json({ message });
   } catch (error) { logger.error({ err: error }, "Failed to send message"); res.status(500).json({ error: "Failed to send message" }); }
 });
 
@@ -95,6 +102,40 @@ router.post("/conversations", authenticate, async (req: AuthRequest, res: Respon
         listing: { select: { id: true, title: true } },
       },
     });
+
+    if (listingId) {
+      try {
+        const listing = await prisma.listing.findUnique({
+          where: { id: listingId },
+          select: { assignedAgentId: true, title: true },
+        });
+        if (listing) {
+          const sender = await prisma.user.findUnique({
+            where: { id: senderId },
+            select: { name: true, email: true },
+          });
+          const inquiry = await prisma.inquiry.create({
+            data: {
+              clientName: sender?.name || "Unknown",
+              clientContact: sender?.email || "",
+              message: content,
+              listingId,
+              assignedAgentId: listing.assignedAgentId,
+            },
+          });
+          if (listing.assignedAgentId) {
+            const agent = await prisma.user.findUnique({
+              where: { id: listing.assignedAgentId },
+              select: { name: true, email: true },
+            });
+            if (agent) {
+              emailService.inquiryNotification(agent.email, agent.name, sender?.name || "A user", listing.title, content).catch(() => {});
+            }
+          }
+        }
+      } catch (e) { logger.error({ err: e }, "Failed to create inquiry from message"); }
+    }
+
     res.status(201).json({ conversation });
   } catch (error) { logger.error({ err: error }, "Failed to create conversation"); res.status(500).json({ error: "Failed to create conversation" }); }
 });

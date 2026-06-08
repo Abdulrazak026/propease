@@ -44,9 +44,9 @@ export default function AboutPage() {
             <div className="absolute inset-0">
           {(() => {
             const heroImg = resolveImageUrl(get("about_hero_image"));
-            return heroImg ? <img src={heroImg} alt="" className="w-full h-full object-cover opacity-50" /> : <div className="w-full h-full bg-gray-900 opacity-50" />;
+            return heroImg ? <img src={heroImg} alt="" className="w-full h-full object-cover opacity-70 scale-110" /> : <div className="w-full h-full bg-gray-900 opacity-70" />;
           })()}
-          <div className="absolute inset-0 bg-gradient-to-b from-gray-950/30 via-gray-950/40 to-gray-950" />
+          <div className="absolute inset-0 bg-gradient-to-b from-gray-950/20 via-gray-950/30 to-gray-950" />
         </div>
         <div className="relative max-w-[1400px] mx-auto px-5 sm:px-6 lg:px-10 pt-20 sm:pt-28 lg:pt-32 pb-20 sm:pb-28">
           <div className="max-w-3xl">

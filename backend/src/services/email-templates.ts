@@ -11,8 +11,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .container{max-width:560px;margin:0 auto;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.06)}
 .hero{background:linear-gradient(135deg,${C} 0%,#0a5a3e 100%);padding:40px 40px 32px;text-align:center;position:relative}
 .hero::after{content:'';position:absolute;bottom:0;left:0;right:0;height:4px;background:linear-gradient(90deg,${C2},#fbbf24,${C2})}
-.hero img{width:56px;height:56px;border-radius:14px;margin-bottom:16px;box-shadow:0 4px 12px rgba(0,0,0,0.2)}
-.hero h1{color:#fff;font-size:20px;font-weight:700;margin:0 0 6px;letter-spacing:-0.3px}
+.hero h1{color:#fff;font-size:24px;font-weight:700;margin:0 0 6px;letter-spacing:-0.3px}
 .hero p{color:rgba(255,255,255,0.8);font-size:13px;margin:0}
 .content{padding:36px 40px}
 .content p{font-size:15px;line-height:1.7;margin:0 0 14px;color:#334155}
@@ -58,7 +57,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 </style></head><body style="padding:32px 16px">
 <div class="container">
 <div class="hero">
-<img src="${LOGO}" alt="${NAME}">
 <h1>${NAME}</h1>
 <p>Mutual Benefit Premier Properties</p>
 </div>
