@@ -15,6 +15,9 @@ export default function UsersPage() {
   const [createForm, setCreateForm] = useState({ name: "", email: "", password: "", role: "client" as string, city: "" });
   const [creating, setCreating] = useState(false);
   const [createError, setCreateError] = useState("");
+  const [messageUser, setMessageUser] = useState<ApiUser | null>(null);
+  const [messageText, setMessageText] = useState("");
+  const [sendingMessage, setSendingMessage] = useState(false);
 
   const fetchUsers = () => {
     api.get<{ users: ApiUser[] }>("/api/admin/users").then(r => { if (r.data?.users) setUsers(r.data.users); });
@@ -57,6 +60,17 @@ export default function UsersPage() {
       setCreateError("Email already exists");
     } else {
       setCreateError(error || "Failed to create user");
+    }
+  };
+
+  const sendMessage = async () => {
+    if (!messageText.trim() || !messageUser) return;
+    setSendingMessage(true);
+    const { status } = await api.post(`/api/admin/users/${messageUser.id}/message`, { message: messageText });
+    setSendingMessage(false);
+    if (status === 200) {
+      setMessageUser(null);
+      setMessageText("");
     }
   };
 
@@ -127,6 +141,7 @@ export default function UsersPage() {
                   <td className="px-4 py-3">
                     <div className="flex gap-1.5">
                       <Button size="sm" variant="ghost" onClick={() => setViewUser(u)}>View</Button>
+                      <Button size="sm" variant="ghost" onClick={() => setMessageUser(u)}>Message</Button>
                       {u.role!=="head"&&<Button size="sm" variant={u.isApproved?"outline":"primary"} onClick={()=>toggleApprove(u)} disabled={saving===u.id}>{u.isApproved?"Suspend":"Approve"}</Button>}
                     </div>
                   </td>
@@ -175,6 +190,32 @@ export default function UsersPage() {
         </div>
         <div className="mt-4 flex gap-2">{viewUser.role!=="head"&&<><Button variant="outline" size="sm" className="flex-1" onClick={()=>{toggleApprove(viewUser);setViewUser(null)}}>{viewUser.isApproved?"Suspend":"Approve"}</Button><Button variant="danger" size="sm" className="flex-1" disabled={deleting===viewUser.id} onClick={()=>deleteUser(viewUser)}>{deleting===viewUser.id?"Deleting...":"Delete"}</Button></>}</div>
       </div></div>}
+
+      {/* Message User Modal */}
+      {messageUser && (
+        <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4" onClick={() => setMessageUser(null)}>
+          <div className="bg-white rounded-xl p-6 max-w-md w-full shadow-2xl" onClick={e => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h3 className="text-lg font-bold text-gray-900">Send Message</h3>
+                <p className="text-xs text-gray-500">To: {messageUser.name} ({messageUser.email})</p>
+              </div>
+              <button onClick={() => setMessageUser(null)} className="text-gray-400 hover:text-gray-600"><svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12"/></svg></button>
+            </div>
+            <textarea
+              value={messageText}
+              onChange={e => setMessageText(e.target.value)}
+              placeholder="Type your message..."
+              rows={5}
+              className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm resize-none focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)]"
+            />
+            <p className="text-[10px] text-gray-400 mt-1 mb-3">User will receive this via email and in-app notification.</p>
+            <Button className="w-full" onClick={sendMessage} disabled={!messageText.trim() || sendingMessage}>
+              {sendingMessage ? "Sending..." : "Send Message"}
+            </Button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

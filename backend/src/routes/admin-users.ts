@@ -90,6 +90,36 @@ router.delete("/:id", authenticate, authorize("head"), requirePermission("canMan
   }
 });
 
+router.post("/:id/message", authenticate, authorize("head"), async (req: AuthRequest, res: Response) => {
+  try {
+    const { message } = req.body;
+    if (!message) return res.status(400).json({ error: "Message is required" });
+
+    const user = await prisma.user.findUnique({
+      where: { id: req.params.id as string },
+      select: { id: true, name: true, email: true },
+    });
+    if (!user) return res.status(404).json({ error: "User not found" });
+
+    await emailService.supportMessage(user.email, user.name, message);
+
+    await prisma.notification.create({
+      data: {
+        userId: user.id,
+        type: "message_received",
+        title: "Message from Support",
+        body: message.slice(0, 200),
+        link: "/messages",
+      },
+    });
+
+    res.json({ success: true, message: "Message sent" });
+  } catch (error) {
+    logger.error({ err: error }, "Send support message error:");
+    res.status(500).json({ error: "Failed to send message" });
+  }
+});
+
 export default router;
 
 

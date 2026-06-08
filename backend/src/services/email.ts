@@ -180,4 +180,7 @@ export const emailService = {
   async sendNewsletter(email: string, subject: string, html: string) {
     return send(email, subject, html);
   },
+  async supportMessage(email: string, name: string, message: string) {
+    return send(email, "Message from MBPP Support", defaultTemplates.supportMessage(name, message));
+  },
 };

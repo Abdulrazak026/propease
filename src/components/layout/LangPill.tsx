@@ -22,8 +22,8 @@ export default function LangPill() {
       </button>
       {open && (
         <>
-          <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
-          <div className="absolute right-0 mt-1.5 bg-white rounded-xl shadow-xl border border-gray-200 z-50 min-w-[120px] overflow-hidden">
+          <div className="fixed inset-0 z-[60]" onClick={() => setOpen(false)} />
+          <div className="absolute right-0 mt-1.5 bg-white rounded-xl shadow-xl border border-gray-200 z-[70] min-w-[120px] overflow-hidden">
             {ORDER.map(l => (
               <button
                 key={l}

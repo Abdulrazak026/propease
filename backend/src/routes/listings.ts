@@ -157,8 +157,19 @@ router.put("/:id", authenticate, authorize("head", "ambassador", "agent"), async
 
     const fresh = await prisma.listing.findUnique({
       where: { id: listingId },
-      include: { photos: true, postedBy: { select: { id: true, name: true } } },
+      include: { photos: true, postedBy: { select: { id: true, name: true, email: true } } },
     });
+
+    // Send price drop alert if price decreased
+    if (fresh && listing.price && fresh.price < listing.price) {
+      emailService.priceDropAlert(
+        fresh.postedBy?.email || "",
+        fresh.postedBy?.name || "",
+        fresh.title,
+        listing.price,
+        fresh.price
+      ).catch(() => {});
+    }
 
     invalidate("listings:*");
     invalidate("dashboard:stats");
@@ -225,6 +236,8 @@ router.post("/:id/approve", authenticate, authorize("head", "ambassador"), async
     invalidate("listings:*");
     invalidate("dashboard:stats");
     res.json({ listing: { ...listing, status: "approved" }, message: "Listing approved and published" });
+    const owner = await prisma.user.findUnique({ where: { id: listing.postedById }, select: { email: true, name: true } });
+    emailService.listingPublished(owner?.email || "", owner?.name || "", listing.title, listing.id).catch(() => {});
   } catch (error) {
     logger.error({ err: error }, "Failed to approve listing");
     res.status(500).json({ error: "Failed to approve listing" });

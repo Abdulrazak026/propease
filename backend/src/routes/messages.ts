@@ -61,6 +61,18 @@ router.post("/conversations/:id/messages", authenticate, async (req: AuthRequest
       data: { updatedAt: new Date() },
     });
     res.status(201).json({ message });
+
+    // Notify recipient about new message
+    const conversation = await prisma.conversation.findUnique({
+      where: { id: convId },
+      include: { participants: { include: { user: { select: { id: true, name: true, email: true } } } } },
+    });
+    if (conversation) {
+      const recipient = conversation.participants.find(p => p.userId !== senderId);
+      if (recipient) {
+        emailService.newMessage(recipient.user.email, recipient.user.name, message.sender?.name || "Someone").catch(() => {});
+      }
+    }
   } catch (error) { logger.error({ err: error }, "Failed to send message"); res.status(500).json({ error: "Failed to send message" }); }
 });
 

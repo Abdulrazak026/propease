@@ -95,6 +95,7 @@ router.post("/webhook", async (req, res: Response) => {
         });
         const user = await prisma.user.findUnique({ where: { id: userId }, select: { email: true, name: true } });
         emailService.walletFunded(user?.email || "", user?.name || "", amount / 100, reference).catch(() => {});
+        emailService.paymentReceipt(user?.email || "", user?.name || "", amount / 100, reference, "Wallet Top-up").catch(() => {});
       }
     }
 

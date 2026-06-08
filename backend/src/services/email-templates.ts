@@ -774,12 +774,25 @@ export const templates = {
        `New custom order: ${propertyType} in ${area}, budget ₦${budget.toLocaleString()}`
      );
    },
-   newsletter(body: string) {
-     return base(
-       "Newsletter from MBPP 📰",
-       body,
-       undefined,
-       "You have a new newsletter from MBPP Properties."
-     );
-   },
+    newsletter(body: string) {
+      return base(
+        "Newsletter from MBPP 📰",
+        body,
+        undefined,
+        "You have a new newsletter from MBPP Properties."
+      );
+    },
+    supportMessage(name: string, message: string) {
+      return base(
+        "Message from MBPP Support",
+        `<p>Hello <strong>${name}</strong>,</p>
+         <p>You have a new message from the MBPP support team:</p>
+         <div style="background:#f8fafc;border-left:4px solid #0d6e4e;padding:16px 20px;border-radius:0 12px 12px 0;margin:20px 0">
+           <p style="white-space:pre-wrap;margin:0;font-size:14px;line-height:1.7;color:#334155">${message}</p>
+         </div>
+         <p>If you have any questions, feel free to reply to this email or contact us through your dashboard.</p>`,
+        ["Go to Dashboard", `${URL}/login`],
+        `You have a new message from MBPP support.`
+      );
+    },
 };

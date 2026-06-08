@@ -52,6 +52,7 @@ router.post("/", authenticate, authorize("head", "ambassador", "agent"), require
     });
 
     res.status(201).json({ agreement });
+    emailService.agreementReady(tenantEmail, tenantName, propertyTitle).catch(() => {});
   } catch (error) {
     logger.error({ err: error }, "Create agreement error:");
     res.status(500).json({ error: "Failed to create agreement" });
@@ -192,6 +193,12 @@ router.post("/:id/sign", authenticate, async (req: AuthRequest, res: Response) =
             link: `/agreements/${agId}`,
           },
         });
+      }
+
+      emailService.agreementSigned(agreement.tenantEmail || "", agreement.tenantName, agreement.propertyTitle).catch(() => {});
+      if (agreement.agentId) {
+        const agent = await prisma.user.findUnique({ where: { id: agreement.agentId }, select: { email: true, name: true } });
+        emailService.agreementSigned(agent?.email || "", agent?.name || "", agreement.propertyTitle).catch(() => {});
       }
 
       // Trigger commission distribution on agreement completion
