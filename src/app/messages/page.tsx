@@ -220,7 +220,7 @@ function MessagesPage() {
         ) : (
           <div className="divide-y divide-gray-50">
             {filtered.map((conv) => {
-              const name = conv.participants[0]?.user.name || "Unknown";
+              const name = conv?.participants?.[0]?.user?.name || "Unknown";
               return (
                 <button
                   key={conv.id}
@@ -266,7 +266,7 @@ function ConversationDetail({ conversation, onBack }: { conversation: Conversati
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
-  const name = conversation.participants[0]?.user.name || "Unknown";
+  const name = conversation?.participants?.[0]?.user?.name || "Unknown";
 
   useEffect(() => {
     setLoading(true);
@@ -294,11 +294,13 @@ function ConversationDetail({ conversation, onBack }: { conversation: Conversati
     try {
       const r = await api.post(`/api/messages/conversations/${conversation.id}`, { content: txt });
       if (r.data) {
-        const newMsg = (r.data as any).message || { id: crypto.randomUUID(), content: txt, senderId: "me", createdAt: new Date().toISOString() };
+        const newMsg = (r.data as any)?.message || { id: crypto.randomUUID(), content: txt, senderId: "me", createdAt: new Date().toISOString() };
         setMessages(prev => [...prev, newMsg]);
+        setInput("");
       }
-    } catch {}
-    setInput("");
+    } catch (err) {
+      console.error("Failed to send message:", err);
+    }
     setSending(false);
   };
 

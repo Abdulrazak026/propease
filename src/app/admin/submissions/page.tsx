@@ -58,10 +58,14 @@ export default function SubmissionsPage() {
   const sendReply = async (contact: ContactSub) => {
     if (!replyText.trim()) return;
     setSendingReply(true);
-    await api.post("/api/contact/reply", { contactId: contact.id, email: contact.email, name: contact.name, message: replyText });
+    try {
+      const { status } = await api.post("/api/contact/reply", { contactId: contact.id, email: contact.email, name: contact.name, message: replyText });
+      if (status === 200 || status === 201) {
+        setReplyText("");
+        setSelectedContact(null);
+      }
+    } catch {}
     setSendingReply(false);
-    setReplyText("");
-    setSelectedContact(null);
   };
 
   const unreadCount = contacts.filter(c => !c.read).length;
