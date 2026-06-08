@@ -61,9 +61,12 @@ router.get("/", authenticate, authorize("head", "ambassador", "agent"), async (r
 
     if (status) where.status = status;
 
-    // Agents only see their own applications
+    // Agents see their own + unassigned applications
     if (req.user!.role === "agent") {
-      where.assignedAgentId = req.user!.id;
+      where.OR = [
+        { assignedAgentId: req.user!.id },
+        { assignedAgentId: null },
+      ];
     }
 
     const applications = await prisma.tenantApplication.findMany({
