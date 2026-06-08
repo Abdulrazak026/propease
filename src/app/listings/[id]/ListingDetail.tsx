@@ -231,7 +231,6 @@ export default function ListingDetail() {
                       return;
                     }
                     let agentId = listing.assignedAgent?.id || listing.postedBy?.id;
-                    // If no agent/poster found, try to find an admin to message
                     if (!agentId) {
                       try {
                         const adminRes = await api.get<{ users: any[] }>("/api/admin/users");
@@ -246,9 +245,9 @@ export default function ListingDetail() {
                         listingId: listing.id,
                         content: `Hi! I'm interested in "${listing.title}" (${formatNaira(listing.price)}). Is it still available?`,
                       });
-                      const convId = (r.data as any)?.conversation?.id || (r.data as any)?.id;
-                      if (convId) {
-                        router.push(`/messages?id=${convId}`);
+                      if (r.status === 201 || r.status === 200) {
+                        // Redirect to inbox - the conversation will appear there
+                        router.push("/messages");
                       }
                     } catch (err) {
                       console.error("Failed to create conversation:", err);

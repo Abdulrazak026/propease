@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useRole } from "@/context/RoleContext";
 import { api } from "@/lib/api-client";
 
@@ -86,7 +86,8 @@ const MORE_TABS = [
 
 export default function BottomNav() {
   const pathname = usePathname();
-  const { isAuthenticated, currentUser, role, loading } = useRole();
+  const router = useRouter();
+  const { isAuthenticated, currentUser, role, loading, logout } = useRole();
   const [sheetOpen, setSheetOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
 
@@ -179,6 +180,23 @@ export default function BottomNav() {
                   );
                 })}
               </div>
+              {isAuthenticated && (
+                <button
+                  onClick={async () => {
+                    setSheetOpen(false);
+                    await logout();
+                    window.location.href = "/";
+                  }}
+                  className="flex items-center gap-3.5 p-3 rounded-lg w-full text-left hover:bg-red-50 transition-colors mt-2 border-t border-gray-100 pt-4"
+                >
+                  <span className="shrink-0 text-red-500">
+                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75" /></svg>
+                  </span>
+                  <div className="min-w-0">
+                    <p className="text-sm font-medium text-red-600">Sign Out</p>
+                  </div>
+                </button>
+              )}
             </div>
           </div>
         </>

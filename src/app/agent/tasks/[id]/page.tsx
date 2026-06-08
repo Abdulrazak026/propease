@@ -18,12 +18,21 @@ export default function AgentTaskDetail() {
   const [commentText, setCommentText] = useState("");
   const [sendingComment, setSendingComment] = useState(false);
   const commentRef = useRef<HTMLInputElement>(null);
+  const [showSubmit, setShowSubmit] = useState(false);
+  const [submitDesc, setSubmitDesc] = useState("");
+  const [submitPhotos, setSubmitPhotos] = useState<string[]>([]);
+  const [submitting, setSubmitting] = useState(false);
+  const [submissions, setSubmissions] = useState<any[]>([]);
 
   useEffect(() => {
     api.get<any>(`/api/tasks/${id}`).then(r => {
       if (r.data) setTask((r.data as any).task || r.data);
       setLoading(false);
     }).catch(() => setLoading(false));
+    // Load submissions
+    api.get<any>(`/api/tasks/${id}/submissions`).then(r => {
+      if ((r.data as any)?.submissions) setSubmissions((r.data as any).submissions);
+    }).catch(() => {});
   }, [id]);
 
   const updateStatus = async (status: string) => {
@@ -47,6 +56,25 @@ export default function AgentTaskDetail() {
       commentRef.current?.focus();
     } catch {}
     setSendingComment(false);
+  };
+
+  const submitTask = async () => {
+    if (!submitDesc.trim()) return;
+    setSubmitting(true);
+    try {
+      const r = await api.post(`/api/tasks/${id}/submit`, {
+        description: submitDesc,
+        photos: submitPhotos,
+      });
+      if ((r.data as any)?.submission) {
+        setSubmissions(prev => [(r.data as any).submission, ...prev]);
+        setTask((prev: any) => ({ ...prev, status: "submitted" }));
+        setShowSubmit(false);
+        setSubmitDesc("");
+        setSubmitPhotos([]);
+      }
+    } catch {}
+    setSubmitting(false);
   };
 
   if (loading) return <div className="flex items-center justify-center h-64"><div className="h-8 w-8 border-2 border-[var(--color-primary)] border-t-transparent rounded-full animate-spin" /></div>;
@@ -75,10 +103,72 @@ export default function AgentTaskDetail() {
 
         {perms.canCreateTasks && <div className="mt-6 flex flex-wrap gap-2">
           <Button size="sm" variant="secondary" disabled={updating !== "" || task.status === "in_progress"} onClick={() => updateStatus("in_progress")}>{updating === "in_progress" ? "..." : task.status === "in_progress" ? "In Progress" : "Start Task"}</Button>
-          <Button size="sm" variant="outline" disabled={updating !== "" || task.status === "fulfilled"} onClick={() => updateStatus("fulfilled")}>{updating === "fulfilled" ? "..." : "Mark Fulfilled"}</Button>
+          {!showSubmit && task.status !== "submitted" && task.status !== "fulfilled" && task.status !== "closed" && (
+            <Button size="sm" variant="primary" onClick={() => setShowSubmit(true)}>Submit Task</Button>
+          )}
           <Button size="sm" variant="outline" disabled={updating !== "" || task.status === "closed"} onClick={() => updateStatus("closed")}>{updating === "closed" ? "..." : "Close Task"}</Button>
         </div>}
+
+        {/* Task Submission Form */}
+        {showSubmit && (
+          <div className="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+            <h3 className="text-sm font-semibold text-gray-900 mb-3">Submit Task Completion</h3>
+            <div className="space-y-3">
+              <div>
+                <label className="block text-xs font-medium text-gray-600 mb-1">Description *</label>
+                <textarea
+                  value={submitDesc}
+                  onChange={e => setSubmitDesc(e.target.value)}
+                  placeholder="Describe what was done..."
+                  rows={3}
+                  className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm resize-none focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)]"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-600 mb-1">Photos (URLs, one per line)</label>
+                <textarea
+                  value={submitPhotos.join("\n")}
+                  onChange={e => setSubmitPhotos(e.target.value.split("\n").filter(Boolean))}
+                  placeholder="https://example.com/photo1.jpg&#10;https://example.com/photo2.jpg"
+                  rows={2}
+                  className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm font-mono resize-none focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)]"
+                />
+              </div>
+              <div className="flex gap-2">
+                <Button size="sm" variant="outline" onClick={() => setShowSubmit(false)}>Cancel</Button>
+                <Button size="sm" onClick={submitTask} disabled={!submitDesc.trim() || submitting}>{submitting ? "Submitting..." : "Submit"}</Button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
+
+      {/* Submissions */}
+      {submissions.length > 0 && (
+        <div className="bg-white rounded-lg border border-gray-100 p-6">
+          <h2 className="font-semibold text-gray-900 text-sm mb-4">Submissions ({submissions.length})</h2>
+          <div className="space-y-4">
+            {submissions.map((s: any) => (
+              <div key={s.id} className="border border-gray-200 rounded-lg p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs font-medium text-gray-900">{s.submittedBy?.name || "You"}</span>
+                  <Badge variant={s.status === "approved" ? "success" : s.status === "rejected" ? "danger" : "warning"}>{s.status}</Badge>
+                </div>
+                <p className="text-sm text-gray-700 mb-2">{s.description}</p>
+                {s.photos?.length > 0 && (
+                  <div className="flex gap-2 overflow-x-auto">
+                    {s.photos.map((p: string, i: number) => (
+                      <img key={i} src={p} alt="" className="w-20 h-20 object-cover rounded-lg border border-gray-200" />
+                    ))}
+                  </div>
+                )}
+                {s.adminNotes && <p className="text-xs text-gray-500 mt-2">Admin: {s.adminNotes}</p>}
+                <p className="text-[10px] text-gray-400 mt-2">{formatDate(s.createdAt)}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className="bg-white rounded-lg border border-gray-100 p-6">
         <h2 className="font-semibold text-gray-900 text-sm mb-4">Comments ({task.comments?.length || 0})</h2>

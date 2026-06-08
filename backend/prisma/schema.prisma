@@ -51,6 +51,7 @@ enum PropertyType {
 enum TaskStatus {
   open
   in_progress
+  submitted
   fulfilled
   closed
 }
@@ -146,6 +147,7 @@ model User {
   reservations  Reservation[]
   withdrawals   Withdrawal[]
   comments      TaskComment[]
+  taskSubmissions TaskSubmission[]
   auditLogs     AuditLog[]
   tokens        RefreshToken[]
   passwordResetTokens PasswordResetToken[]
@@ -283,6 +285,7 @@ model Task {
   submittedListingId String?
 
   comments   TaskComment[]
+  submissions TaskSubmission[]
   customOrder CustomOrder?
 
   @@index([status])
@@ -302,6 +305,25 @@ model TaskComment {
   task   Task   @relation(fields: [taskId], references: [id], onDelete: Cascade)
 
   @@index([taskId])
+}
+
+model TaskSubmission {
+  id          String   @id @default(uuid())
+  description String
+  photos      String[]
+  status      String   @default("pending")
+  adminNotes  String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  taskId   String
+  task     Task   @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  submittedById String
+  submittedBy   User   @relation(fields: [submittedById], references: [id])
+
+  @@index([taskId])
+  @@index([submittedById])
 }
 
 model CommissionRate {
@@ -616,6 +638,7 @@ enum NotificationType {
   application_status
   message_received
   price_change
+  task_status
 }
 
 model Conversation {
