@@ -27,6 +27,7 @@ export const dashboardNav: Record<string, NavItem[]> = {
     { label: "Careers", href: "/admin/careers", icon: "agreements", group: "Operations" },
     { label: "CRM Settings", href: "/admin/crm", icon: "settings", group: "Config" },
     { label: "Settings", href: "/admin/settings", icon: "settings", group: "Config" },
+    { label: "Profile", href: "/profile", icon: "users", group: "Config" },
   ],
   agent: [
     { label: "Dashboard", href: "/agent", icon: "dashboard" },
@@ -37,6 +38,7 @@ export const dashboardNav: Record<string, NavItem[]> = {
     { label: "Agreements", href: "/agent/agreements", icon: "agreements", permission: "canManageAgreements" },
     { label: "Commissions", href: "/agent/commissions", icon: "commissions" },
     { label: "Wallet", href: "/wallet", icon: "wallet" },
+    { label: "Profile", href: "/profile", icon: "users" },
   ],
   ambassador: [
     { label: "City Overview", href: "/ambassador", icon: "city-overview" },
@@ -46,5 +48,6 @@ export const dashboardNav: Record<string, NavItem[]> = {
     { label: "Commissions", href: "/ambassador/commissions", icon: "commissions" },
     { label: "Wallet", href: "/wallet", icon: "wallet" },
     { label: "Settings", href: "/ambassador/settings", icon: "settings" },
+    { label: "Profile", href: "/profile", icon: "users" },
   ],
 };

@@ -268,7 +268,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
             {/* Footer */}
             <div className="border-t border-gray-100 px-4 py-3 flex gap-2">
-              <button onClick={async () => { await logout(); setMobileOpen(false); router.push("/"); }} className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-red-50 text-red-600 text-sm font-medium hover:bg-red-100 transition-colors">
+              <button onClick={async () => { await logout(); setMobileOpen(false); window.location.href = "/"; }} className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-red-50 text-red-600 text-sm font-medium hover:bg-red-100 transition-colors">
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75" /></svg>
                 Sign Out
               </button>
@@ -300,7 +300,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </div>
         <nav className="flex-1 p-2 space-y-0.5 overflow-y-auto"><DesktopNavItems /></nav>
         <div className="p-2 border-t border-slate-700 space-y-0.5">
-          <button onClick={async () => { await logout(); router.push("/"); }} className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs text-red-400 hover:bg-red-900/30 hover:text-red-300 transition-all w-full text-left">
+          <button onClick={async () => { await logout(); window.location.href = "/"; }} className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs text-red-400 hover:bg-red-900/30 hover:text-red-300 transition-all w-full text-left">
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75" /></svg>
             Sign Out
           </button>

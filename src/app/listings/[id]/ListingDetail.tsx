@@ -236,7 +236,7 @@ export default function ListingDetail() {
                   const waRaw = listing.assignedAgent?.whatsapp || getSetting("support_whatsapp");
                   if (!waRaw) return null;
                   const clean = waRaw.replace(/[^0-9]/g, "");
-                  const msg = encodeURIComponent(`Hi! I'm interested in "${listing.title}" (${formatNaira(listing.price)}) on MBPP.`);
+                  const msg = encodeURIComponent(`Hi! I'm interested in "${listing.title}" (${formatNaira(listing.price)}) on MBPP.\n\nhttps://mbpproperties.com/listings/${listing.id}`);
                   return (
                     <a
                       href={`https://wa.me/${clean}?text=${msg}`}

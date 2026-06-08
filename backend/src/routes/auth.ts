@@ -278,6 +278,35 @@ router.post("/logout", authenticate, async (req: AuthRequest, res: Response) => 
   }
 });
 
+router.put("/profile", authenticate, async (req: AuthRequest, res: Response) => {
+  try {
+    const { name, currentPassword, newPassword } = req.body;
+    const user = await prisma.user.findUnique({ where: { id: req.user!.id } });
+    if (!user) return res.status(404).json({ error: "User not found" });
+
+    const updateData: any = {};
+    if (name && name !== user.name) updateData.name = name;
+    if (newPassword) {
+      if (!currentPassword) return res.status(400).json({ error: "Current password required" });
+      const valid = await bcrypt.compare(currentPassword, user.password);
+      if (!valid) return res.status(400).json({ error: "Current password is incorrect" });
+      if (newPassword.length < 8) return res.status(400).json({ error: "New password must be at least 8 characters" });
+      updateData.password = await bcrypt.hash(newPassword, 12);
+    }
+    if (Object.keys(updateData).length === 0) return res.status(400).json({ error: "Nothing to update" });
+
+    const updated = await prisma.user.update({
+      where: { id: req.user!.id },
+      data: updateData,
+      select: { id: true, name: true, email: true, role: true },
+    });
+    res.json({ user: updated, message: "Profile updated" });
+  } catch (error) {
+    logger.error({ err: error }, "Profile update error:");
+    res.status(500).json({ error: "Failed to update profile" });
+  }
+});
+
 router.get("/me", authenticate, async (req: AuthRequest, res: Response) => {
   try {
     const user = await prisma.user.findUnique({

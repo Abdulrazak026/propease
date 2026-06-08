@@ -71,12 +71,13 @@ export default function SoldPropertiesGallery() {
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {items.slice(0, 6).map((p, i) => (
-            <div key={p.id} className="bg-white rounded-2xl border border-gray-100 overflow-hidden hover:shadow-lg transition-shadow group">
+            <div key={p.id} className="bg-white rounded-2xl border border-gray-100 overflow-hidden hover:shadow-lg transition-shadow group relative">
               <div className="relative h-44 bg-gray-100 overflow-hidden">
-                <img src={p.coverPhoto || FALLBACK_PHOTOS[i % FALLBACK_PHOTOS.length]} alt={p.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" />
-                <span className="absolute top-3 left-3 inline-flex items-center gap-1.5 bg-gray-950/90 text-white text-[10px] font-semibold px-2.5 py-1 rounded-full">
+                <img src={p.coverPhoto || FALLBACK_PHOTOS[i % FALLBACK_PHOTOS.length]} alt={p.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 grayscale-[30%]" loading="lazy" />
+                <div className="absolute inset-0 bg-gradient-to-t from-red-900/40 via-transparent to-transparent" />
+                <span className="absolute top-3 left-3 inline-flex items-center gap-1.5 bg-red-600 text-white text-[10px] font-bold px-2.5 py-1 rounded-full shadow-lg">
                   <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
-                  Sold
+                  SOLD
                 </span>
                 <span className="absolute top-3 right-3 bg-white/95 text-gray-900 text-[10px] font-medium px-2 py-1 rounded-full">
                   {timeAgo(p.soldAt)}
