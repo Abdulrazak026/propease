@@ -1,6 +1,7 @@
 import { Router, Response } from "express";
 import { emailService } from "../services/email";
 import { logger } from "../lib/logger";
+import prisma from "../lib/prisma";
 
 const router = Router();
 
@@ -11,7 +12,10 @@ router.post("/", async (req, res: Response) => {
       return res.status(400).json({ error: "Name, email, and message are required" });
     }
 
-    // Send to support email via Resend
+    await prisma.contactSubmission.create({
+      data: { name, email, phone: phone || null, subject: subject || "General Inquiry", message },
+    });
+
     await emailService.contactFormSubmission({
       name, email, phone: phone || "", subject: subject || "General Inquiry", message,
     });
