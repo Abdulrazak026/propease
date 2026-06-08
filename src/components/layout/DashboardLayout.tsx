@@ -229,8 +229,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         <button onClick={() => setMobileOpen(true)} className="text-gray-600 p-1">
           <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" /></svg>
         </button>
-        <Link href="/" className="flex-1 flex items-center justify-center px-2">
-          {logo && <img src={logo} alt={getSetting("site_name", "MBPP")} className="h-14 w-auto max-w-full object-contain" />}
+        <Link href="/" className="flex-1 flex items-center justify-center px-1">
+          {logo && <img src={logo} alt={getSetting("site_name", "MBPP")} className="h-full w-auto max-w-full object-contain" />}
         </Link>
         <div className="flex items-center gap-1" ref={notifRef}>
           <button onClick={() => setNotifOpen(!notifOpen)} className="relative text-gray-500 hover:text-gray-700 p-2">
@@ -316,7 +316,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           <div className="hidden md:flex items-center justify-between px-6 py-2 border-b border-gray-200/60 bg-white/70 backdrop-blur-xl sticky top-0 z-30">
             <div className="flex items-center gap-3">
               <Link href="/" className="shrink-0">
-                {logo && <img src={logo} alt={getSetting("site_name", "MBPP")} className="h-10 w-auto max-w-[200px] object-contain" />}
+                {logo && <img src={logo} alt={getSetting("site_name", "MBPP")} className="h-10 w-auto max-w-[300px] object-contain" />}
               </Link>
               <div className="w-px h-6 bg-gray-200" />
               <div className="flex items-center gap-2">

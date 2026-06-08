@@ -76,9 +76,9 @@ export default function Navbar() {
         scrolled ? "border-gray-200" : "border-transparent"
       } ${hidden ? "-translate-y-full" : "translate-y-0"}`}
     >
-      <Link href="/" className="flex-1 flex items-center justify-center px-2">
+      <Link href="/" className="flex-1 flex items-center justify-center px-1">
         {siteLogo ? (
-          <img src={siteLogo} alt={siteName} className="h-14 w-auto max-w-full object-contain" />
+          <img src={siteLogo} alt={siteName} className="h-full w-auto max-w-full object-contain" />
         ) : (
           <div className="flex items-center gap-2">
             <div className="w-10 h-10 rounded-lg bg-[var(--color-primary)] flex items-center justify-center shrink-0">
