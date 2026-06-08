@@ -230,7 +230,15 @@ export default function ListingDetail() {
                       router.push(`/login?redirect=${encodeURIComponent(window.location.pathname)}`);
                       return;
                     }
-                    const agentId = listing.assignedAgent?.id || listing.postedBy?.id;
+                    let agentId = listing.assignedAgent?.id || listing.postedBy?.id;
+                    // If no agent/poster found, try to find an admin to message
+                    if (!agentId) {
+                      try {
+                        const adminRes = await api.get<{ users: any[] }>("/api/admin/users");
+                        const admin = (adminRes.data as any)?.users?.find((u: any) => u.role === "head");
+                        if (admin) agentId = admin.id;
+                      } catch {}
+                    }
                     if (!agentId) return;
                     try {
                       const r = await api.post("/api/messages/conversations", {
@@ -238,10 +246,9 @@ export default function ListingDetail() {
                         listingId: listing.id,
                         content: `Hi! I'm interested in "${listing.title}" (${formatNaira(listing.price)}). Is it still available?`,
                       });
-                      if ((r.data as any)?.conversation?.id) {
-                        router.push(`/messages?id=${(r.data as any).conversation.id}`);
-                      } else if ((r.data as any)?.id) {
-                        router.push(`/messages?id=${(r.data as any).id}`);
+                      const convId = (r.data as any)?.conversation?.id || (r.data as any)?.id;
+                      if (convId) {
+                        router.push(`/messages?id=${convId}`);
                       }
                     } catch (err) {
                       console.error("Failed to create conversation:", err);

@@ -63,8 +63,11 @@ export default function BottomSheet({ open, onClose, children, title }: BottomSh
           <div className="w-10 h-1.5 bg-gray-300 rounded-full" />
         </div>
         {title && (
-          <div className="px-5 pb-3 shrink-0">
+          <div className="px-5 pb-3 shrink-0 flex items-center justify-between">
             <h3 className="text-sm font-semibold text-gray-900">{title}</h3>
+            <button onClick={onClose} className="p-1.5 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100">
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
           </div>
         )}
         <div className="overflow-y-auto px-5 pb-8 flex-1">{children}</div>

@@ -230,7 +230,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" /></svg>
         </button>
         <Link href="/" className="flex-1 h-full flex items-center justify-center overflow-hidden">
-          {logo && <img src={logo} alt={getSetting("site_name", "MBPP")} width="900" height="229" style={{ height: "90%", width: "auto", minWidth: "60%", objectFit: "contain" }} />}
+          {logo && <img src={logo} alt={getSetting("site_name", "MBPP")} width="900" height="229" style={{ height: "100%", width: "auto", objectFit: "contain" }} />}
         </Link>
         <div className="flex items-center shrink-0" ref={notifRef}>
           <button onClick={() => setNotifOpen(!notifOpen)} className="relative text-gray-500 hover:text-gray-700 p-2">
