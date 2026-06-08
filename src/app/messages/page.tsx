@@ -74,7 +74,7 @@ function MessagesPage() {
       }).catch(() => setLoading(false));
     };
     fetch();
-    const interval = setInterval(fetch, 15000);
+    const interval = setInterval(fetch, 10000);
     return () => clearInterval(interval);
   }, []);
 
@@ -96,7 +96,13 @@ function MessagesPage() {
       });
       if ((r.data as any)?.conversation) {
         const conv = (r.data as any).conversation;
-        setConversations(prev => [conv, ...prev]);
+        const formattedConv = {
+          ...conv,
+          lastMessage: newMessage.trim(),
+          lastMessageAt: new Date().toISOString(),
+          unread: 0,
+        };
+        setConversations(prev => [formattedConv, ...prev]);
         setSelectedId(conv.id);
         setNewConvo(null);
         setNewMessage("");
