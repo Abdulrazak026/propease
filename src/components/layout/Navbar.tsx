@@ -72,19 +72,19 @@ export default function Navbar() {
   return (
     <>
     <header
-      className={`lg:hidden sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b h-12 flex items-center pl-4 pr-5 sm:pl-5 sm:pr-6 max-w-[100vw] overflow-hidden rounded-b-2xl transition-transform duration-300 ${
+      className={`lg:hidden sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b h-14 flex items-center pl-4 pr-5 sm:pl-5 sm:pr-6 max-w-[100vw] overflow-hidden rounded-b-2xl transition-transform duration-300 ${
         scrolled ? "border-gray-200" : "border-transparent"
       } ${hidden ? "-translate-y-full" : "translate-y-0"}`}
     >
       <Link href="/" className="flex items-center gap-2 shrink-0 min-w-0">
         {siteLogo ? (
-          <img src={siteLogo} alt={siteName} className="h-6 w-auto rounded-lg object-contain" />
+          <img src={siteLogo} alt={siteName} className="h-10 w-auto rounded-lg object-contain" />
         ) : (
           <>
-            <div className="w-6 h-6 rounded-md bg-[var(--color-primary)] flex items-center justify-center shrink-0">
-              <span className="text-white font-black text-[9px]">M</span>
+            <div className="w-10 h-10 rounded-lg bg-[var(--color-primary)] flex items-center justify-center shrink-0">
+              <span className="text-white font-black text-base">M</span>
             </div>
-            <span className="text-sm font-bold text-gray-900 tracking-tight">MBPP</span>
+            <span className="text-base font-bold text-gray-900 tracking-tight">MBPP</span>
           </>
         )}
       </Link>
@@ -114,11 +114,11 @@ export default function Navbar() {
       <div className="w-full max-w-[1400px] mx-auto px-6 xl:px-10 flex items-center gap-8">
         <Link href="/" className="flex items-center gap-2.5 shrink-0">
           {siteLogo ? (
-            <img src={siteLogo} alt={siteName} className="h-8 w-auto rounded-lg object-contain" />
+            <img src={siteLogo} alt={siteName} className="h-10 w-auto rounded-lg object-contain" />
           ) : (
             <>
-              <div className="w-8 h-8 rounded-lg bg-[var(--color-primary)] flex items-center justify-center">
-                <span className="text-white font-black text-xs">M</span>
+              <div className="w-10 h-10 rounded-lg bg-[var(--color-primary)] flex items-center justify-center">
+                <span className="text-white font-black text-base">M</span>
               </div>
               <span className="text-base font-bold text-gray-900 tracking-tight">{siteName}</span>
             </>

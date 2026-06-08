@@ -64,11 +64,11 @@ export default function Footer() {
           <div className="lg:col-span-4 space-y-5">
             <Link href="/" className="inline-flex items-center gap-2.5">
               {logo ? (
-                <img src={logo} alt={brand} className="h-8 w-auto brightness-0 invert" />
+                <img src={logo} alt={brand} className="h-10 w-auto brightness-0 invert" />
               ) : (
                 <>
-                  <div className="w-9 h-9 rounded-lg bg-white flex items-center justify-center">
-                    <span className="text-gray-950 font-black text-sm">M</span>
+                  <div className="w-10 h-10 rounded-lg bg-white flex items-center justify-center">
+                    <span className="text-gray-950 font-black text-base">M</span>
                   </div>
                   <span className="text-base font-bold text-white tracking-tight">MBPP</span>
                 </>

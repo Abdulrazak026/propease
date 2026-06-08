@@ -154,22 +154,22 @@ export default function Sidebar() {
         } shrink-0`}
       >
         {/* Logo */}
-        <div className={`flex items-center border-b border-gray-200 ${collapsed ? "justify-center h-12" : "px-3 h-12"}`}>
+        <div className={`flex items-center border-b border-gray-200 ${collapsed ? "justify-center h-14" : "px-3 h-14"}`}>
           {collapsed ? (
             <Link href="/" className="shrink-0 hover:opacity-90 transition-opacity">
-              {siteLogo ? <img src={siteLogo} alt={siteName} className="w-7 h-7 rounded-lg object-contain" /> : (
-                <div className="w-7 h-7 bg-[var(--color-primary)] rounded-lg flex items-center justify-center">
-                  <span className="text-white font-bold text-[10px]">M</span>
+              {siteLogo ? <img src={siteLogo} alt={siteName} className="w-9 h-9 rounded-lg object-contain" /> : (
+                <div className="w-9 h-9 bg-[var(--color-primary)] rounded-lg flex items-center justify-center">
+                  <span className="text-white font-bold text-xs">M</span>
                 </div>
               )}
             </Link>
           ) : (
             <Link href="/" className="flex items-center gap-2 group">
               {siteLogo ? (
-                <img src={siteLogo} alt={siteName} className="h-7 w-auto rounded-lg object-contain" />
+                <img src={siteLogo} alt={siteName} className="h-9 w-auto rounded-lg object-contain" />
               ) : (
-                <div className="w-7 h-7 bg-[var(--color-primary)] rounded-lg flex items-center justify-center shrink-0 group-hover:shadow-md transition-shadow">
-                  <span className="text-white font-bold text-[10px]">M</span>
+                <div className="w-9 h-9 bg-[var(--color-primary)] rounded-lg flex items-center justify-center shrink-0 group-hover:shadow-md transition-shadow">
+                  <span className="text-white font-bold text-xs">M</span>
                 </div>
               )}
               {!siteLogo && <span className="text-sm font-bold text-[var(--color-primary)]">MBPP</span>}

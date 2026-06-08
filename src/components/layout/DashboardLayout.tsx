@@ -230,7 +230,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" /></svg>
         </button>
         <div className="flex items-center gap-2">
-          {logo && <img src={logo} alt="" className="h-6 w-auto rounded" />}
+          {logo && <img src={logo} alt={getSetting("site_name", "MBPP")} className="h-10 w-auto rounded-lg object-contain" />}
           <span className="text-sm font-bold text-gray-900">{getSetting("site_name", "MBPP")}</span>
         </div>
         <div className="flex items-center gap-1" ref={notifRef}>
@@ -289,7 +289,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       <aside className="w-56 bg-gradient-to-b from-slate-900 via-slate-900 to-slate-950 backdrop-blur-xl hidden md:flex md:flex-col shrink-0 border-r border-slate-800/50">
         {logo && (
           <div className="p-4 border-b border-slate-800/50">
-            <Link href="/" className="flex items-center justify-center"><img src={logo} alt="" className="h-7 w-auto rounded" /></Link>
+            <Link href="/" className="flex items-center justify-center"><img src={logo} alt={getSetting("site_name", "MBPP")} className="h-10 w-auto rounded-lg object-contain" /></Link>
           </div>
         )}
         <div className="p-4 border-b border-slate-800/50">
