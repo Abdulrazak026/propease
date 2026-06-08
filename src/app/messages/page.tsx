@@ -117,7 +117,7 @@ function MessagesPage() {
   // Show conversation detail full-screen
   if (selectedId && selected) {
     return (
-      <div className="h-full flex flex-col min-h-0">
+      <div className="h-full flex flex-col min-h-0 max-w-2xl mx-auto w-full">
         <ConversationDetail conversation={selected} onBack={() => setSelectedId(null)} />
       </div>
     );
@@ -126,7 +126,7 @@ function MessagesPage() {
   // Show new conversation form full-screen
   if (newConvo) {
     return (
-      <div className="h-full flex flex-col min-h-0">
+      <div className="h-full flex flex-col min-h-0 max-w-2xl mx-auto w-full">
         <div className="flex items-center gap-3 px-5 py-3.5 bg-white border-b border-gray-100 shrink-0">
           <button onClick={() => { setNewConvo(null); setNewMessage(""); }} className="p-1.5 text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded-lg">
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" /></svg>
@@ -161,7 +161,7 @@ function MessagesPage() {
 
   // Show inbox list
   return (
-    <div className="h-full flex flex-col min-h-0">
+    <div className="h-full flex flex-col min-h-0 max-w-2xl mx-auto w-full">
       <div className="px-5 pt-5 pb-3 border-b border-gray-100 bg-white shrink-0">
         <div className="flex items-end justify-between mb-3">
           <div>
@@ -348,7 +348,7 @@ function ConversationDetail({ conversation, onBack }: { conversation: Conversati
         )}
       </div>
 
-      <div className="shrink-0 border-t border-gray-100 px-4 py-3 bg-white">
+      <div className="shrink-0 border-t border-gray-100 px-4 py-3 bg-white pb-20 lg:pb-3">
         <div className="flex items-end gap-2 max-w-2xl mx-auto">
           <textarea
             value={input}

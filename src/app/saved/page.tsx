@@ -77,8 +77,8 @@ export default function SavedPage() {
    localStorage.setItem("savedSearches", JSON.stringify(updated));
  };
 
- return (
- <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+  return (
+  <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 pb-24 lg:pb-10">
   <div className="mb-6">
   <h1 className="text-2xl font-bold text-gray-900">Saved</h1>
  <p className="text-sm text-gray-500 mt-1">Your saved properties and searches</p>

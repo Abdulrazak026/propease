@@ -6,17 +6,23 @@ import Button from "@/components/ui/Button";
 
 interface AgentApp { id: string; name: string; email: string; city: string | null; whatsapp: string | null; createdAt: string; }
 interface ContactSub { id: string; name: string; email: string; phone: string | null; subject: string | null; message: string; read: boolean; createdAt: string; }
+interface Inquiry { id: string; clientName: string; clientContact: string; message: string; status: string; createdAt: string; listing?: { title: string } | null; }
 
 export default function SubmissionsPage() {
-  const [tab, setTab] = useState<"agents" | "contacts">("agents");
+  const [tab, setTab] = useState<"agents" | "contacts" | "inquiries">("agents");
   const [agents, setAgents] = useState<AgentApp[]>([]);
   const [contacts, setContacts] = useState<ContactSub[]>([]);
+  const [inquiries, setInquiries] = useState<Inquiry[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    api.get<{ agentApplications: AgentApp[]; contactSubmissions: ContactSub[] }>("/api/admin/submissions").then(r => {
-      if (r.data?.agentApplications) setAgents(r.data.agentApplications);
-      if (r.data?.contactSubmissions) setContacts(r.data.contactSubmissions);
+    Promise.all([
+      api.get<{ agentApplications: AgentApp[]; contactSubmissions: ContactSub[] }>("/api/admin/submissions"),
+      api.get<{ inquiries: Inquiry[] }>("/api/inquiries/all"),
+    ]).then(([subR, inqR]) => {
+      if (subR.data?.agentApplications) setAgents(subR.data.agentApplications);
+      if (subR.data?.contactSubmissions) setContacts(subR.data.contactSubmissions);
+      if (inqR.data?.inquiries) setInquiries(inqR.data.inquiries);
       setLoading(false);
     }).catch(() => setLoading(false));
   }, []);
@@ -44,20 +50,24 @@ export default function SubmissionsPage() {
   };
 
   const unreadCount = contacts.filter(c => !c.read).length;
+  const newInquiries = inquiries.filter(i => i.status === "new").length;
 
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-3">
         <a href="/admin" className="text-gray-400 hover:text-[var(--color-primary)]"><svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg></a>
-        <div><h1 className="text-xl font-bold text-gray-900">Submissions</h1><p className="text-xs text-gray-500">Agent applications and contact form messages</p></div>
+        <div><h1 className="text-xl font-bold text-gray-900">Submissions</h1><p className="text-xs text-gray-500">Agent applications, contact messages, and property inquiries</p></div>
       </div>
 
-      <div className="flex gap-2">
+      <div className="flex gap-2 flex-wrap">
         <button onClick={() => setTab("agents")} className={`px-3 py-1.5 text-xs font-medium rounded-lg border transition-all ${tab==="agents"?"bg-[var(--color-primary)] text-white border-[var(--color-primary)]":"bg-white text-gray-600 border-gray-200 hover:border-gray-300"}`}>
           Agent Applications ({agents.length})
         </button>
         <button onClick={() => setTab("contacts")} className={`px-3 py-1.5 text-xs font-medium rounded-lg border transition-all ${tab==="contacts"?"bg-[var(--color-primary)] text-white border-[var(--color-primary)]":"bg-white text-gray-600 border-gray-200 hover:border-gray-300"}`}>
           Contact Messages {unreadCount > 0 && <span className="ml-1 bg-red-500 text-white text-[9px] px-1.5 rounded-full">{unreadCount}</span>}
+        </button>
+        <button onClick={() => setTab("inquiries")} className={`px-3 py-1.5 text-xs font-medium rounded-lg border transition-all ${tab==="inquiries"?"bg-[var(--color-primary)] text-white border-[var(--color-primary)]":"bg-white text-gray-600 border-gray-200 hover:border-gray-300"}`}>
+          Property Inquiries {newInquiries > 0 && <span className="ml-1 bg-emerald-500 text-white text-[9px] px-1.5 rounded-full">{newInquiries}</span>}
         </button>
       </div>
 
@@ -99,7 +109,7 @@ export default function SubmissionsPage() {
             </div>
           )}
         </div>
-      ) : (
+      ) : tab === "contacts" ? (
         <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
           {contacts.length === 0 ? (
             <div className="px-4 py-12 text-center text-gray-400 text-sm">No contact messages yet</div>
@@ -121,6 +131,31 @@ export default function SubmissionsPage() {
                     <div className="flex gap-1 shrink-0">
                       {!c.read && <Button size="sm" variant="ghost" onClick={() => markRead(c.id)}>Mark Read</Button>}
                       <Button size="sm" variant="danger" onClick={() => deleteContact(c.id)}>Delete</Button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      ) : (
+        <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+          {inquiries.length === 0 ? (
+            <div className="px-4 py-12 text-center text-gray-400 text-sm">No property inquiries yet</div>
+          ) : (
+            <div className="divide-y divide-gray-100">
+              {inquiries.map(i => (
+                <div key={i.id} className={`px-4 py-3 hover:bg-gray-50/50 ${i.status === "new" ? "bg-emerald-50/30" : ""}`}>
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="text-xs font-semibold text-gray-900">{i.clientName}</span>
+                        <span className="text-[10px] text-gray-400">{i.clientContact}</span>
+                        <Badge variant={i.status === "new" ? "warning" : i.status === "responded" ? "success" : "default"}>{i.status}</Badge>
+                      </div>
+                      {i.listing && <p className="text-[10px] text-gray-500 mb-1">Re: {i.listing.title}</p>}
+                      <p className="text-xs text-gray-600 line-clamp-2">{i.message}</p>
+                      <p className="text-[10px] text-gray-400 mt-1">{new Date(i.createdAt).toLocaleString()}</p>
                     </div>
                   </div>
                 </div>

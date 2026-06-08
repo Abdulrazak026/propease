@@ -168,9 +168,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         const hasActive = groupItems.some(i => pathname === i.href || pathname.startsWith(i.href + "/"));
         return (
           <div key={groupName} className="mb-1">
-            <button onClick={() => toggleGroup(groupName)} className={`flex items-center justify-between w-full px-3 py-1.5 text-[10px] font-semibold uppercase tracking-wider transition-colors ${hasActive ? "text-white/80" : "text-slate-500 hover:text-slate-300"}`}>
+            <button onClick={() => toggleGroup(groupName)} className={`flex items-center justify-between w-full px-3 py-2 text-[10px] font-semibold uppercase tracking-wider transition-colors ${hasActive ? "text-emerald-400/80" : "text-slate-500 hover:text-slate-400"}`}>
               <span>{groupName}</span>
-              <svg className={`w-3 h-3 transition-transform ${expanded ? "rotate-90" : ""}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg>
+              <svg className={`w-3 h-3 transition-transform duration-200 ${expanded ? "rotate-90" : ""}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg>
             </button>
             {expanded && <div className="space-y-0.5 mt-0.5">{groupItems.map(item => <NavLink key={item.href} item={item} />)}</div>}
           </div>
@@ -197,10 +197,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const NavLink = ({ item }: { item: NavItem }) => {
     const active = pathname === item.href || pathname.startsWith(item.href + "/");
     return (
-      <Link href={item.href} className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium transition-all ${active ? "bg-gradient-to-r from-emerald-500/20 to-teal-500/10 text-white shadow-sm" : "text-slate-400 hover:bg-white/5 hover:text-slate-200"}`}>
-        <span className={`shrink-0 ${active ? "text-emerald-400" : ""}`}>{icons[item.icon] || null}</span>
+      <Link href={item.href} className={`group flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-medium transition-all duration-200 ${active ? "bg-gradient-to-r from-emerald-500/20 to-teal-500/10 text-white shadow-sm shadow-emerald-500/5" : "text-slate-400 hover:bg-white/5 hover:text-slate-200"}`}>
+        <span className={`shrink-0 w-5 h-5 flex items-center justify-center rounded-md transition-colors ${active ? "text-emerald-400" : "text-slate-500 group-hover:text-slate-300"}`}>{icons[item.icon] || null}</span>
         <span className="truncate">{item.label}</span>
-        {active && <span className="ml-auto w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-sm shadow-emerald-400/50" />}
+        {active && <span className="ml-auto w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-sm shadow-emerald-400/50 animate-pulse" />}
       </Link>
     );
   };
