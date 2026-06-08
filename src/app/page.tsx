@@ -32,7 +32,7 @@ const FALLBACK_POSTS = [
 ];
 
 export default function HomePage() {
-  const { get: getSetting } = useSettings();
+  const { get: getSetting, loading: settingsLoading } = useSettings();
   const heroImage = getSetting("hero_image") || "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=1600&h=900&fit=crop";
   const siteName = getSetting("site_name", "MBPP");
   const siteTagline = getSetting("site_tagline", "Find Your Dream Property in Kano");
@@ -95,8 +95,8 @@ export default function HomePage() {
     <div className="flex flex-col">
       <section ref={heroRef} className="relative bg-gray-950 overflow-hidden">
         <div className="absolute inset-0">
-          <img src={heroImage} alt="" className="w-full h-full object-cover opacity-50" />
-          <div className="absolute inset-0 bg-gradient-to-b from-gray-950/60 via-gray-950/40 to-gray-950" />
+          {!settingsLoading && <img src={heroImage} alt="" className="w-full h-full object-cover opacity-65 transition-opacity duration-500" />}
+          <div className="absolute inset-0 bg-gradient-to-b from-gray-950/40 via-gray-950/25 to-gray-950" />
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--color-primary)_0%,_transparent_60%)] opacity-25 mix-blend-screen" />
         </div>
 
