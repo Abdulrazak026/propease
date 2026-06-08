@@ -29,7 +29,7 @@ router.get("/", authenticate, authorize("head"), requirePermission("canManageUse
 
 router.patch("/contact/:id/read", authenticate, authorize("head"), requirePermission("canManageUsers"), async (req: AuthRequest, res: Response) => {
   try {
-    await prisma.contactSubmission.update({ where: { id: req.params.id }, data: { read: true } });
+    await prisma.contactSubmission.update({ where: { id: String(req.params.id) }, data: { read: true } });
     res.json({ success: true });
   } catch (error) {
     res.status(500).json({ error: "Failed" });
@@ -38,7 +38,7 @@ router.patch("/contact/:id/read", authenticate, authorize("head"), requirePermis
 
 router.delete("/agent/:id", authenticate, authorize("head"), requirePermission("canManageUsers"), async (req: AuthRequest, res: Response) => {
   try {
-    await prisma.user.delete({ where: { id: req.params.id } });
+    await prisma.user.delete({ where: { id: String(req.params.id) } });
     res.json({ success: true });
   } catch (error) {
     res.status(500).json({ error: "Failed" });
@@ -47,7 +47,7 @@ router.delete("/agent/:id", authenticate, authorize("head"), requirePermission("
 
 router.delete("/contact/:id", authenticate, authorize("head"), requirePermission("canManageUsers"), async (req: AuthRequest, res: Response) => {
   try {
-    await prisma.contactSubmission.delete({ where: { id: req.params.id } });
+    await prisma.contactSubmission.delete({ where: { id: String(req.params.id) } });
     res.json({ success: true });
   } catch (error) {
     res.status(500).json({ error: "Failed" });

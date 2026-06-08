@@ -14,7 +14,7 @@ router.get("/my", authenticate, authorize("agent", "ambassador", "head"), async 
       where: {
         OR: [
           { assignedToId: req.user!.id },
-          { assignedToId: null, status: "open" },
+          { assignedToId: { equals: null as any }, status: "open" },
         ],
       },
       include: {
@@ -205,7 +205,7 @@ router.post("/:id/claim", authenticate, authorize("agent"), async (req: AuthRequ
       data: { assignedToId: req.user!.id, status: "in_progress" },
       include: {
         assignedTo: { select: { id: true, name: true } },
-        createdBy: { select: { id: true, name: true } },
+        createdBy: { select: { id: true, name: true, email: true } },
       },
     });
 
