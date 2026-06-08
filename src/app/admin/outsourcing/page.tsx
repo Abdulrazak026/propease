@@ -2,10 +2,12 @@
 import { useState, useEffect } from "react";
 import { api } from "@/lib/api-client";
 import { formatNaira, resolveImageUrl } from "@/lib/utils";
+import { usePermissions } from "@/lib/use-permissions";
 
 interface Listing { id: string; title: string; description?: string; propertyType: string; listingType: string; category: string; city: string; address: string; price: number; status: string; bedrooms?: number; bathrooms?: number; sqft?: number; features?: string[]; photos?: { url: string }[]; negotiable?: boolean; createdAt?: string; }
 
 export default function OutsourcingPage() {
+  const perms = usePermissions();
   const [listings, setListings] = useState<Listing[]>([]);
   const [loading, setLoading] = useState(true);
   const [filterType, setFilterType] = useState("all");
@@ -43,7 +45,7 @@ export default function OutsourcingPage() {
         <div><h1 className="text-xl font-bold text-gray-900">Outsourcing</h1><p className="text-sm text-gray-500">All platform listings</p></div>
       </div>
 
-      <a href="/admin/listings/new" className="block bg-white rounded-xl border border-gray-200 p-5 hover:border-[var(--color-primary)]/30 hover:shadow-sm transition-all">
+      {perms.canCreateListings && <a href="/admin/listings/new" className="block bg-white rounded-xl border border-gray-200 p-5 hover:border-[var(--color-primary)]/30 hover:shadow-sm transition-all">
         <div className="flex items-center gap-3">
           <div className="w-12 h-12 bg-[var(--color-primary)]/10 rounded-lg flex items-center justify-center shrink-0">
             <svg className="w-6 h-6 text-[var(--color-primary)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4"/></svg>
@@ -53,7 +55,7 @@ export default function OutsourcingPage() {
             <p className="text-sm text-gray-500 mt-0.5">Add a house, flat, land, or commercial property with full details, photos, and pricing</p>
           </div>
         </div>
-      </a>
+      </a>}
 
       <div className="flex gap-2 flex-wrap">
         {["all","available","sold","rented","draft","review","sale","rent"].map(f=><button key={f} onClick={()=>setFilterType(f)} className={`px-4 py-2 text-sm font-medium rounded-lg border capitalize transition-all ${filterType===f?"bg-[var(--color-primary)] text-white border-[var(--color-primary)]":"bg-white text-gray-600 border-gray-200 hover:border-gray-300"}`}>{f}</button>)}
@@ -90,8 +92,8 @@ export default function OutsourcingPage() {
                   <td className="px-4 py-3">
                     <div className="flex gap-2">
                       <button onClick={() => setPreview(p)} className="text-xs px-3 py-1.5 rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200 font-medium">View</button>
-                      <a href={`/admin/listings/${p.id}/edit`} className="text-xs px-3 py-1.5 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 font-medium">Edit</a>
-                      <button onClick={() => deleteListing(p.id)} className="text-xs px-3 py-1.5 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 font-medium">Delete</button>
+                      {perms.canCreateListings && <a href={`/admin/listings/${p.id}/edit`} className="text-xs px-3 py-1.5 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 font-medium">Edit</a>}
+                      {perms.canCreateListings && <button onClick={() => deleteListing(p.id)} className="text-xs px-3 py-1.5 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 font-medium">Delete</button>}
                     </div>
                   </td>
                 </tr>

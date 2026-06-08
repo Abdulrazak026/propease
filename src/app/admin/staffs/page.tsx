@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import Badge from "@/components/ui/Badge";
 import Button from "@/components/ui/Button";
 import { api } from "@/lib/api-client";
+import { usePermissions } from "@/lib/use-permissions";
 
 interface ApiUser {
   id: string; name: string; email: string; role: string; city: string | null;
@@ -25,6 +26,7 @@ const PERMISSIONS = [
 type RoleTab = "heads" | "ambassadors" | "agents";
 
 export default function StaffsPage() {
+  const perms = usePermissions();
   const [users, setUsers] = useState<ApiUser[]>([]);
   const [view, setView] = useState<RoleTab>("heads");
   const [loading, setLoading] = useState(true);
@@ -55,7 +57,7 @@ export default function StaffsPage() {
           <a href="/admin" className="text-gray-400 hover:text-[var(--color-primary)]"><svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg></a>
           <div><h1 className="text-xl font-bold text-gray-900">Staff Management</h1><p className="text-xs text-gray-500">Manage all staff roles and permissions</p></div>
         </div>
-        <Button size="sm" onClick={() => setEditUser("new")}>+ Add Staff</Button>
+        {perms.canManageUsers && <Button size="sm" onClick={() => setEditUser("new")}>+ Add Staff</Button>}
       </div>
 
       <div className="grid grid-cols-3 gap-4">

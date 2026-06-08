@@ -32,7 +32,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   const resolvedRole = role === "head" ? "admin" : role;
   const logo = getSetting("site_logo");
-  const items = resolvedRole ? dashboardNav[resolvedRole] || [] : [];
+  const allItems = resolvedRole ? dashboardNav[resolvedRole] || [] : [];
+  const items = allItems.filter(item => {
+    if (!item.permission) return true;
+    if (role === "head") return true;
+    return (currentUser as any)?.[item.permission] === true;
+  });
   const [counts, setCounts] = useState<Record<string, number>>({});
 
   useEffect(() => {

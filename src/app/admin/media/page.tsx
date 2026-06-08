@@ -2,6 +2,7 @@
 import { useState, useRef, useEffect } from "react";
 import { api, getAccessToken } from "@/lib/api-client";
 import { resolveImageUrl } from "@/lib/utils";
+import { usePermissions } from "@/lib/use-permissions";
 
 const API_URL = "https://propease-production.up.railway.app";
 
@@ -16,6 +17,7 @@ interface MediaItem {
 }
 
 export default function MediaPage() {
+  const perms = usePermissions();
   const [files, setFiles] = useState<MediaItem[]>([]);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
@@ -81,13 +83,13 @@ export default function MediaPage() {
               disabled={uploading}
               className="hidden"
             />
-            <button
+            {perms.canManageContent && <button
               onClick={() => fileRef.current?.click()}
               disabled={uploading}
               className="px-4 py-2 bg-[var(--color-primary)] text-white text-sm rounded-lg hover:opacity-90 disabled:opacity-50"
             >
               {uploading ? "Uploading..." : "Upload New"}
-            </button>
+            </button>}
           </div>
         </div>
 
@@ -112,7 +114,7 @@ export default function MediaPage() {
                   <p className="text-[10px] text-gray-600 truncate mb-0.5" title={f.filename}>{f.filename}</p>
                   <div className="flex items-center justify-between">
                     <button onClick={() => navigator.clipboard.writeText(resolveImageUrl(f.url) || f.url)} className="text-[10px] text-[var(--color-primary)] hover:underline">Copy</button>
-                    <button onClick={() => handleDelete(f.id)} className="text-[10px] text-red-500 hover:underline">Del</button>
+                    {perms.canManageContent && <button onClick={() => handleDelete(f.id)} className="text-[10px] text-red-500 hover:underline">Del</button>}
                   </div>
                 </div>
               </div>

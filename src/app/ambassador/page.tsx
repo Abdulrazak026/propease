@@ -2,12 +2,14 @@
 import { useState, useEffect } from "react";
 import { api } from "@/lib/api-client";
 import Link from "next/link";
+import { usePermissions } from "@/lib/use-permissions";
 
 interface Stats { totalListings: number; availableListings: number; agentCount: number; openTasks: number; }
 interface Listing { id: string; title: string; price: number; status: string; listingType: string; }
 interface Agent { id: string; name: string; walletBalance: number; }
 
 export default function AmbassadorPage() {
+  const perms = usePermissions();
   const [stats, setStats] = useState<Stats | null>(null);
   const [listings, setListings] = useState<Listing[]>([]);
   const [agents, setAgents] = useState<Agent[]>([]);
@@ -37,7 +39,7 @@ export default function AmbassadorPage() {
           <h1 className="text-xl font-bold text-gray-900">City Overview</h1>
           <p className="text-xs text-gray-500">Your city performance dashboard</p>
         </div>
-        <Link href="/ambassador/listings/new" className="text-xs font-medium px-3 py-2 bg-[var(--color-primary)] text-white rounded-lg">+ Post Listing</Link>
+        {perms.canCreateListings && <Link href="/ambassador/listings/new" className="text-xs font-medium px-3 py-2 bg-[var(--color-primary)] text-white rounded-lg">+ Post Listing</Link>}
       </div>
 
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">

@@ -2,6 +2,7 @@
 export const dynamic = "force-dynamic";
 import { useState, useEffect } from "react";
 import { api } from "@/lib/api-client";
+import { usePermissions } from "@/lib/use-permissions";
 
 interface Listing { id: string; title: string; propertyType: string; listingType: string; city: string; price: number; status: string; createdAt: string; postedBy?: { name: string } | null; }
 
@@ -17,6 +18,7 @@ const statusStyles: Record<string, string> = {
 };
 
 export default function ModerationPage() {
+  const perms = usePermissions();
   const [listings, setListings] = useState<Listing[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("review");
@@ -101,7 +103,7 @@ export default function ModerationPage() {
                     <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${statusStyles[l.status] || ""}`}>{l.status}</span>
                   </td>
                   <td className="px-4 py-3">
-                    {l.status === "review" ? (
+                    {l.status === "review" && perms.canManageContent ? (
                       <div className="flex gap-1.5">
                         <button onClick={() => approve(l.id)} disabled={busy === l.id} className="text-[11px] font-semibold px-2.5 py-1.5 rounded-lg bg-emerald-100 text-emerald-700 hover:bg-emerald-200 disabled:opacity-50 transition-colors">
                           {busy === l.id ? "..." : "Approve"}

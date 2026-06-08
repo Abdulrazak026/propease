@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import Button from "@/components/ui/Button";
 import { api } from "@/lib/api-client";
 import { formatNaira, resolveImageUrl } from "@/lib/utils";
+import { usePermissions } from "@/lib/use-permissions";
 
 interface SoldProperty {
   id: string;
@@ -16,6 +17,7 @@ interface SoldProperty {
 }
 
 export default function AdminSoldPage() {
+  const perms = usePermissions();
   const [sold, setSold] = useState<SoldProperty[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAdd, setShowAdd] = useState(false);
@@ -46,7 +48,7 @@ export default function AdminSoldPage() {
           <a href="/admin" className="text-gray-400 hover:text-[var(--color-primary)]"><svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg></a>
           <div><h1 className="text-xl font-bold text-gray-900">Sold Properties</h1><p className="text-xs text-gray-500">Manage the sold listings shown on /sold</p></div>
         </div>
-        <Button size="sm" onClick={() => setShowAdd(true)}>+ Add Sold</Button>
+        {perms.canCloseDeals && <Button size="sm" onClick={() => setShowAdd(true)}>+ Add Sold</Button>}
       </div>
 
       <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
@@ -83,9 +85,9 @@ export default function AdminSoldPage() {
                   <td className="px-4 py-3 text-xs font-medium text-gray-900">{formatNaira(s.price)}</td>
                   <td className="px-4 py-3 text-xs text-gray-500">{s.soldDate ? new Date(s.soldDate).toLocaleDateString("en-GB") : "N/A"}</td>
                   <td className="px-4 py-3">
-                    <Button size="sm" variant="ghost" className="text-red-600 hover:bg-red-50" disabled={deleting === s.id} onClick={() => deleteSold(s.id)}>
+                    {perms.canCloseDeals && <Button size="sm" variant="ghost" className="text-red-600 hover:bg-red-50" disabled={deleting === s.id} onClick={() => deleteSold(s.id)}>
                       {deleting === s.id ? "..." : "Delete"}
-                    </Button>
+                    </Button>}
                   </td>
                 </tr>
               ))}

@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { api } from "@/lib/api-client";
 import Link from "next/link";
 import Badge from "@/components/ui/Badge";
+import { usePermissions } from "@/lib/use-permissions";
 
 interface Agreement { id: string; tenantName: string; landlordName: string; propertyTitle: string; annualRent: number; status: string; createdAt: string; }
 
@@ -12,6 +13,7 @@ const statusStyles: Record<string, string> = {
 };
 
 export default function AgentAgreements() {
+  const perms = usePermissions();
   const [agreements, setAgreements] = useState<Agreement[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -31,7 +33,7 @@ export default function AgentAgreements() {
           <a href="/agent" className="text-gray-400 hover:text-[var(--color-primary)]"><svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg></a>
           <div><h1 className="text-xl font-bold text-gray-900">Agreements</h1><p className="text-xs text-gray-500">Manage tenancy contracts</p></div>
         </div>
-        <Link href="/agent/agreements/new" className="text-xs font-medium px-3 py-2 bg-[var(--color-primary)] text-white rounded-lg hover:opacity-90">+ New</Link>
+        {perms.canManageAgreements && <Link href="/agent/agreements/new" className="text-xs font-medium px-3 py-2 bg-[var(--color-primary)] text-white rounded-lg hover:opacity-90">+ New</Link>}
       </div>
 
       <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">

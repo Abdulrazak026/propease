@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { api } from "@/lib/api-client";
 import Button from "@/components/ui/Button";
+import { usePermissions } from "@/lib/use-permissions";
 
 interface AdminTask { id: string; title: string; description: string; propertyType: string; area: string; budget: number; deadline: string; status: string; createdAt: string; createdBy: { id: string; name: string }; assignedTo: { id: string; name: string }; }
 interface Agent { id: string; name: string; email: string; role: string; isApproved: boolean; }
@@ -15,6 +16,7 @@ const statusStyles: Record<string, string> = {
 };
 
 export default function AdminTasksPage() {
+  const perms = usePermissions();
   const [tasks, setTasks] = useState<AdminTask[]>([]);
   const [loading, setLoading] = useState(true);
   const [showCreate, setShowCreate] = useState(false);
@@ -73,7 +75,7 @@ export default function AdminTasksPage() {
           <p className="text-sm text-gray-500">Every task across the platform</p>
         </div>
         <div className="flex items-center gap-2">
-          <button onClick={() => setShowCreate(!showCreate)} className="text-xs font-semibold px-3.5 py-2.5 bg-[var(--color-primary)] text-white rounded-lg hover:bg-[var(--color-primary)]/90">+ Create Task</button>
+          {perms.canCreateTasks && <button onClick={() => setShowCreate(!showCreate)} className="text-xs font-semibold px-3.5 py-2.5 bg-[var(--color-primary)] text-white rounded-lg hover:bg-[var(--color-primary)]/90">+ Create Task</button>}
           <Link href="/admin" className="text-xs font-semibold text-gray-600 hover:text-gray-900">← Back to dashboard</Link>
         </div>
       </div>

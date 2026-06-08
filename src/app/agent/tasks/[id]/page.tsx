@@ -6,8 +6,10 @@ import Badge from "@/components/ui/Badge";
 import Button from "@/components/ui/Button";
 import { formatNaira, formatDate, propertyTypeLabels } from "@/lib/utils";
 import { api } from "@/lib/api-client";
+import { usePermissions } from "@/lib/use-permissions";
 
 export default function AgentTaskDetail() {
+  const perms = usePermissions();
   const { id } = useParams();
   const router = useRouter();
   const [task, setTask] = useState<any>(null);
@@ -71,11 +73,11 @@ export default function AgentTaskDetail() {
 
         {task.notes && <div className="mt-4"><p className="text-xs text-gray-500 mb-1">Special Notes</p><p className="text-sm text-gray-700 bg-gray-50 rounded-lg p-3">{task.notes}</p></div>}
 
-        <div className="mt-6 flex flex-wrap gap-2">
+        {perms.canCreateTasks && <div className="mt-6 flex flex-wrap gap-2">
           <Button size="sm" variant="secondary" disabled={updating !== "" || task.status === "in_progress"} onClick={() => updateStatus("in_progress")}>{updating === "in_progress" ? "..." : task.status === "in_progress" ? "In Progress" : "Start Task"}</Button>
           <Button size="sm" variant="outline" disabled={updating !== "" || task.status === "fulfilled"} onClick={() => updateStatus("fulfilled")}>{updating === "fulfilled" ? "..." : "Mark Fulfilled"}</Button>
           <Button size="sm" variant="outline" disabled={updating !== "" || task.status === "closed"} onClick={() => updateStatus("closed")}>{updating === "closed" ? "..." : "Close Task"}</Button>
-        </div>
+        </div>}
       </div>
 
       <div className="bg-white rounded-lg border border-gray-100 p-6">

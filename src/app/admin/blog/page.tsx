@@ -5,10 +5,12 @@ import { api } from "@/lib/api-client";
 import Button from "@/components/ui/Button";
 import Badge from "@/components/ui/Badge";
 import ImagePicker from "@/components/ui/ImagePicker";
+import { usePermissions } from "@/lib/use-permissions";
 
 interface Post { id: string; title: string; slug: string; excerpt: string | null; content: string; coverImage: string | null; published: boolean; publishedAt: string | null; createdAt: string; author?: { name: string } | null; }
 
 export default function BlogPage() {
+  const perms = usePermissions();
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -69,7 +71,7 @@ export default function BlogPage() {
           <a href="/admin" className="text-gray-400 hover:text-[var(--color-primary)]"><svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg></a>
           <div><h1 className="text-xl font-bold text-gray-900">Blog</h1><p className="text-xs text-gray-500">Manage news and articles</p></div>
         </div>
-        <Button size="sm" onClick={openCreate}>+ New Post</Button>
+        {perms.canManageContent && <Button size="sm" onClick={openCreate}>+ New Post</Button>}
       </div>
 
       {showForm && (
@@ -96,9 +98,9 @@ export default function BlogPage() {
                   <td className="px-4 py-3 text-xs text-gray-500">{new Date(p.createdAt).toLocaleDateString()}</td>
                   <td className="px-4 py-3">
                     <div className="flex gap-1">
-                      <Button size="sm" variant="ghost" onClick={() => openEdit(p)}>Edit</Button>
-                      <Button size="sm" variant="ghost" onClick={() => togglePublish(p)}>{p.published ? "Unpublish" : "Publish"}</Button>
-                      <Button size="sm" variant="ghost" onClick={() => deletePost(p.id)}>Delete</Button>
+                      {perms.canManageContent && <Button size="sm" variant="ghost" onClick={() => openEdit(p)}>Edit</Button>}
+                      {perms.canManageContent && <Button size="sm" variant="ghost" onClick={() => togglePublish(p)}>{p.published ? "Unpublish" : "Publish"}</Button>}
+                      {perms.canManageContent && <Button size="sm" variant="ghost" onClick={() => deletePost(p.id)}>Delete</Button>}
                     </div>
                   </td>
                 </tr>

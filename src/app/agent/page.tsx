@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRole } from "@/context/RoleContext";
+import { usePermissions } from "@/lib/use-permissions";
 import { api } from "@/lib/api-client";
 import Footer from "@/components/layout/Footer";
 
@@ -20,6 +21,7 @@ const statusStyles: Record<string, string> = {
 
 export default function AgentPage() {
   const { isAuthenticated, currentUser, role } = useRole();
+  const perms = usePermissions();
   const isAgent = isAuthenticated && role === "agent";
   const [listings, setListings] = useState<MyListing[]>([]);
   const [loading, setLoading] = useState(false);
@@ -47,7 +49,7 @@ export default function AgentPage() {
             <h1 className="text-2xl font-bold text-gray-900">Welcome back, {currentUser?.name?.split(" ")[0] || ""}</h1>
             <p className="text-sm text-gray-500">Manage your listings and inquiries</p>
           </div>
-          <Link href="/ambassador/listings/new" className="text-xs font-semibold px-3.5 py-2.5 bg-[var(--color-primary)] text-white rounded-lg hover:bg-[var(--color-primary)]/90 transition-colors">+ New Listing</Link>
+          {perms.canCreateListings && <Link href="/ambassador/listings/new" className="text-xs font-semibold px-3.5 py-2.5 bg-[var(--color-primary)] text-white rounded-lg hover:bg-[var(--color-primary)]/90 transition-colors">+ New Listing</Link>}
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -78,7 +80,7 @@ export default function AgentPage() {
               </div>
               <p className="text-sm font-semibold text-gray-900 mb-1">No listings yet</p>
               <p className="text-xs text-gray-500 mb-4 max-w-sm mx-auto">Post your first property. It goes to review before going public, usually within a few hours.</p>
-              <Link href="/ambassador/listings/new" className="inline-flex items-center justify-center min-h-[40px] px-5 py-2 text-xs font-semibold rounded-full bg-gray-900 text-white hover:bg-gray-800 transition-colors">Post a property</Link>
+              {perms.canCreateListings && <Link href="/ambassador/listings/new" className="inline-flex items-center justify-center min-h-[40px] px-5 py-2 text-xs font-semibold rounded-full bg-gray-900 text-white hover:bg-gray-800 transition-colors">Post a property</Link>}
             </div>
           ) : (
             <div className="overflow-x-auto">

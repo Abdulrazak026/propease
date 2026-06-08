@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { api } from "@/lib/api-client";
+import { usePermissions } from "@/lib/use-permissions";
 
 interface MyListing { id: string; title: string; propertyType: string; listingType: string; city: string; price: number; status: string; createdAt: string; }
 
@@ -16,6 +17,7 @@ const statusStyles: Record<string, string> = {
 };
 
 export default function AgentMyListingsPage() {
+  const perms = usePermissions();
   const [listings, setListings] = useState<MyListing[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("all");
@@ -46,7 +48,7 @@ export default function AgentMyListingsPage() {
         </div>
         <div className="flex items-center gap-2">
           <Link href="/agent" className="text-xs font-semibold text-gray-600 hover:text-gray-900">← Back</Link>
-          <Link href="/ambassador/listings/new" className="text-xs font-semibold px-3.5 py-2.5 bg-[var(--color-primary)] text-white rounded-lg hover:bg-[var(--color-primary)]/90">+ New Listing</Link>
+          {perms.canCreateListings && <Link href="/ambassador/listings/new" className="text-xs font-semibold px-3.5 py-2.5 bg-[var(--color-primary)] text-white rounded-lg hover:bg-[var(--color-primary)]/90">+ New Listing</Link>}
         </div>
       </div>
 
