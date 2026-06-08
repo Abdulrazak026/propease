@@ -90,12 +90,12 @@ export default function Navbar() {
       </Link>
       <div className="flex-1 min-w-0" />
       <div className="mr-1 shrink-0"><LangPill /></div>
-      {isAuthenticated ? (
+      {isAuthenticated && currentUser ? (
         <Link
-          href={currentUser!.role === "head" ? "/admin" : `/${currentUser!.role}`}
+          href={currentUser.role === "head" ? "/admin" : `/${currentUser.role}`}
           className="w-8 h-8 rounded-full bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary-light)] flex items-center justify-center text-white text-[10px] font-bold shadow-sm shrink-0 ml-3"
         >
-          {currentUser!.name.split(" ").map(n => n[0]).join("").slice(0, 2)}
+          {currentUser.name?.split(" ").map(n => n[0]).join("").slice(0, 2) || "?"}
         </Link>
       ) : (
         <Link
@@ -181,16 +181,16 @@ export default function Navbar() {
 
         <div className="flex items-center gap-2">
           <div className="mr-1"><LangPill /></div>
-          {isAuthenticated ? (
+          {isAuthenticated && currentUser ? (
             <div ref={userRef} className="relative">
               <button
                 onClick={() => setUserOpen(!userOpen)}
                 className="flex items-center gap-2.5 pl-1 pr-3 py-1 rounded-full hover:bg-gray-50 transition-colors"
               >
                 <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary-light)] flex items-center justify-center text-white text-xs font-bold shadow-sm">
-                  {currentUser!.name.split(" ").map(n => n[0]).join("").slice(0, 2)}
+                  {currentUser.name?.split(" ").map(n => n[0]).join("").slice(0, 2) || "?"}
                 </div>
-                <span className="text-sm text-gray-700 font-medium capitalize hidden xl:inline">{currentUser!.role === "head" ? "admin" : currentUser!.role}</span>
+                <span className="text-sm text-gray-700 font-medium capitalize hidden xl:inline">{currentUser.role === "head" ? "admin" : currentUser.role}</span>
                 <svg className={`w-3.5 h-3.5 text-gray-400 transition-transform ${userOpen ? "rotate-180" : ""}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
                 </svg>
@@ -198,12 +198,12 @@ export default function Navbar() {
               {userOpen && (
                 <div className="absolute top-full right-0 mt-2 w-56 bg-white rounded-xl border border-gray-100 shadow-xl shadow-gray-900/5 p-2 z-50">
                   <div className="px-3 py-2.5 border-b border-gray-100">
-                    <p className="text-sm font-semibold text-gray-900 truncate">{currentUser!.name}</p>
-                    <p className="text-xs text-gray-500 capitalize">{currentUser!.role === "head" ? "admin" : currentUser!.role}{currentUser!.city ? ` · ${currentUser!.city}` : ""}</p>
+                    <p className="text-sm font-semibold text-gray-900 truncate">{currentUser.name}</p>
+                    <p className="text-xs text-gray-500 capitalize">{currentUser.role === "head" ? "admin" : currentUser.role}{currentUser.city ? ` · ${currentUser.city}` : ""}</p>
                   </div>
                   <div className="py-1">
                     <Link
-                      href={currentUser!.role === "head" ? "/admin" : `/${currentUser!.role}`}
+                      href={currentUser.role === "head" ? "/admin" : `/${currentUser.role}`}
                       onClick={() => setUserOpen(false)}
                       className="flex items-center gap-2.5 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md"
                     >

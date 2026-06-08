@@ -113,7 +113,7 @@ function MessagesPage() {
   const selected = conversations.find((c) => c.id === selectedId);
   const filtered = query
     ? conversations.filter(c => {
-        const name = c.participants[0]?.user.name || "";
+        const name = c?.participants?.[0]?.user?.name || "";
         const subj = c.subject || "";
         const lst = c.listing?.title || "";
         return [name, subj, lst].some(s => s.toLowerCase().includes(query.toLowerCase()));
@@ -336,7 +336,7 @@ function ConversationDetail({ conversation, onBack }: { conversation: Conversati
         ) : (
           <div className="space-y-2 max-w-2xl mx-auto">
             {messages.map((msg: any) => {
-              const isMe = msg.senderId !== conversation.participants[0]?.user.id;
+              const isMe = msg.senderId !== conversation?.participants?.[0]?.user?.id;
               return (
                 <div key={msg.id} className={`flex ${isMe ? "justify-end" : "justify-start"}`}>
                   <div className="max-w-[80%]">
