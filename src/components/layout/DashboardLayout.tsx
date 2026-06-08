@@ -229,10 +229,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         <button onClick={() => setMobileOpen(true)} className="text-gray-600 p-1">
           <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" /></svg>
         </button>
-        <div className="flex items-center gap-2">
-          {logo && <img src={logo} alt={getSetting("site_name", "MBPP")} className="h-10 w-auto rounded-lg object-contain" />}
-          <span className="text-sm font-bold text-gray-900">{getSetting("site_name", "MBPP")}</span>
-        </div>
+        <Link href="/" className="flex-1 flex items-center justify-center px-2">
+          {logo && <img src={logo} alt={getSetting("site_name", "MBPP")} className="h-10 w-auto max-w-[70%] object-contain" />}
+        </Link>
         <div className="flex items-center gap-1" ref={notifRef}>
           <button onClick={() => setNotifOpen(!notifOpen)} className="relative text-gray-500 hover:text-gray-700 p-2">
             {bellIcon}
@@ -287,11 +286,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
       {/* Desktop sidebar */}
       <aside className="w-56 bg-gradient-to-b from-slate-900 via-slate-900 to-slate-950 backdrop-blur-xl hidden md:flex md:flex-col shrink-0 border-r border-slate-800/50">
-        {logo && (
-          <div className="p-4 border-b border-slate-800/50">
-            <Link href="/" className="flex items-center justify-center"><img src={logo} alt={getSetting("site_name", "MBPP")} className="h-10 w-auto rounded-lg object-contain" /></Link>
-          </div>
-        )}
         <div className="p-4 border-b border-slate-800/50">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-white text-xs font-bold shadow-lg shadow-emerald-500/20 shrink-0">
@@ -318,11 +312,17 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
         {/* Content area */}
         <div className="flex-1 min-w-0 bg-gradient-to-br from-gray-50 via-gray-50 to-gray-100 overflow-y-auto pt-14 md:pt-0">
-          {/* Content top bar with notification bell */}
-          <div className="hidden md:flex items-center justify-between px-6 py-3 border-b border-gray-200/60 bg-white/70 backdrop-blur-xl sticky top-0 z-30">
-            <div className="flex items-center gap-2">
-              <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-              <span className="text-xs text-gray-500 font-medium">{resolvedRole === "admin" ? "Admin Panel" : resolvedRole === "agent" ? "Agent Dashboard" : "Ambassador Portal"}</span>
+          {/* Content top bar with logo + notification bell */}
+          <div className="hidden md:flex items-center justify-between px-6 py-2 border-b border-gray-200/60 bg-white/70 backdrop-blur-xl sticky top-0 z-30">
+            <div className="flex items-center gap-3">
+              <Link href="/" className="shrink-0">
+                {logo && <img src={logo} alt={getSetting("site_name", "MBPP")} className="h-10 w-auto max-w-[200px] object-contain" />}
+              </Link>
+              <div className="w-px h-6 bg-gray-200" />
+              <div className="flex items-center gap-2">
+                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                <span className="text-xs text-gray-500 font-medium">{resolvedRole === "admin" ? "Admin Panel" : resolvedRole === "agent" ? "Agent Dashboard" : "Ambassador Portal"}</span>
+              </div>
             </div>
             <div className="relative" ref={notifRef}>
               <button onClick={() => setNotifOpen(!notifOpen)} className="relative text-gray-500 hover:text-gray-700 p-2 rounded-xl hover:bg-gray-100/80 transition-all">
