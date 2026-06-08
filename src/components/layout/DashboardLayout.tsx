@@ -225,14 +225,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   return (
     <div className="flex h-full w-full">
       {/* Mobile top bar */}
-      <div className="md:hidden fixed top-0 left-0 right-0 z-40 bg-white border-b border-gray-200 flex items-center justify-between h-16">
-        <button onClick={() => setMobileOpen(true)} className="text-gray-600 p-2 shrink-0">
+      <div className="md:hidden fixed top-0 left-0 right-0 z-40 bg-white border-b border-gray-200 flex items-center h-16">
+        <button onClick={() => setMobileOpen(true)} className="text-gray-600 p-2 shrink-0 w-10">
           <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" /></svg>
         </button>
-        <Link href="/" className="flex-1 h-full flex items-center justify-center overflow-hidden px-1">
-          {logo && <img src={logo} alt={getSetting("site_name", "MBPP")} width="768" height="229" className="h-full w-auto max-w-full object-contain" />}
+        <Link href="/" className="flex-1 h-full flex items-center justify-center overflow-hidden">
+          {logo && <img src={logo} alt={getSetting("site_name", "MBPP")} width="900" height="229" style={{ height: "100%", width: "auto", maxWidth: "100%" }} />}
         </Link>
-        <div className="flex items-center gap-1 shrink-0" ref={notifRef}>
+        <div className="flex items-center shrink-0" ref={notifRef}>
           <button onClick={() => setNotifOpen(!notifOpen)} className="relative text-gray-500 hover:text-gray-700 p-2">
             {bellIcon}
             {unreadCount > 0 && <span className="absolute top-1 right-1 w-4 h-4 bg-red-500 text-white text-[8px] font-bold rounded-full flex items-center justify-center">{unreadCount > 9 ? "9+" : unreadCount}</span>}
