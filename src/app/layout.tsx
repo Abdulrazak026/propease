@@ -38,11 +38,12 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const settings = await getPublicSettings();
   return (
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
       <body className="h-full antialiased">
-        <ClientBody>{children}</ClientBody>
+        <ClientBody initialSettings={settings}>{children}</ClientBody>
       </body>
     </html>
   );

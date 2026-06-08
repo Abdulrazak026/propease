@@ -278,7 +278,7 @@ function ConversationDetail({ conversation, onBack }: { conversation: Conversati
   useEffect(() => {
     setLoading(true);
     const fetch = () => {
-      api.get<any>(`/api/messages/conversations/${conversation.id}`).then(r => {
+      api.get<any>(`/api/messages/conversations/${conversation.id}/messages`).then(r => {
         if ((r.data as any)?.messages) setMessages((r.data as any).messages);
         setLoading(false);
       }).catch(() => setLoading(false));
@@ -299,7 +299,7 @@ function ConversationDetail({ conversation, onBack }: { conversation: Conversati
     if (!txt || sending) return;
     setSending(true);
     try {
-      const r = await api.post(`/api/messages/conversations/${conversation.id}`, { content: txt });
+      const r = await api.post(`/api/messages/conversations/${conversation.id}/messages`, { content: txt });
       if (r.data) {
         const newMsg = (r.data as any)?.message || { id: crypto.randomUUID(), content: txt, senderId: "me", createdAt: new Date().toISOString() };
         setMessages(prev => [...prev, newMsg]);

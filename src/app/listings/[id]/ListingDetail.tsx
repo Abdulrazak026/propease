@@ -232,13 +232,9 @@ export default function ListingDetail() {
                     }
                     let agentId = listing.assignedAgent?.id || listing.postedBy?.id;
                     if (!agentId) {
-                      try {
-                        const adminRes = await api.get<{ users: any[] }>("/api/admin/users");
-                        const admin = (adminRes.data as any)?.users?.find((u: any) => u.role === "head");
-                        if (admin) agentId = admin.id;
-                      } catch {}
+                      alert("No agent assigned to this listing yet. Please try again later.");
+                      return;
                     }
-                    if (!agentId) return;
                     try {
                       const r = await api.post("/api/messages/conversations", {
                         recipientId: agentId,
@@ -246,11 +242,12 @@ export default function ListingDetail() {
                         content: `Hi! I'm interested in "${listing.title}" (${formatNaira(listing.price)}). Is it still available?`,
                       });
                       if (r.status === 201 || r.status === 200) {
-                        // Redirect to inbox - the conversation will appear there
                         router.push("/messages");
+                      } else {
+                        alert("Failed to start conversation. Please try again.");
                       }
                     } catch (err) {
-                      console.error("Failed to create conversation:", err);
+                      alert("Failed to start conversation. Please try again.");
                     }
                   }}
                   className="inline-flex items-center justify-center gap-2 w-full px-4 py-2.5 rounded-lg text-sm font-medium text-white bg-[var(--color-primary)] hover:bg-[var(--color-primary-light)] transition-colors"

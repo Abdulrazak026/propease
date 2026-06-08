@@ -11,9 +11,9 @@ import { LangProvider } from "@/lib/i18n/LangContext";
 import { CompareProvider } from "@/lib/compare-context";
 import CompareSheet from "@/components/listings/CompareSheet";
 
-export default function ClientBody({ children }: { children: React.ReactNode }) {
+export default function ClientBody({ children, initialSettings }: { children: React.ReactNode; initialSettings?: Record<string, string> }) {
   return (
-    <SettingsProvider>
+    <SettingsProvider initialSettings={initialSettings}>
       <LangProvider>
       <RoleProvider>
         <CompareProvider>

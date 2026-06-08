@@ -47,9 +47,9 @@ const SettingsContext = createContext<SettingsContextType>({
   settings: defaults, get: () => "", loading: true,
 });
 
-export function SettingsProvider({ children }: { children: ReactNode }) {
-  const [settings, setSettings] = useState<SettingsMap>(defaults);
-  const [loading, setLoading] = useState(true);
+export function SettingsProvider({ children, initialSettings }: { children: ReactNode; initialSettings?: SettingsMap }) {
+  const [settings, setSettings] = useState<SettingsMap>({ ...defaults, ...initialSettings });
+  const [loading, setLoading] = useState(!initialSettings);
 
   useEffect(() => {
     api.get<{ settings: SettingsMap }>("/api/settings").then((r) => {
