@@ -7,28 +7,62 @@ const router = Router();
 
 router.get("/dashboard", authenticate, authorize("ambassador"), async (req: AuthRequest, res: Response) => {
   try {
+    const uid = req.user!.id;
+    const now = new Date();
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const startOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+    const endOfLastMonth = new Date(now.getFullYear(), now.getMonth(), 0);
+
     const userCities = await prisma.userCity.findMany({
-      where: { userId: req.user!.id },
+      where: { userId: uid },
       include: { city: true },
     });
     const cityNames = userCities.map((uc) => uc.city.name);
 
-    const activeListings = await prisma.listing.count({
-      where: { city: { in: cityNames }, status: { notIn: ["sold", "rented"] } },
-    });
-    const totalListings = await prisma.listing.count({
-      where: { city: { in: cityNames } },
-    });
-    const agentsUnder = await prisma.user.count({
-      where: { ambassadorId: req.user!.id },
-    });
-    const openTasks = await prisma.task.count({
-      where: { area: { in: cityNames }, status: { in: ["open", "in_progress"] } },
-    });
+    const [activeListings, totalListings, agentsUnder, openTasks, totalEarned, thisMonthEarned, lastMonthEarned, recentCommissions, inquiryStats, agentPerf] =
+      await Promise.all([
+        prisma.listing.count({ where: { city: { in: cityNames }, status: { notIn: ["sold", "rented"] } } }),
+        prisma.listing.count({ where: { city: { in: cityNames } } }),
+        prisma.user.count({ where: { ambassadorId: uid } }),
+        prisma.task.count({ where: { area: { in: cityNames }, status: { in: ["open", "in_progress"] } } }),
+        prisma.commission.aggregate({ where: { ambassadorId: uid }, _sum: { ambassadorCut: true } }),
+        prisma.commission.aggregate({ where: { ambassadorId: uid, paidAt: { gte: startOfMonth } }, _sum: { ambassadorCut: true } }),
+        prisma.commission.aggregate({ where: { ambassadorId: uid, paidAt: { gte: startOfLastMonth, lte: endOfLastMonth } }, _sum: { ambassadorCut: true } }),
+        prisma.commission.findMany({ where: { ambassadorId: uid }, orderBy: { paidAt: "desc" }, take: 5 }),
+        prisma.inquiry.groupBy({ by: ["status"], where: { listing: { city: { in: cityNames } } }, _count: { id: true } }),
+        prisma.user.findMany({
+          where: { ambassadorId: uid },
+          select: {
+            id: true, name: true,
+            _count: { select: { assignedListings: true } },
+          },
+          orderBy: { name: "asc" },
+        }),
+      ]);
+
+    const inqStats: Record<string, number> = { new: 0, read: 0, responded: 0 };
+    for (const s of inquiryStats) inqStats[s.status] = s._count.id;
 
     res.json({
       stats: { activeListings, totalListings, agentsUnder, openTasks },
       cities: cityNames,
+      earnings: {
+        totalEarned: totalEarned._sum.ambassadorCut || 0,
+        thisMonth: thisMonthEarned._sum.ambassadorCut || 0,
+        lastMonth: lastMonthEarned._sum.ambassadorCut || 0,
+      },
+      recentCommissions: recentCommissions.map(c => ({
+        amount: c.ambassadorCut,
+        dealTitle: c.dealTitle,
+        date: c.paidAt,
+      })),
+      agentPerformance: agentPerf.map(a => ({
+        id: a.id,
+        name: a.name,
+        listings: a._count.assignedListings,
+        earnings: 0,
+      })),
+      inquiryStats: inqStats,
     });
   } catch (error) {
     logger.error({ err: error }, "Ambassador dashboard error:");

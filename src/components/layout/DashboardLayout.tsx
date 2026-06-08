@@ -197,9 +197,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const NavLink = ({ item }: { item: NavItem }) => {
     const active = pathname === item.href || pathname.startsWith(item.href + "/");
     return (
-      <Link href={item.href} className={`flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium transition-all ${active ? "bg-white/10 text-white" : "text-slate-400 hover:bg-slate-800 hover:text-slate-200"}`}>
-        <span className="shrink-0">{icons[item.icon] || null}</span>
+      <Link href={item.href} className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium transition-all ${active ? "bg-gradient-to-r from-emerald-500/20 to-teal-500/10 text-white shadow-sm" : "text-slate-400 hover:bg-white/5 hover:text-slate-200"}`}>
+        <span className={`shrink-0 ${active ? "text-emerald-400" : ""}`}>{icons[item.icon] || null}</span>
         <span className="truncate">{item.label}</span>
+        {active && <span className="ml-auto w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-sm shadow-emerald-400/50" />}
       </Link>
     );
   };
@@ -297,30 +298,30 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       )}
 
       {/* Desktop sidebar */}
-      <aside className="w-48 bg-slate-900 hidden md:flex md:flex-col shrink-0">
+      <aside className="w-56 bg-gradient-to-b from-slate-900 via-slate-900 to-slate-950 backdrop-blur-xl hidden md:flex md:flex-col shrink-0 border-r border-slate-800/50">
         {logo && (
-          <div className="p-3 border-b border-slate-700">
-            <Link href="/"><img src={logo} alt="" className="h-6 w-auto mx-auto rounded" /></Link>
+          <div className="p-4 border-b border-slate-800/50">
+            <Link href="/" className="flex items-center justify-center"><img src={logo} alt="" className="h-7 w-auto rounded" /></Link>
           </div>
         )}
-        <div className="p-4 border-b border-slate-700">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-[var(--color-primary)] flex items-center justify-center text-white text-xs font-bold shrink-0">
+        <div className="p-4 border-b border-slate-800/50">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-white text-xs font-bold shadow-lg shadow-emerald-500/20 shrink-0">
               {currentUser?.name?.split(" ").map(n => n[0]).join("").slice(0, 2) || "P"}
             </div>
             <div className="min-w-0 flex-1">
-              <p className="text-xs font-semibold text-white truncate capitalize">{resolvedRole}</p>
-              <p className="text-[10px] text-slate-400 capitalize truncate">{currentUser?.city || ""}</p>
+              <p className="text-sm font-semibold text-white truncate">{currentUser?.name || "User"}</p>
+              <p className="text-[10px] text-slate-400 capitalize truncate">{resolvedRole}{currentUser?.city ? ` · ${currentUser.city}` : ""}</p>
             </div>
           </div>
         </div>
-        <nav className="flex-1 p-2 space-y-0.5 overflow-y-auto"><DesktopNavItems /></nav>
-        <div className="p-2 border-t border-slate-700 space-y-0.5">
-          <button onClick={async () => { await logout(); window.location.href = "/"; }} className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs text-red-400 hover:bg-red-900/30 hover:text-red-300 transition-all w-full text-left">
+        <nav className="flex-1 p-2 space-y-0.5 overflow-y-auto scrollbar-thin"><DesktopNavItems /></nav>
+        <div className="p-2 border-t border-slate-800/50 space-y-0.5">
+          <button onClick={async () => { await logout(); window.location.href = "/"; }} className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-all w-full text-left">
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75" /></svg>
             Sign Out
           </button>
-          <Link href="/" className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs text-slate-500 hover:bg-slate-800 hover:text-slate-300 transition-all">
+          <Link href="/" className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs text-slate-500 hover:bg-slate-800/50 hover:text-slate-300 transition-all">
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
             Back to Site
           </Link>
@@ -328,18 +329,22 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       </aside>
 
         {/* Content area */}
-        <div className="flex-1 min-w-0 bg-gray-50 overflow-y-auto pt-14 md:pt-0">
+        <div className="flex-1 min-w-0 bg-gradient-to-br from-gray-50 via-gray-50 to-gray-100 overflow-y-auto pt-14 md:pt-0">
           {/* Content top bar with notification bell */}
-          <div className="hidden md:flex items-center justify-end px-6 py-3 border-b border-gray-100 bg-white sticky top-0 z-30">
+          <div className="hidden md:flex items-center justify-between px-6 py-3 border-b border-gray-200/60 bg-white/70 backdrop-blur-xl sticky top-0 z-30">
+            <div className="flex items-center gap-2">
+              <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              <span className="text-xs text-gray-500 font-medium">{resolvedRole === "admin" ? "Admin Panel" : resolvedRole === "agent" ? "Agent Dashboard" : "Ambassador Portal"}</span>
+            </div>
             <div className="relative" ref={notifRef}>
-              <button onClick={() => setNotifOpen(!notifOpen)} className="relative text-gray-500 hover:text-gray-700 p-2 rounded-lg hover:bg-gray-100 transition-colors">
+              <button onClick={() => setNotifOpen(!notifOpen)} className="relative text-gray-500 hover:text-gray-700 p-2 rounded-xl hover:bg-gray-100/80 transition-all">
                 {bellIcon}
-                {unreadCount > 0 && <span className="absolute top-1 right-1 w-4 h-4 bg-red-500 text-white text-[8px] font-bold rounded-full flex items-center justify-center">{unreadCount > 9 ? "9+" : unreadCount}</span>}
+                {unreadCount > 0 && <span className="absolute top-1 right-1 w-4 h-4 bg-red-500 text-white text-[8px] font-bold rounded-full flex items-center justify-center shadow-sm">{unreadCount > 9 ? "9+" : unreadCount}</span>}
               </button>
               {notifOpen && <div className="absolute right-0 top-full mt-2"><NotificationDropdown /></div>}
             </div>
           </div>
-          <div className="p-4 sm:p-6">{children}</div>
+          <div className="p-4 sm:p-6 lg:p-8">{children}</div>
         </div>
     </div>
   );

@@ -43,43 +43,53 @@ export default function AgentPage() {
       rented: listings.filter(l => l.status === "rented" || l.status === "sold").length,
     };
     return (
-      <div className="space-y-6 pt-2">
+      <div className="space-y-6">
+        {/* Header */}
         <div className="flex items-center justify-between gap-3 flex-wrap">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Welcome back, {currentUser?.name?.split(" ")[0] || ""}</h1>
-            <p className="text-sm text-gray-500">Manage your listings and inquiries</p>
+            <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Welcome back, {currentUser?.name?.split(" ")[0] || ""}</h1>
+            <p className="text-sm text-gray-500 mt-1">Manage your listings and inquiries</p>
           </div>
-          {perms.canCreateListings && <Link href="/agent/listings/new" className="text-xs font-semibold px-3.5 py-2.5 bg-[var(--color-primary)] text-white rounded-lg hover:bg-[var(--color-primary)]/90 transition-colors">+ New Listing</Link>}
+          {perms.canCreateListings && <Link href="/agent/listings/new" className="inline-flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 text-white text-sm font-semibold rounded-xl hover:from-emerald-700 hover:to-teal-700 transition-all shadow-lg shadow-emerald-500/20">
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
+            New Listing
+          </Link>}
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        {/* Stat Cards */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
           {[
-            { l: "Total listings", v: counts.total, c: "from-gray-500 to-gray-700" },
-            { l: "Awaiting review", v: counts.review, c: "from-amber-500 to-amber-700" },
-            { l: "Live", v: counts.approved, c: "from-emerald-500 to-emerald-700" },
-            { l: "Closed", v: counts.rented, c: "from-sky-500 to-sky-700" },
+            { l: "Total", v: counts.total, icon: "📋", gradient: "from-gray-500 to-gray-700", bg: "bg-gray-50" },
+            { l: "Review", v: counts.review, icon: "⏳", gradient: "from-amber-500 to-orange-600", bg: "bg-amber-50" },
+            { l: "Live", v: counts.approved, icon: "✅", gradient: "from-emerald-500 to-teal-600", bg: "bg-emerald-50" },
+            { l: "Closed", v: counts.rented, icon: "🔒", gradient: "from-sky-500 to-blue-600", bg: "bg-sky-50" },
           ].map(s => (
-            <div key={s.l} className="bg-white rounded-xl border border-gray-200 p-4">
-              <p className="text-xs text-gray-500">{s.l}</p>
-              <p className={`text-2xl font-bold mt-1 bg-gradient-to-br ${s.c} bg-clip-text text-transparent`}>{s.v}</p>
+            <div key={s.l} className="group bg-white rounded-2xl border border-gray-200/60 p-5 hover:shadow-lg hover:shadow-gray-200/50 transition-all duration-300 overflow-hidden relative">
+              <div className={`absolute top-0 right-0 w-16 h-16 ${s.bg} rounded-full -mr-4 -mt-4 opacity-60`} />
+              <div className="relative">
+                <div className={`w-9 h-9 rounded-xl bg-gradient-to-br ${s.gradient} flex items-center justify-center text-white text-base shadow-lg mb-3`}>{s.icon}</div>
+                <p className="text-xs font-medium text-gray-500">{s.l}</p>
+                <p className="text-2xl font-bold text-gray-900 mt-0.5">{s.v}</p>
+              </div>
             </div>
           ))}
         </div>
 
-        <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-          <div className="px-5 py-3.5 border-b border-gray-100 flex items-center justify-between">
-            <h2 className="text-sm font-semibold text-gray-900">My listings</h2>
-            <span className="text-[11px] text-gray-500">{listings.length} total</span>
+        {/* Listings */}
+        <div className="bg-white rounded-2xl border border-gray-200/60 overflow-hidden">
+          <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
+            <h2 className="text-sm font-semibold text-gray-900">My Listings</h2>
+            <span className="text-[10px] text-gray-400">{listings.length} total</span>
           </div>
           {loading ? (
             <div className="p-8 text-center text-sm text-gray-400">Loading…</div>
           ) : listings.length === 0 ? (
             <div className="p-10 text-center">
-              <div className="w-14 h-14 rounded-2xl bg-gray-50 flex items-center justify-center mx-auto mb-3">
+              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center mx-auto mb-3">
                 <svg className="w-6 h-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21" /></svg>
               </div>
               <p className="text-sm font-semibold text-gray-900 mb-1">No listings yet</p>
-              <p className="text-xs text-gray-500 mb-4 max-w-sm mx-auto">Post your first property. It goes to review before going public, usually within a few hours.</p>
+              <p className="text-xs text-gray-500 mb-4 max-w-sm mx-auto">Post your first property to get started.</p>
               {perms.canCreateListings && <Link href="/agent/listings/new" className="inline-flex items-center justify-center min-h-[40px] px-5 py-2 text-xs font-semibold rounded-full bg-gray-900 text-white hover:bg-gray-800 transition-colors">Post a property</Link>}
             </div>
           ) : (
@@ -87,23 +97,23 @@ export default function AgentPage() {
             <div className="hidden md:block overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-gray-100 bg-gray-50 text-left">
-                    <th className="px-5 py-3 text-[11px] font-medium text-gray-600 uppercase tracking-wider">Property</th>
-                    <th className="px-5 py-3 text-[11px] font-medium text-gray-600 uppercase tracking-wider">Type</th>
-                    <th className="px-5 py-3 text-[11px] font-medium text-gray-600 uppercase tracking-wider">City</th>
-                    <th className="px-5 py-3 text-[11px] font-medium text-gray-600 uppercase tracking-wider">Price</th>
-                    <th className="px-5 py-3 text-[11px] font-medium text-gray-600 uppercase tracking-wider">Status</th>
+                  <tr className="border-b border-gray-100 bg-gray-50/50 text-left">
+                    <th className="px-5 py-3 text-[11px] font-medium text-gray-500 uppercase tracking-wider">Property</th>
+                    <th className="px-5 py-3 text-[11px] font-medium text-gray-500 uppercase tracking-wider">Type</th>
+                    <th className="px-5 py-3 text-[11px] font-medium text-gray-500 uppercase tracking-wider">City</th>
+                    <th className="px-5 py-3 text-[11px] font-medium text-gray-500 uppercase tracking-wider">Price</th>
+                    <th className="px-5 py-3 text-[11px] font-medium text-gray-500 uppercase tracking-wider">Status</th>
                   </tr>
                 </thead>
                 <tbody>
                   {listings.slice(0, 10).map(l => (
-                    <tr key={l.id} className="border-b border-gray-50 hover:bg-gray-50/50">
+                    <tr key={l.id} className="border-b border-gray-50 hover:bg-gray-50/50 transition-colors">
                       <td className="px-5 py-3 text-sm font-medium text-gray-900 max-w-[200px] truncate">{l.title}</td>
                       <td className="px-5 py-3 text-xs text-gray-600 capitalize">{l.propertyType} · {l.listingType}</td>
                       <td className="px-5 py-3 text-xs text-gray-600">{l.city}</td>
                       <td className="px-5 py-3 text-xs font-medium text-gray-900">₦{l.price.toLocaleString()}</td>
                       <td className="px-5 py-3">
-                        <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${statusStyles[l.status] || "bg-gray-100 text-gray-700"}`}>{l.status}</span>
+                        <span className={`text-[10px] font-medium px-2.5 py-1 rounded-full ${statusStyles[l.status] || "bg-gray-100 text-gray-700"}`}>{l.status}</span>
                       </td>
                     </tr>
                   ))}
@@ -112,10 +122,10 @@ export default function AgentPage() {
             </div>
             <div className="md:hidden space-y-3 p-4">
               {listings.slice(0, 10).map(l => (
-                <div key={l.id} className="bg-white rounded-xl border border-gray-200 p-4 space-y-2">
+                <div key={l.id} className="bg-white rounded-xl border border-gray-200/60 p-4 space-y-2 hover:shadow-md transition-shadow">
                   <div className="flex items-center justify-between">
                     <p className="text-sm font-medium text-gray-900 truncate max-w-[70%]">{l.title}</p>
-                    <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${statusStyles[l.status] || "bg-gray-100 text-gray-700"}`}>{l.status}</span>
+                    <span className={`text-[10px] font-medium px-2.5 py-1 rounded-full ${statusStyles[l.status] || "bg-gray-100 text-gray-700"}`}>{l.status}</span>
                   </div>
                   <div className="grid grid-cols-2 gap-2 text-xs">
                     <div><span className="text-gray-400">Type</span><p className="font-medium text-gray-900 capitalize">{l.propertyType} · {l.listingType}</p></div>

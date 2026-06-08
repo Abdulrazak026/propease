@@ -32,7 +32,44 @@ router.get("/dashboard", authenticate, authorize("head"), requirePermission("can
       };
     });
 
-    res.json({ stats });
+    const [recentUsers, recentInquiries, pendingWithdrawals, inquiryStats, withdrawalStats, pendingListings, unapprovedUsers] =
+      await Promise.all([
+        prisma.user.findMany({ orderBy: { createdAt: "desc" }, take: 5, select: { id: true, name: true, role: true, createdAt: true } }),
+        prisma.inquiry.findMany({ orderBy: { createdAt: "desc" }, take: 5, include: { listing: { select: { title: true } } } }),
+        prisma.withdrawal.count({ where: { status: "pending" } }),
+        prisma.inquiry.groupBy({ by: ["status"], _count: { id: true } }),
+        prisma.withdrawal.aggregate({ where: { status: "pending" }, _sum: { amount: true } }),
+        prisma.listing.count({ where: { status: "draft" } }),
+        prisma.user.count({ where: { isApproved: false } }),
+      ]);
+
+    const recentActivity: any[] = [];
+    for (const u of recentUsers) {
+      recentActivity.push({ type: "user_registered", title: `New ${u.role}: ${u.name}`, time: u.createdAt, icon: "👤" });
+    }
+    for (const i of recentInquiries) {
+      recentActivity.push({ type: "inquiry_received", title: `Inquiry: ${i.listing?.title || "Property"}`, time: i.createdAt, icon: "📩" });
+    }
+    recentActivity.sort((a, b) => new Date(b.time).getTime() - new Date(a.time).getTime());
+
+    const inqStats: Record<string, number> = { new: 0, read: 0, responded: 0 };
+    for (const s of inquiryStats) inqStats[s.status] = s._count.id;
+
+    res.json({
+      stats,
+      recentActivity: recentActivity.slice(0, 8),
+      pendingItems: {
+        unapprovedUsers,
+        draftListings: pendingListings,
+        pendingWithdrawals,
+        newInquiries: inqStats.new || 0,
+      },
+      inquiryStats: inqStats,
+      withdrawalStats: {
+        pendingAmount: withdrawalStats._sum.amount || 0,
+        pendingCount: pendingWithdrawals,
+      },
+    });
   } catch (error) {
     logger.error({ err: error }, "Dashboard error:");
     res.status(500).json({ error: "Failed to fetch dashboard" });
