@@ -2,8 +2,15 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { api } from "@/lib/api-client";
+import { useRole } from "@/context/RoleContext";
 
-interface MyTask { id: string; title: string; description: string; propertyType: string; area: string; budget: number; deadline: string; status: string; createdAt: string; }
+interface MyTask {
+  id: string; title: string; description: string; propertyType: string;
+  area: string; budget: number; deadline: string; status: string; createdAt: string;
+  assignedToId?: string | null;
+  assignedTo?: { id: string; name: string } | null;
+  createdBy?: { id: string; name: string; role: string } | null;
+}
 
 const statusStyles: Record<string, string> = {
   open: "bg-amber-100 text-amber-800",
@@ -20,30 +27,48 @@ const statusLabel: Record<string, string> = {
 };
 
 export default function AgentTasksPage() {
+  const { currentUser } = useRole();
   const [tasks, setTasks] = useState<MyTask[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<string>("all");
+  const [claiming, setClaiming] = useState<string | null>(null);
 
-  useEffect(() => {
+  const load = () => {
     setLoading(true);
     api.get<{ tasks: MyTask[] }>("/api/tasks/my")
       .then(r => setTasks(r.data?.tasks || []))
       .catch(() => setTasks([]))
       .finally(() => setLoading(false));
-  }, []);
+  };
 
-  const filtered = filter === "all" ? tasks : tasks.filter(t => t.status === filter);
+  useEffect(() => { load(); }, []);
+
+  const claim = async (id: string) => {
+    setClaiming(id);
+    const { status } = await api.post(`/api/tasks/${id}/claim`);
+    if (status === 200) {
+      setTasks(prev => prev.map(t => t.id === id ? { ...t, assignedTo: { id: currentUser!.id, name: currentUser!.name }, status: "in_progress" } : t));
+    }
+    setClaiming(null);
+  };
+
+  const myTasks = tasks.filter(t => t.assignedTo?.id === currentUser?.id);
+  const openTasks = tasks.filter(t => !t.assignedToId);
+  const showTasks = filter === "open" ? openTasks : filter === "all" ? tasks : myTasks.filter(t => t.status === filter);
+
   const counts = {
     all: tasks.length,
-    open: tasks.filter(t => t.status === "open").length,
-    in_progress: tasks.filter(t => t.status === "in_progress").length,
-    fulfilled: tasks.filter(t => t.status === "fulfilled").length,
+    mine: myTasks.length,
+    open: openTasks.length,
+    in_progress: myTasks.filter(t => t.status === "in_progress").length,
+    fulfilled: myTasks.filter(t => t.status === "fulfilled").length,
   };
 
   const filters = [
     { v: "all", l: "All" },
-    { v: "open", l: "Open" },
-    { v: "in_progress", l: "In progress" },
+    { v: "open", l: "Open to Claim" },
+    { v: "mine", l: "My Tasks" },
+    { v: "in_progress", l: "In Progress" },
     { v: "fulfilled", l: "Done" },
   ];
 
@@ -51,8 +76,8 @@ export default function AgentTasksPage() {
     <div className="space-y-6 pt-2">
       <div className="flex items-center justify-between gap-3 flex-wrap">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">My Tasks</h1>
-          <p className="text-sm text-gray-500">Work assigned to you by your ambassador</p>
+          <h1 className="text-2xl font-bold text-gray-900">Tasks</h1>
+          <p className="text-sm text-gray-500">Your assigned tasks and open tasks you can claim</p>
         </div>
         <Link href="/agent" className="text-xs font-semibold text-gray-600 hover:text-gray-900">← Back to dashboard</Link>
       </div>
@@ -64,48 +89,68 @@ export default function AgentTasksPage() {
             onClick={() => setFilter(f.v)}
             className={`shrink-0 text-xs font-medium px-3.5 py-1.5 rounded-full transition-colors ${filter === f.v ? "bg-gray-900 text-white" : "bg-white border border-gray-200 text-gray-600 hover:border-gray-300"}`}
           >
-            {f.l} <span className="opacity-60 ml-1">{f.v === "all" ? counts.all : counts[f.v as keyof typeof counts]}</span>
+            {f.l} <span className="opacity-60 ml-1">{f.v === "all" ? counts.all : f.v === "open" ? counts.open : f.v === "mine" ? counts.mine : counts[f.v as keyof typeof counts]}</span>
           </button>
         ))}
       </div>
 
       {loading ? (
         <div className="bg-white rounded-xl border border-gray-200 p-10 text-center text-sm text-gray-400">Loading…</div>
-      ) : filtered.length === 0 ? (
+      ) : showTasks.length === 0 ? (
         <div className="bg-white rounded-xl border border-gray-200 p-12 text-center">
           <div className="w-14 h-14 rounded-2xl bg-gray-50 flex items-center justify-center mx-auto mb-3">
             <svg className="w-6 h-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M11.35 3.836c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15a2.25 2.25 0 012.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m8.9-4.414c.376.023.75.05 1.124.08 1.131.094 1.976 1.057 1.976 2.192V16.5A2.25 2.25 0 0118 18.75h-2.25m-7.5-10.5H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V18.75M10.5 16.875h3.75M10.5 11.25h3.75M10.5 14.0625h3.75" /></svg>
           </div>
           <p className="text-sm font-semibold text-gray-900 mb-1">No tasks</p>
-          <p className="text-xs text-gray-500 max-w-sm mx-auto">Your ambassador will assign tasks here. They'll show up automatically.</p>
+          <p className="text-xs text-gray-500 max-w-sm mx-auto">
+            {filter === "open" ? "No open tasks available to claim right now." : "Your ambassador will assign tasks here. They'll show up automatically."}
+          </p>
         </div>
       ) : (
         <div className="space-y-2">
-          {filtered.map(t => (
-            <Link
-              key={t.id}
-              href={`/agent/tasks/${t.id}`}
-              className="block bg-white rounded-xl border border-gray-200 p-4 hover:border-gray-300 hover:shadow-sm transition-all"
-            >
-              <div className="flex items-start justify-between gap-3">
-                <div className="min-w-0 flex-1">
-                  <p className="text-sm font-semibold text-gray-900 truncate">{t.title}</p>
-                  <p className="text-xs text-gray-500 mt-0.5 line-clamp-1">{t.description}</p>
-                  <div className="flex items-center gap-2 mt-2 flex-wrap">
-                    <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-gray-100 text-gray-700 capitalize">{t.propertyType}</span>
-                    <span className="text-[10px] text-gray-500">📍 {t.area}</span>
-                    <span className="text-[10px] text-gray-500">💰 ₦{t.budget.toLocaleString()}</span>
-                    {t.deadline && (
-                      <span className="text-[10px] text-gray-500">⏱ {new Date(t.deadline).toLocaleDateString()}</span>
+          {showTasks.map(t => {
+            const isMine = t.assignedTo?.id === currentUser?.id;
+            const isOpen = !t.assignedToId;
+            return (
+              <div key={t.id} className="bg-white rounded-xl border border-gray-200 p-4 hover:border-gray-300 hover:shadow-sm transition-all">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2">
+                      <p className="text-sm font-semibold text-gray-900 truncate">{t.title}</p>
+                      {isOpen && <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-700">OPEN</span>}
+                    </div>
+                    <p className="text-xs text-gray-500 mt-0.5 line-clamp-1">{t.description}</p>
+                    <div className="flex items-center gap-2 mt-2 flex-wrap">
+                      <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-gray-100 text-gray-700 capitalize">{t.propertyType}</span>
+                      <span className="text-[10px] text-gray-500">📍 {t.area}</span>
+                      <span className="text-[10px] text-gray-500">💰 ₦{t.budget.toLocaleString()}</span>
+                      {t.deadline && <span className="text-[10px] text-gray-500">⏱ {new Date(t.deadline).toLocaleDateString()}</span>}
+                      {isOpen && t.createdBy && <span className="text-[10px] text-gray-400">by {t.createdBy.name}</span>}
+                    </div>
+                  </div>
+                  <div className="shrink-0 flex flex-col items-end gap-2">
+                    <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${statusStyles[t.status] || "bg-gray-100 text-gray-700"}`}>
+                      {statusLabel[t.status] || t.status}
+                    </span>
+                    {isOpen && (
+                      <button
+                        onClick={(e) => { e.preventDefault(); claim(t.id); }}
+                        disabled={claiming === t.id}
+                        className="text-[10px] font-semibold px-3 py-1.5 rounded-lg bg-[var(--color-primary)] text-white hover:bg-[var(--color-primary)]/90 disabled:opacity-50 transition-colors"
+                      >
+                        {claiming === t.id ? "Claiming..." : "Claim Task"}
+                      </button>
+                    )}
+                    {isMine && (
+                      <Link href={`/agent/tasks/${t.id}`} className="text-[10px] font-medium text-[var(--color-primary)] hover:underline">
+                        View Details →
+                      </Link>
                     )}
                   </div>
                 </div>
-                <span className={`shrink-0 text-[10px] font-medium px-2 py-0.5 rounded-full ${statusStyles[t.status] || "bg-gray-100 text-gray-700"}`}>
-                  {statusLabel[t.status] || t.status}
-                </span>
               </div>
-            </Link>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>

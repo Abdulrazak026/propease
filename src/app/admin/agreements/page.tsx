@@ -24,7 +24,7 @@ export default function AdminAgreementsPage() {
     }).catch(() => setLoading(false));
   }, []);
 
-  const filtered = filter === "all" ? agreements : agreements.filter(a => a.status === filter);
+  const filtered = filter === "all" ? agreements : filter === "pending" ? agreements.filter(a => a.status === "pending_landlord" || a.status === "pending_tenant") : agreements.filter(a => a.status === filter);
 
   if (loading) return <div className="flex items-center justify-center h-64"><div className="h-8 w-8 border-2 border-[var(--color-primary)] border-t-transparent rounded-full animate-spin" /></div>;
 
@@ -38,8 +38,8 @@ export default function AdminAgreementsPage() {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        {[{ label: "Total", value: stats.total, bg: "bg-gray-50" },{ label: "Pending Signature", value: stats.pending, bg: "bg-amber-50" },{ label: "Completed", value: stats.completed, bg: "bg-emerald-50" }].map(s => (
-          <div key={s.label} className={`${s.bg} rounded-xl border border-gray-200 p-4 text-center cursor-pointer`} onClick={() => setFilter(filter === s.label.toLowerCase().replace(" ","_") ? "all" : s.label.toLowerCase().replace(" ","_"))}>
+        {[{ label: "Total", value: stats.total, bg: "bg-gray-50", filterKey: "all" },{ label: "Pending Signature", value: stats.pending, bg: "bg-amber-50", filterKey: "pending" },{ label: "Completed", value: stats.completed, bg: "bg-emerald-50", filterKey: "completed" }].map(s => (
+          <div key={s.label} className={`${s.bg} rounded-xl border border-gray-200 p-4 text-center cursor-pointer`} onClick={() => setFilter(filter === s.filterKey ? "all" : s.filterKey)}>
             <p className="text-xs text-gray-500">{s.label}</p><p className="text-2xl font-bold text-gray-900 mt-1">{s.value}</p>
           </div>
         ))}

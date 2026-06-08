@@ -90,7 +90,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"/></svg>
         </button>
         <span className="text-sm font-bold text-white">{getSetting("site_name", "MBPP")} | {resolvedRole || "Dashboard"}</span>
-        <Link href="/" className="text-white/60 text-xs">Exit</Link>
+        <div className="flex items-center gap-2">
+          <Link href="/notifications" className="relative text-white/70 hover:text-white p-1">
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" /></svg>
+            {counts.notifications > 0 && <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-red-500 text-white text-[8px] font-bold rounded-full flex items-center justify-center">{counts.notifications > 9 ? "9+" : counts.notifications}</span>}
+          </Link>
+          <Link href="/" className="text-white/60 text-xs">Exit</Link>
+        </div>
       </div>
 
       {/* Mobile slide-out nav */}
@@ -137,10 +143,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <div className="w-8 h-8 rounded-lg bg-[var(--color-primary)] flex items-center justify-center text-white text-xs font-bold shrink-0">
               {currentUser?.name?.split(" ").map(n => n[0]).join("").slice(0, 2) || "P"}
             </div>
-            <div className="min-w-0">
+            <div className="min-w-0 flex-1">
               <p className="text-xs font-semibold text-white truncate capitalize">{resolvedRole}</p>
               <p className="text-[10px] text-slate-400 capitalize truncate">{currentUser?.city || ""}</p>
             </div>
+            <Link href="/notifications" className="relative text-slate-400 hover:text-white p-1 transition-colors">
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" /></svg>
+              {counts.notifications > 0 && <span className="absolute -top-0.5 -right-0.5 w-3.5 h-3.5 bg-red-500 text-white text-[7px] font-bold rounded-full flex items-center justify-center">{counts.notifications > 9 ? "9+" : counts.notifications}</span>}
+            </Link>
           </div>
         </div>
         <nav className="flex-1 p-2 space-y-0.5 overflow-y-auto"><NavItems /></nav>

@@ -11,9 +11,15 @@ const router = Router();
 router.get("/my", authenticate, authorize("agent", "ambassador", "head"), async (req: AuthRequest, res: Response) => {
   try {
     const tasks = await prisma.task.findMany({
-      where: { assignedToId: req.user!.id },
+      where: {
+        OR: [
+          { assignedToId: req.user!.id },
+          { assignedToId: null, status: "open" },
+        ],
+      },
       include: {
         createdBy: { select: { id: true, name: true, role: true } },
+        assignedTo: { select: { id: true, name: true } },
         comments: {
           include: { author: { select: { id: true, name: true } } },
           orderBy: { createdAt: "asc" },
@@ -180,6 +186,38 @@ router.patch("/:id/status", authenticate, async (req: AuthRequest, res: Response
   } catch (error) {
     logger.error({ err: error }, "Update task status error:");
     res.status(500).json({ error: "Failed to update task status" });
+  }
+});
+
+router.post("/:id/claim", authenticate, authorize("agent"), async (req: AuthRequest, res: Response) => {
+  try {
+    const taskId = req.params.id as string;
+    const task = await prisma.task.findUnique({ where: { id: taskId } });
+    if (!task) {
+      return res.status(404).json({ error: "Task not found" });
+    }
+    if (task.assignedToId) {
+      return res.status(400).json({ error: "This task is already assigned" });
+    }
+
+    const updated = await prisma.task.update({
+      where: { id: taskId },
+      data: { assignedToId: req.user!.id, status: "in_progress" },
+      include: {
+        assignedTo: { select: { id: true, name: true } },
+        createdBy: { select: { id: true, name: true } },
+      },
+    });
+
+    res.json({ task: updated });
+
+    if (updated.createdBy?.email) {
+      const agent = await prisma.user.findUnique({ where: { id: req.user!.id }, select: { name: true } });
+      emailService.taskStatusChanged(updated.createdBy.email, updated.createdBy.name, task.title, "claimed").catch(() => {});
+    }
+  } catch (error) {
+    logger.error({ err: error }, "Claim task error:");
+    res.status(500).json({ error: "Failed to claim task" });
   }
 });
 

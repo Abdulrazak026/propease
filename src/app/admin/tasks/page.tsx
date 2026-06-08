@@ -43,7 +43,7 @@ export default function AdminTasksPage() {
   useEffect(() => { loadAgents(); }, []);
 
   const createTask = async () => {
-    if (!form.title || !form.assignedToId) return;
+    if (!form.title) return;
     setSaving(true);
     await api.post("/api/tasks", {
       title: form.title,
@@ -52,7 +52,7 @@ export default function AdminTasksPage() {
       propertyType: form.propertyType,
       budget: form.budget ? Number(form.budget) : 0,
       deadline: form.deadline || undefined,
-      assignedToId: form.assignedToId,
+      assignedToId: form.assignedToId || undefined,
     });
     setSaving(false);
     setShowCreate(false);
@@ -89,9 +89,9 @@ export default function AdminTasksPage() {
               <input value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/30" placeholder="e.g. Find 3-bed flat in Nassarawa" />
             </div>
             <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">Assign To *</label>
+              <label className="block text-xs font-medium text-gray-600 mb-1">Assign To</label>
               <select value={form.assignedToId} onChange={e => setForm({ ...form, assignedToId: e.target.value })} className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/30">
-                <option value="">Select agent...</option>
+                <option value="">Open — Any agent can take it</option>
                 {agents.map(a => <option key={a.id} value={a.id}>{a.name} ({a.email})</option>)}
               </select>
             </div>
@@ -124,7 +124,7 @@ export default function AdminTasksPage() {
           </div>
           <div className="flex justify-end gap-2">
             <button onClick={() => setShowCreate(false)} className="text-xs font-semibold px-3.5 py-2 rounded-lg border border-gray-200 text-gray-700 hover:bg-gray-50">Cancel</button>
-            <Button disabled={saving || !form.title || !form.assignedToId} onClick={createTask}>{saving ? "Creating..." : "Create Task"}</Button>
+            <Button disabled={saving || !form.title} onClick={createTask}>{saving ? "Creating..." : "Create Task"}</Button>
           </div>
         </div>
       )}

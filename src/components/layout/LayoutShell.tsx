@@ -6,7 +6,7 @@ import { useSettings } from "@/context/SettingsContext";
 import { useRole } from "@/context/RoleContext";
 
 const NO_SIDEBAR_PATHS = ["/login", "/register", "/forgot-password", "/reset-password"];
-const DASHBOARD_PATHS = ["/admin", "/agent", "/ambassador", "/wallet"];
+const DASHBOARD_PATHS = ["/admin", "/agent", "/ambassador", "/wallet", "/messages", "/notifications"];
 
 export default function LayoutShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
