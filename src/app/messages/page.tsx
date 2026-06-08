@@ -103,9 +103,9 @@ function MessagesPage() {
           unread: 0,
         };
         setConversations(prev => [formattedConv, ...prev]);
-        setSelectedId(conv.id);
         setNewConvo(null);
         setNewMessage("");
+        // Stay on inbox list so user can see the new conversation
       }
     } catch {}
   };

@@ -89,14 +89,12 @@ export default function Navbar() {
         )}
       </Link>
       <div className="flex-1 min-w-0" />
-      <div className="mr-1 shrink-0"><LangPill /></div>
       {isAuthenticated && currentUser ? (
-        <Link
-          href={currentUser.role === "head" ? "/admin" : `/${currentUser.role}`}
-          className="w-8 h-8 rounded-full bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary-light)] flex items-center justify-center text-white text-[10px] font-bold shadow-sm shrink-0 ml-3"
+        <div
+          className="w-8 h-8 rounded-full bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary-light)] flex items-center justify-center text-white text-[10px] font-bold shadow-sm shrink-0 ml-3 cursor-default"
         >
           {currentUser.name?.split(" ").map(n => n[0]).join("").slice(0, 2) || "?"}
-        </Link>
+        </div>
       ) : (
         <Link
           href="/login"
@@ -180,7 +178,6 @@ export default function Navbar() {
         <div className="flex-1" />
 
         <div className="flex items-center gap-2">
-          <div className="mr-1"><LangPill /></div>
           {isAuthenticated && currentUser ? (
             <div ref={userRef} className="relative">
               <button
