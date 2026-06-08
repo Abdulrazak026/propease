@@ -224,13 +224,34 @@ export default function ListingDetail() {
                   {listing.status === "available" ? "Reserve This Property" : "Already Reserved"}
                 </Button>
 
-                <Link
-                  href={currentUser ? `/messages?id=new&listing=${listing.id}&agent=${listing.assignedAgent?.id || listing.postedBy?.id}` : `/login?redirect=${encodeURIComponent(`/messages?id=new&listing=${listing.id}&agent=${listing.assignedAgent?.id || listing.postedBy?.id}`)}`}
+                <button
+                  onClick={async () => {
+                    if (!currentUser) {
+                      router.push(`/login?redirect=${encodeURIComponent(window.location.pathname)}`);
+                      return;
+                    }
+                    const agentId = listing.assignedAgent?.id || listing.postedBy?.id;
+                    if (!agentId) return;
+                    try {
+                      const r = await api.post("/api/messages/conversations", {
+                        recipientId: agentId,
+                        listingId: listing.id,
+                        content: `Hi! I'm interested in "${listing.title}" (${formatNaira(listing.price)}). Is it still available?`,
+                      });
+                      if ((r.data as any)?.conversation?.id) {
+                        router.push(`/messages?id=${(r.data as any).conversation.id}`);
+                      } else if ((r.data as any)?.id) {
+                        router.push(`/messages?id=${(r.data as any).id}`);
+                      }
+                    } catch (err) {
+                      console.error("Failed to create conversation:", err);
+                    }
+                  }}
                   className="inline-flex items-center justify-center gap-2 w-full px-4 py-2.5 rounded-lg text-sm font-medium text-white bg-[var(--color-primary)] hover:bg-[var(--color-primary-light)] transition-colors"
                 >
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>
                   Message Agent
-                </Link>
+                </button>
 
                 {(() => {
                   const waRaw = listing.assignedAgent?.whatsapp || getSetting("support_whatsapp");
