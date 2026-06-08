@@ -48,10 +48,11 @@ export default function ApplyAsAgentPage() {
   const handleConfirm = async () => {
     setSubmitting(true);
     setError("");
+    const tempPassword = form.phone.length >= 8 ? form.phone : `Agent${form.phone}2026!`;
     const { status } = await api.post("/api/auth/register", {
       name: form.fullName,
       email: form.email,
-      password: form.phone,
+      password: tempPassword,
       role: "agent",
       city: form.location,
     });

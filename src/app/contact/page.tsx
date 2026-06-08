@@ -2,6 +2,7 @@
 import { useState } from "react";
 import Button from "@/components/ui/Button";
 import { useSettings } from "@/context/SettingsContext";
+import { api } from "@/lib/api-client";
 
 const faqs = [
   { q: "How do I schedule a property viewing?", a: "Click 'Inquire' on the property page, fill in your details, and the assigned agent will contact you within 24 hours to arrange a viewing." },
@@ -18,23 +19,17 @@ export default function ContactPage() {
   const [error, setError] = useState("");
   const [openFaq, setOpenFaq] = useState<number | null>(null);
 
-  const API = process.env.NEXT_PUBLIC_API_URL || "https://propease-production.up.railway.app";
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSending(true);
     setError("");
     try {
-      const res = await fetch(`${API}/api/contact`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
-      });
-      if (!res.ok) {
-        const d = await res.json().catch(() => ({}));
-        throw new Error(d.error || "Failed to send message");
+      const { status, data, error: apiError } = await api.post("/api/contact", form);
+      if (status === 200 || status === 201) {
+        setSubmitted(true);
+      } else {
+        setError((data as any)?.error || apiError || "Failed to send message");
       }
-      setSubmitted(true);
     } catch (err: any) {
       setError(err.message || "Something went wrong");
     }
