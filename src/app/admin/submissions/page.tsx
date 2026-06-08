@@ -1,12 +1,13 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { api } from "@/lib/api-client";
 import Badge from "@/components/ui/Badge";
 import Button from "@/components/ui/Button";
 
 interface AgentApp { id: string; name: string; email: string; city: string | null; whatsapp: string | null; createdAt: string; }
 interface ContactSub { id: string; name: string; email: string; phone: string | null; subject: string | null; message: string; read: boolean; createdAt: string; }
-interface Inquiry { id: string; clientName: string; clientContact: string; message: string; status: string; createdAt: string; listing?: { title: string } | null; }
+interface Inquiry { id: string; clientName: string; clientContact: string; message: string; status: string; createdAt: string; listing?: { id: string; title: string } | null; assignedAgent?: { id: string; name: string } | null; }
+interface Conversation { id: string; messages: { id: string; content: string; senderId: string; sender?: { name: string }; createdAt: string }[]; participants: { user: { id: string; name: string } }[]; }
 
 export default function SubmissionsPage() {
   const [tab, setTab] = useState<"agents" | "contacts" | "inquiries">("agents");
@@ -14,6 +15,10 @@ export default function SubmissionsPage() {
   const [contacts, setContacts] = useState<ContactSub[]>([]);
   const [inquiries, setInquiries] = useState<Inquiry[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedInquiry, setSelectedInquiry] = useState<Inquiry | null>(null);
+  const [inquiryConversation, setInquiryConversation] = useState<Conversation | null>(null);
+  const [loadingConversation, setLoadingConversation] = useState(false);
+  const chatScrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     Promise.all([
@@ -26,6 +31,21 @@ export default function SubmissionsPage() {
       setLoading(false);
     }).catch(() => setLoading(false));
   }, []);
+
+  useEffect(() => {
+    if (chatScrollRef.current) chatScrollRef.current.scrollTop = chatScrollRef.current.scrollHeight;
+  }, [inquiryConversation?.messages?.length]);
+
+  const openInquiry = async (inquiry: Inquiry) => {
+    setSelectedInquiry(inquiry);
+    setLoadingConversation(true);
+    setInquiryConversation(null);
+    try {
+      const r = await api.get<{ inquiry: Inquiry; conversation: Conversation | null }>(`/api/inquiries/${inquiry.id}/conversation`);
+      if (r.data?.conversation) setInquiryConversation(r.data.conversation);
+    } catch {}
+    setLoadingConversation(false);
+  };
 
   const approveAgent = async (id: string) => {
     await api.patch(`/api/admin/users/${id}`, { isApproved: true, suspendedAt: null });
@@ -47,6 +67,11 @@ export default function SubmissionsPage() {
     if (!confirm("Delete this submission?")) return;
     await api.delete(`/api/admin/submissions/contact/${id}`);
     setContacts(prev => prev.filter(c => c.id !== id));
+  };
+
+  const updateInquiryStatus = async (id: string, status: string) => {
+    await api.patch(`/api/inquiries/${id}/status`, { status });
+    setInquiries(prev => prev.map(i => i.id === id ? { ...i, status } : i));
   };
 
   const unreadCount = contacts.filter(c => !c.read).length;
@@ -139,27 +164,82 @@ export default function SubmissionsPage() {
           )}
         </div>
       ) : (
-        <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-          {inquiries.length === 0 ? (
-            <div className="px-4 py-12 text-center text-gray-400 text-sm">No property inquiries yet</div>
-          ) : (
-            <div className="divide-y divide-gray-100">
-              {inquiries.map(i => (
-                <div key={i.id} className={`px-4 py-3 hover:bg-gray-50/50 ${i.status === "new" ? "bg-emerald-50/30" : ""}`}>
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="text-xs font-semibold text-gray-900">{i.clientName}</span>
-                        <span className="text-[10px] text-gray-400">{i.clientContact}</span>
-                        <Badge variant={i.status === "new" ? "warning" : i.status === "responded" ? "success" : "default"}>{i.status}</Badge>
-                      </div>
-                      {i.listing && <p className="text-[10px] text-gray-500 mb-1">Re: {i.listing.title}</p>}
-                      <p className="text-xs text-gray-600 line-clamp-2">{i.message}</p>
-                      <p className="text-[10px] text-gray-400 mt-1">{new Date(i.createdAt).toLocaleString()}</p>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+          {/* Inquiry List */}
+          <div className={`bg-white rounded-xl border border-gray-200 overflow-hidden ${selectedInquiry ? "hidden lg:block" : ""}`}>
+            {inquiries.length === 0 ? (
+              <div className="px-4 py-12 text-center text-gray-400 text-sm">No property inquiries yet</div>
+            ) : (
+              <div className="divide-y divide-gray-100 max-h-[600px] overflow-y-auto">
+                {inquiries.map(i => (
+                  <button key={i.id} onClick={() => openInquiry(i)} className={`w-full text-left px-4 py-3 hover:bg-gray-50/50 transition-colors ${selectedInquiry?.id === i.id ? "bg-emerald-50/50 border-l-2 border-emerald-500" : ""} ${i.status === "new" ? "bg-emerald-50/30" : ""}`}>
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="text-xs font-semibold text-gray-900">{i.clientName}</span>
+                      <Badge variant={i.status === "new" ? "warning" : i.status === "responded" ? "success" : "default"}>{i.status}</Badge>
                     </div>
+                    {i.listing && <p className="text-[10px] text-gray-500 mb-1 truncate">Re: {i.listing.title}</p>}
+                    {i.assignedAgent && <p className="text-[10px] text-emerald-600 mb-1">Agent: {i.assignedAgent.name}</p>}
+                    <p className="text-xs text-gray-600 line-clamp-1">{i.message}</p>
+                    <p className="text-[10px] text-gray-400 mt-1">{new Date(i.createdAt).toLocaleString()}</p>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Conversation Detail */}
+          {selectedInquiry && (
+            <div className="lg:col-span-2 bg-white rounded-xl border border-gray-200 overflow-hidden flex flex-col max-h-[600px]">
+              <div className="px-4 py-3 border-b border-gray-100 flex items-center justify-between shrink-0">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <button onClick={() => { setSelectedInquiry(null); setInquiryConversation(null); }} className="lg:hidden text-gray-400 hover:text-gray-600">
+                      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" /></svg>
+                    </button>
+                    <h3 className="text-sm font-semibold text-gray-900">{selectedInquiry.clientName}</h3>
+                    <Badge variant={selectedInquiry.status === "new" ? "warning" : selectedInquiry.status === "responded" ? "success" : "default"}>{selectedInquiry.status}</Badge>
                   </div>
+                  <p className="text-[10px] text-gray-500 mt-0.5">
+                    {selectedInquiry.listing ? `Re: ${selectedInquiry.listing.title}` : "General inquiry"}
+                    {selectedInquiry.assignedAgent ? ` · Agent: ${selectedInquiry.assignedAgent.name}` : ""}
+                  </p>
                 </div>
-              ))}
+                <div className="flex gap-1">
+                  {selectedInquiry.status === "new" && <Button size="sm" variant="ghost" onClick={() => updateInquiryStatus(selectedInquiry.id, "read")}>Mark Read</Button>}
+                  {selectedInquiry.status !== "responded" && <Button size="sm" variant="primary" onClick={() => updateInquiryStatus(selectedInquiry.id, "responded")}>Mark Responded</Button>}
+                </div>
+              </div>
+
+              {/* Chat messages */}
+              <div ref={chatScrollRef} className="flex-1 overflow-y-auto p-4 space-y-3 bg-gray-50">
+                {loadingConversation ? (
+                  <div className="flex items-center justify-center h-full">
+                    <div className="w-6 h-6 border-2 border-[var(--color-primary)] border-t-transparent rounded-full animate-spin" />
+                  </div>
+                ) : inquiryConversation?.messages?.length ? (
+                  inquiryConversation.messages.map(msg => {
+                    const senderName = msg.sender?.name || "Unknown";
+                    const isCustomer = msg.senderId !== selectedInquiry.assignedAgent?.id;
+                    return (
+                      <div key={msg.id} className={`flex ${isCustomer ? "justify-start" : "justify-end"}`}>
+                        <div className="max-w-[80%]">
+                          <p className="text-[10px] text-gray-400 mb-0.5 px-1">{senderName}</p>
+                          <div className={`px-3 py-2 rounded-xl text-sm ${isCustomer ? "bg-white border border-gray-200 text-gray-900 rounded-bl-sm" : "bg-[var(--color-primary)] text-white rounded-br-sm"}`}>
+                            {msg.content}
+                          </div>
+                          <p className="text-[10px] text-gray-400 mt-0.5 px-1">{new Date(msg.createdAt).toLocaleString()}</p>
+                        </div>
+                      </div>
+                    );
+                  })
+                ) : (
+                  <div className="flex flex-col items-center justify-center h-full text-center">
+                    <p className="text-sm text-gray-500 mb-2">No conversation found</p>
+                    <p className="text-xs text-gray-400">{selectedInquiry.clientContact ? `Contact: ${selectedInquiry.clientContact}` : "No contact info"}</p>
+                    <p className="text-xs text-gray-400 mt-1">{selectedInquiry.message}</p>
+                  </div>
+                )}
+              </div>
             </div>
           )}
         </div>

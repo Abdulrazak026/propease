@@ -105,12 +105,47 @@ router.get("/all", authenticate, authorize("head"), async (_req: AuthRequest, re
   try {
     const inquiries = await prisma.inquiry.findMany({
       orderBy: { createdAt: "desc" },
-      include: { listing: { select: { title: true } } },
+      include: {
+        listing: { select: { id: true, title: true } },
+        assignedAgent: { select: { id: true, name: true } },
+      },
       take: 100,
     });
     res.json({ inquiries });
   } catch (error) {
     res.status(500).json({ error: "Failed to fetch inquiries" });
+  }
+});
+
+router.get("/:id/conversation", authenticate, authorize("head"), async (req: AuthRequest, res: Response) => {
+  try {
+    const inquiry = await prisma.inquiry.findUnique({
+      where: { id: req.params.id as string },
+      include: {
+        listing: { select: { id: true, title: true } },
+        assignedAgent: { select: { id: true, name: true } },
+      },
+    });
+    if (!inquiry) return res.status(404).json({ error: "Inquiry not found" });
+
+    let conversation: any = null;
+    if (inquiry.listingId && inquiry.clientContact) {
+      conversation = await prisma.conversation.findFirst({
+        where: {
+          listingId: inquiry.listingId,
+          participants: { some: { user: { email: inquiry.clientContact } } },
+        },
+        include: {
+          participants: { include: { user: { select: { id: true, name: true, email: true } } } },
+          messages: { orderBy: { createdAt: "asc" }, include: { sender: { select: { id: true, name: true } } } },
+        },
+      });
+    }
+
+    res.json({ inquiry, conversation });
+  } catch (error) {
+    logger.error({ err: error }, "Get inquiry conversation error:");
+    res.status(500).json({ error: "Failed to fetch inquiry details" });
   }
 });
 
