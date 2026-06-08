@@ -48,8 +48,8 @@ export default function ApplyAsAgentPage() {
   const handleConfirm = async () => {
     setSubmitting(true);
     setError("");
-    const tempPassword = form.phone.length >= 8 ? form.phone : `Agent${form.phone}2026!`;
-    const { status } = await api.post("/api/auth/register", {
+    const tempPassword = `Agent${form.phone.replace(/[^0-9]/g, "")}2026!`;
+    const { status, data, error: apiError } = await api.post("/api/auth/register", {
       name: form.fullName,
       email: form.email,
       password: tempPassword,
@@ -57,12 +57,12 @@ export default function ApplyAsAgentPage() {
       city: form.location,
     });
     setSubmitting(false);
-    if (status === 201) {
+    if (status === 201 || status === 200) {
       setStep("done");
     } else if (status === 409) {
       setError("This email is already registered");
     } else {
-      setError("Submission failed. Please try again.");
+      setError((data as any)?.error || apiError || "Submission failed. Please try again.");
     }
   };
 

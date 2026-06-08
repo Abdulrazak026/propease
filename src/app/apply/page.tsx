@@ -3,8 +3,7 @@ import { Suspense, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Button from "@/components/ui/Button";
-
-const API = process.env.NEXT_PUBLIC_API_URL || "https://propease-production.up.railway.app";
+import { api } from "@/lib/api-client";
 
 type Step = 1 | 2 | 3 | 4 | 5 | 6;
 
@@ -118,36 +117,32 @@ function ApplyPage() {
     setSending(true);
     setError("");
     try {
-      const res = await fetch(`${API}/api/applications`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          fullName: form.fullName,
-          email: form.email,
-          phone: form.phone,
-          listingId: form.listingId || undefined,
-          dateOfBirth: form.dateOfBirth || undefined,
-          employmentStatus: form.employmentStatus,
-          employer: form.employer,
-          jobTitle: form.jobTitle,
-          workAddress: form.workAddress,
-          idType: form.idType,
-          idNumber: form.idNumber,
-          refName: form.refName,
-          refPhone: form.refPhone,
-          refEmail: form.refEmail,
-          refRelation: form.refRelation,
-          nokName: form.nokName,
-          nokPhone: form.nokPhone,
-          nokEmail: form.nokEmail,
-          nokRelation: form.nokRelation,
-        }),
+      const { status, data, error: apiError } = await api.post("/api/applications", {
+        fullName: form.fullName,
+        email: form.email,
+        phone: form.phone,
+        listingId: form.listingId || undefined,
+        dateOfBirth: form.dateOfBirth || undefined,
+        employmentStatus: form.employmentStatus,
+        employer: form.employer,
+        jobTitle: form.jobTitle,
+        workAddress: form.workAddress,
+        idType: form.idType,
+        idNumber: form.idNumber,
+        refName: form.refName,
+        refPhone: form.refPhone,
+        refEmail: form.refEmail,
+        refRelation: form.refRelation,
+        nokName: form.nokName,
+        nokPhone: form.nokPhone,
+        nokEmail: form.nokEmail,
+        nokRelation: form.nokRelation,
       });
-      if (!res.ok) {
-        const d = await res.json().catch(() => ({}));
-        throw new Error(d.error || "Failed to submit application");
+      if (status === 201 || status === 200) {
+        setSubmitted(true);
+      } else {
+        setError((data as any)?.error || apiError || "Failed to submit application");
       }
-      setSubmitted(true);
     } catch (err: any) {
       setError(err.message || "Something went wrong");
     }
