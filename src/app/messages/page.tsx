@@ -58,6 +58,7 @@ function MessagesPage() {
   const searchParams = useSearchParams();
   const newListingId = searchParams.get("listing");
   const newAgentId = searchParams.get("agent");
+  const directConvoId = searchParams.get("id");
 
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [loading, setLoading] = useState(true);
@@ -77,6 +78,12 @@ function MessagesPage() {
     const interval = setInterval(fetch, 10000);
     return () => clearInterval(interval);
   }, []);
+
+  useEffect(() => {
+    if (directConvoId) {
+      setSelectedId(directConvoId);
+    }
+  }, [directConvoId]);
 
   useEffect(() => {
     if (newListingId && newAgentId) {

@@ -65,16 +65,10 @@ export default function Footer() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-10 lg:gap-8">
           <div className="lg:col-span-4 space-y-5">
             <Link href="/" className="inline-flex items-center gap-2.5">
-              {logo ? (
-                <img src={logo} alt={brand} className="h-10 w-auto" style={{ filter: "brightness(0) invert(1)" }} />
-              ) : (
-                <>
-                  <div className="w-10 h-10 rounded-lg bg-white flex items-center justify-center">
-                    <span className="text-gray-950 font-black text-base">M</span>
-                  </div>
-                  <span className="text-base font-bold text-white tracking-tight">MBPP</span>
-                </>
-              )}
+              <div className="w-10 h-10 rounded-lg bg-white flex items-center justify-center">
+                <span className="text-gray-950 font-black text-base">M</span>
+              </div>
+              <span className="text-base font-bold text-white tracking-tight">{brand}</span>
             </Link>
             <p className="text-sm leading-relaxed text-gray-400 max-w-sm">{tagline}</p>
             <div className="space-y-2">

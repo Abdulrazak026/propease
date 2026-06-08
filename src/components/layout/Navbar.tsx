@@ -1,10 +1,9 @@
 "use client";
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
-import { useRouter, usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useRole } from "@/context/RoleContext";
 import { useSettings } from "@/context/SettingsContext";
-import LangPill from "@/components/layout/LangPill";
 
 const PRIMARY_LINKS = [
   { label: "Buy", href: "/?type=buy" },
@@ -25,7 +24,7 @@ const MORE_LINKS = [
 export default function Navbar() {
   const router = useRouter();
   const pathname = usePathname();
-  const { currentUser, setCurrentUser, isAuthenticated } = useRole();
+  const { currentUser, setCurrentUser, isAuthenticated, loading } = useRole();
   const { get: getSetting } = useSettings();
   const [moreOpen, setMoreOpen] = useState(false);
   const [userOpen, setUserOpen] = useState(false);
@@ -89,7 +88,9 @@ export default function Navbar() {
         )}
       </Link>
       <div className="flex-1 min-w-0" />
-      {isAuthenticated && currentUser ? (
+      {loading ? (
+        <div className="w-8 h-8 ml-3" />
+      ) : isAuthenticated && currentUser ? (
         <div
           className="w-8 h-8 rounded-full bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary-light)] flex items-center justify-center text-white text-[10px] font-bold shadow-sm shrink-0 ml-3 cursor-default"
         >
@@ -178,7 +179,9 @@ export default function Navbar() {
         <div className="flex-1" />
 
         <div className="flex items-center gap-2">
-          {isAuthenticated && currentUser ? (
+          {loading ? (
+            <div className="w-20 h-8" />
+          ) : isAuthenticated && currentUser ? (
             <div ref={userRef} className="relative">
               <button
                 onClick={() => setUserOpen(!userOpen)}
