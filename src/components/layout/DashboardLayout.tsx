@@ -265,20 +265,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
             {/* Scrollable content */}
             <div className="flex-1 overflow-y-auto pb-4">
-              {/* Quick actions */}
-              <div className="px-4 pt-4 pb-2">
-                <div className="grid grid-cols-4 gap-2">
-                  {quickActions.map(qa => (
-                    <Link key={qa.href} href={qa.href} onClick={() => setMobileOpen(false)} className="flex flex-col items-center gap-1.5 p-3 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors">
-                      <span className="text-gray-500">{qa.icon}</span>
-                      <span className="text-[10px] font-medium text-gray-700">{qa.label}</span>
-                    </Link>
-                  ))}
-                </div>
-              </div>
-
               {/* Nav items */}
-              <div className="mt-2">
+              <div className="pt-2">
                 <MobileNavItems />
               </div>
             </div>
