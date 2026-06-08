@@ -209,9 +209,6 @@ export default function AdminApplicationsPage() {
 
               {/* Status Actions */}
               <div className="flex gap-2 pt-2">
-                <Button variant="outline" className="flex-1" disabled={updating} onClick={() => updateStatus(selected.id, "under_review")}>
-                  {updating ? "..." : "Under Review"}
-                </Button>
                 <Button variant="primary" className="flex-1" disabled={updating} onClick={() => updateStatus(selected.id, "approved")}>
                   {updating ? "..." : "Approve"}
                 </Button>
