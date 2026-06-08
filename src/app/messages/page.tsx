@@ -67,10 +67,15 @@ function MessagesPage() {
   const [newMessage, setNewMessage] = useState("");
 
   useEffect(() => {
-    api.get<{ conversations: Conversation[] }>("/api/messages/conversations").then(r => {
-      if (r.data?.conversations) setConversations(r.data.conversations);
-      setLoading(false);
-    }).catch(() => setLoading(false));
+    const fetch = () => {
+      api.get<{ conversations: Conversation[] }>("/api/messages/conversations").then(r => {
+        if (r.data?.conversations) setConversations(r.data.conversations);
+        setLoading(false);
+      }).catch(() => setLoading(false));
+    };
+    fetch();
+    const interval = setInterval(fetch, 15000);
+    return () => clearInterval(interval);
   }, []);
 
   useEffect(() => {
@@ -193,7 +198,7 @@ function MessagesPage() {
             ))}
           </div>
         ) : filtered.length === 0 ? (
-          <div className="text-center py-20 px-6">
+          <div className="flex flex-col items-center justify-center h-full text-center px-6 py-20">
             <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center mx-auto mb-4">
               <svg className="w-7 h-7 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
@@ -259,10 +264,15 @@ function ConversationDetail({ conversation, onBack }: { conversation: Conversati
 
   useEffect(() => {
     setLoading(true);
-    api.get<any>(`/api/messages/conversations/${conversation.id}`).then(r => {
-      if ((r.data as any)?.messages) setMessages((r.data as any).messages);
-      setLoading(false);
-    }).catch(() => setLoading(false));
+    const fetch = () => {
+      api.get<any>(`/api/messages/conversations/${conversation.id}`).then(r => {
+        if ((r.data as any)?.messages) setMessages((r.data as any).messages);
+        setLoading(false);
+      }).catch(() => setLoading(false));
+    };
+    fetch();
+    const interval = setInterval(fetch, 5000);
+    return () => clearInterval(interval);
   }, [conversation.id]);
 
   useEffect(() => {

@@ -75,10 +75,15 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   // Fetch notifications
   useEffect(() => {
     if (!isAuthenticated) return;
-    api.get<{ notifications: any[]; unread: number }>("/api/notifications").then(r => {
-      if (r.data?.notifications) setNotifs(r.data.notifications.slice(0, 8));
-      if (r.data?.unread !== undefined) setUnreadCount(r.data.unread);
-    }).catch(() => {});
+    const fetch = () => {
+      api.get<{ notifications: any[]; unread: number }>("/api/notifications").then(r => {
+        if (r.data?.notifications) setNotifs(r.data.notifications.slice(0, 8));
+        if (r.data?.unread !== undefined) setUnreadCount(r.data.unread);
+      }).catch(() => {});
+    };
+    fetch();
+    const interval = setInterval(fetch, 30000);
+    return () => clearInterval(interval);
   }, [isAuthenticated]);
 
   // Auto-expand groups with active items
@@ -108,6 +113,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     setUnreadCount(prev => Math.max(0, prev - 1));
   };
 
+  const markAllRead = async () => {
+    await api.patch("/api/notifications/read-all");
+    setNotifs(prev => prev.map(n => ({ ...n, read: true })));
+    setUnreadCount(0);
+  };
+
   const bellIcon = (
     <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
       <path strokeLinecap="round" strokeLinejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" />
@@ -118,7 +129,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     <div className={`${mobile ? "w-full" : "absolute right-0 top-full mt-2 w-80"} bg-white rounded-xl shadow-xl border border-gray-200 z-50 overflow-hidden`}>
       <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
         <span className="text-sm font-semibold text-gray-900">Notifications</span>
-        {unreadCount > 0 && <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-red-500 text-white">{unreadCount}</span>}
+        <div className="flex items-center gap-2">
+          {unreadCount > 0 && <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-red-500 text-white">{unreadCount}</span>}
+          {unreadCount > 0 && (
+            <button onClick={markAllRead} className="text-[10px] font-medium text-[var(--color-primary)] hover:underline">Mark all read</button>
+          )}
+        </div>
       </div>
       <div className="max-h-80 overflow-y-auto">
         {notifs.length === 0 ? (
@@ -127,8 +143,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           <button key={n.id} onClick={() => { if (!n.read) markRead(n.id); if (n.link) router.push(n.link); setNotifOpen(false); }} className={`w-full text-left px-4 py-3 flex items-start gap-3 hover:bg-gray-50 transition-colors border-b border-gray-50 ${!n.read ? "bg-blue-50/40" : ""}`}>
             <span className="text-base mt-0.5 shrink-0">{NOTIF_ICONS[n.type] || "🔔"}</span>
             <div className="min-w-0 flex-1">
-              <p className="text-xs font-medium text-gray-900 truncate">{n.title}</p>
-              <p className="text-[11px] text-gray-500 truncate mt-0.5">{n.body}</p>
+              <p className="text-xs font-medium text-gray-900">{n.title}</p>
+              <p className="text-[11px] text-gray-500 mt-0.5 leading-relaxed">{n.body}</p>
               <p className="text-[10px] text-gray-400 mt-1">{timeAgo(n.createdAt)}</p>
             </div>
             {!n.read && <span className="w-2 h-2 rounded-full bg-[var(--color-primary)] shrink-0 mt-1.5" />}

@@ -22,6 +22,10 @@ export async function generateMetadata(): Promise<Metadata> {
     title: s.meta_title || "Mutual Benefit Premier Properties | Real Estate Marketplace, Kano",
     description: s.meta_description || "Find verified houses, land, flats and commercial properties for rent and sale in Kano, Nigeria.",
     manifest: "/manifest.webmanifest",
+    icons: {
+      icon: "/icons/favicon.svg",
+      apple: "/icons/icon-192x192.png",
+    },
     openGraph: { title: s.meta_title || "MBPP", description: s.meta_description || "", images: s.og_image ? [s.og_image] : [], siteName: s.site_name || "MBPP", type: "website" },
     twitter: { card: "summary_large_image", title: s.meta_title || "MBPP", description: s.meta_description || "", images: s.og_image ? [s.og_image] : [] },
     other: {
