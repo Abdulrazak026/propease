@@ -17,6 +17,8 @@ export const dashboardNav: Record<string, NavItem[]> = {
     { label: "Inquiries", href: "/admin/crm", icon: "messages", group: "Inbox" },
     { label: "Tasks", href: "/admin/tasks", icon: "tasks", badge: "tasks", permission: "canCreateTasks", group: "Operations" },
     { label: "Applications", href: "/admin/applications", icon: "applications", group: "Operations" },
+    { label: "Reservations", href: "/admin/reservations", icon: "agreements", group: "Operations" },
+    { label: "Custom Orders", href: "/admin/custom-orders", icon: "tasks", group: "Operations" },
     { label: "Agreements", href: "/admin/agreements", icon: "agreements", permission: "canManageAgreements", group: "Operations" },
     { label: "Deals", href: "/admin/deals", icon: "audit", permission: "canCloseDeals", group: "Operations" },
     { label: "Commissions", href: "/admin/commissions", icon: "commissions", group: "Operations" },

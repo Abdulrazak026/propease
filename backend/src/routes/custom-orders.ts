@@ -57,6 +57,7 @@ router.get("/", authenticate, async (req: AuthRequest, res: Response) => {
     if (req.user!.role === "ambassador") {
       where = { area: req.user!.city || "" };
     }
+    // head/admin sees all - no filter
 
     const orders = await prisma.customOrder.findMany({
       where,
@@ -68,6 +69,20 @@ router.get("/", authenticate, async (req: AuthRequest, res: Response) => {
   } catch (error) {
     logger.error({ err: error }, "List custom orders error:");
     res.status(500).json({ error: "Failed to fetch custom orders" });
+  }
+});
+
+router.patch("/:id/status", authenticate, async (req: AuthRequest, res: Response) => {
+  try {
+    const { status } = req.body;
+    const order = await prisma.customOrder.update({
+      where: { id: req.params.id as string },
+      data: { status },
+    });
+    res.json({ order });
+  } catch (error) {
+    logger.error({ err: error }, "Update custom order error:");
+    res.status(500).json({ error: "Failed to update order" });
   }
 });
 
