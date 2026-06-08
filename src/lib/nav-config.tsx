@@ -11,7 +11,6 @@ export const dashboardNav: Record<string, NavItem[]> = {
   admin: [
     { label: "Dashboard", href: "/admin", icon: "dashboard", group: "Overview" },
     { label: "Submissions", href: "/admin/submissions", icon: "inquiries", group: "Inbox" },
-    { label: "Messages", href: "/messages", icon: "messages", group: "Inbox" },
     { label: "Notifications", href: "/notifications", icon: "notifications", group: "Inbox" },
     { label: "Users", href: "/admin/users", icon: "users", permission: "canManageUsers", group: "People" },
     { label: "Staffs", href: "/admin/staffs", icon: "tasks", permission: "canManageUsers", group: "People" },

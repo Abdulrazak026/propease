@@ -773,7 +773,15 @@ export const templates = {
        
        <p>A new custom property request has been submitted. Route to the appropriate ambassador in ${area}.</p>`,
       ["View Dashboard", `${URL}/admin`],
-      `New custom order: ${propertyType} in ${area}, budget ₦${budget.toLocaleString()}`
-    );
-  },
+       `New custom order: ${propertyType} in ${area}, budget ₦${budget.toLocaleString()}`
+     );
+   },
+   newsletter(body: string) {
+     return base(
+       "Newsletter from MBPP 📰",
+       body,
+       undefined,
+       "You have a new newsletter from MBPP Properties."
+     );
+   },
 };

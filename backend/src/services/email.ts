@@ -200,4 +200,7 @@ export const emailService = {
     const html = defaultTemplates.customOrderReceived(name, email, propertyType, area, budget);
     return send(supportEmail, `New custom order \u2014 ${propertyType} in ${area}`, html);
   },
+  async sendNewsletter(email: string, subject: string, html: string) {
+    return send(email, subject, html);
+  },
 };

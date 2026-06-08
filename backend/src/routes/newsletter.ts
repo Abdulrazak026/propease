@@ -3,6 +3,7 @@ import prisma from "../lib/prisma";
 import { authenticate, AuthRequest } from "../middleware/auth";
 import { authorize } from "../middleware/rbac";
 import { logger } from "../lib/logger";
+import { emailService } from "../services/email";
 
 const router = Router();
 
@@ -49,6 +50,42 @@ router.delete("/subscribers/:id", authenticate, authorize("head"), async (req, r
     res.json({ message: "Deleted" });
   } catch (error) {
     res.status(500).json({ error: "Failed to delete" });
+  }
+});
+
+router.post("/send", authenticate, authorize("head"), async (req: AuthRequest, res: Response) => {
+  try {
+    const { subject, body } = req.body;
+    if (!subject || !body) {
+      return res.status(400).json({ error: "Subject and body are required" });
+    }
+
+    const subscribers = await prisma.newsletterSubscriber.findMany({
+      where: { isActive: true },
+    });
+
+    if (subscribers.length === 0) {
+      return res.status(400).json({ error: "No active subscribers" });
+    }
+
+    const { templates } = await import("../services/email-templates");
+    const newsletterHtml = (templates as any).newsletter
+      ? (templates as any).newsletter(body)
+      : body;
+
+    let sent = 0;
+    for (const sub of subscribers) {
+      try {
+        await emailService.sendNewsletter(sub.email, subject, newsletterHtml);
+        sent++;
+      } catch {}
+    }
+
+    logger.info(`Newsletter sent to ${sent}/${subscribers.length} subscribers`);
+    res.json({ success: true, sent, total: subscribers.length });
+  } catch (error) {
+    logger.error({ err: error }, "Send newsletter error:");
+    res.status(500).json({ error: "Failed to send newsletter" });
   }
 });
 

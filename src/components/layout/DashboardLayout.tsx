@@ -84,13 +84,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   // Auto-expand groups with active items
   useEffect(() => {
     if (resolvedRole !== "admin") return;
-    const newExpanded: Record<string, boolean> = {};
     Object.entries(groups).forEach(([groupName, groupItems]) => {
       if (groupItems.some(item => pathname === item.href || pathname.startsWith(item.href + "/"))) {
-        newExpanded[groupName] = true;
+        setExpandedGroups(prev => ({ ...prev, [groupName]: true }));
       }
     });
-    setExpandedGroups(prev => ({ ...prev, ...newExpanded }));
   }, [pathname, resolvedRole]);
 
   // Close notif dropdown on outside click
@@ -150,7 +148,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     }
     return <>
       {Object.entries(groups).map(([groupName, groupItems]) => {
-        const expanded = expandedGroups[groupName] !== false;
+        const expanded = expandedGroups[groupName] === true;
         const hasActive = groupItems.some(i => pathname === i.href || pathname.startsWith(i.href + "/"));
         return (
           <div key={groupName} className="mb-1">

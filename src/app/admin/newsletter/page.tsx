@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { api } from "@/lib/api-client";
+import Button from "@/components/ui/Button";
 
 interface Subscriber { id: string; email: string; source?: string; isActive: boolean; createdAt: string; }
 
@@ -9,6 +10,11 @@ export default function AdminNewsletterPage() {
   const [subs, setSubs] = useState<Subscriber[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
+  const [showCompose, setShowCompose] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [subject, setSubject] = useState("");
+  const [body, setBody] = useState("");
+  const [msg, setMsg] = useState<string | null>(null);
 
   useEffect(() => {
     setLoading(true);
@@ -26,6 +32,22 @@ export default function AdminNewsletterPage() {
     setSubs(subs.filter(s => s.id !== id));
   };
 
+  const sendNewsletter = async () => {
+    if (!subject.trim() || !body.trim()) return;
+    setSending(true);
+    setMsg(null);
+    const { status } = await api.post("/api/newsletter/send", { subject, body });
+    setSending(false);
+    if (status === 200) {
+      setMsg("Newsletter sent successfully!");
+      setShowCompose(false);
+      setSubject("");
+      setBody("");
+    } else {
+      setMsg("Failed to send newsletter. Please try again.");
+    }
+  };
+
   return (
     <div className="space-y-6 pt-2">
       <div className="flex items-center justify-between gap-3 flex-wrap">
@@ -33,8 +55,34 @@ export default function AdminNewsletterPage() {
           <h1 className="text-2xl font-bold text-gray-900">Newsletter Subscribers</h1>
           <p className="text-sm text-gray-500">Emails collected from the website footer</p>
         </div>
-        <Link href="/admin" className="text-xs font-semibold text-gray-600 hover:text-gray-900">← Back</Link>
+        <div className="flex items-center gap-2">
+          <Button size="sm" onClick={() => setShowCompose(!showCompose)}>Send Newsletter</Button>
+          <Link href="/admin" className="text-xs font-semibold text-gray-600 hover:text-gray-900">← Back</Link>
+        </div>
       </div>
+
+      {msg && <div className={`px-4 py-3 rounded-lg text-sm ${msg.includes("success") ? "bg-emerald-50 text-emerald-700 border border-emerald-200" : "bg-red-50 text-red-700 border border-red-200"}`}>{msg}</div>}
+
+      {showCompose && (
+        <div className="bg-white rounded-xl border border-gray-200 p-5 space-y-4">
+          <h2 className="text-sm font-semibold text-gray-900">Compose Newsletter</h2>
+          <div>
+            <label className="block text-xs font-medium text-gray-600 mb-1">Subject *</label>
+            <input value={subject} onChange={e => setSubject(e.target.value)} className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/30" placeholder="e.g. New properties this week" />
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-gray-600 mb-1">Body (HTML) *</label>
+            <textarea value={body} onChange={e => setBody(e.target.value)} rows={8} className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/30 font-mono" placeholder="<p>Write your newsletter content here...</p>" />
+          </div>
+          <div className="flex items-center justify-between">
+            <p className="text-xs text-gray-500">Will be sent to {subs.length} subscriber{subs.length !== 1 ? "s" : ""}</p>
+            <div className="flex gap-2">
+              <button onClick={() => setShowCompose(false)} className="text-xs font-semibold px-3.5 py-2 rounded-lg border border-gray-200 text-gray-700 hover:bg-gray-50">Cancel</button>
+              <Button disabled={sending || !subject.trim() || !body.trim()} onClick={sendNewsletter}>{sending ? "Sending..." : "Send to All"}</Button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="bg-white rounded-xl border border-gray-200 p-3">
         <input

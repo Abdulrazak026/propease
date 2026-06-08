@@ -17,7 +17,6 @@ export default function LayoutShell({ children }: { children: React.ReactNode })
   const maintenance = get("maintenance_mode") === "true";
   const isAdmin = role === "head";
   const isStaff = isAuthenticated && ["head", "admin", "ambassador", "agent"].includes(role || "");
-  const effectiveDashboard = isDashboard || (isStaff && !isAuth);
 
   if (maintenance && !isAdmin && !isAuth) {
     return (
@@ -35,7 +34,7 @@ export default function LayoutShell({ children }: { children: React.ReactNode })
 
   if (isAuth) return <>{children}</>;
 
-  if (effectiveDashboard) {
+  if (isDashboard) {
     return (
       <>
         <div className="flex h-full">{children}</div>
