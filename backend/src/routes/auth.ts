@@ -113,16 +113,16 @@ router.post("/login", validate(loginSchema), async (req, res: Response) => {
       return res.status(401).json({ error: "Invalid email or password" });
     }
 
-    const validPassword = await bcrypt.compare(password, user.password);
-    if (!validPassword) {
-      return res.status(401).json({ error: "Invalid email or password" });
-    }
-
     if (!user.isApproved && user.role !== "head") {
       if ((user as any).suspendedAt) {
         return res.status(403).json({ error: "Your account has been suspended. Please contact support for more information." });
       }
       return res.status(403).json({ error: "Account pending approval" });
+    }
+
+    const validPassword = await bcrypt.compare(password, user.password);
+    if (!validPassword) {
+      return res.status(401).json({ error: "Invalid email or password" });
     }
 
     const accessToken = generateAccessToken(user);
