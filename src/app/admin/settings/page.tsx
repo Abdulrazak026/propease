@@ -97,16 +97,24 @@ function EmailTemplateSection({ label, settingKey, settings, set }: { label: str
   const [previewHtml, setPreviewHtml] = useState<string | null>(null);
   const [loadingPreview, setLoadingPreview] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
+  const [previewError, setPreviewError] = useState<string | null>(null);
 
   const loadPreview = async () => {
     setLoadingPreview(true);
+    setPreviewError(null);
     try {
       const r = await api.get<{ html: string }>(`/api/admin/settings/email-preview/${settingKey}`);
       if (r.data?.html) {
         setPreviewHtml(r.data.html);
         setShowPreview(true);
+      } else if (r.status !== 200) {
+        setPreviewError(`Failed to load preview (${r.status})`);
+      } else {
+        setPreviewError("No preview content returned");
       }
-    } catch {}
+    } catch (err: any) {
+      setPreviewError(err?.message || "Failed to load preview");
+    }
     setLoadingPreview(false);
   };
 
@@ -120,6 +128,7 @@ function EmailTemplateSection({ label, settingKey, settings, set }: { label: str
       </div>
       <div className="p-3">
         <textarea value={settings[settingKey] || ""} onChange={(e) => set(settingKey, e.target.value)} rows={4} className="w-full rounded border border-gray-200 bg-white px-3 py-2 text-xs font-mono focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20 resize-y" placeholder="Leave empty to use the default template..." />
+        {previewError && <p className="text-xs text-red-500 mt-1">{previewError}</p>}
       </div>
       {showPreview && previewHtml && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={() => setShowPreview(false)}>

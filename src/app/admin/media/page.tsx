@@ -42,9 +42,11 @@ export default function MediaPage() {
     formData.append("file", e.target.files[0]);
 
     try {
+      const token = getAccessToken();
       const res = await fetch(`${API_URL}/api/upload`, {
         method: "POST",
-        headers: { Authorization: `Bearer ${getAccessToken() || ""}` },
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+        credentials: "include",
         body: formData,
       });
       if (!res.ok) {

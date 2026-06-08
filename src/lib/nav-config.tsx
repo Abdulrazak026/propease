@@ -19,6 +19,7 @@ export const dashboardNav: Record<string, NavItem[]> = {
     { label: "FAQs", href: "/admin/faqs", icon: "inquiries", group: "Content" },
     { label: "Newsletter", href: "/admin/newsletter", icon: "inquiries", group: "Content" },
     { label: "Tasks", href: "/admin/tasks", icon: "tasks", badge: "tasks", permission: "canCreateTasks", group: "Operations" },
+    { label: "Applications", href: "/admin/applications", icon: "applications", group: "Operations" },
     { label: "Agreements", href: "/admin/agreements", icon: "agreements", permission: "canManageAgreements", group: "Operations" },
     { label: "Deals", href: "/admin/deals", icon: "audit", permission: "canCloseDeals", group: "Operations" },
     { label: "Commissions", href: "/admin/commissions", icon: "commissions", group: "Operations" },
@@ -36,7 +37,6 @@ export const dashboardNav: Record<string, NavItem[]> = {
     { label: "Agreements", href: "/agent/agreements", icon: "agreements", permission: "canManageAgreements" },
     { label: "Commissions", href: "/agent/commissions", icon: "commissions" },
     { label: "Wallet", href: "/wallet", icon: "wallet" },
-    { label: "Messages", href: "/messages", icon: "messages" },
   ],
   ambassador: [
     { label: "City Overview", href: "/ambassador", icon: "city-overview" },
@@ -46,6 +46,5 @@ export const dashboardNav: Record<string, NavItem[]> = {
     { label: "Commissions", href: "/ambassador/commissions", icon: "commissions" },
     { label: "Wallet", href: "/wallet", icon: "wallet" },
     { label: "Settings", href: "/ambassador/settings", icon: "settings" },
-    { label: "Messages", href: "/messages", icon: "messages" },
   ],
 };

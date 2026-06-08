@@ -60,7 +60,6 @@ app.use(cors({
   origin: process.env.FRONTEND_URL || [
     "https://mbpproperties.com",
     "https://propease.white-king-bd7d.workers.dev",
-    "http://localhost:3000",
   ],
   credentials: true,
 }));
