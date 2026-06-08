@@ -74,7 +74,7 @@ ${action ? `<div style="margin:24px 0 8px"><a href="${action[1]}" class="btn">${
 </div>
 <p>${NAME} &mdash; Kano, Nigeria</p>
 <p style="margin-top:4px"><a href="${URL}">${URL}</a></p>
-<p style="margin-top:12px;font-size:11px;color:#b0b8c4">You received this email because you have an account on MBPP.<br>If you didn't expect this email, please <a href="mailto:support@mbpproperties.com" style="color:#94a3b8">contact support</a>.</p>
+<p style="margin-top:12px;font-size:11px;color:#b0b8c4">You received this email because you have an account on MBPP.<br>If you didn't expect this email, please <a href="mailto:support@mbpproperties.com" style="color:#94a3b8">contact support</a>.<br><a href="https://mbpproperties.com/unsubscribe" style="color:#94a3b8;text-decoration:underline">Unsubscribe</a></p>
 </div>
 </div></body></html>`;
 }

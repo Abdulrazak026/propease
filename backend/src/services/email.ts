@@ -67,89 +67,55 @@ async function send(to: string, subject: string, html: string) {
 
 export const emailService = {
   async welcome(email: string, name: string) {
-    const tpl = await getTemplate("welcome_template", name);
-    const html = tpl || defaultTemplates.welcome(name);
-    return send(email, "Welcome to MBPP!", html);
+    return send(email, "Welcome to MBPP!", defaultTemplates.welcome(name));
   },
   async accountApproved(email: string, name: string, role: string) {
-    const tpl = await getTemplate("approved_template", name, role);
-    const html = tpl || defaultTemplates.accountApproved(name, role);
-    return send(email, `Your MBPP ${role} account has been approved!`, html);
+    return send(email, `Your MBPP ${role} account has been approved!`, defaultTemplates.accountApproved(name, role));
   },
   async accountSuspended(email: string, name: string, reason?: string) {
-    const tpl = await getTemplate("account_suspended_template", name, "", reason || "");
-    const html = tpl || defaultTemplates.accountSuspended(name, reason);
-    return send(email, "Your MBPP account has been suspended", html);
+    return send(email, "Your MBPP account has been suspended", defaultTemplates.accountSuspended(name, reason));
   },
   async passwordReset(email: string, name: string, token: string) {
-    const tpl = await getTemplate("reset_template", name, "", "", "", "", "", "", "", "", "", "", "", "", "", token);
-    const html = tpl || defaultTemplates.passwordReset(name, token);
-    return send(email, "Reset your MBPP password", html);
+    return send(email, "Reset your MBPP password", defaultTemplates.passwordReset(name, token));
   },
   async passwordChanged(email: string, name: string) {
-    const tpl = await getTemplate("password_changed_template", name);
-    const html = tpl || defaultTemplates.passwordChanged(name);
-    return send(email, "Your MBPP password has been changed", html);
+    return send(email, "Your MBPP password has been changed", defaultTemplates.passwordChanged(name));
   },
   async inquiryNotification(agentEmail: string, agentName: string, clientName: string, propertyTitle: string, message: string) {
-    const tpl = await getTemplate("inquiry_template", "", "", propertyTitle, "", "", "", "", "", agentName, clientName, "", message);
-    const html = tpl || defaultTemplates.inquiryNotification(agentName, clientName, propertyTitle, message);
-    return send(agentEmail, `New inquiry: ${propertyTitle}`, html);
+    return send(agentEmail, `New inquiry: ${propertyTitle}`, defaultTemplates.inquiryNotification(agentName, clientName, propertyTitle, message));
   },
   async inquiryConfirmation(clientEmail: string, clientName: string, propertyTitle: string) {
-    const tpl = await getTemplate("inquiry_template", clientName, "", propertyTitle);
-    const html = tpl || defaultTemplates.inquiryConfirmation(clientName, propertyTitle);
-    return send(clientEmail, "Your inquiry has been received", html);
+    return send(clientEmail, "Your inquiry has been received", defaultTemplates.inquiryConfirmation(clientName, propertyTitle));
   },
   async applicationReceived(email: string, name: string, propertyTitle: string) {
-    const tpl = await getTemplate("application_template", name, "", propertyTitle);
-    const html = tpl || defaultTemplates.applicationReceived(name, propertyTitle);
-    return send(email, `Application received — ${propertyTitle}`, html);
+    return send(email, `Application received — ${propertyTitle}`, defaultTemplates.applicationReceived(name, propertyTitle));
   },
   async applicationStatus(email: string, name: string, propertyTitle: string, status: string) {
-    const tpl = await getTemplate("application_template", name, "", propertyTitle, status);
-    const html = tpl || defaultTemplates.applicationStatus(name, propertyTitle, status);
-    return send(email, `Application ${status} — ${propertyTitle}`, html);
+    return send(email, `Application ${status} — ${propertyTitle}`, defaultTemplates.applicationStatus(name, propertyTitle, status));
   },
   async agreementReady(email: string, name: string, propertyTitle: string) {
-    const tpl = await getTemplate("agreement_template", name, "", propertyTitle);
-    const html = tpl || defaultTemplates.agreementReady(name, propertyTitle);
-    return send(email, "Tenancy agreement ready for signing", html);
+    return send(email, "Tenancy agreement ready for signing", defaultTemplates.agreementReady(name, propertyTitle));
   },
   async agreementSigned(email: string, name: string, propertyTitle: string) {
-    const tpl = await getTemplate("agreement_signed_template", name, "", propertyTitle);
-    const html = tpl || defaultTemplates.agreementSigned(name, propertyTitle);
-    return send(email, "Agreement signed — complete!", html);
+    return send(email, "Agreement signed — complete!", defaultTemplates.agreementSigned(name, propertyTitle));
   },
   async priceDropAlert(email: string, name: string, propertyTitle: string, oldPrice: number, newPrice: number) {
-    const tpl = await getTemplate("price_drop_template", name, "", propertyTitle, "", "", "", "", "", "", "", "", "", String(oldPrice), String(newPrice));
-    const html = tpl || defaultTemplates.priceDropAlert(name, propertyTitle, oldPrice, newPrice);
-    return send(email, `Price drop: ${propertyTitle}`, html);
+    return send(email, `Price drop: ${propertyTitle}`, defaultTemplates.priceDropAlert(name, propertyTitle, oldPrice, newPrice));
   },
   async newMessage(email: string, name: string, senderName: string) {
-    const tpl = await getTemplate("message_template", name, "", "", "", senderName);
-    const html = tpl || defaultTemplates.newMessage(name, senderName);
-    return send(email, `New message from ${senderName}`, html);
+    return send(email, `New message from ${senderName}`, defaultTemplates.newMessage(name, senderName));
   },
   async paymentReceipt(email: string, name: string, amount: number, reference: string, purpose: string) {
-    const tpl = await getTemplate("payment_template", name, "", "", "", "", String(amount), reference, purpose);
-    const html = tpl || defaultTemplates.paymentReceipt(name, amount, reference, purpose);
-    return send(email, "Payment receipt — MBPP", html);
+    return send(email, "Payment receipt — MBPP", defaultTemplates.paymentReceipt(name, amount, reference, purpose));
   },
   async agentApplicationSubmitted(email: string, name: string) {
-    const tpl = await getTemplate("agent_application_template", name);
-    const html = tpl || defaultTemplates.agentApplicationSubmitted(name);
-    return send(email, "Agent application received", html);
+    return send(email, "Agent application received", defaultTemplates.agentApplicationSubmitted(name));
   },
   async listingPublished(email: string, agentName: string, propertyTitle: string, listingId: string) {
-    const tpl = await getTemplate("listing_published_template", "", "", propertyTitle, "", "", "", "", listingId, agentName);
-    const html = tpl || defaultTemplates.listingPublished(agentName, propertyTitle, listingId);
-    return send(email, "Your listing is live!", html);
+    return send(email, "Your listing is live!", defaultTemplates.listingPublished(agentName, propertyTitle, listingId));
   },
   async verificationSubmitted(email: string, name: string) {
-    const tpl = await getTemplate("verification_template", name);
-    const html = tpl || defaultTemplates.verificationSubmitted(name);
-    return send(email, "Verification documents received", html);
+    return send(email, "Verification documents received", defaultTemplates.verificationSubmitted(name));
   },
   async contactFormSubmission(data: { name: string; email: string; phone: string; subject: string; message: string }) {
     const supportEmail = process.env.SUPPORT_EMAIL || "support@mbpproperties.com";
@@ -169,75 +135,47 @@ export const emailService = {
     return send(supportEmail, `New inquiry from ${data.name}: ${data.subject}`, html);
   },
   async withdrawalRequested(email: string, name: string, amount: number) {
-    const tpl = await getTemplate("withdrawal_requested_template", name, String(amount));
-    const html = tpl || defaultTemplates.withdrawalRequested(name, amount);
-    return send(email, `Withdrawal request submitted — ₦${amount.toLocaleString()}`, html);
+    return send(email, `Withdrawal request submitted — ₦${amount.toLocaleString()}`, defaultTemplates.withdrawalRequested(name, amount));
   },
   async withdrawalApproved(email: string, name: string, amount: number) {
-    const tpl = await getTemplate("withdrawal_approved_template", name, String(amount));
-    const html = tpl || defaultTemplates.withdrawalApproved(name, amount);
-    return send(email, `Withdrawal approved — ₦${amount.toLocaleString()}`, html);
+    return send(email, `Withdrawal approved — ₦${amount.toLocaleString()}`, defaultTemplates.withdrawalApproved(name, amount));
   },
   async withdrawalRejected(email: string, name: string, amount: number, reason?: string) {
-    const tpl = await getTemplate("withdrawal_rejected_template", name, String(amount), reason || "");
-    const html = tpl || defaultTemplates.withdrawalRejected(name, amount, reason);
-    return send(email, `Withdrawal rejected — ₦${amount.toLocaleString()}`, html);
+    return send(email, `Withdrawal rejected — ₦${amount.toLocaleString()}`, defaultTemplates.withdrawalRejected(name, amount, reason));
   },
   async listingSubmittedForReview(email: string, name: string, title: string) {
-    const tpl = await getTemplate("listing_submitted_template", name, "", title);
-    const html = tpl || defaultTemplates.listingSubmittedForReview(name, title);
-    return send(email, `Listing submitted for review: ${title}`, html);
+    return send(email, `Listing submitted for review: ${title}`, defaultTemplates.listingSubmittedForReview(name, title));
   },
   async listingRejected(email: string, name: string, title: string) {
-    const tpl = await getTemplate("listing_rejected_template", name, "", title);
-    const html = tpl || defaultTemplates.listingRejected(name, title);
-    return send(email, `Listing needs revision: ${title}`, html);
+    return send(email, `Listing needs revision: ${title}`, defaultTemplates.listingRejected(name, title));
   },
   async commissionEarned(email: string, name: string, amount: number, dealTitle: string) {
-    const tpl = await getTemplate("commission_template", name, String(amount), dealTitle);
-    const html = tpl || defaultTemplates.commissionEarned(name, amount, dealTitle);
-    return send(email, `Commission earned: ₦${amount.toLocaleString()}`, html);
+    return send(email, `Commission earned: ₦${amount.toLocaleString()}`, defaultTemplates.commissionEarned(name, amount, dealTitle));
   },
   async walletFunded(email: string, name: string, amount: number, reference: string) {
-    const tpl = await getTemplate("wallet_template", name, String(amount), reference);
-    const html = tpl || defaultTemplates.walletFunded(name, amount, reference);
-    return send(email, `Wallet funded — ₦${amount.toLocaleString()}`, html);
+    return send(email, `Wallet funded — ₦${amount.toLocaleString()}`, defaultTemplates.walletFunded(name, amount, reference));
   },
   async taskAssigned(email: string, name: string, taskTitle: string, area: string) {
-    const tpl = await getTemplate("task_assigned_template", name, taskTitle, area);
-    const html = tpl || defaultTemplates.taskAssigned(name, taskTitle, area);
-    return send(email, `New task assigned: ${taskTitle}`, html);
+    return send(email, `New task assigned: ${taskTitle}`, defaultTemplates.taskAssigned(name, taskTitle, area));
   },
   async taskStatusChanged(email: string, name: string, taskTitle: string, status: string) {
-    const tpl = await getTemplate("task_status_template", name, taskTitle, status);
-    const html = tpl || defaultTemplates.taskStatusChanged(name, taskTitle, status);
-    return send(email, `Task updated: ${taskTitle}`, html);
+    return send(email, `Task updated: ${taskTitle}`, defaultTemplates.taskStatusChanged(name, taskTitle, status));
   },
   async taskCommentAdded(email: string, name: string, taskTitle: string, authorName: string) {
-    const tpl = await getTemplate("task_comment_template", name, taskTitle, authorName);
-    const html = tpl || defaultTemplates.taskCommentAdded(name, taskTitle, authorName);
-    return send(email, `New comment on: ${taskTitle}`, html);
+    return send(email, `New comment on: ${taskTitle}`, defaultTemplates.taskCommentAdded(name, taskTitle, authorName));
   },
   async reviewSubmitted(agentEmail: string, agentName: string, rating: number, comment: string) {
-    const tpl = await getTemplate("review_submitted_template", agentName, String(rating), comment);
-    const html = tpl || defaultTemplates.reviewSubmitted(agentName, rating, comment);
-    return send(agentEmail, `New review: ${rating}/5 stars`, html);
+    return send(agentEmail, `New review: ${rating}/5 stars`, defaultTemplates.reviewSubmitted(agentName, rating, comment));
   },
   async reviewModerated(email: string, name: string, status: string) {
-    const tpl = await getTemplate("review_moderated_template", name, status);
-    const html = tpl || defaultTemplates.reviewModerated(name, status);
-    return send(email, `Review ${status}`, html);
+    return send(email, `Review ${status}`, defaultTemplates.reviewModerated(name, status));
   },
   async agreementCancelled(email: string, name: string, propertyTitle: string) {
-    const tpl = await getTemplate("agreement_cancelled_template", name, "", propertyTitle);
-    const html = tpl || defaultTemplates.agreementCancelled(name, propertyTitle);
-    return send(email, `Agreement cancelled: ${propertyTitle}`, html);
+    return send(email, `Agreement cancelled: ${propertyTitle}`, defaultTemplates.agreementCancelled(name, propertyTitle));
   },
   async customOrderReceived(name: string, email: string, propertyType: string, area: string, budget: number) {
     const supportEmail = process.env.SUPPORT_EMAIL || "support@mbpproperties.com";
-    const tpl = await getTemplate("custom_order_template", name, email, propertyType, area, String(budget));
-    const html = tpl || defaultTemplates.customOrderReceived(name, email, propertyType, area, budget);
-    return send(supportEmail, `New custom order — ${propertyType} in ${area}`, html);
+    return send(supportEmail, `New custom order — ${propertyType} in ${area}`, defaultTemplates.customOrderReceived(name, email, propertyType, area, budget));
   },
   async sendNewsletter(email: string, subject: string, html: string) {
     return send(email, subject, html);
