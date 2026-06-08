@@ -296,13 +296,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               <p className="text-xs font-semibold text-white truncate capitalize">{resolvedRole}</p>
               <p className="text-[10px] text-slate-400 capitalize truncate">{currentUser?.city || ""}</p>
             </div>
-            <div className="relative" ref={notifRef}>
-              <button onClick={() => setNotifOpen(!notifOpen)} className="relative text-slate-400 hover:text-white p-1 transition-colors">
-                {bellIcon}
-                {unreadCount > 0 && <span className="absolute -top-0.5 -right-0.5 w-3.5 h-3.5 bg-red-500 text-white text-[7px] font-bold rounded-full flex items-center justify-center">{unreadCount > 9 ? "9+" : unreadCount}</span>}
-              </button>
-              {notifOpen && <div className="absolute left-full ml-2 top-0"><NotificationDropdown /></div>}
-            </div>
           </div>
         </div>
         <nav className="flex-1 p-2 space-y-0.5 overflow-y-auto"><DesktopNavItems /></nav>
@@ -318,10 +311,20 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </div>
       </aside>
 
-      {/* Content area */}
-      <div className="flex-1 min-w-0 bg-gray-50 overflow-y-auto pt-14 md:pt-0">
-        <div className="p-4 sm:p-6">{children}</div>
-      </div>
+        {/* Content area */}
+        <div className="flex-1 min-w-0 bg-gray-50 overflow-y-auto pt-14 md:pt-0">
+          {/* Content top bar with notification bell */}
+          <div className="hidden md:flex items-center justify-end px-6 py-3 border-b border-gray-100 bg-white sticky top-0 z-30">
+            <div className="relative" ref={notifRef}>
+              <button onClick={() => setNotifOpen(!notifOpen)} className="relative text-gray-500 hover:text-gray-700 p-2 rounded-lg hover:bg-gray-100 transition-colors">
+                {bellIcon}
+                {unreadCount > 0 && <span className="absolute top-1 right-1 w-4 h-4 bg-red-500 text-white text-[8px] font-bold rounded-full flex items-center justify-center">{unreadCount > 9 ? "9+" : unreadCount}</span>}
+              </button>
+              {notifOpen && <div className="absolute right-0 top-full mt-2"><NotificationDropdown /></div>}
+            </div>
+          </div>
+          <div className="p-4 sm:p-6">{children}</div>
+        </div>
     </div>
   );
 }

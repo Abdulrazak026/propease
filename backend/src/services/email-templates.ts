@@ -86,14 +86,14 @@ export const templates = {
     return base(
       "Welcome to MBPP! 🎉",
       `<p>Hello <strong>${name}</strong>,</p>
-       <p>Welcome aboard! Your account has been created and you're all set to start exploring the best properties in Kano.</p>
+       <p>Welcome to MBPP! Your account is ready — you can now browse properties, contact agents, and save your favorites.</p>
        
        <div class="features">
          <div class="feature-row">
            <div class="feature-icon">🏠</div>
            <div class="feature-text">
              <strong>Browse Properties</strong>
-             <span>Discover verified houses, flats, land, and commercial properties for rent and sale.</span>
+             <span>Discover verified houses, flats, land, and commercial properties for rent and sale in Kano.</span>
            </div>
          </div>
          <div class="feature-row">
@@ -113,8 +113,8 @@ export const templates = {
        </div>
        
        <p>Ready to find your next property? Sign in and start exploring.</p>`,
-      ["Sign In to Dashboard", `${URL}/login`],
-      `Welcome to MBPP, ${name}! Your account is ready. Start browsing verified properties in Kano.`
+      ["Browse Properties", URL],
+      `${name}, your MBPP account is ready. Start browsing verified properties in Kano today.`
     );
   },
 

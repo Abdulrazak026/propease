@@ -51,6 +51,9 @@ import { logger } from "./lib/logger";
 const app = express();
 const PORT = process.env.PORT || 4000;
 
+// Trust proxy for Railway/Cloudflare
+app.set("trust proxy", 1);
+
 // Security
 app.use(helmet({ crossOriginResourcePolicy: false }));
 app.use(cors({
