@@ -1,8 +1,18 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Button from "@/components/ui/Button";
 import { api } from "@/lib/api-client";
+import { useSettings } from "@/context/SettingsContext";
+
+const DEFAULT_TERMS = `<p><strong>1. Code of Conduct</strong><br />As an MBPP agent, you agree to represent properties truthfully, maintain client confidentiality, and act in the best interest of both property owners and tenants.</p>
+<p><strong>2. Listing Accuracy</strong><br />All property listings must include accurate information, current photographs, and truthful descriptions. Misrepresentation will result in immediate termination.</p>
+<p><strong>3. Commission Structure</strong><br />Agents earn a commission of 5% on each successful rental or sale transaction facilitated through MBPP. Commissions are paid within 7 days of transaction completion.</p>
+<p><strong>4. Verification Requirements</strong><br />Agents must provide valid identification (NIN or BVN), proof of address, and two professional references. MBPP reserves the right to verify all provided information.</p>
+<p><strong>5. Exclusive Platform</strong><br />Properties listed on MBPP must not be listed on competing platforms at a lower price. Agents are encouraged to use MBPP as their primary listing platform.</p>
+<p><strong>6. Data Protection</strong><br />Agents must comply with the Nigeria Data Protection Regulation (NDPR). Client personal information must not be shared with third parties without explicit consent.</p>
+<p><strong>7. Dispute Resolution</strong><br />Any disputes arising from agent activities shall be resolved through arbitration in accordance with the Arbitration and Conciliation Act, Cap A18, Laws of the Federation of Nigeria.</p>
+<p><strong>8. Termination</strong><br />MBPP reserves the right to terminate an agent's account with 14 days' notice if terms are violated. Agents may terminate their account at any time with 7 days' notice.</p>`;
 
 interface FormData {
   fullName: string;
@@ -24,6 +34,8 @@ export default function ApplyAsAgentPage() {
   const [agreed, setAgreed] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
+  const { get: getSetting } = useSettings();
+  const agentTerms = getSetting("agent_terms", DEFAULT_TERMS);
 
   const update = (field: keyof FormData, value: string) =>
     setForm((prev) => ({ ...prev, [field]: value }));
@@ -76,16 +88,10 @@ export default function ApplyAsAgentPage() {
       <main className="min-h-screen bg-gray-50 flex items-center justify-center px-4 py-10">
         <div className="bg-white rounded-lg border border-gray-200 p-8 max-w-2xl w-full">
           <h1 className="text-xl font-bold text-gray-900 mb-4">Agent Terms & Conditions</h1>
-          <div className="text-sm text-gray-600 space-y-3 mb-6 max-h-80 overflow-y-auto border border-gray-100 rounded-lg p-4 bg-gray-50">
-            <p><strong>1. Code of Conduct</strong><br />As an MBPP agent, you agree to represent properties truthfully, maintain client confidentiality, and act in the best interest of both property owners and tenants.</p>
-            <p><strong>2. Listing Accuracy</strong><br />All property listings must include accurate information, current photographs, and truthful descriptions. Misrepresentation will result in immediate termination.</p>
-            <p><strong>3. Commission Structure</strong><br />Agents earn a commission of 5% on each successful rental or sale transaction facilitated through MBPP. Commissions are paid within 7 days of transaction completion.</p>
-            <p><strong>4. Verification Requirements</strong><br />Agents must provide valid identification (NIN or BVN), proof of address, and two professional references. MBPP reserves the right to verify all provided information.</p>
-            <p><strong>5. Exclusive Platform</strong><br />Properties listed on MBPP must not be listed on competing platforms at a lower price. Agents are encouraged to use MBPP as their primary listing platform.</p>
-            <p><strong>6. Data Protection</strong><br />Agents must comply with the Nigeria Data Protection Regulation (NDPR). Client personal information must not be shared with third parties without explicit consent.</p>
-            <p><strong>7. Dispute Resolution</strong><br />Any disputes arising from agent activities shall be resolved through arbitration in accordance with the Arbitration and Conciliation Act, Cap A18, Laws of the Federation of Nigeria.</p>
-            <p><strong>8. Termination</strong><br />MBPP reserves the right to terminate an agent's account with 14 days&apos; notice if terms are violated. Agents may terminate their account at any time with 7 days&apos; notice.</p>
-          </div>
+          <div
+            className="text-sm text-gray-600 space-y-3 mb-6 max-h-[480px] overflow-y-auto border border-gray-100 rounded-lg p-4 bg-gray-50 prose prose-sm max-w-none"
+            dangerouslySetInnerHTML={{ __html: agentTerms }}
+          />
           <label className="flex items-start gap-3 mb-6 cursor-pointer">
             <input
               type="checkbox"

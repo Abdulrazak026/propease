@@ -5,19 +5,19 @@ import { resolveImageUrl } from "@/lib/utils";
 import Footer from "@/components/layout/Footer";
 
 const defaultTeam = [
-  { name: "Ahmad Abubakar", role: "Managing Director", bio: "Started MBPP in 2017 after buying and selling three properties the hard way. Now he focuses on capital, partnerships, and making sure the company doesn't lose its soul as it grows.", photo: "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=400&h=400&fit=crop&crop=faces" },
-  { name: "Barr. Sulaiman Usman", role: "Legal Adviser", bio: "Twenty years in Kano property law. He reads the contracts the rest of us skip, and he's the reason our agreements have held up in every dispute we've seen.", photo: "https://images.unsplash.com/photo-1556157382-97eda2d62296?w=400&h=400&fit=crop&crop=faces" },
-  { name: "Engr. Salisu Muhammad", role: "Operations Manager", bio: "Runs the ambassador network. Every field agent, every photographer, every viewing, coordinated from his desk or in person.", photo: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&crop=faces" },
-  { name: "Abdulmalik Abubakar", role: "Finance & IT", bio: "Keeps the books honest and the servers up. If you've ever gotten a payout on time, you have Abdulmalik to thank.", photo: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop&crop=faces" },
-  { name: "Tasiu Sani", role: "Source & Procurement", bio: "Walks neighborhoods we haven't listed in yet. If a property is about to come up for sale, Tasiu usually knows before the sign goes up.", photo: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=faces" },
-  { name: "Engr. Sani Umar", role: "Platform Manager", bio: "Built the search, the filters, the owner dashboard. If something on the site works well, Sani probably wrote it. If it doesn't, he's already on it.", photo: "https://images.unsplash.com/photo-1463453091185-61582044d556?w=400&h=400&fit=crop&crop=faces" },
-  { name: "Zahradden Aliyu", role: "Project Manager", bio: "Our newest construction and renovation lead. If you're buying off-plan through us, Zahradden is the one making sure they actually build it.", photo: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=400&h=400&fit=crop&crop=faces" },
-  { name: "Umar Nuhu", role: "Admin Officer", bio: "The person who actually keeps the lights on. Sales records, expense tracking, the filing cabinet nobody else wants to touch. That's Umar.", photo: "https://images.unsplash.com/photo-1531427186611-ecfd6d936c79?w=400&h=400&fit=crop&crop=faces" },
-  { name: "Ahmad Abubakar Ali", role: "Office Secretary", bio: "The first voice you hear when you call. Ahmad runs scheduling, internal coordination, and our social media. He does the latter better than any of us expected.", photo: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&h=400&fit=crop&crop=faces" },
+  { name: "Ahmad Abubakar", role: "Managing Director", bio: "Started MBPP in 2017 after buying and selling three properties the hard way. Now he focuses on capital, partnerships, and making sure the company doesn't lose its soul as it grows.", photo: "" },
+  { name: "Barr. Sulaiman Usman", role: "Legal Adviser", bio: "Twenty years in Kano property law. He reads the contracts the rest of us skip, and he's the reason our agreements have held up in every dispute we've seen.", photo: "" },
+  { name: "Engr. Salisu Muhammad", role: "Operations Manager", bio: "Runs the ambassador network. Every field agent, every photographer, every viewing, coordinated from his desk or in person.", photo: "" },
+  { name: "Abdulmalik Abubakar", role: "Finance & IT", bio: "Keeps the books honest and the servers up. If you've ever gotten a payout on time, you have Abdulmalik to thank.", photo: "" },
+  { name: "Tasiu Sani", role: "Source & Procurement", bio: "Walks neighborhoods we haven't listed in yet. If a property is about to come up for sale, Tasiu usually knows before the sign goes up.", photo: "" },
+  { name: "Engr. Sani Umar", role: "Platform Manager", bio: "Built the search, the filters, the owner dashboard. If something on the site works well, Sani probably wrote it. If it doesn't, he's already on it.", photo: "" },
+  { name: "Zahradden Aliyu", role: "Project Manager", bio: "Our newest construction and renovation lead. If you're buying off-plan through us, Zahradden is the one making sure they actually build it.", photo: "" },
+  { name: "Umar Nuhu", role: "Admin Officer", bio: "The person who actually keeps the lights on. Sales records, expense tracking, the filing cabinet nobody else wants to touch. That's Umar.", photo: "" },
+  { name: "Ahmad Abubakar Ali", role: "Office Secretary", bio: "The first voice you hear when you call. Ahmad runs scheduling, internal coordination, and our social media. He does the latter better than any of us expected.", photo: "" },
 ];
 
 export default function AboutPage() {
-  const { get } = useSettings();
+  const { get, loading } = useSettings();
   let team: typeof defaultTeam;
   try {
     const raw = get("team_members");
@@ -42,17 +42,35 @@ export default function AboutPage() {
     <div className="flex flex-col">
       <section className="relative bg-gray-950 overflow-hidden">
         <div className="absolute inset-0">
-          <img src={resolveImageUrl(get("about_hero_image")) || "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1600&h=900&fit=crop"} alt="" className="w-full h-full object-cover opacity-30" />
+          {(() => {
+            const heroImg = resolveImageUrl(get("about_hero_image"));
+            return heroImg ? <img src={heroImg} alt="" className="w-full h-full object-cover opacity-30" /> : <div className="w-full h-full bg-gray-900 opacity-30" />;
+          })()}
           <div className="absolute inset-0 bg-gradient-to-b from-gray-950/70 via-gray-950/80 to-gray-950" />
         </div>
         <div className="relative max-w-[1400px] mx-auto px-5 sm:px-6 lg:px-10 pt-20 sm:pt-28 lg:pt-32 pb-20 sm:pb-28">
           <div className="max-w-3xl">
-            <p className="text-xs font-semibold text-emerald-400 uppercase tracking-[0.15em] mb-5">Since 2017 · Kano</p>
-            <h1 className="text-4xl sm:text-5xl lg:text-7xl font-bold text-white leading-[1.02] tracking-tight">
-              About us<br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-300 to-teal-200">MBPP, Kano.</span>
-            </h1>
-            <p className="text-base sm:text-lg text-white/55 mt-6 leading-relaxed max-w-xl">
+            <div className="flex items-center gap-5 mb-8">
+              {(() => {
+                const logo = get("site_logo");
+                if (logo) {
+                  return <img src={resolveImageUrl(logo) || ""} alt="MBPP Logo" className="h-20 w-20 sm:h-28 sm:w-28 rounded-2xl object-contain bg-white/10 p-2" />;
+                }
+                return (
+                  <div className="h-20 w-20 sm:h-28 sm:w-28 rounded-2xl bg-[var(--color-primary)] flex items-center justify-center shadow-2xl shadow-emerald-900/40">
+                    <span className="text-white font-bold text-4xl sm:text-5xl">P</span>
+                  </div>
+                );
+              })()}
+              <div>
+                <p className="text-xs font-semibold text-emerald-400 uppercase tracking-[0.15em] mb-2">Since 2017 · Kano</p>
+                <h1 className="text-4xl sm:text-5xl lg:text-7xl font-bold text-white leading-[1.02] tracking-tight">
+                  MBPP
+                </h1>
+                <p className="text-sm sm:text-base text-white/50 mt-1">Mutual Benefit Premier Properties</p>
+              </div>
+            </div>
+            <p className="text-base sm:text-lg text-white/55 leading-relaxed max-w-xl">
               We are a small property company. We work in Kano. We have been doing this since 2017.
             </p>
           </div>

@@ -5,7 +5,7 @@ import { useRole } from "@/context/RoleContext";
 import { useSettings } from "@/context/SettingsContext";
 import Button from "@/components/ui/Button";
 
-const rolePath = (role: string) => role === "head" ? "/admin" : `/${role}`;
+const rolePath = (role: string) => role === "head" ? "/admin" : role === "client" ? "/" : `/${role}`;
 
 function LoginForm() {
   const [email, setEmail] = useState("");

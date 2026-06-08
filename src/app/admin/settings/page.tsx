@@ -30,13 +30,15 @@ function defaults(): SettingsMap {
     google_maps_key: "", resend_api_key: "",
     smtp_host: "", smtp_port: "", smtp_user: "", smtp_pass: "", smtp_enc: "tls",
     facebook_url: "", instagram_url: "", linkedin_url: "", youtube_url: "", twitter_url: "",
-    welcome_template: "<h2>Welcome to MBPP, {{name}}!</h2><p>Your account has been created. Once approved, you'll be able to access all features.</p>",
-    approved_template: "<h2>Account Approved, {{name}}!</h2><p>Your {{role}} account has been approved. <a href='{{login_url}}'>Sign in here</a>.</p>",
-    reset_template: "<h2>Password Reset</h2><p>Click here to reset: <a href='{{reset_url}}'>{{reset_url}}</a>. Link expires in 15 minutes.</p>",
-    inquiry_template: "<h2>New Inquiry: {{property_title}}</h2><p>{{client_name}} ({{client_contact}}) sent: {{message}}</p>",
-    application_template: "<h2>Application Update: {{property_title}}</h2><p>Status: <strong>{{status}}</strong></p>",
-    agreement_template: "<h2>Agreement Ready</h2><p>The tenancy agreement for {{property_title}} is ready for signing.</p>",
-    payment_template: "<h2>Payment Receipt</h2><p>₦{{amount}} received for {{purpose}}. Ref: {{reference}}</p>",
+    welcome_template: "<h2>Welcome to MBPP!</h2><p>Hello <strong>{{name}}</strong>,</p><p>Your account has been created and is ready to use. You can now browse properties, contact agents, and manage your listings.</p><p>If you have any questions, reach out to us at support@mbpproperties.com.</p>",
+    approved_template: "<h2>Account Approved!</h2><p>Hello <strong>{{name}}</strong>,</p><p>Your <strong>{{role}}</strong> account has been approved. You now have full access to your dashboard and all platform features.</p><p><a href='{{login_url}}'>Sign in to your account</a></p>",
+    reset_template: "<h2>Reset Your Password</h2><p>Hello <strong>{{name}}</strong>,</p><p>We received a request to reset your password. Click the button below to create a new password. This link expires in 15 minutes.</p><p><a href='{{reset_url}}'>Reset Password</a></p><p>If you did not request this, please ignore this email.</p>",
+    inquiry_template: "<h2>New Inquiry: {{property_title}}</h2><p><strong>{{client_name}}</strong> ({{client_contact}}) sent an inquiry about your listing:</p><blockquote>{{message}}</blockquote><p>Log in to your dashboard to respond.</p>",
+    application_template: "<h2>Application Update</h2><p>Hello,</p><p>Your application for <strong>{{property_title}}</strong> has been updated.</p><p>Status: <strong>{{status}}</strong></p><p>Log in to your dashboard for more details.</p>",
+    agreement_template: "<h2>Tenancy Agreement Ready</h2><p>Hello <strong>{{name}}</strong>,</p><p>The tenancy agreement for <strong>{{property_title}}</strong> is ready for your review and signature.</p><p>Log in to your dashboard to view and sign the agreement.</p>",
+    payment_template: "<h2>Payment Receipt</h2><p>Hello <strong>{{name}}</strong>,</p><p>We have received your payment of <strong>₦{{amount}}</strong> for <strong>{{purpose}}</strong>.</p><p>Reference: {{reference}}</p><p>Log in to your dashboard to view the full receipt.</p>",
+    agent_application_template: "<h2>Agent Application Received</h2><p>Hello <strong>{{name}}</strong>,</p><p>Thank you for applying to become an agent with MBPP. We have received your application and our team is reviewing your credentials.</p><p>We will get back to you within 48 hours with an update.</p>",
+    agent_terms: "<p><strong>1. Code of Conduct</strong><br />As an MBPP agent, you agree to represent properties truthfully, maintain client confidentiality, and act in the best interest of both property owners and tenants.</p>\n<p><strong>2. Listing Accuracy</strong><br />All property listings must include accurate information, current photographs, and truthful descriptions. Misrepresentation will result in immediate termination.</p>\n<p><strong>3. Commission Structure</strong><br />Agents earn a commission of 5% on each successful rental or sale transaction facilitated through MBPP. Commissions are paid within 7 days of transaction completion.</p>\n<p><strong>4. Verification Requirements</strong><br />Agents must provide valid identification (NIN or BVN), proof of address, and two professional references. MBPP reserves the right to verify all provided information.</p>\n<p><strong>5. Exclusive Platform</strong><br />Properties listed on MBPP must not be listed on competing platforms at a lower price. Agents are encouraged to use MBPP as their primary listing platform.</p>\n<p><strong>6. Data Protection</strong><br />Agents must comply with the Nigeria Data Protection Regulation (NDPR). Client personal information must not be shared with third parties without explicit consent.</p>\n<p><strong>7. Dispute Resolution</strong><br />Any disputes arising from agent activities shall be resolved through arbitration in accordance with the Arbitration and Conciliation Act, Cap A18, Laws of the Federation of Nigeria.</p>\n<p><strong>8. Termination</strong><br />MBPP reserves the right to terminate an agent's account with 14 days' notice if terms are violated. Agents may terminate their account at any time with 7 days' notice.</p>",
     agent_dir_visible: "true", default_commission: "5",
     primary_color: "#0d6e4e", secondary_color: "#f97316", accent_color: "#facc15",
     heading_font: "Inter", body_font: "Inter",
@@ -368,6 +370,7 @@ export default function AdminSettings() {
           <RichTextArea label="Application Status Change" value={s("application_template")} onChange={(v) => set("application_template", v)} rows={5} />
           <RichTextArea label="Agreement Ready" value={s("agreement_template")} onChange={(v) => set("agreement_template", v)} rows={5} />
           <RichTextArea label="Payment Receipt" value={s("payment_template")} onChange={(v) => set("payment_template", v)} rows={5} />
+          <RichTextArea label="Agent Application Received" value={s("agent_application_template")} onChange={(v) => set("agent_application_template", v)} rows={5} />
         </>)}
 
         {/* Staff & Roles */}
@@ -393,6 +396,10 @@ export default function AdminSettings() {
               </div>
             ))}
           </div>
+          <hr className="border-gray-100" />
+          <h3 className="text-sm font-semibold text-gray-900">Agent Agreement</h3>
+          <p className="text-xs text-gray-500">This text is shown to agents during the signup process at <code>/apply-as-agent</code>.</p>
+          <RichTextArea label="Agent Terms & Conditions" value={s("agent_terms")} onChange={(v) => set("agent_terms", v)} rows={10} />
         </>)}
 
         {/* System */}

@@ -41,9 +41,9 @@ export const templates = {
   welcome(name: string) {
     return base("Welcome to MBPP!",
       `<p>Hello <strong>${name}</strong>,</p>
-       <p>Your account has been created and is pending review by our team. Once approved, you'll gain access to property listings, client management tools, and more.</p>
-       <p>Approval typically takes <strong>24–48 hours</strong>. You'll receive another email when your account is active.</p>`,
-      ["Visit Platform", `${URL}/login`]
+       <p>Your account has been created and is ready to use. You can now browse properties, contact agents, and manage your listings.</p>
+       <p>If you have any questions, reach out to us at <a href="mailto:support@mbpproperties.com">support@mbpproperties.com</a>.</p>`,
+      ["Sign In", `${URL}/login`]
     );
   },
 
@@ -151,7 +151,8 @@ export const templates = {
   agentApplicationSubmitted(name: string) {
     return base("Agent Application Received",
       `<p>Hello <strong>${name}</strong>,</p>
-       <p>Thank you for applying to become an agent with MBPP. Our team will review your credentials and get back to you within 48 hours.</p>`,
+       <p>Thank you for applying to become an agent with MBPP. We have received your application and our team is reviewing your credentials.</p>
+       <p>We will get back to you within <strong>48 hours</strong> with an update.</p>`,
       ["Visit Platform", URL]
     );
   },

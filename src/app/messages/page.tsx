@@ -1,8 +1,10 @@
 "use client";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, Suspense } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { formatDate } from "@/lib/utils";
 import { api } from "@/lib/api-client";
+import Button from "@/components/ui/Button";
 
 interface User { id: string; name: string; avatar?: string; }
 interface Conversation {
@@ -44,11 +46,26 @@ function timeAgo(iso?: string) {
   return new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric" });
 }
 
-export default function MessagesPage() {
+export default function MessagesPageWrapper() {
+  return (
+    <Suspense fallback={<div className="flex-1 flex items-center justify-center"><div className="animate-spin w-6 h-6 border-2 border-[var(--color-primary)] border-t-transparent rounded-full" /></div>}>
+      <MessagesPage />
+    </Suspense>
+  );
+}
+
+function MessagesPage() {
+  const searchParams = useSearchParams();
+  const newConversationId = searchParams.get("id");
+  const newListingId = searchParams.get("listing");
+  const newAgentId = searchParams.get("agent");
+
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [query, setQuery] = useState("");
+  const [newConvo, setNewConvo] = useState<{ subject: string; recipientId: string; listingId: string } | null>(null);
+  const [newMessage, setNewMessage] = useState("");
 
   useEffect(() => {
     api.get<{ conversations: Conversation[] }>("/api/messages/conversations").then(r => {
@@ -56,6 +73,32 @@ export default function MessagesPage() {
       setLoading(false);
     }).catch(() => setLoading(false));
   }, []);
+
+  useEffect(() => {
+    if (newListingId && newAgentId) {
+      setNewConvo({ subject: "", recipientId: newAgentId, listingId: newListingId });
+      setSelectedId(null);
+    }
+  }, [newListingId, newAgentId]);
+
+  const handleSendNewConversation = async () => {
+    if (!newConvo || !newMessage.trim()) return;
+    try {
+      const r = await api.post("/api/messages/conversations", {
+        recipientId: newConvo.recipientId,
+        listingId: newConvo.listingId || undefined,
+        subject: newConvo.subject || undefined,
+        content: newMessage.trim(),
+      });
+      if ((r.data as any)?.conversation) {
+        const conv = (r.data as any).conversation;
+        setConversations(prev => [conv, ...prev]);
+        setSelectedId(conv.id);
+        setNewConvo(null);
+        setNewMessage("");
+      }
+    } catch {}
+  };
 
   const selected = conversations.find((c) => c.id === selectedId);
   const filtered = query
@@ -71,7 +114,7 @@ export default function MessagesPage() {
     <div className="h-full flex flex-col">
       <div className="flex-1 flex overflow-hidden min-h-0">
         {/* List */}
-        <div className={`w-full lg:w-96 border-r border-gray-100 bg-white flex flex-col ${selectedId ? "hidden lg:flex" : "flex"}`}>
+        <div className={`w-full lg:w-1/2 border-r border-gray-100 bg-white flex flex-col ${(selectedId || newConvo) ? "hidden lg:flex" : "flex"}`}>
           <div className="px-5 pt-5 pb-3 border-b border-gray-100">
             <div className="flex items-end justify-between mb-3">
               <div>
@@ -163,8 +206,39 @@ export default function MessagesPage() {
         </div>
 
         {/* Detail / Placeholder */}
-        <div className={`flex-1 flex flex-col bg-gradient-to-br from-gray-50 to-white min-h-0 ${!selectedId ? "hidden lg:flex" : "flex"}`}>
-          {selected ? (
+        <div className={`flex-1 flex flex-col bg-gradient-to-br from-gray-50 to-white min-h-0 ${!selectedId && !newConvo ? "hidden lg:flex" : "flex"}`}>
+          {newConvo ? (
+            <div className="flex flex-col flex-1 min-h-0">
+              <div className="flex items-center gap-3 px-5 py-3.5 bg-white/80 backdrop-blur-md border-b border-gray-100 shrink-0">
+                <button onClick={() => { setNewConvo(null); setNewMessage(""); }} className="lg:hidden -ml-1 p-1.5 text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded-lg">
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" /></svg>
+                </button>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold text-gray-900 truncate">New Conversation</p>
+                  <p className="text-[11px] text-gray-500 truncate">Start a new message thread</p>
+                </div>
+              </div>
+              <div className="flex-1 flex flex-col items-center justify-center p-6">
+                <div className="w-full max-w-md space-y-3">
+                  <input
+                    type="text"
+                    placeholder="Subject (optional)"
+                    value={newConvo.subject}
+                    onChange={(e) => setNewConvo({ ...newConvo, subject: e.target.value })}
+                    className="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)]"
+                  />
+                  <textarea
+                    value={newMessage}
+                    onChange={(e) => setNewMessage(e.target.value)}
+                    placeholder="Type your first message..."
+                    rows={4}
+                    className="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-lg resize-none focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)]"
+                  />
+                  <Button className="w-full" onClick={handleSendNewConversation} disabled={!newMessage.trim()}>Send Message</Button>
+                </div>
+              </div>
+            </div>
+          ) : selected ? (
             <ConversationDetail conversation={selected} onBack={() => setSelectedId(null)} />
           ) : (
             <div className="flex-1 flex items-center justify-center p-6">

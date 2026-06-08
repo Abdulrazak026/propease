@@ -50,9 +50,12 @@ export default function StaffsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-3">
-        <a href="/admin" className="text-gray-400 hover:text-[var(--color-primary)]"><svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg></a>
-        <div><h1 className="text-xl font-bold text-gray-900">Staff Management</h1><p className="text-xs text-gray-500">Manage all staff roles and permissions</p></div>
+      <div className="flex items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <a href="/admin" className="text-gray-400 hover:text-[var(--color-primary)]"><svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg></a>
+          <div><h1 className="text-xl font-bold text-gray-900">Staff Management</h1><p className="text-xs text-gray-500">Manage all staff roles and permissions</p></div>
+        </div>
+        <Button size="sm" onClick={() => setEditUser("new")}>+ Add Staff</Button>
       </div>
 
       <div className="grid grid-cols-3 gap-4">
@@ -87,7 +90,11 @@ export default function StaffsPage() {
         </div>
       </div>
 
-      {editUser && <RolesModal userId={editUser} users={users} onClose={() => { setEditUser(null); fetchUsers(); }} />}
+      {editUser && editUser === "new" ? (
+        <AddStaffModal onClose={() => { setEditUser(null); fetchUsers(); }} />
+      ) : editUser ? (
+        <RolesModal userId={editUser} users={users} onClose={() => { setEditUser(null); fetchUsers(); }} />
+      ) : null}
     </div>
   );
 }
@@ -95,7 +102,10 @@ export default function StaffsPage() {
 function RolesModal({ userId, users, onClose }: { userId: string; users: ApiUser[]; onClose: () => void }) {
   const u = users.find(x => x.id === userId)!;
   const [saving, setSaving] = useState(false);
+  const [localPerms, setLocalPerms] = useState<Record<string, boolean>>({});
   if (!u) return null;
+
+  const getPerm = (k: string) => localPerms[k] !== undefined ? localPerms[k] : !!(u as any)[k];
 
   const update = async (data: Record<string, unknown>) => {
     setSaving(true);
@@ -123,9 +133,13 @@ function RolesModal({ userId, users, onClose }: { userId: string; users: ApiUser
             <label className="text-xs font-semibold text-gray-700 mb-2 block">Permissions</label>
             <div className="space-y-2">
               {PERMISSIONS.map(p => (
-                <label key={p.k} className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50 cursor-pointer" onClick={async () => { await update({ [p.k]: !(u as any)[p.k] }); }}>
-                  <div className={`w-10 h-6 rounded-full relative transition-colors ${(u as any)[p.k] ? "bg-[var(--color-primary)]" : "bg-gray-300"}`}>
-                    <span className={`absolute top-0.5 w-5 h-5 rounded-full bg-white transition-transform ${(u as any)[p.k] ? "translate-x-5" : "left-0.5"}`} />
+                <label key={p.k} className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50 cursor-pointer" onClick={async () => {
+                  const newVal = !getPerm(p.k);
+                  setLocalPerms(prev => ({ ...prev, [p.k]: newVal }));
+                  await update({ [p.k]: newVal });
+                }}>
+                  <div className={`w-10 h-6 rounded-full relative transition-colors duration-200 ease-in-out ${getPerm(p.k) ? "bg-[var(--color-primary)]" : "bg-gray-300"}`}>
+                    <span className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow-sm transition-transform duration-200 ease-in-out ${getPerm(p.k) ? "translate-x-4" : "translate-x-0"}`} />
                   </div>
                   <span className="text-sm font-medium text-gray-900">{p.l}</span>
                 </label>
@@ -134,10 +148,50 @@ function RolesModal({ userId, users, onClose }: { userId: string; users: ApiUser
           </div>
           <div>
             <label className="text-xs font-semibold text-gray-700">Status</label>
-            <Button size="sm" variant={u.isApproved ? "outline" : "primary"} className="mt-1 w-full" onClick={async () => { await update({ isApproved: !u.isApproved }); }} disabled={saving}>
+            <Button size="sm" variant={u.isApproved ? "outline" : "primary"} className="mt-1 w-full" onClick={async () => { await update({ isApproved: !u.isApproved, suspendedAt: u.isApproved ? new Date().toISOString() : null }); }} disabled={saving}>
               {u.isApproved ? "Suspend Account" : "Approve Account"}
             </Button>
           </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function AddStaffModal({ onClose }: { onClose: () => void }) {
+  const [form, setForm] = useState({ name: "", email: "", role: "agent", password: "", city: "" });
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
+
+  const handleCreate = async () => {
+    if (!form.name || !form.email || !form.password) { setError("Name, email and password are required"); return; }
+    setSaving(true);
+    setError("");
+    const r = await api.post("/api/admin/users", { name: form.name, email: form.email, role: form.role, password: form.password, city: form.city || undefined });
+    setSaving(false);
+    if (r.status === 201 || r.status === 200) { onClose(); }
+    else { setError("Failed to create staff"); }
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4" onClick={onClose}>
+      <div className="bg-white rounded-xl p-6 max-w-md w-full shadow-2xl" onClick={e => e.stopPropagation()}>
+        <h3 className="text-lg font-bold text-gray-900 mb-4">Add New Staff</h3>
+        <div className="space-y-3">
+          <input placeholder="Full Name" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm" />
+          <input type="email" placeholder="Email" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm" />
+          <select value={form.role} onChange={e => setForm({ ...form, role: e.target.value })} className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm">
+            <option value="head">Admin / Head</option>
+            <option value="ambassador">Ambassador</option>
+            <option value="agent">Agent</option>
+          </select>
+          <input placeholder="City (optional)" value={form.city} onChange={e => setForm({ ...form, city: e.target.value })} className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm" />
+          <input type="password" placeholder="Password" value={form.password} onChange={e => setForm({ ...form, password: e.target.value })} className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm" />
+        </div>
+        {error && <p className="text-xs text-red-600 mt-2">{error}</p>}
+        <div className="flex gap-2 mt-4">
+          <Button className="flex-1" disabled={saving} onClick={handleCreate}>{saving ? "Creating..." : "Create Staff"}</Button>
+          <Button variant="outline" className="flex-1" onClick={onClose}>Cancel</Button>
         </div>
       </div>
     </div>

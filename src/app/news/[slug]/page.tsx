@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Breadcrumb from "@/components/ui/Breadcrumb";
 
-const API = process.env.NEXT_PUBLIC_API_URL || "https://propease-production.up.railway.app";
 const SITE_URL = "https://mbpproperties.com";
 
 const FALLBACK_POSTS: Record<string, { title: string; excerpt: string; content: string; coverImage: string; publishedAt: string; authorName: string }> = {
@@ -117,13 +116,6 @@ const FALLBACK_POSTS: Record<string, { title: string; excerpt: string; content: 
 
 async function getPost(slug: string) {
   const fallback = FALLBACK_POSTS[slug];
-  try {
-    const res = await fetch(`${API}/api/blog/${slug}`, { next: { revalidate: 3600 } });
-    if (res.ok) {
-      const data = await res.json();
-      if (data.post) return data.post;
-    }
-  } catch {}
   if (fallback) {
     return {
       slug,
@@ -182,7 +174,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
             description: post.excerpt,
             image: post.coverImage,
             datePublished: post.publishedAt,
-            dateModified: post.updatedAt,
+            dateModified: post.publishedAt,
             author: { "@type": "Person", name: post.author?.name },
             publisher: {
               "@type": "Organization",

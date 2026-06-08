@@ -20,11 +20,8 @@ export const dashboardNav: Record<string, NavItem[]> = {
   { label: "Newsletter", href: "/admin/newsletter", icon: "inquiries" },
   { label: "Settings", href: "/admin/settings", icon: "settings" },
   { label: "Moderation", href: "/admin/moderation", icon: "agreements" },
-  { label: "Blog", href: "/admin/blog", icon: "agreements" },
-  { label: "FAQs", href: "/admin/faqs", icon: "inquiries" },
-  { label: "Media", href: "/admin/media", icon: "agreements" },
-  { label: "Analytics", href: "/admin/analytics", icon: "audit" },
-  { label: "Audit Log", href: "/admin/audit", icon: "audit", badge: "withdrawals" },
+ { label: "Blog", href: "/admin/blog", icon: "agreements" },
+ { label: "FAQs", href: "/admin/faqs", icon: "inquiries" },
  ],
  agent: [
  { label: "Task Board", href: "/agent", icon: "tasks", badge: "tasks" },

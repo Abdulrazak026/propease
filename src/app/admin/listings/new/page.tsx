@@ -52,7 +52,7 @@ export default function AdminNewListingPage() {
       const fd = new FormData();
       fd.append("file", file);
       try {
-        const res = await fetch(`${API}/api/upload`, { method: "POST", headers: token ? { Authorization: `Bearer ${token}` } : {}, body: fd });
+        const res = await fetch(`${API}/api/upload`, { method: "POST", headers: token ? { Authorization: `Bearer ${token}` } : {}, body: fd, credentials: "include" });
         if (res.ok) { const { url } = await res.json(); setUploadedUrls(prev => [...prev, url]); }
       } catch {}
     }

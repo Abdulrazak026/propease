@@ -2,6 +2,8 @@ import type { MetadataRoute } from "next";
 
 const BASE = "https://mbpproperties.com";
 
+export const revalidate = 3600;
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticPages = ["", "/about", "/contact", "/news", "/help", "/list-property", "/sell", "/careers", "/research", "/zestimates", "/mobile-apps", "/fair-housing", "/terms", "/privacy", "/login", "/register"];
 
@@ -14,7 +16,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   try {
     const API = "https://propease-production.up.railway.app";
-    const res = await fetch(`${API}/api/listings`);
+    const res = await fetch(`${API}/api/listings`, { signal: AbortSignal.timeout(2000) });
     if (res.ok) {
       const data = await res.json();
       const listings: any[] = data.listings || [];

@@ -60,7 +60,7 @@ export default function AdminEditListingPage() {
     for (const file of Array.from(files).slice(0, 10 - uploadedUrls.length)) {
       const fd = new FormData(); fd.append("file", file);
       try {
-        const res = await fetch(`${API_URL}/api/upload`, { method: "POST", headers: token ? { Authorization: `Bearer ${token}` } : {}, body: fd });
+        const res = await fetch(`${API_URL}/api/upload`, { method: "POST", headers: token ? { Authorization: `Bearer ${token}` } : {}, body: fd, credentials: "include" });
         if (res.ok) { const { url } = await res.json(); setUploadedUrls(prev => [...prev, url]); }
       } catch {}
     }

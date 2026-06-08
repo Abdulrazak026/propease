@@ -6,7 +6,7 @@ import Button from "@/components/ui/Button";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "https://propease-production.up.railway.app";
 
-type Step = 1 | 2 | 3 | 4 | 5 | 6 | 7;
+type Step = 1 | 2 | 3 | 4 | 5 | 6;
 
 interface ApplicationData {
  listingId: string;
@@ -18,7 +18,6 @@ interface ApplicationData {
  employer: string;
  jobTitle: string;
  workAddress: string;
- monthlyIncome: string;
  idType: string;
  idNumber: string;
  refName: string;
@@ -35,7 +34,6 @@ const emptyForm: ApplicationData = {
  listingId: "",
  fullName: "", email: "", phone: "", dateOfBirth: "",
  employmentStatus: "", employer: "", jobTitle: "", workAddress: "",
- monthlyIncome: "",
  idType: "", idNumber: "",
  refName: "", refPhone: "", refEmail: "", refRelation: "",
  nokName: "", nokPhone: "", nokEmail: "", nokRelation: "",
@@ -44,10 +42,9 @@ const emptyForm: ApplicationData = {
 const steps = [
  { num: 1, label: "Personal Info" },
  { num: 2, label: "Employment" },
- { num: 3, label: "Income" },
- { num: 4, label: "ID Verification" },
- { num: 5, label: "References" },
- { num: 6, label: "Next of Kin" },
+ { num: 3, label: "ID Verification" },
+ { num: 4, label: "References" },
+ { num: 5, label: "Next of Kin" },
 ];
 
 function StepIndicator({ current }: { current: Step }) {
@@ -110,10 +107,9 @@ function ApplyPage() {
  switch (s) {
  case 1: return form.fullName.length>= 2 && form.email.includes("@") && form.phone.length>= 8;
  case 2: return form.employmentStatus !== "";
- case 3: return form.monthlyIncome !== "";
- case 4: return form.idType !== "" && form.idNumber.length>= 3;
- case 5: return form.refName.length>= 2 && form.refPhone.length>= 8;
- case 6: return form.nokName.length>= 2 && form.nokPhone.length>= 8;
+ case 3: return form.idType !== "" && form.idNumber.length>= 3;
+ case 4: return form.refName.length>= 2 && form.refPhone.length>= 8;
+ case 5: return form.nokName.length>= 2 && form.nokPhone.length>= 8;
  default: return true;
  }
  };
@@ -135,7 +131,6 @@ function ApplyPage() {
           employer: form.employer,
           jobTitle: form.jobTitle,
           workAddress: form.workAddress,
-          monthlyIncome: form.monthlyIncome ? Number(form.monthlyIncome) : undefined,
           idType: form.idType,
           idNumber: form.idNumber,
           refName: form.refName,
@@ -187,7 +182,7 @@ function ApplyPage() {
  Back to listings
  </Link>
  <h1 className="text-xl font-bold text-gray-900">Rental Application</h1>
- <p className="text-sm text-gray-500 mt-0.5">Complete all 6 steps to submit your application</p>
+ <p className="text-sm text-gray-500 mt-0.5">Complete all 5 steps to submit your application</p>
  </div>
 
  <div className="bg-white rounded-lg border border-gray-200 p-6">
@@ -257,32 +252,8 @@ function ApplyPage() {
  </div>
  )}
 
- {/* Step 3: Income */}
+ {/* Step 3: ID Verification */}
  {step === 3 && (
- <div className="space-y-4">
- <h2 className="text-base font-semibold text-gray-900">Income Information</h2>
- <p className="text-xs text-gray-500">Your monthly income helps us find the right property for you</p>
- <div>
- <label className="block text-xs font-medium text-gray-700 mb-1">Monthly Income *</label>
- <div className="relative">
- <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm text-gray-400 font-medium">₦</span>
- <input value={form.monthlyIncome} onChange={(e) => update("monthlyIncome", e.target.value)} type="number" className="w-full rounded-lg border border-gray-200 bg-white pl-8 pr-4 py-2.5 text-sm" placeholder="e.g. 150000" />
- </div>
- <p className="text-[10px] text-gray-400 mt-1">Enter your average monthly income after tax</p>
- </div>
- <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
- <p className="text-xs text-amber-800 flex items-center gap-2">
- <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
- <path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
- </svg>
- Your income information is kept confidential and only shared with the agent reviewing your application.
- </p>
- </div>
- </div>
- )}
-
- {/* Step 4: ID Verification */}
- {step === 4 && (
  <div className="space-y-4">
  <h2 className="text-base font-semibold text-gray-900">ID Verification</h2>
  <p className="text-xs text-gray-500">Upload a valid form of identification</p>
@@ -321,8 +292,8 @@ function ApplyPage() {
  </div>
  )}
 
- {/* Step 5: References */}
- {step === 5 && (
+ {/* Step 4: References */}
+ {step === 4 && (
  <div className="space-y-4">
  <h2 className="text-base font-semibold text-gray-900">Reference</h2>
  <p className="text-xs text-gray-500">Someone who can vouch for you (not a family member)</p>
@@ -349,8 +320,8 @@ function ApplyPage() {
  </div>
  )}
 
- {/* Step 6: Next of Kin */}
- {step === 6 && (
+ {/* Step 5: Next of Kin */}
+ {step === 5 && (
  <div className="space-y-4">
  <h2 className="text-base font-semibold text-gray-900">Next of Kin</h2>
  <p className="text-xs text-gray-500">Emergency contact information</p>
@@ -377,8 +348,8 @@ function ApplyPage() {
  </div>
  )}
 
- {/* Step 7: Review */}
- {step === 7 && (
+ {/* Step 6: Review */}
+ {step === 6 && (
  <div className="space-y-4">
  <h2 className="text-base font-semibold text-gray-900">Review Your Application</h2>
  <p className="text-xs text-gray-500">Please verify all information before submitting</p>
@@ -387,7 +358,6 @@ function ApplyPage() {
  <div><span className="font-medium text-gray-700">Email:</span> <span className="text-gray-600">{form.email}</span></div>
  <div><span className="font-medium text-gray-700">Phone:</span> <span className="text-gray-600">{form.phone}</span></div>
  <div><span className="font-medium text-gray-700">Employment:</span> <span className="text-gray-600">{form.employmentStatus} at {form.employer}</span></div>
- <div><span className="font-medium text-gray-700">Monthly Income:</span> <span className="text-gray-600">₦{parseInt(form.monthlyIncome || "0").toLocaleString()}</span></div>
  <div><span className="font-medium text-gray-700">ID Type:</span> <span className="text-gray-600">{form.idType}</span></div>
  <div><span className="font-medium text-gray-700">Reference:</span> <span className="text-gray-600">{form.refName}</span></div>
  <div><span className="font-medium text-gray-700">Next of Kin:</span> <span className="text-gray-600">{form.nokName} ({form.nokRelation})</span></div>
@@ -407,20 +377,20 @@ function ApplyPage() {
  )}
  </div>
  <div className="flex items-center gap-2">
- {step < 6 && (
+ {step < 5 && (
  <Button
- disabled={!canProceed(step)}
- onClick={() => setStep((step + 1) as Step)}
->
- Continue →
+   disabled={!canProceed(step)}
+   onClick={() => setStep((step + 1) as Step)}
+ >
+   Continue →
  </Button>
  )}
- {step === 6 && (
- <Button onClick={() => setStep(7)}>
- Review →
- </Button>
+ {step === 5 && (
+   <Button onClick={() => setStep(6)}>
+     Review →
+   </Button>
  )}
-  {step === 7 && (
+   {step === 6 && (
     <>
       {error && <p className="text-xs text-red-600 text-center mb-2">{error}</p>}
       <Button onClick={handleSubmit} disabled={sending}>
@@ -431,9 +401,9 @@ function ApplyPage() {
  </div>
  </div>
 
- {step < 7 && (
+ {step < 6 && (
  <p className="text-xs text-gray-400 text-center mt-4">
- Step {step} of 6
+ Step {step} of 5
  </p>
  )}
  </div>

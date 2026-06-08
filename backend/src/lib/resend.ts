@@ -25,5 +25,5 @@ export async function getResend(): Promise<Resend> {
   return resendInstance;
 }
 
-export const FROM_ADDRESS = "MBPP <noreply@mbpproperties.com>";
+export const FROM_ADDRESS = "MBPP <support@mbpproperties.com>";
 export const SUPPORT_ADDRESS = "support@mbpproperties.com";

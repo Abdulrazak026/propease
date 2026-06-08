@@ -55,6 +55,17 @@ export default function ListingDetail() {
     setFav(now);
   };
 
+  if (loading) {
+    return (
+      <div className="flex-1 flex items-center justify-center py-24">
+        <div className="flex items-center gap-3 text-sm text-gray-500">
+          <div className="w-5 h-5 border-2 border-[var(--color-primary)] border-t-transparent rounded-full animate-spin" />
+          Loading property...
+        </div>
+      </div>
+    );
+  }
+
   if (!listing) {
     return (
       <div className="flex-1 flex items-center justify-center py-24">

@@ -11,17 +11,15 @@ async function getDbTemplate(key: string): Promise<string | null> {
   }
 }
 
-async function getTemplate(key: string, ...args: string[]): Promise<string> {
+async function getTemplate(key: string, ...args: string[]): Promise<string | null> {
   const dbTpl = await getDbTemplate(key);
-  if (dbTpl) {
-    let result = dbTpl;
-    args.forEach((arg, i) => {
-      const placeholders = ["name", "role", "propertyTitle", "status", "senderName", "amount", "reference", "purpose", "listingId", "agentName", "clientName", "clientContact", "message", "oldPrice", "newPrice", "token", "loginUrl", "resetUrl"];
-      if (placeholders[i]) result = result.split(`{{${placeholders[i]}}}`).join(arg || "");
-    });
-    return result;
-  }
-  return "";
+  if (!dbTpl) return null;
+  let result = dbTpl;
+  args.forEach((arg, i) => {
+    const placeholders = ["name", "role", "propertyTitle", "status", "senderName", "amount", "reference", "purpose", "listingId", "agentName", "clientName", "clientContact", "message", "oldPrice", "newPrice", "token", "loginUrl", "resetUrl"];
+    if (placeholders[i]) result = result.split(`{{${placeholders[i]}}}`).join(arg || "");
+  });
+  return result;
 }
 
 async function send(to: string, subject: string, html: string) {
@@ -41,7 +39,7 @@ export const emailService = {
   async welcome(email: string, name: string) {
     const tpl = await getTemplate("welcome_template", name);
     const html = tpl || defaultTemplates.welcome(name);
-    return send(email, "Welcome to MBPP — Account Pending Review", html);
+    return send(email, tpl ? "Welcome to MBPP" : "Welcome to MBPP", html);
   },
   async accountApproved(email: string, name: string, role: string) {
     const tpl = await getTemplate("approved_template", name, role);
@@ -101,7 +99,7 @@ export const emailService = {
   async agentApplicationSubmitted(email: string, name: string) {
     const tpl = await getTemplate("agent_application_template", name);
     const html = tpl || defaultTemplates.agentApplicationSubmitted(name);
-    return send(email, "Agent application received", html);
+    return send(email, tpl ? "Agent Application Received" : "Agent application received", html);
   },
   async listingPublished(email: string, agentName: string, propertyTitle: string, listingId: string) {
     const tpl = await getTemplate("listing_published_template", agentName, propertyTitle, listingId);
@@ -115,19 +113,24 @@ export const emailService = {
   },
   async contactFormSubmission(data: { name: string; email: string; phone: string; subject: string; message: string }) {
     const supportEmail = process.env.SUPPORT_EMAIL || "support@mbpproperties.com";
-    const html = `<div style="font-family:sans-serif;max-width:600px;margin:0 auto">
-      <h2>New Contact Form Submission</h2>
-      <table style="width:100%;border-collapse:collapse">
-        <tr><td style="padding:8px;border-bottom:1px solid #eee;font-weight:600">Name</td><td style="padding:8px;border-bottom:1px solid #eee">${data.name}</td></tr>
-        <tr><td style="padding:8px;border-bottom:1px solid #eee;font-weight:600">Email</td><td style="padding:8px;border-bottom:1px solid #eee">${data.email}</td></tr>
-        <tr><td style="padding:8px;border-bottom:1px solid #eee;font-weight:600">Phone</td><td style="padding:8px;border-bottom:1px solid #eee">${data.phone || "N/A"}</td></tr>
-        <tr><td style="padding:8px;border-bottom:1px solid #eee;font-weight:600">Subject</td><td style="padding:8px;border-bottom:1px solid #eee">${data.subject}</td></tr>
-      </table>
-      <div style="margin-top:16px;padding:12px;background:#f9fafb;border-radius:8px">
-        <p style="white-space:pre-wrap;margin:0">${data.message}</p>
-      </div>
-    </div>`;
-    return send(supportEmail, `[Contact] ${data.subject} \u2014 from ${data.name}`, html);
+    const { templates } = await import("./email-templates");
+    const html = (templates as any).customOrderReceived
+      ? `<div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;max-width:600px;margin:0 auto;color:#334155">
+        <p style="font-size:14px;margin:0 0 16px">You have a new contact form submission from <strong>${data.name}</strong>.</p>
+        <table style="width:100%;border-collapse:collapse;background:#f8fafc;border-radius:8px;overflow:hidden">
+          <tr><td style="padding:10px 16px;font-size:13px;font-weight:600;color:#64748b;width:100px;border-bottom:1px solid #e2e8f0">Name</td><td style="padding:10px 16px;font-size:13px;border-bottom:1px solid #e2e8f0">${data.name}</td></tr>
+          <tr><td style="padding:10px 16px;font-size:13px;font-weight:600;color:#64748b;border-bottom:1px solid #e2e8f0">Email</td><td style="padding:10px 16px;font-size:13px;border-bottom:1px solid #e2e8f0"><a href="mailto:${data.email}">${data.email}</a></td></tr>
+          <tr><td style="padding:10px 16px;font-size:13px;font-weight:600;color:#64748b;border-bottom:1px solid #e2e8f0">Phone</td><td style="padding:10px 16px;font-size:13px;border-bottom:1px solid #e2e8f0">${data.phone || "Not provided"}</td></tr>
+          <tr><td style="padding:10px 16px;font-size:13px;font-weight:600;color:#64748b">Subject</td><td style="padding:10px 16px;font-size:13px">${data.subject}</td></tr>
+        </table>
+        <div style="margin-top:16px;padding:16px;background:#f8fafc;border-radius:8px;border-left:3px solid #0d6e4e">
+          <p style="font-size:13px;color:#64748b;margin:0 0 4px;font-weight:600">Message</p>
+          <p style="white-space:pre-wrap;margin:0;font-size:14px;line-height:1.6">${data.message}</p>
+        </div>
+        <p style="font-size:12px;color:#94a3b8;margin-top:16px">This message was sent via the MBPP contact form.</p>
+      </div>`
+      : `<div style="font-family:sans-serif;max-width:600px;margin:0 auto"><h2>New Contact Form Submission</h2><p><strong>${data.name}</strong> (${data.email}) sent a message:</p><p>${data.message}</p></div>`;
+    return send(supportEmail, `New inquiry from ${data.name}: ${data.subject}`, html);
   },
 
   // --- NEW TRIGGERS ---
