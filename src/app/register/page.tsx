@@ -84,8 +84,8 @@ export default function RegisterPage() {
           </div>
 
           <div className="mb-8">
-            <a href="/" className="inline-flex items-center gap-1 text-sm text-gray-400 hover:text-[var(--color-primary)] transition-colors mb-4">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M19 12H5M12 19l-7-7 7-7" /></svg> Back to Home
+            <a href="/" className="inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--color-primary)] hover:text-[var(--color-primary-dark)] transition-colors mb-4">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M19 12H5M12 19l-7-7 7-7" /></svg> Back to Home
             </a>
             <h2 className="text-2xl font-bold text-gray-900">Create your account</h2>
             <p className="text-sm text-gray-500 mt-1">Join for free and start exploring properties</p>

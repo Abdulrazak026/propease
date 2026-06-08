@@ -46,7 +46,7 @@ export default function LayoutShell({ children }: { children: React.ReactNode })
   return (
     <div className="flex flex-col min-h-full">
       <Navbar />
-      <main className="flex-1 pb-16 lg:pb-0">{children}</main>
+      <main className="flex-1">{children}</main>
       <BottomNav />
     </div>
   );
