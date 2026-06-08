@@ -2,8 +2,7 @@
 import { useState } from "react";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
-
-const API = process.env.NEXT_PUBLIC_API_URL || "https://propease-production.up.railway.app";
+import { api } from "@/lib/api-client";
 
 const propertyTypes = [
  { value: "house", label: "House" },
@@ -28,23 +27,19 @@ export default function CustomOrderPage() {
     setSending(true);
     setError("");
     try {
-      const res = await fetch(`${API}/api/custom-orders`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          clientName: form.clientName,
-          clientContact: form.clientContact,
-          propertyType: form.propertyType,
-          area: form.area,
-          budget: Number(form.budget) || 0,
-          notes: form.notes,
-        }),
+      const { status, data, error: apiError } = await api.post("/api/custom-orders", {
+        clientName: form.clientName,
+        clientContact: form.clientContact,
+        propertyType: form.propertyType,
+        area: form.area,
+        budget: Number(form.budget) || 0,
+        notes: form.notes,
       });
-      if (!res.ok) {
-        const d = await res.json().catch(() => ({}));
-        throw new Error(d.error || "Failed to submit");
+      if (status === 201 || status === 200) {
+        setSubmitted(true);
+      } else {
+        setError((data as any)?.error || apiError || "Failed to submit");
       }
-      setSubmitted(true);
     } catch (err: any) {
       setError(err.message || "Something went wrong");
     }
