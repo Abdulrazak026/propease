@@ -87,8 +87,26 @@ function MessagesPage() {
 
   useEffect(() => {
     if (newListingId && newAgentId) {
-      setNewConvo({ subject: "", recipientId: newAgentId, listingId: newListingId });
-      setSelectedId(null);
+      // Auto-create conversation silently - no form needed
+      const create = async () => {
+        const r = await api.post("/api/messages/conversations", {
+          recipientId: newAgentId,
+          listingId: newListingId,
+          content: `Hi! I was interested in this property. Is it still available?`,
+        });
+        if ((r.data as any)?.conversation) {
+          const conv = (r.data as any).conversation;
+          const formattedConv = {
+            ...conv,
+            lastMessage: conv.messages?.[0]?.content || "New conversation",
+            lastMessageAt: conv.messages?.[0]?.createdAt || new Date().toISOString(),
+            unread: 0,
+          };
+          setConversations(prev => [formattedConv, ...prev]);
+          setSelectedId(conv.id);
+        }
+      };
+      create();
     }
   }, [newListingId, newAgentId]);
 
@@ -110,9 +128,9 @@ function MessagesPage() {
           unread: 0,
         };
         setConversations(prev => [formattedConv, ...prev]);
+        setSelectedId(conv.id);
         setNewConvo(null);
         setNewMessage("");
-        // Stay on inbox list so user can see the new conversation
       }
     } catch {}
   };
@@ -151,13 +169,6 @@ function MessagesPage() {
         </div>
         <div className="flex-1 flex flex-col items-center justify-center p-6">
           <div className="w-full max-w-md space-y-3">
-            <input
-              type="text"
-              placeholder="Subject (optional)"
-              value={newConvo.subject}
-              onChange={(e) => setNewConvo({ ...newConvo, subject: e.target.value })}
-              className="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)]"
-            />
             <textarea
               value={newMessage}
               onChange={(e) => setNewMessage(e.target.value)}
