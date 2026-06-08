@@ -78,7 +78,7 @@ export default function Navbar() {
     >
       <Link href="/" className="flex-1 h-full flex items-center justify-center overflow-hidden px-1">
         {siteLogo ? (
-          <img src={siteLogo} alt={siteName} className="h-full w-full object-contain" />
+          <img src={siteLogo} alt={siteName} width="768" height="229" className="h-full w-auto max-w-full object-contain" />
         ) : (
           <div className="flex items-center gap-2">
             <div className="w-10 h-10 rounded-lg bg-[var(--color-primary)] flex items-center justify-center shrink-0">
