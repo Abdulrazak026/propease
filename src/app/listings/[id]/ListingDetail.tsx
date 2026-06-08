@@ -230,9 +230,9 @@ export default function ListingDetail() {
                       router.push(`/login?redirect=${encodeURIComponent(window.location.pathname)}`);
                       return;
                     }
-                    let agentId = listing.assignedAgent?.id || listing.postedBy?.id;
+                    const agentId = listing.assignedAgent?.id || listing.postedBy?.id;
                     if (!agentId) {
-                      alert("No agent assigned to this listing yet. Please try again later.");
+                      alert("No one is assigned to this listing yet. Please try again later.");
                       return;
                     }
                     try {
@@ -242,7 +242,12 @@ export default function ListingDetail() {
                         content: `Hi! I'm interested in "${listing.title}" (${formatNaira(listing.price)}). Is it still available?`,
                       });
                       if (r.status === 201 || r.status === 200) {
-                        router.push("/messages");
+                        const convId = (r.data as any)?.conversation?.id || (r.data as any)?.id;
+                        if (convId) {
+                          router.push(`/messages?id=${convId}`);
+                        } else {
+                          router.push("/messages");
+                        }
                       } else {
                         alert("Failed to start conversation. Please try again.");
                       }

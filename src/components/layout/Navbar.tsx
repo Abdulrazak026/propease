@@ -76,16 +76,7 @@ export default function Navbar() {
       } ${hidden ? "-translate-y-full" : "translate-y-0"}`}
     >
       <Link href="/" className="flex-1 h-full flex items-center justify-center overflow-hidden">
-        {siteLogo ? (
-          <img src={siteLogo} alt={siteName} width="900" height="229" style={{ height: "100%", width: "auto", objectFit: "contain" }} />
-        ) : (
-          <div className="flex items-center gap-2">
-            <div className="w-10 h-10 rounded-lg bg-[var(--color-primary)] flex items-center justify-center shrink-0">
-              <span className="text-white font-black text-base">M</span>
-            </div>
-            <span className="text-base font-bold text-gray-900 tracking-tight">MBPP</span>
-          </div>
-        )}
+        <img src={siteLogo || `https://propease-production.up.railway.app/api/upload/file/7ea15ec8-11b2-4c34-a855-1469d56656a5.png`} alt={siteName} width="900" height="229" style={{ height: "100%", width: "auto", minWidth: "50vw", objectFit: "contain" }} />
       </Link>
       <div className="flex-1 min-w-0" />
       {loading ? (
@@ -112,16 +103,7 @@ export default function Navbar() {
     >
       <div className="w-full max-w-[1400px] mx-auto px-6 xl:px-10 flex items-center gap-8">
         <Link href="/" className="flex items-center gap-2.5 shrink-0">
-          {siteLogo ? (
-            <img src={siteLogo} alt={siteName} className="h-10 w-auto rounded-lg object-contain" />
-          ) : (
-            <>
-              <div className="w-10 h-10 rounded-lg bg-[var(--color-primary)] flex items-center justify-center">
-                <span className="text-white font-black text-base">M</span>
-              </div>
-              <span className="text-base font-bold text-gray-900 tracking-tight">{siteName}</span>
-            </>
-          )}
+          <img src={siteLogo || `https://propease-production.up.railway.app/api/upload/file/7ea15ec8-11b2-4c34-a855-1469d56656a5.png`} alt={siteName} className="h-10 w-auto rounded-lg object-contain" />
         </Link>
 
         <nav className="flex items-center gap-1">
