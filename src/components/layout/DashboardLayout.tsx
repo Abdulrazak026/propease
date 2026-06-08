@@ -229,7 +229,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         <button onClick={() => setMobileOpen(true)} className="text-gray-600 p-2 shrink-0 w-10">
           <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" /></svg>
         </button>
-        <Link href="/" className="flex-1 h-full flex items-center justify-center overflow-hidden">
+        <Link href="/" className="flex-1 h-full flex items-center justify-center">
           <img src={logo || `https://propease-production.up.railway.app/api/upload/file/7ea15ec8-11b2-4c34-a855-1469d56656a5.png`} alt={getSetting("site_name", "MBPP")} width="900" height="229" style={{ height: "100%", width: "auto", minWidth: "50vw", objectFit: "contain" }} />
         </Link>
         <div className="flex items-center shrink-0" ref={notifRef}>

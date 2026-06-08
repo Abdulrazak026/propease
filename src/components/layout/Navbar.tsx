@@ -75,7 +75,7 @@ export default function Navbar() {
         scrolled ? "border-gray-200" : "border-transparent"
       } ${hidden ? "-translate-y-full" : "translate-y-0"}`}
     >
-      <Link href="/" className="flex-1 h-full flex items-center justify-center overflow-hidden">
+      <Link href="/" className="flex-1 h-full flex items-center justify-center">
         <img src={siteLogo || `https://propease-production.up.railway.app/api/upload/file/7ea15ec8-11b2-4c34-a855-1469d56656a5.png`} alt={siteName} width="900" height="229" style={{ height: "100%", width: "auto", minWidth: "50vw", objectFit: "contain" }} />
       </Link>
       <div className="flex-1 min-w-0" />
