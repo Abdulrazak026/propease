@@ -41,12 +41,12 @@ export default function AboutPage() {
   return (
     <div className="flex flex-col">
       <section className="relative bg-gray-950 overflow-hidden">
-        <div className="absolute inset-0">
+            <div className="absolute inset-0">
           {(() => {
             const heroImg = resolveImageUrl(get("about_hero_image"));
-            return heroImg ? <img src={heroImg} alt="" className="w-full h-full object-cover opacity-30" /> : <div className="w-full h-full bg-gray-900 opacity-30" />;
+            return heroImg ? <img src={heroImg} alt="" className="w-full h-full object-cover opacity-50" /> : <div className="w-full h-full bg-gray-900 opacity-50" />;
           })()}
-          <div className="absolute inset-0 bg-gradient-to-b from-gray-950/70 via-gray-950/80 to-gray-950" />
+          <div className="absolute inset-0 bg-gradient-to-b from-gray-950/30 via-gray-950/40 to-gray-950" />
         </div>
         <div className="relative max-w-[1400px] mx-auto px-5 sm:px-6 lg:px-10 pt-20 sm:pt-28 lg:pt-32 pb-20 sm:pb-28">
           <div className="max-w-3xl">

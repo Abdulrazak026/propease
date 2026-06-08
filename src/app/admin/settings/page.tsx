@@ -113,7 +113,8 @@ function EmailTemplateSection({ label, settingKey, settings, set }: { label: str
         setPreviewError("No preview content returned");
       }
     } catch (err: any) {
-      setPreviewError(err?.message || "Failed to load preview");
+      const status = err?.response?.status;
+      setPreviewError(status ? `Failed to load preview (${status})` : (err?.message || "Failed to load preview"));
     }
     setLoadingPreview(false);
   };

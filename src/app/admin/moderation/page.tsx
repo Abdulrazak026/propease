@@ -119,12 +119,8 @@ export default function ModerationPage() {
                            <Link href={`/admin/listings/${l.id}/edit`} className="text-[10px] font-medium px-2 py-1 rounded bg-gray-100 text-gray-700 hover:bg-gray-200">Edit</Link>
                            {perms.canManageContent && (
                              <>
-                               {l.status !== "approved" && l.status !== "available" && (
-                                 <button onClick={() => approve(l.id)} disabled={busy === l.id} className="text-[10px] font-medium px-2 py-1 rounded bg-emerald-100 text-emerald-700 hover:bg-emerald-200 disabled:opacity-50">{busy === l.id ? "..." : "Approve"}</button>
-                               )}
-                               {l.status !== "draft" && l.status !== "rejected" && (
-                                 <button onClick={() => reject(l.id)} disabled={busy === l.id} className="text-[10px] font-medium px-2 py-1 rounded bg-red-100 text-red-600 hover:bg-red-200 disabled:opacity-50">{busy === l.id ? "..." : "Reject"}</button>
-                               )}
+                               <button onClick={() => approve(l.id)} disabled={busy === l.id} className="text-[10px] font-medium px-2 py-1 rounded bg-emerald-100 text-emerald-700 hover:bg-emerald-200 disabled:opacity-50">{busy === l.id ? "..." : "Approve"}</button>
+                               <button onClick={() => reject(l.id)} disabled={busy === l.id} className="text-[10px] font-medium px-2 py-1 rounded bg-red-100 text-red-600 hover:bg-red-200 disabled:opacity-50">{busy === l.id ? "..." : "Reject"}</button>
                                <button onClick={() => remove(l.id)} disabled={busy === l.id} className="text-[10px] font-medium px-2 py-1 rounded bg-red-50 text-red-500 hover:bg-red-100 disabled:opacity-50">Delete</button>
                              </>
                            )}

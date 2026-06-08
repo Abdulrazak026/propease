@@ -22,7 +22,43 @@ router.get("/", authenticate, authorize("head"), async (_req, res: Response) => 
 
 router.get("/email-preview/:key", authenticate, authorize("head"), async (req, res: Response) => {
   try {
-    const key = req.params.key;
+    const settingKey = req.params.key;
+
+    const keyMap: Record<string, string> = {
+      welcome_template: "welcome",
+      agent_application_template: "agentApplicationSubmitted",
+      approved_template: "accountApproved",
+      account_suspended_template: "accountSuspended",
+      reset_template: "passwordReset",
+      password_changed_template: "passwordChanged",
+      inquiry_template: "inquiryNotification",
+      application_received_template: "applicationReceived",
+      application_template: "applicationStatus",
+      agreement_template: "agreementReady",
+      agreement_signed_template: "agreementSigned",
+      agreement_cancelled_template: "agreementCancelled",
+      listing_submitted_template: "listingSubmittedForReview",
+      listing_published_template: "listingPublished",
+      listing_rejected_template: "listingRejected",
+      verification_template: "verificationSubmitted",
+      task_assigned_template: "taskAssigned",
+      task_status_template: "taskStatusChanged",
+      task_comment_template: "taskCommentAdded",
+      commission_template: "commissionEarned",
+      wallet_template: "walletFunded",
+      payment_template: "paymentReceipt",
+      withdrawal_requested_template: "withdrawalRequested",
+      withdrawal_approved_template: "withdrawalApproved",
+      withdrawal_rejected_template: "withdrawalRejected",
+      price_drop_template: "priceDropAlert",
+      message_template: "newMessage",
+      review_submitted_template: "reviewSubmitted",
+      review_moderated_template: "reviewModerated",
+      newsletter_template: "newsletter",
+    };
+
+    const tplKey = keyMap[settingKey] || settingKey;
+
     const sampleData: Record<string, string> = {
       name: "John Doe", role: "agent", propertyTitle: "3-Bedroom Flat in Kano Municipal",
       status: "approved", senderName: "Jane Smith", amount: "150,000", reference: "MBPP-2026-001",
@@ -35,11 +71,9 @@ router.get("/email-preview/:key", authenticate, authorize("head"), async (req, r
       propertyType: "House", email: "user@example.com", budget: "1,500,000",
     };
 
-    // Try to get template function from email-templates.ts
-    const tplFn = (templates as any)[key];
+    const tplFn = (templates as any)[tplKey];
     let html = "";
     if (typeof tplFn === "function") {
-      // Call with sample data — some templates need different args
       const argMap: Record<string, string[]> = {
         welcome: ["name"], agentApplicationSubmitted: ["name"],
         accountApproved: ["name", "role"], accountSuspended: ["name"],
@@ -66,11 +100,12 @@ router.get("/email-preview/:key", authenticate, authorize("head"), async (req, r
         reviewModerated: ["name", "status"],
         agreementCancelled: ["name", "propertyTitle"],
         customOrderReceived: ["name", "email", "propertyType", "area", "budget"],
+        newsletter: ["body"],
       };
-      const args = (argMap[key] || ["name"]).map(k => sampleData[k] || k);
+      const args = (argMap[tplKey] || ["name"]).map(k => sampleData[k] || k);
       html = tplFn(...args);
     } else {
-      html = `<p style="color:#999;font-size:14px;">Template "${key}" not found in email-templates.ts</p>`;
+      html = `<p style="color:#999;font-size:14px;">Template "${settingKey}" not found in email-templates.ts</p>`;
     }
 
     res.json({ html });
