@@ -64,11 +64,11 @@ const nextConfig: NextConfig = {
             key: "Content-Security-Policy",
             value: [
               "default-src 'self'",
-              "script-src 'self' 'unsafe-inline' https://static.cloudflareinsights.com",
+              "script-src 'self' 'unsafe-inline' https://static.cloudflareinsights.com https://www.googletagmanager.com",
               "style-src 'self' 'unsafe-inline'",
               "img-src 'self' data: blob: https:",
               "font-src 'self' data:",
-              "connect-src 'self' https://*.paystack.com https://*.googleapis.com http://localhost:4000 https://*.up.railway.app https://*.railway.app",
+              "connect-src 'self' https://*.paystack.com https://*.googleapis.com http://localhost:4000 https://*.up.railway.app https://*.railway.app https://*.google-analytics.com https://www.googletagmanager.com",
               "frame-src 'self' https://*.paystack.com",
               "media-src 'self' https://*.r2.cloudflarestorage.com",
               "frame-ancestors 'self'",
