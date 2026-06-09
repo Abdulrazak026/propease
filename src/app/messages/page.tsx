@@ -97,13 +97,11 @@ function MessagesPage() {
           if (r.status === 201 || r.status === 200) {
             const conv = (r.data as any)?.conversation || (r.data as any);
             if (conv?.id) {
-              const formattedConv = {
-                ...conv,
-                lastMessage: conv.messages?.[0]?.content || "New conversation",
-                lastMessageAt: conv.messages?.[0]?.createdAt || new Date().toISOString(),
-                unread: 0,
-              };
-              setConversations(prev => [formattedConv, ...prev]);
+              // Refresh the full list from API to get proper data
+              const refresh = await api.get<{ conversations: Conversation[] }>("/api/messages/conversations");
+              if (refresh.data?.conversations) {
+                setConversations(refresh.data.conversations);
+              }
               setSelectedId(conv.id);
               return;
             }
@@ -246,7 +244,11 @@ function MessagesPage() {
         ) : (
           <div className="divide-y divide-gray-50">
             {filtered.map((conv) => {
-              const name = conv?.participants?.[0]?.user?.name || "Unknown";
+              // Find the OTHER participant (not the current user)
+              const other = conv?.participants?.length > 1 
+                ? conv.participants.find((p: any) => p.user?.name !== "Admin User" && p.user?.name !== "You")?.user 
+                : conv?.participants?.[0]?.user;
+              const name = other?.name || conv?.listing?.title || conv?.subject || "New conversation";
               return (
                 <button
                   key={conv.id}
