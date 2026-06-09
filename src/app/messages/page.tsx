@@ -86,33 +86,9 @@ function MessagesPage() {
   }, [directConvoId]);
 
   useEffect(() => {
-    if (newListingId && newAgentId) {
-      const create = async () => {
-        try {
-          const r = await api.post("/api/messages/conversations", {
-            recipientId: newAgentId,
-            listingId: newListingId,
-            content: `Hi! I'm interested in this property. Is it still available?`,
-          });
-          if (r.status === 201 || r.status === 200) {
-            const conv = (r.data as any)?.conversation || (r.data as any);
-            if (conv?.id) {
-              // Refresh the full list from API to get proper data
-              const refresh = await api.get<{ conversations: Conversation[] }>("/api/messages/conversations");
-              if (refresh.data?.conversations) {
-                setConversations(refresh.data.conversations);
-              }
-              setSelectedId(conv.id);
-              return;
-            }
-          }
-          // If auto-create failed, fall back to the form
-          setNewConvo({ subject: "", recipientId: newAgentId, listingId: newListingId });
-        } catch {
-          setNewConvo({ subject: "", recipientId: newAgentId, listingId: newListingId });
-        }
-      };
-      create();
+    if (newListingId && newAgentId && newAgentId.trim() && newAgentId !== "undefined" && newAgentId !== "null") {
+      // Show the new conversation form directly
+      setNewConvo({ subject: "", recipientId: newAgentId, listingId: newListingId });
     }
   }, [newListingId, newAgentId]);
 
