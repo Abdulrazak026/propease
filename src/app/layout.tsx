@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Script from "next/script";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import ClientBody from "@/components/layout/ClientBody";
@@ -119,14 +118,14 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         {settings.seo_icbm && <meta name="ICBM" content={settings.seo_icbm} />}
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusiness) }} />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(website) }} />
-      </head>
-      <body className="h-full antialiased">
         {(settings.ga_id && settings.ga_id !== "G-XXXXX") && (
           <>
-            <Script src={`https://www.googletagmanager.com/gtag/js?id=${settings.ga_id}`} strategy="beforeInteractive" />
-            <Script id="ga-init" strategy="beforeInteractive">{`window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','${settings.ga_id}');`}</Script>
+            <script async src={`https://www.googletagmanager.com/gtag/js?id=${settings.ga_id}`} />
+            <script dangerouslySetInnerHTML={{ __html: `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','${settings.ga_id}');` }} />
           </>
         )}
+      </head>
+      <body className="h-full antialiased">
         <ClientBody initialSettings={settings}>{children}</ClientBody>
       </body>
     </html>
