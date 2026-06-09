@@ -87,23 +87,31 @@ function MessagesPage() {
 
   useEffect(() => {
     if (newListingId && newAgentId) {
-      // Auto-create conversation silently - no form needed
       const create = async () => {
-        const r = await api.post("/api/messages/conversations", {
-          recipientId: newAgentId,
-          listingId: newListingId,
-          content: `Hi! I was interested in this property. Is it still available?`,
-        });
-        if ((r.data as any)?.conversation) {
-          const conv = (r.data as any).conversation;
-          const formattedConv = {
-            ...conv,
-            lastMessage: conv.messages?.[0]?.content || "New conversation",
-            lastMessageAt: conv.messages?.[0]?.createdAt || new Date().toISOString(),
-            unread: 0,
-          };
-          setConversations(prev => [formattedConv, ...prev]);
-          setSelectedId(conv.id);
+        try {
+          const r = await api.post("/api/messages/conversations", {
+            recipientId: newAgentId,
+            listingId: newListingId,
+            content: `Hi! I'm interested in this property. Is it still available?`,
+          });
+          if (r.status === 201 || r.status === 200) {
+            const conv = (r.data as any)?.conversation || (r.data as any);
+            if (conv?.id) {
+              const formattedConv = {
+                ...conv,
+                lastMessage: conv.messages?.[0]?.content || "New conversation",
+                lastMessageAt: conv.messages?.[0]?.createdAt || new Date().toISOString(),
+                unread: 0,
+              };
+              setConversations(prev => [formattedConv, ...prev]);
+              setSelectedId(conv.id);
+              return;
+            }
+          }
+          // If auto-create failed, fall back to the form
+          setNewConvo({ subject: "", recipientId: newAgentId, listingId: newListingId });
+        } catch {
+          setNewConvo({ subject: "", recipientId: newAgentId, listingId: newListingId });
         }
       };
       create();
