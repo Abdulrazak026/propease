@@ -16,6 +16,13 @@ const PUBLIC_KEYS = [
   "site_logo", "site_favicon",
   "available_cities", "about_hero_image",
   "team_members", "research_reports",
+  "seo_canonical_url", "seo_geo_region", "seo_geo_placename", "seo_geo_position", "seo_icbm",
+  "seo_content_language", "seo_robots", "seo_og_locale",
+  "seo_schema_phone", "seo_schema_email", "seo_schema_street", "seo_schema_city",
+  "seo_schema_state", "seo_schema_country", "seo_schema_lat", "seo_schema_lng",
+  "seo_schema_opening_days", "seo_schema_open_time", "seo_schema_close_time",
+  "seo_schema_area_served", "seo_schema_same_as", "seo_schema_description",
+  "seo_property_schema_enabled",
 ];
 
 router.get("/", async (_req, res: Response) => {

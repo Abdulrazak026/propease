@@ -18,6 +18,17 @@ function defaults(): SettingsMap {
     meta_title: "Mutual Benefit Premier Properties | Real Estate Marketplace, Kano",
     meta_description: "Find verified houses, land, flats and commercial properties for rent and sale in Kano, Nigeria. Your trusted real estate marketplace with secure transactions and verified agents.",
     og_image: "", ga_id: "", gtm_id: "", fb_pixel: "", robots_txt: "User-agent: *\nAllow: /\nSitemap: https://mbpproperties.com/sitemap.xml",
+    seo_canonical_url: "https://mbpproperties.com/", seo_geo_region: "NG-KN", seo_geo_placename: "Kano, Nigeria",
+    seo_geo_position: "12.0022;8.5920", seo_icbm: "12.0022, 8.5920",
+    seo_content_language: "en-NG", seo_robots: "index, follow, max-image-preview:large", seo_og_locale: "en_NG",
+    seo_schema_phone: "+234-xxx-xxx-xxxx", seo_schema_email: "info@mbpproperties.com",
+    seo_schema_street: "Kano Municipal", seo_schema_city: "Kano", seo_schema_state: "Kano State", seo_schema_country: "NG",
+    seo_schema_lat: "12.0022", seo_schema_lng: "8.5920",
+    seo_schema_opening_days: "Monday,Tuesday,Wednesday,Thursday,Friday",
+    seo_schema_open_time: "08:00", seo_schema_close_time: "18:00",
+    seo_schema_area_served: "Kano", seo_schema_same_as: "https://www.facebook.com/mbpproperties,https://www.instagram.com/mbpproperties,https://twitter.com/mbpproperties",
+    seo_schema_description: "Find verified houses, land, flats and commercial properties for rent and sale in Kano, Nigeria.",
+    seo_property_schema_enabled: "true",
     terms_of_service: "# Terms of Service\n\n**Last updated: June 2026**\n\n## 1. Acceptance of Terms\nBy accessing or using MBPP, you agree to these Terms. If you do not agree, do not use the Platform.\n\n## 2. Services\nMBPP provides a real estate marketplace connecting property seekers with verified listings in Kano, Nigeria. Services include property browsing, tenant applications, agent management, and transaction facilitation.\n\n## 3. User Accounts\nYou must provide accurate information when creating an account. You are responsible for maintaining the confidentiality of your login credentials. MBPP reserves the right to suspend accounts that violate these terms.\n\n## 4. Property Listings\nAll listings must be accurate and truthful. MBPP reserves the right to remove any listing that violates these terms or contains misleading information.\n\n## 5. Payments & Transactions\nAll payments are processed securely through authorized payment providers. MBPP is not liable for payment disputes between buyers, sellers, landlords, or tenants.\n\n## 6. Privacy\nYour data is handled according to our Privacy Policy. We never sell your personal information to third parties.\n\n## 7. Limitation of Liability\nMBPP is not liable for any direct or indirect damages arising from the use of the Platform. Properties listed are the responsibility of their respective owners or agents.\n\n## 8. Contact\nFor questions about these terms, contact support@mbpproperties.com.",
     privacy_policy: "# Privacy Policy\n\n**Last updated: June 2026**\n\n## 1. Information Collected\nWe collect: registration details (name, email, phone), property preferences, usage data, and communications with agents.\n\n## 2. Use of Information\nYour information is used to provide services, process transactions, communicate about listings and inquiries, and improve the Platform.\n\n## 3. Data Sharing\nData may be shared with agents/landlords for inquiries, payment processors for transactions, and authorities when required by law. We never sell your data.\n\n## 4. Security\nWe implement industry-standard security measures including encryption, secure servers, and access controls. However, no electronic storage is 100% secure.\n\n## 5. Your Rights\nYou may access, correct, or request deletion of your personal data at any time by contacting support@mbpproperties.com.\n\n## 6. Cookies\nWe use essential cookies for site functionality and optional analytics cookies. You can manage cookie preferences in your browser settings.\n\n## 7. Policy Updates\nThis policy may be updated periodically. Continued use of the Platform after changes constitutes acceptance of the updated policy.",
     cookie_text: "We use cookies to improve your experience. By continuing to browse, you agree to our use of cookies.",
@@ -301,6 +312,51 @@ export default function AdminSettings() {
             <F label="Facebook Pixel" v={s("fb_pixel")} onChange={(v) => set("fb_pixel", v)} />
           </div>
           <TA label="robots.txt" v={s("robots_txt")} onChange={(v) => set("robots_txt", v)} rows={3} />
+          <hr className="border-gray-100" />
+          <h3 className="text-sm font-semibold text-gray-900">Geo & Local SEO</h3>
+          <p className="text-xs text-gray-500 mb-2">These values appear in meta tags and structured data for Google local search results.</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <F label="Canonical URL" v={s("seo_canonical_url")} onChange={(v) => set("seo_canonical_url", v)} placeholder="https://mbpproperties.com/" />
+            <F label="Content Language" v={s("seo_content_language")} onChange={(v) => set("seo_content_language", v)} placeholder="en-NG" />
+            <F label="Geo Region" v={s("seo_geo_region")} onChange={(v) => set("seo_geo_region", v)} placeholder="NG-KN" />
+            <F label="Geo Placename" v={s("seo_geo_placename")} onChange={(v) => set("seo_geo_placename", v)} placeholder="Kano, Nigeria" />
+            <F label="Geo Position (lat;lng)" v={s("seo_geo_position")} onChange={(v) => set("seo_geo_position", v)} placeholder="12.0022;8.5920" />
+            <F label="ICBM (lat, lng)" v={s("seo_icbm")} onChange={(v) => set("seo_icbm", v)} placeholder="12.0022, 8.5920" />
+            <F label="Robots Meta" v={s("seo_robots")} onChange={(v) => set("seo_robots", v)} placeholder="index, follow, max-image-preview:large" />
+            <F label="OG Locale" v={s("seo_og_locale")} onChange={(v) => set("seo_og_locale", v)} placeholder="en_NG" />
+          </div>
+          <hr className="border-gray-100" />
+          <h3 className="text-sm font-semibold text-gray-900">Business Schema (Structured Data)</h3>
+          <p className="text-xs text-gray-500 mb-2">Appears in Google rich results as a LocalBusiness listing. Fill in your real business details.</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <F label="Business Phone" v={s("seo_schema_phone")} onChange={(v) => set("seo_schema_phone", v)} placeholder="+234-xxx-xxx-xxxx" />
+            <F label="Business Email" v={s("seo_schema_email")} onChange={(v) => set("seo_schema_email", v)} placeholder="info@mbpproperties.com" />
+            <F label="Street Address" v={s("seo_schema_street")} onChange={(v) => set("seo_schema_street", v)} placeholder="Kano Municipal" />
+            <F label="City" v={s("seo_schema_city")} onChange={(v) => set("seo_schema_city", v)} placeholder="Kano" />
+            <F label="State / Region" v={s("seo_schema_state")} onChange={(v) => set("seo_schema_state", v)} placeholder="Kano State" />
+            <S label="Country" v={s("seo_schema_country")} onChange={(v) => set("seo_schema_country", v)} opts={[["NG","Nigeria"],["US","United States"],["GB","United Kingdom"]]} />
+            <F label="Latitude" v={s("seo_schema_lat")} onChange={(v) => set("seo_schema_lat", v)} placeholder="12.0022" />
+            <F label="Longitude" v={s("seo_schema_lng")} onChange={(v) => set("seo_schema_lng", v)} placeholder="8.5920" />
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <F label="Opening Days (comma-separated)" v={s("seo_schema_opening_days")} onChange={(v) => set("seo_schema_opening_days", v)} placeholder="Monday,Tuesday,..." />
+            <F label="Open Time" v={s("seo_schema_open_time")} onChange={(v) => set("seo_schema_open_time", v)} placeholder="08:00" />
+            <F label="Close Time" v={s("seo_schema_close_time")} onChange={(v) => set("seo_schema_close_time", v)} placeholder="18:00" />
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <F label="Area Served" v={s("seo_schema_area_served")} onChange={(v) => set("seo_schema_area_served", v)} placeholder="Kano" />
+            <F label="Social Media URLs (comma-separated)" v={s("seo_schema_same_as")} onChange={(v) => set("seo_schema_same_as", v)} placeholder="https://facebook.com/...,https://instagram.com/..." />
+          </div>
+          <TA label="Schema Description" v={s("seo_schema_description")} onChange={(v) => set("seo_schema_description", v)} rows={2} />
+          <div className="flex items-center justify-between py-2 px-4 rounded-lg bg-gray-50 border border-gray-100" onClick={() => set("seo_property_schema_enabled", s("seo_property_schema_enabled") === "true" ? "false" : "true")}>
+            <div>
+              <span className="text-sm font-medium text-gray-900">Property Listing Schema</span>
+              <p className="text-[10px] text-gray-500">Adds RealEstateListing structured data on each property page for Google rich results.</p>
+            </div>
+            <button type="button" className={`relative w-11 h-6 rounded-full transition-colors ${s("seo_property_schema_enabled") === "true" ? "bg-[var(--color-primary)]" : "bg-gray-300"}`}>
+              <span className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white transition-transform ${s("seo_property_schema_enabled") === "true" ? "translate-x-5" : ""}`} />
+            </button>
+          </div>
           <hr className="border-gray-100" />
           <h3 className="text-sm font-semibold text-gray-900">Legal Documents</h3>
           <RichTextArea label="Terms of Service" value={s("terms_of_service")} onChange={(v) => set("terms_of_service", v)} rows={8} />
