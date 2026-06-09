@@ -70,12 +70,14 @@ function MessagesPage() {
   useEffect(() => {
     const fetch = () => {
       api.get<{ conversations: Conversation[] }>("/api/messages/conversations").then(r => {
-        if (r.data?.conversations) setConversations(r.data.conversations);
+        if (r.data?.conversations) {
+          setConversations(r.data.conversations);
+        }
         setLoading(false);
       }).catch(() => setLoading(false));
     };
     fetch();
-    const interval = setInterval(fetch, 10000);
+    const interval = setInterval(fetch, 15000);
     return () => clearInterval(interval);
   }, []);
 
@@ -98,7 +100,6 @@ function MessagesPage() {
       const r = await api.post("/api/messages/conversations", {
         recipientId: newConvo.recipientId,
         listingId: newConvo.listingId || undefined,
-        subject: newConvo.subject || undefined,
         content: newMessage.trim(),
       });
       if ((r.data as any)?.conversation) {
@@ -113,6 +114,10 @@ function MessagesPage() {
         setSelectedId(conv.id);
         setNewConvo(null);
         setNewMessage("");
+        // Also refresh from server in background
+        api.get<{ conversations: Conversation[] }>("/api/messages/conversations").then(res => {
+          if (res.data?.conversations) setConversations(res.data.conversations);
+        }).catch(() => {});
       }
     } catch {}
   };
