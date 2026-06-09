@@ -45,8 +45,24 @@ export default function CrmPage() {
     setConversation(null);
     try {
       const r = await api.get<{ inquiry: Inquiry; conversation: Conversation | null }>(`/api/inquiries/${i.id}/conversation`);
-      if (r.data?.conversation) setConversation(r.data.conversation);
-    } catch {}
+      if (r.data?.conversation) {
+        setConversation(r.data.conversation);
+      } else {
+        // If no conversation exists, show the inquiry message as the first message
+        setConversation({
+          id: "",
+          messages: [{
+            id: i.id,
+            content: i.message,
+            senderId: "client",
+            createdAt: i.createdAt,
+          }],
+          participants: [],
+        });
+      }
+    } catch {
+      setConversation({ id: "", messages: [{ id: i.id, content: i.message, senderId: "client", createdAt: i.createdAt }], participants: [] });
+    }
     setLoadingConv(false);
   };
 

@@ -156,18 +156,46 @@ router.post("/:id/reply", authenticate, authorize("head"), async (req: AuthReque
 
     const inquiry = await prisma.inquiry.findUnique({
       where: { id: req.params.id as string },
-      include: { listing: { select: { id: true, title: true } }, assignedAgent: { select: { id: true, name: true, email: true } } },
+      include: { listing: { select: { id: true, title: true, postedById: true } }, assignedAgent: { select: { id: true, name: true, email: true } } },
     });
     if (!inquiry) return res.status(404).json({ error: "Inquiry not found" });
 
+    // Find or create conversation
     let conversation: any = null;
-    if (inquiry.listingId && inquiry.clientContact) {
-      conversation = await prisma.conversation.findFirst({
-        where: {
-          listingId: inquiry.listingId,
-          participants: { some: { user: { email: inquiry.clientContact } } },
-        },
-      });
+    if (inquiry.listingId) {
+      // Try to find existing conversation for this listing + client
+      if (inquiry.clientContact) {
+        try {
+          const clientUser = await prisma.user.findFirst({
+            where: { email: inquiry.clientContact },
+            select: { id: true },
+          });
+          if (clientUser) {
+            conversation = await prisma.conversation.findFirst({
+              where: {
+                listingId: inquiry.listingId,
+                participants: { some: { userId: clientUser.id } },
+              },
+            });
+          }
+        } catch {}
+      }
+      // If no conversation exists, create one
+      if (!conversation) {
+        const agentOrAdmin = inquiry.assignedAgentId || inquiry.listing?.postedById;
+        conversation = await prisma.conversation.create({
+          data: {
+            listingId: inquiry.listingId,
+            subject: inquiry.listing?.title || "Property Inquiry",
+            participants: {
+              create: [
+                { userId: req.user!.id },
+                ...(agentOrAdmin && agentOrAdmin !== req.user!.id ? [{ userId: agentOrAdmin }] : []),
+              ],
+            },
+          },
+        });
+      }
     }
 
     if (conversation) {
