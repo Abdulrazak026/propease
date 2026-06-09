@@ -95,7 +95,7 @@ export default function HomePage() {
     <div className="flex flex-col">
       <section ref={heroRef} className="relative bg-gray-950 overflow-hidden">
         <div className="absolute inset-0">
-          {!settingsLoading && <img src={heroImage} alt="" className="w-full h-full object-cover opacity-65 transition-opacity duration-500" />}
+          {!settingsLoading && <img src={heroImage} alt="MBPP Properties - Find verified houses, land and flats in Kano, Nigeria" className="w-full h-full object-cover opacity-65 transition-opacity duration-500" />}
           <div className="absolute inset-0 bg-gradient-to-b from-gray-950/40 via-gray-950/25 to-gray-950" />
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--color-primary)_0%,_transparent_60%)] opacity-25 mix-blend-screen" />
         </div>

@@ -55,7 +55,7 @@ export default function PropertyCard({ listing }: PropertyCardProps) {
     >
       <div className="relative h-60 sm:h-64 bg-gray-100 overflow-hidden">
         {hasPhoto ? (
-          <img src={resolveImageUrl(listing.photos[0].url) || ""} alt={listing.photos[0].alt} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" loading="lazy" />
+          <img src={resolveImageUrl(listing.photos[0].url) || ""} alt={listing.photos[0].alt || listing.title || "Property listing"} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" loading="lazy" />
         ) : (
           <div className="absolute inset-0 flex items-center justify-center text-gray-300 text-3xl">🏠</div>
         )}

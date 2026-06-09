@@ -137,7 +137,7 @@ export default function ListingDetail() {
                       i === selectedPhoto ? "border-[var(--color-primary)]" : "border-transparent hover:border-gray-300"
                     }`}
                   >
-                    <img src={resolveImageUrl(photo.url) || ""} alt={photo.alt} className="w-full h-full object-cover" loading="lazy" />
+                     <img src={resolveImageUrl(photo.url) || ""} alt={photo.alt || listing?.title || "Property photo"} className="w-full h-full object-cover" loading="lazy" />
                   </button>
                 ))}
               </div>
