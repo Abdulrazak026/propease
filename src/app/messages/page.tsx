@@ -68,17 +68,28 @@ function MessagesPage() {
   const [newMessage, setNewMessage] = useState("");
 
   useEffect(() => {
+    let isMounted = true;
     const fetch = () => {
       api.get<{ conversations: Conversation[] }>("/api/messages/conversations").then(r => {
+        if (!isMounted) return;
         if (r.data?.conversations) {
-          setConversations(r.data.conversations);
+          // Merge: keep existing entries, add new ones from API
+          setConversations(prev => {
+            const merged = [...prev];
+            for (const c of r.data!.conversations) {
+              const idx = merged.findIndex(x => x.id === c.id);
+              if (idx === -1) merged.push(c);
+              else merged[idx] = { ...merged[idx], ...c };
+            }
+            return merged.sort((a, b) => new Date(b.lastMessageAt || 0).getTime() - new Date(a.lastMessageAt || 0).getTime());
+          });
         }
         setLoading(false);
-      }).catch(() => setLoading(false));
+      }).catch(() => { if (isMounted) setLoading(false); });
     };
     fetch();
     const interval = setInterval(fetch, 15000);
-    return () => clearInterval(interval);
+    return () => { isMounted = false; clearInterval(interval); };
   }, []);
 
   useEffect(() => {
@@ -102,22 +113,20 @@ function MessagesPage() {
         listingId: newConvo.listingId || undefined,
         content: newMessage.trim(),
       });
-      if ((r.data as any)?.conversation) {
-        const conv = (r.data as any).conversation;
-        const formattedConv = {
-          ...conv,
-          lastMessage: newMessage.trim(),
-          lastMessageAt: new Date().toISOString(),
-          unread: 0,
-        };
-        setConversations(prev => [formattedConv, ...prev]);
-        setSelectedId(conv.id);
-        setNewConvo(null);
-        setNewMessage("");
-        // Also refresh from server in background
-        api.get<{ conversations: Conversation[] }>("/api/messages/conversations").then(res => {
-          if (res.data?.conversations) setConversations(res.data.conversations);
-        }).catch(() => {});
+      if (r.status === 201 || r.status === 200) {
+        const conv = (r.data as any)?.conversation || (r.data as any);
+        if (conv?.id) {
+          // Add to list immediately so it shows
+          setConversations(prev => {
+            const exists = prev.find(c => c.id === conv.id);
+            if (exists) return prev;
+            return [{ ...conv, lastMessage: newMessage.trim(), lastMessageAt: new Date().toISOString(), unread: 0 }, ...prev];
+          });
+          // Open the chat
+          setSelectedId(conv.id);
+          setNewConvo(null);
+          setNewMessage("");
+        }
       }
     } catch {}
   };
