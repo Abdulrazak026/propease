@@ -119,24 +119,19 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         {settings.seo_icbm && <meta name="ICBM" content={settings.seo_icbm} />}
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusiness) }} />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(website) }} />
-        {(settings.ga_id && settings.ga_id !== "G-XXXXX") && (
+      </head>
+      <body className="h-full antialiased">
+        {settings.ga_id && settings.ga_id !== "G-XXXXX" && (
           <>
             <Script
               src={`https://www.googletagmanager.com/gtag/js?id=${settings.ga_id}`}
               strategy="afterInteractive"
             />
             <Script id="google-analytics" strategy="afterInteractive">
-              {`
-                window.dataLayer = window.dataLayer || [];
-                function gtag(){dataLayer.push(arguments);}
-                gtag('js', new Date());
-                gtag('config', '${settings.ga_id}');
-              `}
+              {`window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','${settings.ga_id}');`}
             </Script>
           </>
         )}
-      </head>
-      <body className="h-full antialiased">
         <ClientBody initialSettings={settings}>{children}</ClientBody>
       </body>
     </html>
