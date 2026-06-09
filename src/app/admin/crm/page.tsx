@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import Badge from "@/components/ui/Badge";
 import Button from "@/components/ui/Button";
 import { api } from "@/lib/api-client";
+import { useRole } from "@/context/RoleContext";
 
 interface Inquiry {
   id: string; clientName: string; clientContact: string; message: string;
@@ -17,6 +18,7 @@ interface Conversation {
 }
 
 export default function CrmPage() {
+  const { currentUser } = useRole();
   const [inquiries, setInquiries] = useState<Inquiry[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -29,11 +31,28 @@ export default function CrmPage() {
   const chatRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    api.get<{ inquiries: Inquiry[] }>("/api/inquiries/all").then(r => {
-      if (r.data?.inquiries) setInquiries(r.data.inquiries);
-      setLoading(false);
-    }).catch(() => setLoading(false));
+    const fetch = () => {
+      api.get<{ inquiries: Inquiry[] }>("/api/inquiries/all").then(r => {
+        if (r.data?.inquiries) setInquiries(r.data.inquiries);
+        setLoading(false);
+      }).catch(() => setLoading(false));
+    };
+    fetch();
+    const interval = setInterval(fetch, 15000);
+    return () => clearInterval(interval);
   }, []);
+
+  // Poll selected conversation every 10 seconds
+  useEffect(() => {
+    if (!selected) return;
+    const poll = () => {
+      api.get<{ conversation: Conversation | null }>(`/api/inquiries/${selected.id}/conversation`).then(r => {
+        if (r.data?.conversation) setConversation(r.data.conversation);
+      }).catch(() => {});
+    };
+    const interval = setInterval(poll, 10000);
+    return () => clearInterval(interval);
+  }, [selected?.id]);
 
   useEffect(() => {
     if (chatRef.current) chatRef.current.scrollTop = chatRef.current.scrollHeight;
@@ -181,7 +200,7 @@ export default function CrmPage() {
                 <div className="flex items-center justify-center h-full"><div className="w-6 h-6 border-2 border-[var(--color-primary)] border-t-transparent rounded-full animate-spin" /></div>
               ) : conversation?.messages?.length ? (
                 conversation.messages.map(msg => {
-                  const isCustomer = msg.senderId !== selected.assignedAgent?.id;
+                  const isCustomer = msg.senderId !== currentUser?.id;
                   return (
                     <div key={msg.id} className={`flex ${isCustomer ? "justify-start" : "justify-end"}`}>
                       <div className="max-w-[80%]">

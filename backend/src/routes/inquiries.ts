@@ -183,15 +183,28 @@ router.post("/:id/reply", authenticate, authorize("head"), async (req: AuthReque
       // If no conversation exists, create one
       if (!conversation) {
         const agentOrAdmin = inquiry.assignedAgentId || inquiry.listing?.postedById;
+        const participantCreates = [
+          { userId: req.user!.id },
+          ...(agentOrAdmin && agentOrAdmin !== req.user!.id ? [{ userId: agentOrAdmin }] : []),
+        ];
+        // Add client user as participant if they exist
+        if (inquiry.clientContact) {
+          try {
+            const clientUser = await prisma.user.findFirst({
+              where: { email: inquiry.clientContact },
+              select: { id: true },
+            });
+            if (clientUser && clientUser.id !== req.user!.id && clientUser.id !== agentOrAdmin) {
+              participantCreates.push({ userId: clientUser.id });
+            }
+          } catch {}
+        }
         conversation = await prisma.conversation.create({
           data: {
             listingId: inquiry.listingId,
             subject: inquiry.listing?.title || "Property Inquiry",
             participants: {
-              create: [
-                { userId: req.user!.id },
-                ...(agentOrAdmin && agentOrAdmin !== req.user!.id ? [{ userId: agentOrAdmin }] : []),
-              ],
+              create: participantCreates,
             },
           },
         });
