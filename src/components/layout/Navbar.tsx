@@ -6,9 +6,9 @@ import { useRole } from "@/context/RoleContext";
 import { useSettings } from "@/context/SettingsContext";
 
 const PRIMARY_LINKS = [
-  { label: "Properties", href: "/search" },
-  { label: "Buy", href: "/search?type=buy" },
-  { label: "Rent", href: "/search?type=rent" },
+  { label: "Properties", href: "/list-property" },
+  { label: "Buy", href: "/list-property?type=buy" },
+  { label: "Rent", href: "/list-property?type=rent" },
   { label: "Sell", href: "/sell" },
   { label: "Research", href: "/research" },
 ];

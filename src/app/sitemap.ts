@@ -5,7 +5,7 @@ const BASE = "https://mbpproperties.com";
 export const revalidate = 3600;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const staticPages = ["", "/search", "/about", "/contact", "/news", "/help", "/sell", "/careers", "/research", "/zestimates", "/mobile-apps", "/fair-housing", "/terms", "/privacy", "/login", "/register"];
+  const staticPages = ["", "/list-property", "/about", "/contact", "/news", "/help", "/sell", "/careers", "/research", "/zestimates", "/mobile-apps", "/fair-housing", "/terms", "/privacy", "/login", "/register"];
 
   const entries: MetadataRoute.Sitemap = staticPages.map((p) => ({
     url: `${BASE}${p}`,
