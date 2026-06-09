@@ -1,4 +1,11 @@
+import type { Metadata } from "next";
 import Link from "next/link";
+
+export const metadata: Metadata = {
+  title: "MBPP Mobile Apps | Download Now",
+  description: "Download the MBPP mobile app to browse listings, message agents, and manage rentals from your phone.",
+  alternates: { canonical: "https://mbpproperties.com/mobile-apps" },
+};
 
 const features = [
   { icon: "🔍", title: "Browse Listings", desc: "Search and filter thousands of properties across Kano with powerful search tools." },

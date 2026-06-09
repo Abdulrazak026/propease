@@ -453,7 +453,7 @@ export default function AdminSettings() {
           <h3 className="text-sm font-semibold text-gray-900">API Keys & Integrations</h3>
           <F label="Google Maps API Key" v={s("google_maps_key")} onChange={(v) => set("google_maps_key", v)} type="password" />
           <F label="Resend API Key (Email)" v={s("resend_api_key")} onChange={(v) => set("resend_api_key", v)} type="password" />
-          <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 text-xs text-amber-800">The Resend API key powers all transactional emails. Get one at <a href="https://resend.com" className="underline" target="_blank">resend.com</a>.</div>
+          <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 text-xs text-amber-800">The Resend API key powers all transactional emails. Get one at <a href="https://resend.com" className="underline" target="_blank" rel="noopener noreferrer">resend.com</a>.</div>
           <hr className="border-gray-100" />
           <h3 className="text-sm font-semibold text-gray-900">SMTP (Optional Fallback)</h3>
           <div className="grid grid-cols-2 gap-3">

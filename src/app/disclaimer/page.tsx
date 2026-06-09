@@ -1,3 +1,11 @@
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Disclaimer | MBPP Properties",
+  description: "Important disclaimers regarding the accuracy and use of information on the MBPP Properties website.",
+  alternates: { canonical: "https://mbpproperties.com/disclaimer" },
+};
+
 const API = "https://propease-production.up.railway.app";
 
 async function getSiteName(): Promise<string> {

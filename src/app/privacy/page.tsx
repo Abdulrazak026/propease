@@ -1,3 +1,11 @@
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Privacy Policy | MBPP Properties",
+  description: "Learn how MBPP Properties collects, uses, and protects your personal information.",
+  alternates: { canonical: "https://mbpproperties.com/privacy" },
+};
+
 const API = "https://propease-production.up.railway.app";
 
 async function getSetting(key: string): Promise<string> {

@@ -1,4 +1,11 @@
+import type { Metadata } from "next";
 import Link from "next/link";
+
+export const metadata: Metadata = {
+  title: "Property Valuation Tool | Estimate Your Property Value",
+  description: "Get instant price estimates for any property in Kano. Powered by real listing data and local market intelligence.",
+  alternates: { canonical: "https://mbpproperties.com/zestimates" },
+};
 
 const steps = [
   { num: "1", title: "Property Details", desc: "Enter the location, type, size, and condition of the property you want valued." },

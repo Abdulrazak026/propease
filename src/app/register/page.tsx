@@ -58,7 +58,7 @@ export default function RegisterPage() {
     <div className="min-h-screen flex">
       {/* Left panel */}
       <div className="hidden lg:flex lg:w-[45%] xl:w-1/2 relative overflow-hidden bg-gray-900">
-        <img src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800&h=1200&fit=crop" alt="" className="absolute inset-0 w-full h-full object-cover opacity-60" />
+        <img src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800&h=1200&fit=crop" alt="Modern house exterior in Kano, Nigeria" className="absolute inset-0 w-full h-full object-cover opacity-60" />
         <div className="absolute inset-0 bg-gradient-to-br from-[var(--color-primary)]/90 to-gray-900/80" />
         <div className="relative flex flex-col justify-center p-16 text-white">
           <div className="max-w-md">

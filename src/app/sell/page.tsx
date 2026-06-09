@@ -1,5 +1,12 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import Footer from "@/components/layout/Footer";
+
+export const metadata: Metadata = {
+  title: "Sell Your Property in Kano | MBPP",
+  description: "Tell us about your property. We'll come see it, suggest a fair price, and find a buyer. No charge, no obligation.",
+  alternates: { canonical: "https://mbpproperties.com/sell" },
+};
 
 export default function SellPage() {
   return (

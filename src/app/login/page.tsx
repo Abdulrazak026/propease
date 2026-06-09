@@ -37,7 +37,7 @@ function LoginForm() {
       <div className="hidden lg:flex lg:w-[45%] xl:w-1/2 relative overflow-hidden bg-gray-900">
         <img
           src="https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=800&h=1200&fit=crop"
-          alt=""
+          alt="Property for sale in Kano, Nigeria"
           className="absolute inset-0 w-full h-full object-cover opacity-60"
         />
         <div className="absolute inset-0 bg-gradient-to-br from-[var(--color-primary)]/90 to-gray-900/80" />

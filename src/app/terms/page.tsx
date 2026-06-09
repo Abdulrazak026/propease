@@ -1,3 +1,11 @@
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Terms of Service | MBPP Properties",
+  description: "Read the terms and conditions governing your use of the MBPP Properties platform.",
+  alternates: { canonical: "https://mbpproperties.com/terms" },
+};
+
 const API = "https://propease-production.up.railway.app";
 
 async function getSetting(key: string): Promise<string> {

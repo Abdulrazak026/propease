@@ -211,7 +211,7 @@ export default function ModerationPage() {
               )}
               {/* Actions */}
               <div className="flex gap-2 pt-2 border-t border-gray-100">
-                <Link href={`/listings/${preview.id}`} target="_blank" className="text-xs font-medium px-3 py-2 rounded-lg bg-blue-100 text-blue-700 hover:bg-blue-200">Open Public Page ↗</Link>
+                <Link href={`/listings/${preview.id}`} target="_blank" rel="noopener noreferrer" className="text-xs font-medium px-3 py-2 rounded-lg bg-blue-100 text-blue-700 hover:bg-blue-200">Open Public Page ↗</Link>
                 <Link href={`/admin/listings/${preview.id}/edit`} className="text-xs font-medium px-3 py-2 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200">Edit</Link>
                 {perms.canManageContent && (
                   <>
