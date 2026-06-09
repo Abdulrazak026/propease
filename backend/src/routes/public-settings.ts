@@ -22,7 +22,7 @@ const PUBLIC_KEYS = [
   "seo_schema_state", "seo_schema_country", "seo_schema_lat", "seo_schema_lng",
   "seo_schema_opening_days", "seo_schema_open_time", "seo_schema_close_time",
   "seo_schema_area_served", "seo_schema_same_as", "seo_schema_description",
-  "seo_property_schema_enabled",
+  "seo_property_schema_enabled", "seo_hausa_keywords",
 ];
 
 router.get("/", async (_req, res: Response) => {

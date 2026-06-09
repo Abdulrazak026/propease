@@ -19,8 +19,8 @@ async function getPublicSettings() {
 export async function generateMetadata(): Promise<Metadata> {
   const s = await getPublicSettings();
   return {
-    title: s.meta_title || "Mutual Benefit Premier Properties | Real Estate Marketplace, Kano",
-    description: s.meta_description || "Find verified houses, land, flats and commercial properties for rent and sale in Kano, Nigeria.",
+    title: s.meta_title || "MBPP Properties | Buy, Rent & Sell Houses in Kano | Gidan Siyarwa Kano",
+    description: s.meta_description || "Find verified houses, land, flats and commercial properties for rent and sale in Kano, Nigeria. Gidan siyarwa Kano, gidan haya, property for sale, house for rent.",
     manifest: "/manifest.webmanifest",
     icons: {
       icon: "/icons/favicon.svg",
@@ -49,6 +49,7 @@ export async function generateMetadata(): Promise<Metadata> {
       ...(s.seo_icbm ? { "ICBM": s.seo_icbm } : {}),
       ...(s.seo_content_language ? { "content-language": s.seo_content_language } : {}),
       ...(s.seo_robots ? { "robots": s.seo_robots } : {}),
+      ...(s.seo_hausa_keywords ? { "keywords": s.seo_hausa_keywords } : {}),
     },
   };
 }
@@ -64,7 +65,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     url: settings.seo_canonical_url || "https://mbpproperties.com",
     logo: settings.site_logo ? `${API}/api/upload/file/${settings.site_logo}` : undefined,
     image: settings.og_image || undefined,
-    description: settings.seo_schema_description || settings.meta_description || "Find verified houses, land, flats and commercial properties for rent and sale in Kano, Nigeria.",
+    description: settings.seo_schema_description || settings.meta_description || "Find verified houses, land, flats and commercial properties for rent and sale in Kano, Nigeria. Gidan siyarwa Kano, gidan haya, property for sale.",
     telephone: settings.seo_schema_phone || undefined,
     email: settings.seo_schema_email || undefined,
     address: {

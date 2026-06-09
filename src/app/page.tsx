@@ -269,6 +269,20 @@ export default function HomePage() {
         </div>
       )}
 
+      <section className="bg-gray-50 border-y border-gray-100">
+        <div className="max-w-[1400px] mx-auto px-5 sm:px-6 lg:px-10 py-10 sm:py-14">
+          <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-2">Find Property in Kano</h2>
+          <p className="text-sm text-gray-600 mb-4 max-w-2xl">Whether you are looking to buy, rent, or sell — we have verified properties across Kano. Gidan siyarwa, gidan haya, flats, land, and commercial spaces.</p>
+          <div className="flex flex-wrap gap-2">
+            {["House for sale Kano", "Gidan siyarwa Kano", "House for rent Kano", "Gidan haya Kano", "Flat Kano", "Land for sale Kano", "Plaza Kano", "Shop Kano", "Property Kano", "Sell house Kano", "Sayar da gida", "Commercial property Kano"].map(tag => (
+              <Link key={tag} href={`/list-property?search=${encodeURIComponent(tag)}`} className="px-3 py-1.5 bg-white border border-gray-200 rounded-full text-xs text-gray-600 hover:border-[var(--color-primary)] hover:text-[var(--color-primary)] transition-colors">
+                {tag}
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
       <Footer />
     </div>
   );
