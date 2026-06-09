@@ -124,7 +124,7 @@ export default function Footer() {
             <h4 className="text-xs font-semibold text-white tracking-wide mb-4">Services</h4>
             <ul className="space-y-2.5">
               {[
-                { l: "Advertise", h: "/list-property" },
+                { l: "Advertise", h: "/sell" },
                 { l: "Custom Request", h: "/custom-order" },
                 { l: "Research", h: "/research" },
                 { l: "Sign In", h: "/login" },

@@ -22,6 +22,10 @@ export default function SearchPage() {
   useEffect(() => {
     const v = params?.get("view");
     if (v === "map" || v === "list") setView(v);
+    const type = params?.get("type");
+    if (type === "buy" || type === "rent") {
+      setFilters(prev => ({ ...prev, listingType: type }));
+    }
   }, [params]);
 
   const handleFilterChange = (next: any) => {

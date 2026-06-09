@@ -6,9 +6,10 @@ import { useRole } from "@/context/RoleContext";
 import { useSettings } from "@/context/SettingsContext";
 
 const PRIMARY_LINKS = [
-  { label: "Buy", href: "/?type=buy" },
-  { label: "Rent", href: "/?type=rent" },
-  { label: "Sell", href: "/list-property" },
+  { label: "Properties", href: "/search" },
+  { label: "Buy", href: "/search?type=buy" },
+  { label: "Rent", href: "/search?type=rent" },
+  { label: "Sell", href: "/sell" },
   { label: "Research", href: "/research" },
 ];
 
@@ -225,7 +226,7 @@ export default function Navbar() {
                 Sign In
               </Link>
           <Link
-            href="/list-property"
+            href="/sell"
             className="px-4 py-2 text-sm font-semibold text-white bg-[var(--color-primary)] hover:bg-[var(--color-primary)]/90 rounded-lg transition-colors"
           >
             List Property

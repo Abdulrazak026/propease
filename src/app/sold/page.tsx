@@ -163,11 +163,11 @@ export default function SoldPage() {
             Every property on this page went through an MBPP ambassador, a Kano agent, and a transparent commission split. Your property can be next.
           </p>
           <div className="flex flex-wrap items-center justify-center gap-3">
-            <Link href="/list-property" className="inline-flex items-center gap-2 px-5 py-2.5 bg-[var(--color-primary)] text-white text-sm font-semibold rounded-full hover:opacity-90 transition">
+            <Link href="/sell" className="inline-flex items-center gap-2 px-5 py-2.5 bg-[var(--color-primary)] text-white text-sm font-semibold rounded-full hover:opacity-90 transition">
               List your property
             </Link>
-            <Link href="/sell" className="inline-flex items-center gap-2 px-5 py-2.5 bg-white text-gray-700 text-sm font-semibold rounded-full border border-gray-200 hover:border-gray-300 transition">
-              Talk to an agent
+            <Link href="/search" className="inline-flex items-center gap-2 px-5 py-2.5 bg-white text-gray-700 text-sm font-semibold rounded-full border border-gray-200 hover:border-gray-300 transition">
+              Browse properties
             </Link>
           </div>
         </div>
