@@ -17,14 +17,12 @@ import { isFavorite, toggleFavorite } from "@/lib/favorites";
 import PaystackButton from "@/components/payments/PaystackButton";
 import { formatNaira, formatDate, propertyTypeLabels, rentTierLabels, resolveImageUrl } from "@/lib/utils";
 import { useSettings } from "@/context/SettingsContext";
-import { useCompare } from "@/lib/compare-context";
 
 export default function ListingDetail() {
   const { id } = useParams();
   const router = useRouter();
   const { currentUser } = useRole();
   const { get: getSetting } = useSettings();
-  const compare = useCompare();
   const [listing, setListing] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [selectedPhoto, setSelectedPhoto] = useState(0);
@@ -249,17 +247,6 @@ export default function ListingDetail() {
                     </a>
                   );
                 })()}
-
-                <button
-                  onClick={() => {
-                    if (compare.has(listing.id)) compare.remove(listing.id);
-                    else compare.add({ id: listing.id, title: listing.title, city: listing.city, price: listing.price, listingType: listing.listingType, propertyType: listing.propertyType, bedrooms: listing.bedrooms, bathrooms: listing.bathrooms, sqft: listing.sqft, photo: listing.photos?.[0]?.url });
-                  }}
-                  className={`inline-flex items-center justify-center gap-2 w-full px-4 py-2.5 rounded-lg text-sm font-medium border transition-colors ${compare.has(listing.id) ? "border-[var(--color-primary)] bg-[var(--color-primary)]/5 text-[var(--color-primary)]" : "border-gray-300 text-gray-700 hover:bg-gray-50"}`}
-                >
-                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}><path strokeLinecap="round" strokeLinejoin="round" d="M3 7.5L7.5 3m0 0L12 7.5M7.5 3v13.5m13.5-9L16.5 3m0 0L12 7.5m4.5-4.5v13.5" /></svg>
-                  {compare.has(listing.id) ? "In compare list" : "Add to compare"}
-                </button>
 
                 {listing.listingType === "rent" && (
                   <Link
