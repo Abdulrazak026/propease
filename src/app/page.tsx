@@ -4,7 +4,6 @@ import Link from "next/link";
 import PropertyCard from "@/components/listings/PropertyCard";
 import PropertyFilters from "@/components/listings/PropertyFilters";
 import { useListings } from "@/hooks/useListings";
-import { EmptyState } from "@/components/ui/Skeleton";
 import Footer from "@/components/layout/Footer";
 import { useSettings } from "@/context/SettingsContext";
 import SoldPropertiesGallery from "@/components/listings/SoldPropertiesGallery";
@@ -187,7 +186,24 @@ export default function HomePage() {
             ))}
           </div>
         ) : visibleListings.length === 0 ? (
-          <EmptyState title="Nothing matches" description="Try changing your filters." />
+          <div className="bg-white rounded-2xl border border-gray-100 p-12 text-center">
+            <div className="w-16 h-16 bg-amber-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+              <svg className="w-8 h-8 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+              </svg>
+            </div>
+            <h3 className="text-lg font-bold text-gray-900 mb-2">No properties match your search</h3>
+            <p className="text-sm text-gray-500 mb-6">Tell us what you need and we'll find it for you.</p>
+            <Link
+              href="/custom-order"
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-[var(--color-primary)] text-white text-sm font-semibold rounded-lg hover:opacity-90 transition-opacity"
+            >
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M11.42 15.17l-4.878-4.878a2.25 2.25 0 010-3.182l5.628-5.628a2.25 2.25 0 013.182 0l4.878 4.878m-6.81 6.81l-4.92 4.92a2.25 2.25 0 01-3.182 0l-1.591-1.591a2.25 2.25 0 010-3.182l5.4-5.4m6.81 6.81l4.878-4.878a2.25 2.25 0 000-3.182l-5.628-5.628a2.25 2.25 0 00-3.182 0l-4.878 4.878" />
+              </svg>
+              Request Custom Search
+            </Link>
+          </div>
         ) : (
           <>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
