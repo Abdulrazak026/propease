@@ -93,7 +93,7 @@ export default function CreateListingForm({ backHref, title, subtitle, successRe
       lat: form.lat ? parseFloat(form.lat) : undefined,
       lng: form.lng ? parseFloat(form.lng) : undefined,
       photos: uploadedUrls.map(u => ({ url: u })),
-      status: form.status || "draft",
+      status: "draft",
     });
     setSubmitting(false);
     if (status === 201) {

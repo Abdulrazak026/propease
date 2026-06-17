@@ -3664,7 +3664,7 @@
       "format": "cjs"
     },
     ".open-next/server-functions/default/node_modules/next/dist/server/load-manifest.external.js": {
-      "bytes": 637648,
+      "bytes": 637745,
       "imports": [
         {
           "path": "path",
@@ -15141,7 +15141,7 @@
           "bytesInOutput": 462
         },
         ".open-next/server-functions/default/node_modules/next/dist/server/load-manifest.external.js": {
-          "bytesInOutput": 546029
+          "bytesInOutput": 546126
         },
         ".open-next/cloudflare-templates/shims/throw.js": {
           "bytesInOutput": 215
@@ -16698,7 +16698,7 @@
           "bytesInOutput": 100379
         }
       },
-      "bytes": 6904483
+      "bytes": 6904580
     }
   }
 }

@@ -1,0 +1,2 @@
+UPDATE "SiteSettings" SET value = REPLACE(value, 'https://propease-production.up.railway.app/api/upload/file/', 'https://mbpproperties.com/uploads/') WHERE value LIKE '%propease-production.up.railway.app%';
+UPDATE "MediaFile" SET url = REPLACE(url, 'https://propease-production.up.railway.app/api/upload/file/', 'https://mbpproperties.com/uploads/') WHERE url LIKE '%propease-production.up.railway.app%';
