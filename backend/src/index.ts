@@ -42,6 +42,7 @@ import uploadRoutes from "./routes/upload";
 import contactRoutes from "./routes/contact";
 import agentSettingsRoutes from "./routes/agent-settings";
 import deployRoutes from "./routes/deploy";
+import whatsappRoutes from "./routes/whatsapp";
 import careerRoutes from "./routes/careers";
 import soldPropertiesRoutes from "./routes/sold-properties";
 import newsletterRoutes from "./routes/newsletter";
@@ -142,6 +143,7 @@ app.use("/api/sold-properties", soldPropertiesRoutes);
 app.use("/api/newsletter", newsletterRoutes);
 app.use("/api/admin/submissions", adminSubmissionsRoutes);
 app.use("/api/deploy", deployRoutes);
+app.use("/api/whatsapp", whatsappRoutes);
 
 // 404 handler
 app.use((_req, res) => {

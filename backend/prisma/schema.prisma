@@ -870,3 +870,35 @@ model ContactSubmission {
   @@index([createdAt])
   @@index([read])
 }
+
+model WhatsAppConversation {
+  id          String   @id @default(uuid())
+  phone       String   @unique
+  name        String?
+  step        String   @default("menu") // menu, buy_location, buy_budget, buy_bedrooms, sell_type, sell_location, sell_price, agent_info, awaiting_human, closed
+  data        Json     @default("{}")   // stores temp data for multi-step flows
+  status      String   @default("active") // active, waiting, closed
+  intent      String?                    // buy, rent, sell, agent
+  lastMessageAt DateTime @updatedAt
+  createdAt   DateTime @default(now())
+
+  messages    WhatsAppMessage[]
+
+  @@index([status])
+  @@index([phone])
+}
+
+model WhatsAppMessage {
+  id             String   @id @default(uuid())
+  conversationId String
+  phone          String
+  message        String
+  direction      String   @default("incoming") // incoming, outgoing
+  fromBot        Boolean  @default(false)
+  timestamp      DateTime @default(now())
+
+  conversation   WhatsAppConversation @relation(fields: [conversationId], references: [id])
+
+  @@index([conversationId, timestamp])
+  @@index([phone])
+}
