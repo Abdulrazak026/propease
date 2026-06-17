@@ -21,7 +21,7 @@ module.exports = {
     {
       name: "mbpp-frontend",
       script: "node_modules/.bin/next",
-      args: "start -p 3000",
+      args: "start -p 3000 -H 127.0.0.1",
       cwd: "/var/www/mbpp/frontend",
       instances: 1,
       exec_mode: "fork",

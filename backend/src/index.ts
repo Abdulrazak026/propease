@@ -154,7 +154,8 @@ app.use((err: Error, _req: express.Request, res: express.Response, _next: expres
   res.status(500).json({ error: "Internal server error" });
 });
 
-const server = app.listen(PORT, () => {
+const HOST = process.env.HOST || "127.0.0.1";
+const server = app.listen(Number(PORT), HOST, () => {
   logger.info({ port: PORT }, "API server started");
 });
 
