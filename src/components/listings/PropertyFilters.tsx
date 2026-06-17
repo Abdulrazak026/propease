@@ -189,18 +189,18 @@ export default function PropertyFilters({ onFilterChange }: PropertyFiltersProps
             <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
-            <input type="text" placeholder="Search..." value={filters.search}
+            <input type="text" placeholder="Search by location, property type..." value={filters.search}
               onChange={(e) => update("search", e.target.value)}
               className="w-full rounded-lg border border-gray-300 bg-white pl-9 pr-3 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)]" />
           </div>
           <button onClick={() => setDrawerOpen(true)}
-            className="relative min-h-[44px] min-w-[44px] flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-lg border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:border-gray-400 active:scale-95 transition-all">
+            className="relative min-h-[44px] flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-lg bg-[var(--color-primary)] text-white text-sm font-semibold hover:opacity-90 active:scale-95 transition-all shadow-sm shadow-[var(--color-primary)]/20">
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
             </svg>
             Filter
             {activeCount > 0 && (
-              <span className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-[var(--color-primary)] text-white text-[10px] font-bold rounded-full flex items-center justify-center">{activeCount}</span>
+              <span className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-white text-[var(--color-primary)] text-[10px] font-bold rounded-full flex items-center justify-center">{activeCount}</span>
             )}
           </button>
         </div>

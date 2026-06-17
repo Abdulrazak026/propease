@@ -107,31 +107,34 @@ export default function HomePage() {
               Now serving 4 cities across Kano
             </div>
             <h1 className="text-4xl sm:text-5xl lg:text-7xl font-bold text-white leading-[1.05] tracking-tight">
-              Find Your Home<br />
+              Find Your Dream Home<br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-300 via-teal-200 to-emerald-400">in Kano.</span>
             </h1>
-            <p className="text-base sm:text-lg text-white/60 mt-5 sm:mt-6 max-w-xl leading-relaxed">{siteTagline}</p>
+            <p className="text-base sm:text-lg text-white/60 mt-5 sm:mt-6 max-w-xl leading-relaxed">
+              Trusted properties. Verified listings. Happy clients.
+            </p>
 
-            <div className="mt-8 sm:mt-10 grid grid-cols-3 gap-4 sm:gap-8 max-w-md">
-              <div>
-                <p className="text-2xl sm:text-3xl font-bold text-white">30+</p>
-                <p className="text-xs text-white/40 mt-0.5">Verified properties</p>
-              </div>
-              <div>
-                <p className="text-2xl sm:text-3xl font-bold text-white">14</p>
-                <p className="text-xs text-white/40 mt-0.5">Neighborhoods</p>
-              </div>
-              <div>
-                <p className="text-2xl sm:text-3xl font-bold text-white">4</p>
-                <p className="text-xs text-white/40 mt-0.5">Cities</p>
-              </div>
+            <div className="mt-8 sm:mt-10 grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 max-w-xl">
+              {[
+                { v: "30+", l: "Verified Properties" },
+                { v: "14", l: "Neighborhoods" },
+                { v: "4", l: "Cities" },
+                { v: "100+", l: "Happy Clients" },
+              ].map(s => (
+                <div key={s.l} className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl px-3 py-3 sm:px-4 sm:py-3.5 hover:bg-white/10 transition-colors">
+                  <p className="text-xl sm:text-2xl font-bold text-white">{s.v}</p>
+                  <p className="text-[11px] sm:text-xs text-white/50 mt-0.5">{s.l}</p>
+                </div>
+              ))}
             </div>
           </div>
         </div>
       </section>
 
       <div className="bg-white border-b border-gray-200 shadow-sm" data-filter-search>
-        <PropertyFilters onFilterChange={handleFilterChange} />
+        <div className="max-w-[1400px] mx-auto px-5 sm:px-6 lg:px-10 py-4">
+          <PropertyFilters onFilterChange={handleFilterChange} />
+        </div>
       </div>
 
       <div className="max-w-[1400px] w-full mx-auto px-5 sm:px-6 lg:px-10 py-8 sm:py-10">

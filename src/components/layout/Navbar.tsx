@@ -120,8 +120,12 @@ export default function Navbar() {
         scrolled ? "border-gray-200" : "border-transparent"
       } ${hidden ? "-translate-y-full" : "translate-y-0"}`}
     >
-      <Link href="/" className="flex-1 h-full flex items-center justify-center">
-        <img src={siteLogo || `https://mbpproperties.com/api/upload/file/7ea15ec8-11b2-4c34-a855-1469d56656a5.png`} alt={siteName} width="900" height="229" style={{ height: "100%", width: "auto", minWidth: "50vw", objectFit: "contain" }} />
+      <Link href="/" className="flex items-center gap-2 min-w-0">
+        <img src={siteLogo || `https://mbpproperties.com/api/upload/file/7ea15ec8-11b2-4c34-a855-1469d56656a5.png`} alt={siteName} className="h-8 w-auto rounded object-contain shrink-0" />
+        <div className="hidden xs:block min-w-0">
+          <p className="text-[10px] font-bold text-gray-900 leading-tight truncate">MUTUAL BENEFIT PREMIER</p>
+          <p className="text-[8px] text-gray-400 leading-tight tracking-wider">PROPERTIES LTD</p>
+        </div>
       </Link>
       <div className="flex-1 min-w-0" />
       {loading ? (
@@ -177,7 +181,7 @@ export default function Navbar() {
       ) : (
         <Link
           href="/login"
-          className="ml-3 px-3.5 py-1.5 text-xs font-semibold text-white bg-[var(--color-primary)] hover:bg-[var(--color-primary)]/90 rounded-full transition-colors shrink-0"
+          className="ml-3 px-3.5 py-1.5 text-xs font-semibold text-white bg-[var(--color-primary)] hover:opacity-90 rounded-full transition-opacity shrink-0"
         >
           Sign In
         </Link>
