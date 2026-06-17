@@ -68,7 +68,7 @@ async function startBot() {
   // === Connection Events ===
   sock.ev.on("creds.update", saveCreds);
 
-  sock.ev.on("connection.update", (update) => {
+  sock.ev.on("connection.update", (update: any) => {
     const { connection, lastDisconnect, qr } = update;
     if (qr) { console.log("📱 Scan QR code to connect WhatsApp"); }
     if (connection === "open") {
@@ -113,7 +113,7 @@ async function startBot() {
 
 // ============ DB Helpers ============
 async function getSession(phone: string) {
-  try { const r = await fetch(`${API}/api/whatsapp/conversations/${phone}`); if (r.ok) return (await r.json()).conversation; } catch {}
+  try { const r = await fetch(`${API}/api/whatsapp/conversations/${phone}`); if (r.ok) return ((await r.json()) as any).conversation; } catch {}
   return null;
 }
 
