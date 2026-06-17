@@ -5,7 +5,7 @@ import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import { api, getAccessToken } from "@/lib/api-client";
 
-const API = process.env.NEXT_PUBLIC_API_URL || "https://propease-production.up.railway.app";
+const API = process.env.NEXT_PUBLIC_API_URL || "https://mbpproperties.com";
 
 interface CreateListingFormProps {
   backHref: string;

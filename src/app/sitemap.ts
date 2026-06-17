@@ -15,7 +15,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }));
 
   try {
-    const API = "https://propease-production.up.railway.app";
+    const API = "https://mbpproperties.com";
     const res = await fetch(`${API}/api/listings`, { signal: AbortSignal.timeout(2000) });
     if (res.ok) {
       const data = await res.json();

@@ -3,7 +3,7 @@ import { useState } from "react";
 import { api, getAccessToken } from "@/lib/api-client";
 import { resolveImageUrl } from "@/lib/utils";
 
-const API_URL = "https://propease-production.up.railway.app";
+const API_URL = "https://mbpproperties.com";
 
 interface ImagePickerProps {
   value: string;

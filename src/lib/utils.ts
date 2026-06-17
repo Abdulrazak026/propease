@@ -54,7 +54,7 @@ export const statusColors: Record<string, string> = {
   responded: "bg-emerald-100 text-emerald-800",
 };
 
-const BACKEND_URL = "https://propease-production.up.railway.app";
+const BACKEND_URL = "https://mbpproperties.com";
 
 export function resolveImageUrl(url: string | undefined | null): string | null {
   if (!url) return null;

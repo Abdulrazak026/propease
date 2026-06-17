@@ -6,7 +6,7 @@ import { api, getAccessToken } from "@/lib/api-client";
 import { resolveImageUrl } from "@/lib/utils";
 import { useSettings } from "@/context/SettingsContext";
 
-const API_URL = "https://propease-production.up.railway.app";
+const API_URL = "https://mbpproperties.com";
 const PROPERTY_TYPES = ["house", "flat", "land", "commercial", "other"];
 const FEATURES = ["Borehole", "Parking", "Security", "Pool", "Gym", "Solar", "Furnished", "CCTV"];
 

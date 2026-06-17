@@ -42,12 +42,17 @@ export default function Navbar() {
   const handleLogout = () => { setCurrentUser(null); router.push("/"); };
 
   useEffect(() => {
-    const handleClick = (e: MouseEvent) => {
-      if (moreRef.current && !moreRef.current.contains(e.target as Node)) setMoreOpen(false);
-      if (userRef.current && !userRef.current.contains(e.target as Node)) setUserOpen(false);
+    const handleClick = (e: Event) => {
+      const target = e.target as Node;
+      if (moreRef.current && !moreRef.current.contains(target)) setMoreOpen(false);
+      if (userRef.current && !userRef.current.contains(target)) setUserOpen(false);
     };
     document.addEventListener("mousedown", handleClick);
-    return () => document.removeEventListener("mousedown", handleClick);
+    document.addEventListener("touchstart", handleClick);
+    return () => {
+      document.removeEventListener("mousedown", handleClick);
+      document.removeEventListener("touchstart", handleClick);
+    };
   }, []);
 
   useEffect(() => {
@@ -76,16 +81,46 @@ export default function Navbar() {
       } ${hidden ? "-translate-y-full" : "translate-y-0"}`}
     >
       <Link href="/" className="flex-1 h-full flex items-center justify-center">
-        <img src={siteLogo || `https://propease-production.up.railway.app/api/upload/file/7ea15ec8-11b2-4c34-a855-1469d56656a5.png`} alt={siteName} width="900" height="229" style={{ height: "100%", width: "auto", minWidth: "50vw", objectFit: "contain" }} />
+        <img src={siteLogo || `https://mbpproperties.com/api/upload/file/7ea15ec8-11b2-4c34-a855-1469d56656a5.png`} alt={siteName} width="900" height="229" style={{ height: "100%", width: "auto", minWidth: "50vw", objectFit: "contain" }} />
       </Link>
       <div className="flex-1 min-w-0" />
       {loading ? (
         <div className="w-8 h-8 ml-3" />
       ) : isAuthenticated && currentUser ? (
-        <div
-          className="w-8 h-8 rounded-full bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary-light)] flex items-center justify-center text-white text-[10px] font-bold shadow-sm shrink-0 ml-3 cursor-default"
-        >
-          {currentUser.name?.split(" ").map(n => n[0]).join("").slice(0, 2) || "?"}
+        <div ref={userRef} className="relative shrink-0 ml-3">
+          <button
+            onClick={() => setUserOpen(!userOpen)}
+            className="w-8 h-8 rounded-full bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary-light)] flex items-center justify-center text-white text-[10px] font-bold shadow-sm"
+          >
+            {currentUser.name?.split(" ").map(n => n[0]).join("").slice(0, 2) || "?"}
+          </button>
+          {userOpen && (
+            <div className="absolute top-full right-0 mt-2 w-52 bg-white rounded-xl border border-gray-100 shadow-xl shadow-gray-900/5 p-2 z-50">
+              <div className="px-3 py-2.5 border-b border-gray-100">
+                <p className="text-sm font-semibold text-gray-900 truncate">{currentUser.name}</p>
+                <p className="text-xs text-gray-500 capitalize">{currentUser.role === "head" ? "admin" : currentUser.role}</p>
+              </div>
+              <div className="py-1">
+                <Link href={currentUser.role === "head" ? "/admin" : `/${currentUser.role}`} onClick={() => setUserOpen(false)} className="flex items-center gap-2.5 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md">
+                  Dashboard
+                </Link>
+                <Link href="/deals" onClick={() => setUserOpen(false)} className="flex items-center gap-2.5 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md">
+                  My Deals
+                </Link>
+                <Link href="/messages" onClick={() => setUserOpen(false)} className="flex items-center gap-2.5 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md">
+                  Messages
+                </Link>
+                <Link href="/saved" onClick={() => setUserOpen(false)} className="flex items-center gap-2.5 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md">
+                  Saved
+                </Link>
+              </div>
+              <div className="pt-1 border-t border-gray-100">
+                <button onClick={() => { handleLogout(); setUserOpen(false); }} className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-md">
+                  Sign Out
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       ) : (
         <Link
@@ -103,7 +138,7 @@ export default function Navbar() {
     >
       <div className="w-full max-w-[1400px] mx-auto px-6 xl:px-10 flex items-center gap-8">
         <Link href="/" className="flex items-center gap-2.5 shrink-0">
-          <img src={siteLogo || `https://propease-production.up.railway.app/api/upload/file/7ea15ec8-11b2-4c34-a855-1469d56656a5.png`} alt={siteName} className="h-10 w-auto rounded-lg object-contain" />
+          <img src={siteLogo || `https://mbpproperties.com/api/upload/file/7ea15ec8-11b2-4c34-a855-1469d56656a5.png`} alt={siteName} className="h-10 w-auto rounded-lg object-contain" />
         </Link>
 
         <nav className="flex items-center gap-1">

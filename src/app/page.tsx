@@ -47,7 +47,7 @@ export default function HomePage() {
   try { const raw = getSetting("research_reports"); if (raw) researchReports = JSON.parse(raw); } catch {}
 
   useEffect(() => {
-    fetch("https://propease-production.up.railway.app/api/blog").then(r => r.json()).then(d => {
+    fetch("https://mbpproperties.com/api/blog").then(r => r.json()).then(d => {
       const fetched = (d.posts || []).filter((p: BlogPost) => p.publishedAt);
       if (fetched.length > 0) setPosts(fetched);
       setPostsLoading(false);

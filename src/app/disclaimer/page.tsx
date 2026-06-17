@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   alternates: { canonical: "https://mbpproperties.com/disclaimer" },
 };
 
-const API = "https://propease-production.up.railway.app";
+const API = "https://mbpproperties.com";
 
 async function getSiteName(): Promise<string> {
   try {

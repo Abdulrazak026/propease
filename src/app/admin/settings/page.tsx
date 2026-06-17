@@ -389,7 +389,7 @@ export default function AdminSettings() {
             <h3 className="text-sm font-semibold text-gray-900">Core Team Members</h3>
             <p className="text-xs text-gray-500">{teamMembers.length} members</p>
           </div>
-          <div className="space-y-4">
+          <div className="space-y-4 sm:space-y-0 sm:grid sm:grid-cols-2 sm:gap-4">
             {teamMembers.map((m, i) => (
               <div key={i} className="border border-gray-200 rounded-lg p-4 space-y-3">
                 <div className="flex items-center justify-between">
@@ -529,9 +529,19 @@ export default function AdminSettings() {
                   <p className="text-sm font-medium text-gray-900 capitalize">{role}</p>
                   <p className="text-xs text-gray-500">{role === "head" ? "Full access, manage platform" : role === "ambassador" ? "Manage agents, create tasks" : "Handle listings, close deals"}</p>
                 </div>
-                <span className="text-xs text-gray-400">Permissions managed in Staffs page</span>
               </div>
             ))}
+          </div>
+          <div className="mt-4">
+            <a
+              href="/admin/staffs"
+              className="inline-flex items-center gap-2 px-4 py-2.5 bg-[var(--color-primary)] text-white text-sm font-medium rounded-lg hover:opacity-90 transition-opacity"
+            >
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M18 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zM3 19.235v-.11a6.375 6.375 0 0112.75 0v.109A12.318 12.318 0 019.374 21c-2.331 0-4.512-.645-6.374-1.766z" />
+              </svg>
+              Manage Staff &amp; Permissions
+            </a>
           </div>
           <hr className="border-gray-100" />
           <h3 className="text-sm font-semibold text-gray-900">Agent Agreement</h3>
@@ -582,7 +592,7 @@ function MediaPicker({ label, current, onSelect }: { label: string; current: str
     form.append("file", file);
     try {
       const token = localStorage.getItem("accessToken");
-      const res = await fetch("https://propease-production.up.railway.app/api/upload", {
+      const res = await fetch("https://mbpproperties.com/api/upload", {
         method: "POST",
         headers: token ? { Authorization: `Bearer ${token}` } : {},
         body: form,

@@ -5,7 +5,7 @@ import Button from "@/components/ui/Button";
 import { api, getAccessToken } from "@/lib/api-client";
 import { useSettings } from "@/context/SettingsContext";
 
-const API = process.env.NEXT_PUBLIC_API_URL || "https://propease-production.up.railway.app";
+const API = process.env.NEXT_PUBLIC_API_URL || "https://mbpproperties.com";
 
 const PROPERTY_TYPES = ["house", "flat", "land", "commercial", "other"] as const;
 const LISTING_TYPES = ["sale", "rent"] as const;

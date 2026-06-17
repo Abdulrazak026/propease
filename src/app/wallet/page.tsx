@@ -7,7 +7,7 @@ import Badge from "@/components/ui/Badge";
 import PaystackButton from "@/components/payments/PaystackButton";
 import { api } from "@/lib/api-client";
 
-const API = process.env.NEXT_PUBLIC_API_URL || "https://propease-production.up.railway.app";
+const API = process.env.NEXT_PUBLIC_API_URL || "https://mbpproperties.com";
 
 type Tab = "overview" | "top" | "withdraw";
 

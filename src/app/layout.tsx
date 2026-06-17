@@ -7,7 +7,7 @@ import ClientBody from "@/components/layout/ClientBody";
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
 
-const API = "https://propease-production.up.railway.app";
+const API = "https://mbpproperties.com";
 
 async function getPublicSettings() {
   try {
@@ -121,17 +121,10 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(website) }} />
       </head>
       <body className="h-full antialiased">
-        {settings.ga_id && settings.ga_id !== "G-XXXXX" && (
-          <>
-            <Script
-              src={`https://www.googletagmanager.com/gtag/js?id=${settings.ga_id}`}
-              strategy="afterInteractive"
-            />
-            <Script id="google-analytics" strategy="afterInteractive">
-              {`window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','${settings.ga_id}');`}
-            </Script>
-          </>
-        )}
+        <Script src="https://www.googletagmanager.com/gtag/js?id=G-WRYL5C1X1P" strategy="afterInteractive" />
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-WRYL5C1X1P');`}
+        </Script>
         <ClientBody initialSettings={settings}>{children}</ClientBody>
       </body>
     </html>

@@ -9,7 +9,7 @@ export default function NewsPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const API = process.env.NEXT_PUBLIC_API_URL || "https://propease-production.up.railway.app";
+    const API = process.env.NEXT_PUBLIC_API_URL || "https://mbpproperties.com";
     fetch(`${API}/api/blog`).then(r => r.json()).then(d => {
       setPosts(d.posts || []);
       setLoading(false);

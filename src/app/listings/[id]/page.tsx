@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 const SITE_URL = "https://mbpproperties.com";
-const API = "https://propease-production.up.railway.app";
+const API = "https://mbpproperties.com";
 
 async function getPublicSettings() {
   try {

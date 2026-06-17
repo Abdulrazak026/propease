@@ -4,7 +4,7 @@ import { api, getAccessToken } from "@/lib/api-client";
 import { resolveImageUrl } from "@/lib/utils";
 import { usePermissions } from "@/lib/use-permissions";
 
-const API_URL = "https://propease-production.up.railway.app";
+const API_URL = "https://mbpproperties.com";
 
 interface MediaItem {
   id: string;

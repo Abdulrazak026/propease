@@ -5,13 +5,15 @@ import BottomNav from "@/components/layout/BottomNav";
 import { useSettings } from "@/context/SettingsContext";
 import { useRole } from "@/context/RoleContext";
 
-const NO_SIDEBAR_PATHS = ["/login", "/register", "/forgot-password", "/reset-password"];
-const DASHBOARD_PATHS = ["/admin", "/agent", "/ambassador", "/wallet", "/messages", "/notifications"];
+const AUTH_PATHS = ["/login", "/register", "/forgot-password", "/reset-password"];
+const STAFF_PATHS = ["/admin", "/agent", "/ambassador"];
+const CLIENT_DASHBOARD = ["/wallet", "/messages", "/notifications"];
 
 export default function LayoutShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const isAuth = NO_SIDEBAR_PATHS.some((p) => pathname.startsWith(p));
-  const isDashboard = DASHBOARD_PATHS.some((p) => pathname.startsWith(p));
+  const isAuth = AUTH_PATHS.some((p) => pathname.startsWith(p));
+  const isStaffDashboard = STAFF_PATHS.some((p) => pathname.startsWith(p));
+  const isClientDashboard = CLIENT_DASHBOARD.some((p) => pathname.startsWith(p));
   const { get } = useSettings();
   const { role, isAuthenticated } = useRole();
   const maintenance = get("maintenance_mode") === "true";
@@ -32,17 +34,27 @@ export default function LayoutShell({ children }: { children: React.ReactNode })
     );
   }
 
+  // Auth pages: no nav, clean layout
   if (isAuth) return <>{children}</>;
 
-  if (isDashboard) {
+  // Staff dashboards: DashboardLayout handles its own sidebar nav — no BottomNav
+  if (isStaffDashboard) {
+    return <div className="flex h-full">{children}</div>;
+  }
+
+  // Client dashboards (wallet, messages, notifications): Navbar + BottomNav
+  // Staff users on client dashboards: also get Navbar + BottomNav (BottomNav hides itself for staff)
+  if (isClientDashboard) {
     return (
-      <>
-        <div className="flex h-full">{children}</div>
+      <div className="flex flex-col min-h-full">
+        <Navbar />
+        <main className="flex-1">{children}</main>
         <BottomNav />
-      </>
+      </div>
     );
   }
 
+  // Homepage + public pages: Navbar on top + BottomNav at bottom
   return (
     <div className="flex flex-col min-h-full">
       <Navbar />

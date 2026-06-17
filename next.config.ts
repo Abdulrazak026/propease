@@ -2,13 +2,13 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   env: {
-    NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL || "https://propease-production.up.railway.app",
+    NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL || "https://mbpproperties.com",
   },
   output: "standalone",
   images: {
     remotePatterns: [
       { protocol: "https", hostname: "images.unsplash.com" },
-      { protocol: "https", hostname: "*.up.railway.app" },
+      { protocol: "https", hostname: "mbpproperties.com" },
     ],
   },
   productionBrowserSourceMaps: false,
@@ -68,9 +68,9 @@ const nextConfig: NextConfig = {
               "style-src 'self' 'unsafe-inline'",
               "img-src 'self' data: blob: https:",
               "font-src 'self' data:",
-              "connect-src 'self' https://*.paystack.com https://*.googleapis.com http://localhost:4000 https://*.up.railway.app https://*.railway.app https://*.google-analytics.com https://www.googletagmanager.com",
+              "connect-src 'self' https://*.paystack.com https://*.googleapis.com https://mbpproperties.com https://*.google-analytics.com https://www.googletagmanager.com",
               "frame-src 'self' https://*.paystack.com",
-              "media-src 'self' https://*.r2.cloudflarestorage.com",
+              "media-src 'self' https://mbpproperties.com",
               "frame-ancestors 'self'",
               "base-uri 'self'",
               "form-action 'self'",

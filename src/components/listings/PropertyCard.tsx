@@ -7,7 +7,6 @@ import { resolveImageUrl } from "@/lib/utils";
 import { Listing } from "@/lib/types";
 import { formatNaira, propertyTypeLabels } from "@/lib/utils";
 import { isFavorite, toggleFavorite } from "@/lib/favorites";
-import { useCompare } from "@/lib/compare-context";
 
 interface PropertyCardProps {
   listing: Listing;
@@ -16,8 +15,6 @@ interface PropertyCardProps {
 export default function PropertyCard({ listing }: PropertyCardProps) {
   const hasPhoto = listing.photos.length > 0;
   const [fav, setFav] = useState(false);
-  const compare = useCompare();
-  const inCompare = compare.has(listing.id);
 
   useEffect(() => { setFav(isFavorite(listing.id)); }, [listing.id]);
 
@@ -27,26 +24,10 @@ export default function PropertyCard({ listing }: PropertyCardProps) {
     setFav(toggleFavorite(listing.id));
   };
 
-  const handleCompare = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (inCompare) {
-      compare.remove(listing.id);
-    } else {
-      compare.add({
-        id: listing.id,
-        title: listing.title,
-        city: listing.city,
-        price: listing.price,
-        listingType: listing.listingType,
-        propertyType: listing.propertyType,
-        bedrooms: listing.bedrooms,
-        bathrooms: listing.bathrooms,
-        sqft: listing.sqft,
-        photo: listing.photos?.[0]?.url,
-      });
-    }
-  };
+  const forRent = listing.listingType === "rent";
+  const statusLabel = listing.status === "available"
+    ? forRent ? "Available for Rent" : "Available for Sale"
+    : listing.status;
 
   return (
     <Link
@@ -61,32 +42,20 @@ export default function PropertyCard({ listing }: PropertyCardProps) {
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
 
-        <div className="absolute top-2 left-2 flex gap-1.5">
+        <div className="absolute top-2 left-2 flex flex-wrap gap-1.5">
           <Badge variant={listing.status === "available" ? "success" : listing.status === "reserved" ? "warning" : "default"}>
-            {listing.status}
+            {statusLabel}
           </Badge>
+          <span className={`px-2 py-0.5 text-[11px] font-bold rounded-full ${forRent ? "bg-blue-600 text-white" : "bg-emerald-600 text-white"}`}>
+            {forRent ? "FOR RENT" : "FOR SALE"}
+          </span>
           {listing.category === "partnership" && <Badge variant="info">Partner</Badge>}
           {listing.postedBy?.isVerified && <VerifiedBadge />}
         </div>
 
-        <div className="absolute top-2 right-2 flex flex-col gap-1.5">
-          <button onClick={handleFav} className="w-9 h-9 rounded-full bg-white/80 flex items-center justify-center hover:bg-white hover:shadow-md active:scale-90 transition-all">
-            <svg className={`w-4 h-4 ${fav ? "text-red-500 fill-red-500" : "text-gray-600"}`} viewBox="0 0 24 24" fill={fav ? "currentColor" : "none"} stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-            </svg>
-          </button>
-          <button
-            onClick={handleCompare}
-            aria-label="Add to compare"
-            className={`w-9 h-9 rounded-full flex items-center justify-center hover:shadow-md active:scale-90 transition-all ${inCompare ? "bg-[var(--color-primary)] text-white" : "bg-white/80 text-gray-600 hover:bg-white"}`}
-          >
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}><path strokeLinecap="round" strokeLinejoin="round" d="M3 7.5L7.5 3m0 0L12 7.5M7.5 3v13.5m13.5-9L16.5 3m0 0L12 7.5m4.5-4.5v13.5" /></svg>
-          </button>
-        </div>
-
         <div className="absolute bottom-2 left-2 sm:left-3 backdrop-blur-sm bg-black/55 rounded-md px-2 py-1 max-w-[calc(100%-1rem)]">
           <p className="text-white font-bold text-sm sm:text-base whitespace-nowrap">{formatNaira(listing.price)}</p>
-          {listing.listingType === "rent" && <p className="text-white/70 text-[10px] sm:text-[11px] -mt-0.5">per year</p>}
+          {forRent && <p className="text-white/70 text-[10px] sm:text-[11px] -mt-0.5">per year</p>}
         </div>
       </div>
 
@@ -102,14 +71,19 @@ export default function PropertyCard({ listing }: PropertyCardProps) {
           {listing.city}
         </p>
         <div className="flex items-center justify-between mt-3.5 pt-3 border-t border-gray-100">
-          <div className="flex items-center gap-2.5 text-xs text-gray-500">
-            {listing.bedrooms && <span className="font-medium">{listing.bedrooms} bed</span>}
-            {listing.bathrooms && <span className="font-medium">{listing.bathrooms} bath</span>}
-            {listing.sqft && <span className="font-medium">{listing.sqft.toLocaleString()} sqft</span>}
+          <div className="flex items-center gap-3 text-sm">
+            {listing.bedrooms && <span className="font-bold text-gray-800">{listing.bedrooms} <span className="font-normal text-gray-500">bed</span></span>}
+            {listing.bathrooms && <span className="font-bold text-gray-800">{listing.bathrooms} <span className="font-normal text-gray-500">bath</span></span>}
+            {listing.sqft && <span className="font-bold text-gray-800">{listing.sqft.toLocaleString()} <span className="font-normal text-gray-500">sqft</span></span>}
           </div>
-          <span className="text-xs text-gray-500 font-medium">
-            {listing.listingType === "rent" ? "For Rent" : "For Sale"}
-          </span>
+          <button
+            onClick={handleFav}
+            className="w-8 h-8 rounded-full flex items-center justify-center active:scale-90 transition-all"
+          >
+            <svg className={`w-5 h-5 ${fav ? "text-red-500 fill-red-500" : "text-gray-300 hover:text-red-400"}`} viewBox="0 0 24 24" fill={fav ? "currentColor" : "none"} stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+            </svg>
+          </button>
         </div>
       </div>
     </Link>

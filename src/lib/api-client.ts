@@ -1,4 +1,4 @@
-const BASE_URL = "https://propease-production.up.railway.app";
+const BASE_URL = "https://mbpproperties.com";
 
 const STORAGE_KEY = "mbpp_at";
 

@@ -1,0 +1,29 @@
+name: Deploy to VPS
+
+on:
+  push:
+    branches: [master]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Deploy to Contabo VPS
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: root
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: 22
+          script: |
+            set -e
+            cd /var/www/mbpp/frontend
+            git fetch origin master
+            git reset --hard origin/master
+            npm ci --omit=dev 2>/dev/null || npm ci
+            npm run build
+            pm2 restart mbpp-frontend
+            pm2 save
+            echo "Deploy complete at $(date)"
