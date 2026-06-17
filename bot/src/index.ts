@@ -53,15 +53,19 @@ function formatPrice(price: number, period?: string): string {
 }
 
 function formatListing(item: any, idx: number): string {
+  const price = item.price ? formatPrice(item.price, item.listingType === "rent" ? "year" : "") : "Contact";
+  const link = `https://mbpproperties.com/listings/${item.id}`;
   return `*${idx + 1}️⃣ ${item.title || "Property"}*
-📍 ${item.city || "Kano"}
-💰 ${item.price ? formatPrice(item.price, item.listingType === "rent" ? "year" : "") : "Contact"}
-🛏️ ${item.bedrooms || "?"} bed | 🚿 ${item.bathrooms || "?"} bath`;
+📍 ${item.address || item.city || "Kano"}
+💰 ${price}
+🛏️ ${item.bedrooms || "?"} bed | 🚿 ${item.bathrooms || "?"} bath
+🔗 ${link}`;
 }
 
 function formatDetail(item: any): string {
   const price = item.price ? formatPrice(item.price, item.listingType === "rent" ? "year" : "") : "Contact";
   const type = item.listingType === "rent" ? "Available for Rent" : "Available for Sale";
+  const link = `https://mbpproperties.com/listings/${item.id}`;
   return `🏠 *${item.title || "Property"}*
 
 💰 *Price:* ${price}
@@ -71,6 +75,7 @@ function formatDetail(item: any): string {
 ${item.sqft ? `📐 *Area:* ${item.sqft} sqft\n` : ""}
 ${item.features && item.features.length > 0 ? `⚡ *Features:* ${Array.isArray(item.features) ? item.features.join(", ") : item.features}\n` : ""}
 ${item.description ? `📝 ${item.description.substring(0, 200)}${item.description.length > 200 ? "..." : ""}\n` : ""}
+🔗 *View online:* ${link}
 👤 *Agent:* ${item.postedBy?.name || "MBPP Team"}`;
 }
 
@@ -85,6 +90,40 @@ Welcome! What are you looking for?
 *5️⃣* Talk to support
 
 _Just reply with a number._`;
+
+// ============ Send Photo Helper ============
+async function sendListingPhoto(sock: any, jid: string, listing: any) {
+  if (!listing.photos || listing.photos.length === 0) return;
+  const photoUrl = listing.photos[0]?.url;
+  if (!photoUrl) return;
+
+  try {
+    const urls: string[] = [];
+    if (photoUrl.startsWith("http")) {
+      urls.push(photoUrl);
+    } else {
+      const clean = photoUrl.replace(/^\/+/, "");
+      urls.push(`https://mbpproperties.com/uploads/${clean}`);
+      urls.push(`https://mbpproperties.com/api/upload/file/${clean}`);
+      urls.push(`https://propease-production.up.railway.app/api/upload/file/${clean}`);
+    }
+
+    let resolved = urls[0];
+    for (const url of urls) {
+      try {
+        const r = await fetch(url, { method: "HEAD" });
+        if (r.ok) { resolved = url; break; }
+      } catch {}
+    }
+
+    await sock.sendMessage(jid, {
+      image: { url: resolved },
+      caption: `📷 ${listing.title}\n🔗 https://mbpproperties.com/listings/${listing.id}`
+    });
+  } catch (e) {
+    logger.warn("Photo send failed: " + (e as Error)?.message);
+  }
+}
 
 const CUSTOM_REQUEST_PROMPT = `📝 *Custom Search Request*
 
@@ -246,16 +285,8 @@ async function handleConversation(sock: any, jid: string, text: string, phone: s
       setData(phone, "selectedListing", JSON.stringify(listing));
       setStep(phone, "detail");
       await sock.sendMessage(jid, { text: formatDetail(listing) });
-      // Send photo if available
-      if (listing.photos && listing.photos.length > 0) {
-        const photoUrl = listing.photos[0]?.url;
-        if (photoUrl) {
-          try {
-            const resolved = photoUrl.startsWith("http") ? photoUrl : `${API}/api/upload/file/${photoUrl}`;
-            await sock.sendMessage(jid, { image: { url: resolved }, caption: `📷 ${listing.title}` });
-          } catch {}
-        }
-      }
+      // Send photo + link
+      await sendListingPhoto(sock, jid, listing);
       await sock.sendMessage(jid, { text: `📅 *view* — Schedule a viewing\n💬 *ask* — Ask a question\n🔄 *menu* — Search again` });
       return;
     }
@@ -294,15 +325,7 @@ async function handleConversation(sock: any, jid: string, text: string, phone: s
         const listing = results[num - 1];
         setData(phone, "selectedListing", JSON.stringify(listing));
         await sock.sendMessage(jid, { text: formatDetail(listing) });
-        if (listing.photos && listing.photos.length > 0) {
-          const photoUrl = listing.photos[0]?.url;
-          if (photoUrl) {
-            try {
-              const resolved = photoUrl.startsWith("http") ? photoUrl : `${API}/api/upload/file/${photoUrl}`;
-              await sock.sendMessage(jid, { image: { url: resolved }, caption: `📷 ${listing.title}` });
-            } catch {}
-          }
-        }
+        await sendListingPhoto(sock, jid, listing);
         return;
       }
     }
@@ -512,21 +535,7 @@ async function performSearch(sock: any, jid: string, phone: string) {
 
   // Send first photo of each listing
   for (let i = 0; i < count; i++) {
-    const listing = listings[i];
-    if (listing.photos && listing.photos.length > 0) {
-      const photoUrl = listing.photos[0]?.url;
-      if (photoUrl) {
-        try {
-          // Try local VPS first, then Railway as fallback
-          let resolved = photoUrl.startsWith("http") ? photoUrl : `https://mbpproperties.com/uploads/${photoUrl}`;
-          const res = await fetch(resolved, { method: "HEAD" });
-          if (!res.ok && !photoUrl.startsWith("http")) {
-            resolved = `https://propease-production.up.railway.app/api/upload/file/${photoUrl}`;
-          }
-          await sock.sendMessage(jid, { image: { url: resolved }, caption: `${i + 1}. ${listing.title} — ${formatPrice(listing.price)}` });
-        } catch {}
-      }
-    }
+    await sendListingPhoto(sock, jid, listings[i]);
   }
 }
 
