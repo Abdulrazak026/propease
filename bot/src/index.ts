@@ -139,13 +139,16 @@ async function saveMessage(phone: string, name: string, message: string, directi
     const r = await fetch(`${API}/api/whatsapp/conversations/${phone}`);
     if (!r.ok) { await createSession(phone, name); }
 
-    // Save via POST send — we use the body to store conversation info
-    await fetch(`${API}/api/whatsapp/message`, {
+    const res = await fetch(`${API}/api/whatsapp/message`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ phone, name, message, direction, fromBot: false }),
-    }).catch(() => {});
-  } catch {}
+      body: JSON.stringify({ phone, name, message: message.substring(0, 2000), direction, fromBot: false }),
+    });
+    const text = await res.text();
+    if (!res.ok) logger.warn(`Save message failed: ${res.status} ${text}`);
+  } catch (e: any) {
+    logger.warn(`Save message error: ${e?.message || e}`);
+  }
 }
 
 // ============ Queue Processor ============
