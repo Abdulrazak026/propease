@@ -173,14 +173,15 @@ router.get("/status", async (_req, res: Response) => {
 router.get("/qr", async (_req, res: Response) => {
   try {
     if (!fs.existsSync("/tmp/whatsapp-qr.txt")) {
-      return res.send(`<html><body style="font-family:sans-serif;text-align:center;padding:40px"><h2>No QR code available</h2><p>The bot may already be connected, or it hasn't generated a QR yet.</p><p>Check: pm2 logs mbpp-bot</p></body></html>`);
+      return res.send(`<html><body style="font-family:sans-serif;text-align:center;padding:40px"><h2>No QR code available</h2><p>The bot may already be connected, or hasn't generated a QR yet.</p></body></html>`);
     }
-    const qr = fs.readFileSync("/tmp/whatsapp-qr.txt", "utf-8");
-    const encoded = encodeURIComponent(qr);
-    const html = `<!DOCTYPE html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><title>WhatsApp QR</title><style>body{font-family:-apple-system,BlinkMacSystemFont,sans-serif;text-align:center;padding:20px;background:#f5f5f5}h2{color:#1a1a1a}p.note{color:#666;margin-top:8px;font-size:14px}img{border-radius:12px;box-shadow:0 4px 16px rgba(0,0,0,.1);max-width:90vw}.small{color:#999;font-size:12px;margin-top:8px}</style></head><body><h2>Scan to Connect WhatsApp</h2><img src="https://chart.googleapis.com/chart?chs=300x300&cht=qr&chl=${encoded}&choe=UTF-8" alt="QR Code" onerror="this.onerror=null;this.src='https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encoded}'"><p class="note">Open WhatsApp → Settings → Linked Devices → Scan QR</p><p class="small">https://mbpproperties.com/api/whatsapp/qr</p></body></html>`;
+    const qrData = fs.readFileSync("/tmp/whatsapp-qr.txt", "utf-8");
+    const QRCode = require("qrcode");
+    const svg = await QRCode.toString(qrData, { type: "svg", margin: 2, width: 300 });
+    const html = `<!DOCTYPE html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><title>WhatsApp QR</title><style>body{font-family:-apple-system,BlinkMacSystemFont,sans-serif;text-align:center;padding:24px;background:#f5f5f5}h2{color:#1a1a1a;margin:0 0 8px}.qr-box{display:inline-block;background:#fff;padding:16px;border-radius:16px;box-shadow:0 2px 16px rgba(0,0,0,.08)}.qr-box svg{display:block;max-width:280px;height:auto}.note{color:#555;font-size:14px;margin-top:12px}.small{color:#999;font-size:12px;margin-top:8px}</style></head><body><h2>Scan to Connect WhatsApp</h2><div class="qr-box">${svg}</div><p class="note">WhatsApp → Settings → Linked Devices → Scan QR</p><p class="small">Refresh if expired</p></body></html>`;
     res.send(html);
-  } catch {
-    res.status(500).send("Error reading QR");
+  } catch (e) {
+    res.status(500).send("Error generating QR");
   }
 });
 
