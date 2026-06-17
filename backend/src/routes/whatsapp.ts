@@ -1,9 +1,10 @@
-import { Router, Response } from "express";
+import { Router, Response, json } from "express";
 import prisma from "../lib/prisma";
 import { authenticate, AuthRequest } from "../middleware/auth";
 import * as fs from "fs";
 
 const router = Router();
+router.use(json()); // Explicit JSON parser for this router
 
 // Save incoming/outgoing message (called by bot)
 router.post("/message", async (req: any, res: Response) => {
