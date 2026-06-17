@@ -221,8 +221,7 @@ export default function SocialMediaPage() {
             <p className="text-2xl font-bold text-gray-900 mt-1">{m.value}</p>
             <p className="text-[11px] text-emerald-600 mt-1">{m.change}</p>
             </div>
-          );
-          })}
+          ))}
         </div>
 
       {/* Connected Accounts */}
