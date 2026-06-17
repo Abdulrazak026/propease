@@ -1,6 +1,6 @@
 // ============================================
 // MBPP WhatsApp AI Agent — Smart Bot
-// Interactive buttons, list messages, conversation flows
+// Text-based menus, conversation flows
 // ============================================
 
 import { makeWASocket, useMultiFileAuthState, DisconnectReason, fetchLatestBaileysVersion, makeCacheableSignalKeyStore } from "@whiskeysockets/baileys";
@@ -69,102 +69,6 @@ ${item.description ? `📝 ${item.description.substring(0, 200)}${item.descripti
 👤 *Agent:* ${item.postedBy?.name || "MBPP Team"}`;
 }
 
-// ============ Interactive Messages ============
-function sendMainMenu(sock: any, jid: string) {
-  return sock.sendMessage(jid, {
-    text: "🏠 *Welcome to MBPP Properties!*",
-    buttons: [
-      { buttonId: "buy", buttonText: { displayText: "🏠 Buy Property" }, type: 1 },
-      { buttonId: "rent", buttonText: { displayText: "🏡 Rent Property" }, type: 1 },
-      { buttonId: "sell", buttonText: { displayText: "💰 Sell Property" }, type: 1 },
-    ],
-    headerType: 1,
-  });
-}
-
-function sendMoreMenu(sock: any, jid: string) {
-  return sock.sendMessage(jid, {
-    text: "More options:",
-    buttons: [
-      { buttonId: "agent", buttonText: { displayText: "🤝 Become Agent" }, type: 1 },
-      { buttonId: "support", buttonText: { displayText: "👤 Talk to Support" }, type: 1 },
-      { buttonId: "back_main", buttonText: { displayText: "← Back" }, type: 1 },
-    ],
-    headerType: 1,
-  });
-}
-
-function sendBudgetButtons(sock: any, jid: string) {
-  return sock.sendMessage(jid, {
-    text: "💰 *What's your budget?*",
-    buttons: [
-      { buttonId: "budget_0_5m", buttonText: { displayText: "₦ Under ₦5M" }, type: 1 },
-      { buttonId: "budget_5_10m", buttonText: { displayText: "₦5M – ₦10M" }, type: 1 },
-      { buttonId: "budget_any", buttonText: { displayText: "💰 Any Budget" }, type: 1 },
-    ],
-    headerType: 1,
-  });
-}
-
-function sendMoreBudget(sock: any, jid: string) {
-  return sock.sendMessage(jid, {
-    text: "More budget options:",
-    buttons: [
-      { buttonId: "budget_10_20m", buttonText: { displayText: "₦10M – ₦20M" }, type: 1 },
-      { buttonId: "budget_20m_plus", buttonText: { displayText: "₦20M+" }, type: 1 },
-      { buttonId: "budget_any", buttonText: { displayText: "💰 Any" }, type: 1 },
-    ],
-    headerType: 1,
-  });
-}
-
-function sendBedroomButtons(sock: any, jid: string) {
-  return sock.sendMessage(jid, {
-    text: "🛏️ *How many bedrooms?*",
-    buttons: [
-      { buttonId: "beds_2", buttonText: { displayText: "2 Bedrooms" }, type: 1 },
-      { buttonId: "beds_3", buttonText: { displayText: "3 Bedrooms" }, type: 1 },
-      { buttonId: "beds_any", buttonText: { displayText: "Any" }, type: 1 },
-    ],
-    headerType: 1,
-  });
-}
-
-function sendSellTypeButtons(sock: any, jid: string) {
-  return sock.sendMessage(jid, {
-    text: "💰 *What type of property?*",
-    buttons: [
-      { buttonId: "sell_house", buttonText: { displayText: "🏠 House" }, type: 1 },
-      { buttonId: "sell_flat", buttonText: { displayText: "🏢 Flat" }, type: 1 },
-      { buttonId: "sell_land", buttonText: { displayText: "🏗️ Land" }, type: 1 },
-    ],
-    headerType: 1,
-  });
-}
-
-function sendSellTypeMore(sock: any, jid: string) {
-  return sock.sendMessage(jid, {
-    text: "Or other type:",
-    buttons: [
-      { buttonId: "sell_commercial", buttonText: { displayText: "🏬 Commercial" }, type: 1 },
-      { buttonId: "back_main", buttonText: { displayText: "← Back" }, type: 1 },
-    ],
-    headerType: 1,
-  });
-}
-
-function sendDetailButtons(sock: any, jid: string) {
-  return sock.sendMessage(jid, {
-    text: "What would you like to do?",
-    buttons: [
-      { buttonId: "view", buttonText: { displayText: "📅 Schedule Viewing" }, type: 1 },
-      { buttonId: "ask", buttonText: { displayText: "💬 Ask a Question" }, type: 1 },
-      { buttonId: "back_menu", buttonText: { displayText: "🔄 Back to Menu" }, type: 1 },
-    ],
-    headerType: 1,
-  });
-}
-
 // ============ Send Photo Helper ============
 async function sendListingPhoto(sock: any, jid: string, listing: any, caption: string) {
   const photoUrl = listing.photos?.[0]?.url;
@@ -177,6 +81,19 @@ async function sendListingPhoto(sock: any, jid: string, listing: any, caption: s
   }
   return false;
 }
+
+// ============ Main Menu ============
+const MAIN_MENU = `🏠 *Welcome to MBPP Properties!*
+
+What are you looking for?
+
+1️⃣ Buy a property
+2️⃣ Rent a property
+3️⃣ Sell your property
+4️⃣ Become an agent
+5️⃣ Talk to support
+
+_Reply with a number._`;
 
 // ============ Message Router ============
 async function startBot() {
@@ -225,24 +142,17 @@ async function startBot() {
       const sender = msg.pushName || "Guest";
       const phone = jid.split("@")[0];
 
-      // Extract message text (handles buttons, lists, text, captions)
-      let text = "";
+      // Extract text
+      let text = (msg.message.conversation || msg.message.extendedTextMessage?.text || msg.message.imageMessage?.caption || "").trim();
 
-      // Check for button response
-      const buttonId = (msg.message as any)?.buttonsResponseMessage?.selectedButtonId;
-      if (buttonId) {
-        text = buttonId;
-      }
-
-      // Check for list response
-      const listId = (msg.message as any)?.listResponseMessage?.singleSelectReply?.selectedRowId;
-      if (listId) {
-        text = listId;
-      }
-
-      // Regular text
+      // Check button/list responses
       if (!text) {
-        text = (msg.message.conversation || msg.message.extendedTextMessage?.text || msg.message.imageMessage?.caption || "").trim();
+        const buttonId = (msg.message as any)?.buttonsResponseMessage?.selectedButtonId;
+        if (buttonId) text = buttonId;
+      }
+      if (!text) {
+        const listId = (msg.message as any)?.listResponseMessage?.singleSelectReply?.selectedRowId;
+        if (listId) text = listId;
       }
 
       if (!text) continue;
@@ -287,48 +197,47 @@ async function handleConversation(sock: any, jid: string, text: string, phone: s
   const step = getStep(phone);
 
   // Cancel
-  if (t === "cancel" || t === "back_menu") {
+  if (t === "cancel" || t === "back" || t === "menu") {
     setStep(phone, "menu");
-    await sendMainMenu(sock, jid);
+    await sock.sendMessage(jid, { text: MAIN_MENU });
     return;
   }
 
-  // Menu triggers (text)
-  if (t === "hi" || t === "hello" || t === "hey" || t === "menu" || t === "start" || t === "help") {
+  // Menu triggers
+  if (t === "hi" || t === "hello" || t === "hey" || t === "start" || t === "help") {
     setStep(phone, "menu");
-    await sendMainMenu(sock, jid);
+    await sock.sendMessage(jid, { text: MAIN_MENU });
     return;
   }
 
   // === MAIN MENU ===
   if (step === "menu") {
-    if (t === "buy") {
+    if (num === 1) {
       setStep(phone, "buy_location");
-      await sock.sendMessage(jid, { text: "🏠 *Find a Property to Buy*\n\nWhich area are you interested in?\nExamples: \"GRA Kano\", \"Nassarawa\", \"Tarauni\"" });
+      await sock.sendMessage(jid, { text: "🏠 *Find a Property to Buy*\n\nWhich area are you interested in?\nExamples: \"GRA Kano\", \"Nassarawa\", \"Tarauni\"\n\n_Type the area name._" });
       return;
     }
-    if (t === "rent") {
+    if (num === 2) {
       setStep(phone, "buy_location");
-      await sock.sendMessage(jid, { text: "🏡 *Find a Property to Rent*\n\nWhich area are you interested in?\nExamples: \"GRA Kano\", \"Nassarawa\", \"Tarauni\"" });
+      await sock.sendMessage(jid, { text: "🏡 *Find a Property to Rent*\n\nWhich area are you interested in?\nExamples: \"GRA Kano\", \"Nassarawa\", \"Tarauni\"\n\n_Type the area name._" });
       return;
     }
-    if (t === "sell") {
+    if (num === 3) {
       setStep(phone, "sell_type");
-      await sendSellTypeButtons(sock, jid);
+      await sock.sendMessage(jid, { text: "💰 *Sell Your Property*\n\nWhat type of property?\n1️⃣ House\n2️⃣ Flat\n3️⃣ Land\n4️⃣ Commercial\n\n_Reply with the number._" });
       return;
     }
-    if (t === "agent") {
+    if (num === 4) {
       setStep(phone, "menu");
-      await sock.sendMessage(jid, { text: "🤝 *Become an MBPP Agent*\n\nApply: https://mbpproperties.com/apply-as-agent\n\nReviewed within 48 hours." });
+      await sock.sendMessage(jid, { text: "🤝 *Become an MBPP Agent*\n\nApply here: https://mbpproperties.com/apply-as-agent\n\nReviewed within 48 hours." });
       return;
     }
-    if (t === "support" || t === "5") {
+    if (num === 5) {
       setStep(phone, "menu");
       await sock.sendMessage(jid, { text: "👤 *Connecting you with support...*\n\n📞 +234 707 422 2284\n\nAn agent will message you shortly." });
       return;
     }
-    // Fallback — show buttons again
-    await sendMainMenu(sock, jid);
+    await sock.sendMessage(jid, { text: MAIN_MENU });
     return;
   }
 
@@ -336,42 +245,34 @@ async function handleConversation(sock: any, jid: string, text: string, phone: s
   if (step === "buy_location") {
     setData(phone, "location", text);
     setStep(phone, "buy_budget");
-    await sendBudgetButtons(sock, jid);
+    await sock.sendMessage(jid, { text: "💰 *What's your budget?*\n\n1️⃣ Under ₦5M\n2️⃣ ₦5M–₦10M\n3️⃣ ₦10M–₦20M\n4️⃣ ₦20M+\n5️⃣ Any\n\n_Reply with the number._" });
     return;
   }
 
   // === BUY BUDGET ===
   if (step === "buy_budget") {
-    let budget = text;
-    if (t === "budget_0_5m") budget = "0-5M";
-    else if (t === "budget_5_10m") budget = "5-10M";
-    else if (t === "budget_10_20m") budget = "10-20M";
-    else if (t === "budget_20m_plus") budget = "20M+";
-    else if (t === "budget_any") budget = "any";
-
-    // Numeric fallback for older clients
+    let budget = "any";
     if (num === 1) budget = "0-5M";
     else if (num === 2) budget = "5-10M";
     else if (num === 3) budget = "10-20M";
     else if (num === 4) budget = "20M+";
     else if (num === 5) budget = "any";
+    else budget = t;
 
     setData(phone, "budget", budget);
     setStep(phone, "buy_bedrooms");
-    await sendBedroomButtons(sock, jid);
+    await sock.sendMessage(jid, { text: "🛏️ *How many bedrooms?*\n\n1️⃣ 2 bed\n2️⃣ 3 bed\n3️⃣ 4+ bed\n4️⃣ Any\n\n_Reply with the number._" });
     return;
   }
 
   // === BUY BEDROOMS ===
   if (step === "buy_bedrooms") {
-    let beds = text;
-    if (t === "beds_2") beds = "2";
-    else if (t === "beds_3") beds = "3";
-    else if (t === "beds_any") beds = "any";
-
+    let beds = "any";
     if (num === 1) beds = "2";
     else if (num === 2) beds = "3";
-    else if (num === 3) beds = "any";
+    else if (num === 3) beds = "4";
+    else if (num === 4) beds = "any";
+    else beds = t;
 
     setData(phone, "bedrooms", beds);
     await performSearch(sock, jid, phone);
@@ -388,12 +289,12 @@ async function handleConversation(sock: any, jid: string, text: string, phone: s
       setStep(phone, "detail");
       await sock.sendMessage(jid, { text: formatDetail(listing) });
       await sendListingPhoto(sock, jid, listing, `📷 ${listing.title}`);
-      await sendDetailButtons(sock, jid);
+      await sock.sendMessage(jid, { text: "📅 *view* — Schedule a viewing\n💬 *ask* — Ask a question\n🔄 *menu* — Back to menu\n\n_Reply with a number._" });
       return;
     }
     if (t === "yes" || t.includes("custom") || t.includes("request")) {
       setStep(phone, "custom_request");
-      await sock.sendMessage(jid, { text: "📝 *Custom Search Request*\n\nJust tell us:\n1. Your name\n2. What you're looking for\n3. Your phone number\n\n_Type everything in one message._" });
+      await sock.sendMessage(jid, { text: "📝 *Custom Search Request*\n\nTell us:\n1. Your name\n2. What you're looking for\n3. Your phone number\n\n_Type everything in one message._" });
       return;
     }
     if (num === 0 && t !== "menu") {
@@ -404,28 +305,22 @@ async function handleConversation(sock: any, jid: string, text: string, phone: s
 
   // === DETAIL ACTIONS ===
   if (step === "detail") {
-    if (t === "view" || t.includes("view") || t === "📅") {
+    if (num === 1 || t.includes("view") || t.includes("📅")) {
       setStep(phone, "viewing_input");
       await sock.sendMessage(jid, { text: "📅 *Schedule a Viewing*\n\nPreferred date/time? (e.g. 'Tomorrow 2pm')\nYour name and phone number?\n\n_Type everything in one message._" });
       return;
     }
-    if (t === "ask" || t.includes("ask") || t.includes("inquiry")) {
+    if (num === 2 || t.includes("ask") || t.includes("💬") || t.includes("inquiry")) {
       setStep(phone, "inquiry_question");
       await sock.sendMessage(jid, { text: "💬 *Ask a Question*\n\nType your question about this property." });
       return;
     }
-    if (num >= 1 && num <= 3) {
-      const results = getData(phone).results ? JSON.parse(getData(phone).results) : [];
-      if (num <= results.length) {
-        const listing = results[num - 1];
-        setData(phone, "selectedListing", JSON.stringify(listing));
-        await sock.sendMessage(jid, { text: formatDetail(listing) });
-        await sendListingPhoto(sock, jid, listing, `📷 ${listing.title}`);
-        await sendDetailButtons(sock, jid);
-        return;
-      }
+    if (num === 3 || t.includes("back") || t.includes("🔄")) {
+      setStep(phone, "menu");
+      await sock.sendMessage(jid, { text: MAIN_MENU });
+      return;
     }
-    await sendDetailButtons(sock, jid);
+    await sock.sendMessage(jid, { text: "📅 *1* — Schedule a viewing\n💬 *2* — Ask a question\n🔄 *3* — Back to menu\n\n_Reply with a number._" });
     return;
   }
 
@@ -471,16 +366,12 @@ async function handleConversation(sock: any, jid: string, text: string, phone: s
 
   // === SELL FLOW ===
   if (step === "sell_type") {
-    let sellType = text;
-    if (t === "sell_house") sellType = "House";
-    else if (t === "sell_flat") sellType = "Flat";
-    else if (t === "sell_land") sellType = "Land";
-    else if (t === "sell_commercial") sellType = "Commercial";
-
+    let sellType = "House";
     if (num === 1) sellType = "House";
     else if (num === 2) sellType = "Flat";
     else if (num === 3) sellType = "Land";
     else if (num === 4) sellType = "Commercial";
+    else sellType = t;
 
     setData(phone, "sellType", sellType);
     setStep(phone, "sell_location");
@@ -510,7 +401,7 @@ async function handleConversation(sock: any, jid: string, text: string, phone: s
 
   // Fallback — show menu
   setStep(phone, "menu");
-  await sendMainMenu(sock, jid);
+  await sock.sendMessage(jid, { text: MAIN_MENU });
 }
 
 // ============ Property Search ============
@@ -534,9 +425,7 @@ async function performSearch(sock: any, jid: string, phone: string) {
 
   if (!result || !result.listings || result.listings.length === 0) {
     setStep(phone, "custom_request");
-    await sock.sendMessage(jid, {
-      text: `🔍 *No properties found* in ${location}.\n\n*We can find it for you!*\n\nReply *yes* to submit a custom search request.\n\nOr type *menu* to search again.`,
-    });
+    await sock.sendMessage(jid, { text: `🔍 *No properties found* in ${location}.\n\n*We can find it for you!*\n\nReply *yes* to submit a custom search request.\nOr type *menu* to search again.` });
     return;
   }
 
@@ -545,25 +434,21 @@ async function performSearch(sock: any, jid: string, phone: string) {
   setData(phone, "results", JSON.stringify(listings));
   setStep(phone, "results");
 
-  // Send each listing as photo + details
   for (let i = 0; i < count; i++) {
     const listing = listings[i];
     const price = listing.price ? formatPrice(listing.price, listing.listingType === "rent" ? "year" : "") : "Contact";
     const type = listing.listingType === "rent" ? "For Rent" : "For Sale";
     const link = `${CONFIG.publicUrl}/listings/${listing.id}`;
-    const caption = `*${listing.title || "Property"}*
+    const caption = `*${i + 1}. ${listing.title || "Property"}*
 📍 ${listing.address || listing.city || "Kano"}
 💰 ${price} · ${type}
 🛏️ ${listing.bedrooms || "?"} bed | 🚿 ${listing.bathrooms || "?"} bath
 🔗 ${link}`;
 
     const sent = await sendListingPhoto(sock, jid, listing, caption);
-    if (!sent) {
-      await sock.sendMessage(jid, { text: caption });
-    }
+    if (!sent) await sock.sendMessage(jid, { text: caption });
   }
 
-  // Send action prompt
   if (count === 1) {
     await sock.sendMessage(jid, { text: "_Reply *1* for full details, *yes* for custom request, or *menu* to search again._" });
   } else {
