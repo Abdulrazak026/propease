@@ -26,6 +26,7 @@ export const dashboardNav: Record<string, NavItem[]> = {
     { label: "Media", href: "/admin/media", icon: "post-listing", permission: "canManageContent", group: "Content" },
     { label: "Blog", href: "/admin/blog", icon: "agreements", permission: "canManageContent", group: "Content" },
     { label: "Newsletter", href: "/admin/newsletter", icon: "inquiries", group: "Content" },
+    { label: "Social Media", href: "/admin/social-media", icon: "social", group: "Content" },
     { label: "Settings", href: "/admin/settings", icon: "settings", group: "System" },
     { label: "Profile", href: "/profile", icon: "users", group: "System" },
   ],
