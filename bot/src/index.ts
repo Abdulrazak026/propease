@@ -510,20 +510,42 @@ async function performSearch(sock: any, jid: string, phone: string) {
   setData(phone, "results", JSON.stringify(listings));
   setStep(phone, "results");
 
-  let response = `🏠 *Found ${result.total || count} properties:*\n\n`;
-  for (let i = 0; i < count; i++) {
-    response += formatListing(listings[i], i) + "\n\n";
-  }
-  if (count === 1) {
-    response += `_Reply *1* for details, *yes* for a custom request, or *menu* to search again._`;
-  } else {
-    response += `_Reply *1-${count}* for details, *yes* for a custom request, or *menu* to search again._`;
-  }
-  await sock.sendMessage(jid, { text: response });
+  // Send header
+  await sock.sendMessage(jid, { text: `🏠 *Found ${result.total || count} properties:*` });
 
-  // Send first photo of each listing
+  // Send each listing as ONE message: photo + full details + actions
   for (let i = 0; i < count; i++) {
-    await sendListingPhoto(sock, jid, listings[i]);
+    const listing = listings[i];
+    const price = listing.price ? formatPrice(listing.price, listing.listingType === "rent" ? "year" : "") : "Contact";
+    const type = listing.listingType === "rent" ? "For Rent" : "For Sale";
+    const link = `${CONFIG.publicUrl}/listings/${listing.id}`;
+    const caption = `*${listing.title || "Property"}*
+📍 ${listing.address || listing.city || "Kano"}
+💰 ${price} · ${type}
+🛏️ ${listing.bedrooms || "?"} bed | 🚿 ${listing.bathrooms || "?"} bath
+🔗 ${link}
+
+Reply *${i+1}* for full details`;
+
+    const photoUrl = listing.photos?.[0]?.url;
+    if (photoUrl) {
+      let resolved = photoUrl.startsWith("http") ? photoUrl : `${CONFIG.publicUrl}${photoUrl.startsWith("/") ? "" : "/"}${photoUrl}`;
+      try {
+        await sock.sendMessage(jid, { image: { url: resolved }, caption });
+      } catch {
+        // Photo failed, send as text
+        await sock.sendMessage(jid, { text: caption });
+      }
+    } else {
+      await sock.sendMessage(jid, { text: caption });
+    }
+  }
+
+  // Send action menu
+  if (count === 1) {
+    await sock.sendMessage(jid, { text: `_Reply *1* for full details, *yes* for a custom request, or *menu* to search again._` });
+  } else {
+    await sock.sendMessage(jid, { text: `_Reply *1-${count}* for full details, *yes* for a custom request, or *menu* to search again._` });
   }
 }
 
