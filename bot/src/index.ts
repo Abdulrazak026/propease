@@ -54,7 +54,7 @@ function formatPrice(price: number, period?: string): string {
 
 function formatListing(item: any, idx: number): string {
   const price = item.price ? formatPrice(item.price, item.listingType === "rent" ? "year" : "") : "Contact";
-  const link = `https://mbpproperties.com/listings/${item.id}`;
+  const link = `${CONFIG.publicUrl}/listings/${item.id}`;
   return `*${idx + 1}️⃣ ${item.title || "Property"}*
 📍 ${item.address || item.city || "Kano"}
 💰 ${price}
@@ -65,7 +65,7 @@ function formatListing(item: any, idx: number): string {
 function formatDetail(item: any): string {
   const price = item.price ? formatPrice(item.price, item.listingType === "rent" ? "year" : "") : "Contact";
   const type = item.listingType === "rent" ? "Available for Rent" : "Available for Sale";
-  const link = `https://mbpproperties.com/listings/${item.id}`;
+  const link = `${CONFIG.publicUrl}/listings/${item.id}`;
   return `🏠 *${item.title || "Property"}*
 
 💰 *Price:* ${price}
@@ -98,27 +98,15 @@ async function sendListingPhoto(sock: any, jid: string, listing: any) {
   if (!photoUrl) return;
 
   try {
-    const urls: string[] = [];
-    if (photoUrl.startsWith("http")) {
-      urls.push(photoUrl);
-    } else {
-      const clean = photoUrl.replace(/^\/+/, "");
-      urls.push(`https://mbpproperties.com/uploads/${clean}`);
-      urls.push(`https://mbpproperties.com/api/upload/file/${clean}`);
-      urls.push(`https://propease-production.up.railway.app/api/upload/file/${clean}`);
-    }
-
-    let resolved = urls[0];
-    for (const url of urls) {
-      try {
-        const r = await fetch(url, { method: "HEAD" });
-        if (r.ok) { resolved = url; break; }
-      } catch {}
+    let resolved = photoUrl;
+    if (!photoUrl.startsWith("http")) {
+      // Use public URL so Baileys can fetch the image
+      resolved = `${CONFIG.publicUrl}${photoUrl.startsWith("/") ? "" : "/"}${photoUrl}`;
     }
 
     await sock.sendMessage(jid, {
       image: { url: resolved },
-      caption: `📷 ${listing.title}\n🔗 https://mbpproperties.com/listings/${listing.id}`
+      caption: `📷 ${listing.title}\n🔗 ${CONFIG.publicUrl}/listings/${listing.id}`
     });
   } catch (e) {
     logger.warn("Photo send failed: " + (e as Error)?.message);

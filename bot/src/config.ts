@@ -4,6 +4,7 @@
 
 export const CONFIG = {
   apiUrl: process.env.API_URL || "http://localhost:4000",
+  publicUrl: "https://mbpproperties.com",
   botName: "MBPP Bot",
   adminNumber: process.env.ADMIN_NUMBER || "",
 
