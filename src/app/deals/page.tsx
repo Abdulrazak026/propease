@@ -99,7 +99,7 @@ export default function DealsPage() {
             </div>
           </div>
 
-          <div className="flex gap-1 bg-gray-100 rounded-lg p-1 flex-1">
+          <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-1">
             <button
               onClick={() => setTab("reservations")}
               className={`flex-1 py-1.5 text-xs font-medium rounded-md transition-colors ${tab === "reservations" ? "bg-white text-gray-900 shadow-sm" : "text-gray-500 hover:text-gray-700"}`}
@@ -112,11 +112,10 @@ export default function DealsPage() {
             >
               Transactions ({filteredTransactions.length})
             </button>
-          </div>
-          <button onClick={() => setShowDateFilter(!showDateFilter)} className={`shrink-0 p-1.5 rounded-lg transition-colors ${hasDateFilter ? "bg-[var(--color-primary)] text-white" : "bg-gray-100 text-gray-500"}`}>
+          <button onClick={() => setShowDateFilter(!showDateFilter)} className={`shrink-0 px-2 py-1 rounded-md transition-colors ${hasDateFilter ? "bg-[var(--color-primary)] text-white" : "text-gray-400 hover:text-gray-600"}`}>
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" /></svg>
           </button>
-        </div>
+          </div>
         {showDateFilter && (
           <div className="flex items-center gap-2 mt-3">
             <input type="date" value={fromDate} onChange={e => setFromDate(e.target.value)} className="flex-1 rounded-lg border border-gray-200 px-3 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20" placeholder="From" />
@@ -130,7 +129,6 @@ export default function DealsPage() {
           </div>
         )}
       </div>
-    </div>
 
       <div className="max-w-4xl mx-auto px-4 py-6 space-y-6">
         {tab === "reservations" && (
