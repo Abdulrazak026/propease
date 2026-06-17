@@ -24,11 +24,10 @@ export default function AnalyticsPage() {
       api.get<{ data: DashboardData }>("/api/head/dashboard"),
       api.get<{ listings: any[] }>("/api/listings?limit=100"),
     ]).then(([dashRes, listRes]) => {
-      if (dashRes.data) setData(dashRes.data);
+      if (dashRes.data) setData(dashRes.data as DashboardData);
       if (listRes.data?.listings) setListings(listRes.data.listings);
       setLoading(false);
     }).catch(() => setLoading(false));
-  }, []);
 
   if (loading) return <div className="flex items-center justify-center h-64"><div className="h-8 w-8 border-2 border-[var(--color-primary)] border-t-transparent rounded-full animate-spin" /></div>;
 
