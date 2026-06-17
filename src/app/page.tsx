@@ -117,18 +117,18 @@ export default function HomePage() {
         </div>
       </section>
 
-      <div className="bg-white border-b border-gray-200">
-        <div className="max-w-[1400px] mx-auto px-5 sm:px-6 lg:px-10 py-5">
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+      <div className="bg-white border-b border-gray-100">
+        <div className="max-w-[1400px] mx-auto px-5 sm:px-6 lg:px-10 py-4">
+          <div className="flex justify-between gap-2">
             {[
-              { v: "30+", l: "Verified Properties" },
-              { v: "14", l: "Neighborhoods" },
+              { v: "30+", l: "Properties" },
+              { v: "14", l: "Areas" },
               { v: "4", l: "Cities" },
-              { v: "100+", l: "Happy Clients" },
+              { v: "100+", l: "Clients" },
             ].map(s => (
-              <div key={s.l} className="bg-gray-50 border border-gray-100 rounded-xl px-4 py-4 text-center hover:border-gray-200 hover:shadow-sm transition-all">
-                <p className="text-xl sm:text-2xl font-bold text-[var(--color-primary)]">{s.v}</p>
-                <p className="text-[11px] sm:text-xs text-gray-500 mt-1">{s.l}</p>
+              <div key={s.l} className="flex-1 text-center">
+                <p className="text-lg sm:text-xl font-bold text-gray-900">{s.v}</p>
+                <p className="text-[11px] text-gray-400">{s.l}</p>
               </div>
             ))}
           </div>
