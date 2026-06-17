@@ -82,19 +82,17 @@ export default function AnalyticsPage() {
         </div>
       </div>
 
-      {/* Recent Activity */}
-      {data?.recentActivity && data.recentActivity.length > 0 && (
+      {/* Top Listings */}
+      {listings.length > 0 && (
         <div className="bg-white rounded-xl border border-gray-200 p-5">
-          <h3 className="text-sm font-semibold text-gray-700 mb-3">Recent Activity</h3>
+          <h3 className="text-sm font-semibold text-gray-700 mb-3">Latest Listings ({listings.length})</h3>
           <div className="space-y-2">
-            {data.recentActivity.slice(0, 5).map((a: any, i: number) => (
-              <div key={i} className="flex items-center gap-3 py-2 border-b border-gray-50 last:border-0">
-                <div className="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center text-sm shrink-0">
-                  {a.action?.includes("LISTING") ? "🏠" : a.action?.includes("USER") ? "👤" : "📋"}
-                </div>
+            {listings.slice(0, 5).map(l => (
+              <div key={l.id} className="flex items-center gap-3 py-2 border-b border-gray-50 last:border-0">
+                <div className="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center text-sm shrink-0">🏠</div>
                 <div className="min-w-0 flex-1">
-                  <p className="text-sm text-gray-800 truncate">{a.action?.replace(/_/g, " ") || "Activity"}</p>
-                  <p className="text-xs text-gray-400">{a.createdAt ? new Date(a.createdAt).toLocaleDateString() : ""}</p>
+                  <p className="text-sm text-gray-800 truncate">{l.title || "Property"}</p>
+                  <p className="text-xs text-gray-400">{l.city} · ₦{l.price?.toLocaleString()}</p>
                 </div>
               </div>
             ))}
