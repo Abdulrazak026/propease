@@ -15,6 +15,27 @@ interface CreateListingFormProps {
   defaultCity?: string;
 }
 
+async function compressImage(file: File, maxW = 1600, quality = 0.7): Promise<File> {
+  if (!file.type.startsWith("image/")) return file;
+  return new Promise((resolve) => {
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      let { width, height } = img;
+      if (width > maxW) { height = Math.round(height * maxW / width); width = maxW; }
+      const canvas = document.createElement("canvas");
+      canvas.width = width; canvas.height = height;
+      const ctx = canvas.getContext("2d")!;
+      ctx.drawImage(img, 0, 0, width, height);
+      canvas.toBlob((blob) => {
+        resolve(new File([blob!], file.name, { type: "image/jpeg" }));
+      }, "image/jpeg", quality);
+    };
+    img.src = url;
+  });
+}
+
 export default function CreateListingForm({ backHref, title, subtitle, successRedirectTo, defaultCity }: CreateListingFormProps) {
   const router = useRouter();
   const [step, setStep] = useState(1);
@@ -53,9 +74,11 @@ export default function CreateListingForm({ backHref, title, subtitle, successRe
     setUploading(true);
     const token = getAccessToken();
     for (const file of Array.from(files).slice(0, 10)) {
-      const fd = new FormData();
-      fd.append("file", file);
       try {
+        // Compress image before upload
+        const compressed = await compressImage(file);
+        const fd = new FormData();
+        fd.append("file", compressed, file.name);
         const res = await fetch(`${API}/api/upload`, {
           method: "POST",
           headers: token ? { Authorization: `Bearer ${token}` } : {},

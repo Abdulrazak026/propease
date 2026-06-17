@@ -24,6 +24,9 @@ export default function DealsPage() {
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
+  const [fromDate, setFromDate] = useState("");
+  const [toDate, setToDate] = useState("");
+  const [showDateFilter, setShowDateFilter] = useState(false);
 
   useEffect(() => {
     if (authLoading) return;
@@ -65,8 +68,20 @@ export default function DealsPage() {
     );
   }
 
-  const activeReservations = reservations.filter(r => r.status === "active" || r.status === "pending" || r.status === "confirmed");
-  const pastReservations = reservations.filter(r => r.status === "expired" || r.status === "cancelled");
+  const activeReservations = filterByDate(reservations).filter(r => r.status === "active" || r.status === "pending" || r.status === "confirmed");
+  const pastReservations = filterByDate(reservations).filter(r => r.status === "expired" || r.status === "cancelled");
+  const filteredTransactions = filterByDate(transactions);
+
+  function filterByDate<T extends { createdAt: string }>(items: T[]): T[] {
+    if (!fromDate && !toDate) return items;
+    return items.filter(i => {
+      const d = new Date(i.createdAt);
+      if (fromDate && d < new Date(fromDate)) return false;
+      if (toDate && d > new Date(toDate + "T23:59:59")) return false;
+      return true;
+    });
+  }
+  const hasDateFilter = fromDate || toDate;
 
   return (
     <div className="min-h-screen bg-gray-50 pb-24">
@@ -84,7 +99,7 @@ export default function DealsPage() {
             </div>
           </div>
 
-          <div className="flex gap-1 bg-gray-100 rounded-lg p-1">
+          <div className="flex gap-1 bg-gray-100 rounded-lg p-1 flex-1">
             <button
               onClick={() => setTab("reservations")}
               className={`flex-1 py-1.5 text-xs font-medium rounded-md transition-colors ${tab === "reservations" ? "bg-white text-gray-900 shadow-sm" : "text-gray-500 hover:text-gray-700"}`}
@@ -95,11 +110,27 @@ export default function DealsPage() {
               onClick={() => setTab("transactions")}
               className={`flex-1 py-1.5 text-xs font-medium rounded-md transition-colors ${tab === "transactions" ? "bg-white text-gray-900 shadow-sm" : "text-gray-500 hover:text-gray-700"}`}
             >
-              Transactions ({transactions.length})
+              Transactions ({filteredTransactions.length})
             </button>
           </div>
+          <button onClick={() => setShowDateFilter(!showDateFilter)} className={`shrink-0 p-1.5 rounded-lg transition-colors ${hasDateFilter ? "bg-[var(--color-primary)] text-white" : "bg-gray-100 text-gray-500"}`}>
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" /></svg>
+          </button>
         </div>
+        {showDateFilter && (
+          <div className="flex items-center gap-2 mt-3">
+            <input type="date" value={fromDate} onChange={e => setFromDate(e.target.value)} className="flex-1 rounded-lg border border-gray-200 px-3 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20" placeholder="From" />
+            <span className="text-xs text-gray-400">to</span>
+            <input type="date" value={toDate} onChange={e => setToDate(e.target.value)} className="flex-1 rounded-lg border border-gray-200 px-3 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20" placeholder="To" />
+            {hasDateFilter && (
+              <button onClick={() => { setFromDate(""); setToDate(""); }} className="text-xs text-red-500 hover:text-red-700 px-2">
+                Clear
+              </button>
+            )}
+          </div>
+        )}
       </div>
+    </div>
 
       <div className="max-w-4xl mx-auto px-4 py-6 space-y-6">
         {tab === "reservations" && (
@@ -166,9 +197,9 @@ export default function DealsPage() {
 
         {tab === "transactions" && (
           <>
-            {transactions.length > 0 ? (
+            {filteredTransactions.length > 0 ? (
               <div className="space-y-2">
-                {transactions.map(tx => (
+                {filteredTransactions.map(tx => (
                   <div key={tx.id} className="bg-white rounded-xl border border-gray-200 p-4 flex items-center justify-between">
                     <div className="min-w-0">
                       <p className="text-sm font-medium text-gray-900 capitalize">{tx.type.replace(/_/g, " ")}</p>
