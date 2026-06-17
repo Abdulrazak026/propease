@@ -21,7 +21,7 @@ export default function SocialMediaPage() {
   const [postContent, setPostContent] = useState("");
 
   // WhatsApp real status
-  const [waStatus, setWaStatus] = useState({ connected: false, needsQR: true });
+  const [waStatus, setWaStatus] = useState({ connected: false, needsQR: true, botRunning: true });
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [selectedConv, setSelectedConv] = useState<string | null>(null);
   const [chatHistory, setChatHistory] = useState<Conversation | null>(null);
