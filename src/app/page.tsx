@@ -118,17 +118,20 @@ export default function HomePage() {
       </section>
 
       <div className="bg-white border-b border-gray-100">
-        <div className="max-w-[1400px] mx-auto px-5 sm:px-6 lg:px-10 py-4">
-          <div className="flex justify-between gap-2">
+        <div className="max-w-[1400px] mx-auto px-5 sm:px-6 lg:px-10 py-3">
+          <div className="flex items-center justify-between rounded-xl bg-gray-50/50 px-4 py-3">
             {[
               { v: "30+", l: "Properties" },
               { v: "14", l: "Areas" },
               { v: "4", l: "Cities" },
               { v: "100+", l: "Clients" },
-            ].map(s => (
-              <div key={s.l} className="flex-1 text-center">
-                <p className="text-lg sm:text-xl font-bold text-gray-900">{s.v}</p>
-                <p className="text-[11px] text-gray-400">{s.l}</p>
+            ].map((s, i) => (
+              <div key={s.l} className="flex items-center gap-1">
+                <div className="text-center">
+                  <p className="text-base sm:text-lg font-extrabold text-[var(--color-primary)]">{s.v}</p>
+                  <p className="text-[10px] text-gray-400 font-medium uppercase tracking-wider">{s.l}</p>
+                </div>
+                {i < 3 && <div className="h-8 w-px bg-gray-200 ml-1" />}
               </div>
             ))}
           </div>
