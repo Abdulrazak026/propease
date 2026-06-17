@@ -186,4 +186,33 @@ router.get("/qr", async (_req, res: Response) => {
   }
 });
 
+// QR data endpoint (returns SVG for embedding in dashboard)
+router.get("/qr-svg", async (_req, res: Response) => {
+  try {
+    if (!fs.existsSync("/tmp/whatsapp-qr.txt")) {
+      return res.status(404).json({ error: "No QR available", connected: true });
+    }
+    const qrData = fs.readFileSync("/tmp/whatsapp-qr.txt", "utf-8");
+    const QRCode = require("qrcode");
+    const svg = await QRCode.toString(qrData, { type: "svg", margin: 1, width: 260 });
+    res.type("image/svg+xml").send(svg);
+  } catch (e) {
+    res.status(500).json({ error: "Error generating QR" });
+  }
+});
+
+// Reconnect bot — restarts WhatsApp connection
+router.post("/reconnect", authenticate, async (_req: AuthRequest, res: Response) => {
+  try {
+    const { exec } = require("child_process");
+    // Kill existing bot session files and restart
+    exec("rm -rf /var/www/mbpp/bot/sessions/* && rm -f /tmp/whatsapp-connected && rm -f /tmp/whatsapp-qr.txt && pm2 restart mbpp-bot", (err: any) => {
+      if (err) logger.error({ err }, "Reconnect failed");
+    });
+    res.json({ success: true, message: "Bot reconnecting... QR will appear in 10-15 seconds." });
+  } catch (e) {
+    res.status(500).json({ error: "Failed to reconnect" });
+  }
+});
+
 export default router;

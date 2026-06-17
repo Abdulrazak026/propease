@@ -21,16 +21,44 @@ export default function SocialMediaPage() {
   const [postContent, setPostContent] = useState("");
 
   // WhatsApp real status
-  const [waStatus, setWaStatus] = useState({ connected: false, needsQR: true, botRunning: true });
+  const [waStatus, setWaStatus] = useState({ connected: false, needsQR: true });
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [selectedConv, setSelectedConv] = useState<string | null>(null);
   const [chatHistory, setChatHistory] = useState<Conversation | null>(null);
   const [responseText, setResponseText] = useState("");
   const [inboxLoading, setInboxLoading] = useState(false);
+  const [reconnecting, setReconnecting] = useState(false);
+  const [qrSvg, setQrSvg] = useState<string>("");
 
   useEffect(() => {
     api.get<any>("/api/whatsapp/status").then(r => { if (r.data) setWaStatus(r.data); }).catch(() => {});
+    // Poll status every 10 seconds
+    const interval = setInterval(() => {
+      api.get<any>("/api/whatsapp/status").then(r => {
+        if (r.data) setWaStatus(r.data);
+      }).catch(() => {});
+    }, 10000);
+    return () => clearInterval(interval);
   }, []);
+
+  // Fetch QR when not connected
+  useEffect(() => {
+    if (!waStatus.connected) {
+      fetch("/api/whatsapp/qr-svg").then(r => {
+        if (r.ok) return r.text();
+        return "";
+      }).then(svg => setQrSvg(svg)).catch(() => {});
+    }
+  }, [waStatus.connected]);
+
+  const handleReconnect = async () => {
+    setReconnecting(true);
+    await api.post("/api/whatsapp/reconnect");
+    setTimeout(() => {
+      api.get<any>("/api/whatsapp/status").then(r => { if (r.data) setWaStatus(r.data); }).catch(() => {});
+      setReconnecting(false);
+    }, 15000);
+  };
 
   const fetchConversations = () => {
     setInboxLoading(true);
@@ -183,10 +211,30 @@ export default function SocialMediaPage() {
                     {showKeys === a.id && (
                       <div className="mt-3 pt-3 border-t border-gray-100 space-y-2">
                         {a.id === "whatsapp" ? (
-                          <div className="text-xs text-gray-500 space-y-2">
+                          <div className="text-xs text-gray-500 space-y-3">
                             <div className={`flex items-center gap-2 px-2 py-1.5 rounded-lg ${waStatus.connected ? "bg-emerald-50" : "bg-amber-50"}`}>
                               <span className={`w-1.5 h-1.5 rounded-full ${waStatus.connected ? "bg-emerald-500 animate-pulse" : "bg-amber-500"}`} />
-                              <span>{waStatus.connected ? "Connected · Bot active 24/7" : "QR scan needed. Run: pm2 logs mbpp-bot"}</span>
+                              <span>{waStatus.connected ? "Connected · Bot active 24/7" : "Disconnected · Scan QR below"}</span>
+                            </div>
+                            {!waStatus.connected && qrSvg && (
+                              <div className="flex flex-col items-center py-2">
+                                <div dangerouslySetInnerHTML={{ __html: qrSvg }} />
+                                <p className="text-[10px] text-gray-400 mt-1">WhatsApp → Settings → Linked Devices → Scan</p>
+                              </div>
+                            )}
+                            <div className="flex gap-2">
+                              {!waStatus.connected && (
+                                <button
+                                  onClick={handleReconnect}
+                                  disabled={reconnecting}
+                                  className="flex-1 py-1.5 text-xs font-medium text-white bg-[var(--color-primary)] rounded-lg hover:opacity-90 disabled:opacity-50"
+                                >
+                                  {reconnecting ? "Reconnecting..." : "Reconnect"}
+                                </button>
+                              )}
+                              <a href="/api/whatsapp/qr" target="_blank" rel="noopener" className="flex-1 py-1.5 text-xs font-medium text-center text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50">
+                                Open QR Fullscreen
+                              </a>
                             </div>
                             <p className="text-gray-400">Conversations appear in the Inbox tab.</p>
                           </div>
