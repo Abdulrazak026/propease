@@ -33,17 +33,6 @@ const TABS = [
       </svg>
     ),
   },
-  {
-    label: "Updates",
-    href: "/notifications",
-    icon: (active: boolean) => (
-      <div className="relative">
-        <svg className="w-5 h-5" fill={active ? "currentColor" : "none"} viewBox="0 0 24 24" stroke="currentColor" strokeWidth={active ? 0 : 1.5}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" />
-        </svg>
-      </div>
-    ),
-  },
 ];
 
 const MORE_TABS = [
@@ -89,7 +78,6 @@ export default function BottomNav() {
   const router = useRouter();
   const { isAuthenticated, currentUser, role, loading, logout } = useRole();
   const [sheetOpen, setSheetOpen] = useState(false);
-  const [unreadCount, setUnreadCount] = useState(0);
 
   const handleTabClick = useCallback((href: string) => {
     if (href === pathname) {
@@ -97,8 +85,19 @@ export default function BottomNav() {
     }
   }, [pathname]);
 
-  // Never render while loading
-  if (loading) return null;
+  // Show skeleton while loading
+  if (loading) return (
+    <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-200 pb-safe">
+      <div className="flex items-center justify-around h-16">
+        {[1,2,3,4].map(i => (
+          <div key={i} className="flex flex-col items-center gap-1 px-4">
+            <div className="w-5 h-5 bg-gray-100 rounded-full animate-pulse" />
+            <div className="w-8 h-2.5 bg-gray-100 rounded animate-pulse mt-0.5" />
+          </div>
+        ))}
+      </div>
+    </nav>
+  );
 
   const tabs = [
     ...TABS.slice(0, 2),
@@ -134,11 +133,6 @@ export default function BottomNav() {
                 )}
                 <div className="relative">
                   {tab.icon(active)}
-                  {tab.label === "Updates" && unreadCount > 0 && (
-                    <span className="absolute -top-1 -right-2 w-4 h-4 bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center">
-                      {unreadCount > 9 ? "9+" : unreadCount}
-                    </span>
-                  )}
                 </div>
                 <span className={`text-[11px] font-medium leading-tight ${active ? "font-semibold" : ""}`}>{tab.label}</span>
               </Link>
