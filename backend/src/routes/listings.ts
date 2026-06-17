@@ -95,7 +95,7 @@ router.post("/", authenticate, authorize("head", "ambassador", "agent"), validat
       }
     }
 
-    const { assignedAgentId, ...listingData } = data;
+    const { assignedAgentId, photos, ...listingData } = data;
 
     const listing = await prisma.listing.create({
       data: {
@@ -103,10 +103,21 @@ router.post("/", authenticate, authorize("head", "ambassador", "agent"), validat
         postedById: req.user!.id,
         assignedAgentId: assignedAgentId || undefined,
         price: data.listingType === "rent" ? data.annualRent || 0 : data.salePrice || 0,
-        features: [],
+        features: listingData.features || [],
       },
       include: { photos: true },
     });
+
+    // Save photos
+    if (photos && Array.isArray(photos) && photos.length > 0) {
+      await prisma.listingPhoto.createMany({
+        data: photos.map((p: { url: string; alt?: string }) => ({
+          url: p.url,
+          alt: p.alt || "",
+          listingId: listing.id,
+        })),
+      });
+    }
 
     // Create audit log
     await prisma.auditLog.create({

@@ -92,7 +92,8 @@ export default function CreateListingForm({ backHref, title, subtitle, successRe
       features: [],
       lat: form.lat ? parseFloat(form.lat) : undefined,
       lng: form.lng ? parseFloat(form.lng) : undefined,
-      photos: uploadedUrls,
+      photos: uploadedUrls.map(u => ({ url: u })),
+      status: form.status || "draft",
     });
     setSubmitting(false);
     if (status === 201) {
@@ -109,8 +110,8 @@ export default function CreateListingForm({ backHref, title, subtitle, successRe
         <div className="w-16 h-16 bg-emerald-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
           <svg className="w-8 h-8 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7"/></svg>
         </div>
-        <h2 className="text-2xl font-bold text-gray-900">Listing Published!</h2>
-        <p className="text-sm text-gray-500 mt-2">Your property is now visible on the platform.</p>
+        <h2 className="text-2xl font-bold text-gray-900">Listing Created!</h2>
+        <p className="text-sm text-gray-500 mt-2">Your property is saved as draft. An admin will review and publish it within 48 hours.</p>
       </div>
     );
   }

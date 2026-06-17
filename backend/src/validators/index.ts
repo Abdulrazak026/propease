@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { ListingStatus } from "@prisma/client";
 
 export const registerSchema = z.object({
   name: z.string().min(2).max(100),
@@ -33,6 +34,9 @@ export const createListingSchema = z.object({
   bathrooms: z.number().int().min(0).optional(),
   sqft: z.number().int().min(0).optional(),
   assignedAgentId: z.string().uuid().optional(),
+  photos: z.array(z.object({ url: z.string() })).optional(),
+  status: z.nativeEnum(ListingStatus).optional(),
+  features: z.array(z.string()).optional(),
 });
 
 export const createTaskSchema = z.object({
