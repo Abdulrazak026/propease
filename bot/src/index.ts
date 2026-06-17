@@ -1,6 +1,6 @@
 // ============================================
 // MBPP WhatsApp AI Agent — Smart Bot
-// Conversation flows: Buy, Rent, Sell, Agent, Support
+// Interactive buttons, list messages, conversation flows
 // ============================================
 
 import { makeWASocket, useMultiFileAuthState, DisconnectReason, fetchLatestBaileysVersion, makeCacheableSignalKeyStore } from "@whiskeysockets/baileys";
@@ -52,16 +52,6 @@ function formatPrice(price: number, period?: string): string {
   return period ? `₦${new Intl.NumberFormat("en-NG").format(price)}/${period}` : `₦${new Intl.NumberFormat("en-NG").format(price)}`;
 }
 
-function formatListing(item: any, idx: number): string {
-  const price = item.price ? formatPrice(item.price, item.listingType === "rent" ? "year" : "") : "Contact";
-  const link = `${CONFIG.publicUrl}/listings/${item.id}`;
-  return `*${idx + 1}️⃣ ${item.title || "Property"}*
-📍 ${item.address || item.city || "Kano"}
-💰 ${price}
-🛏️ ${item.bedrooms || "?"} bed | 🚿 ${item.bathrooms || "?"} bath
-🔗 ${link}`;
-}
-
 function formatDetail(item: any): string {
   const price = item.price ? formatPrice(item.price, item.listingType === "rent" ? "year" : "") : "Contact";
   const type = item.listingType === "rent" ? "Available for Rent" : "Available for Sale";
@@ -79,72 +69,116 @@ ${item.description ? `📝 ${item.description.substring(0, 200)}${item.descripti
 👤 *Agent:* ${item.postedBy?.name || "MBPP Team"}`;
 }
 
-const WELCOME = `🏠 *MBPP Properties*
-
-Welcome! What are you looking for?
-
-*1️⃣* Buy a property
-*2️⃣* Rent a property  
-*3️⃣* Sell your property
-*4️⃣* Become an agent
-*5️⃣* Talk to support
-
-_Just reply with a number._`;
-
-// ============ Send Photo Helper ============
-async function sendListingPhoto(sock: any, jid: string, listing: any) {
-  if (!listing.photos || listing.photos.length === 0) return;
-  const photoUrl = listing.photos[0]?.url;
-  if (!photoUrl) return;
-
-  try {
-    let resolved = photoUrl;
-    if (!photoUrl.startsWith("http")) {
-      // Use public URL so Baileys can fetch the image
-      resolved = `${CONFIG.publicUrl}${photoUrl.startsWith("/") ? "" : "/"}${photoUrl}`;
-    }
-
-    await sock.sendMessage(jid, {
-      image: { url: resolved },
-      caption: `📷 ${listing.title}\n🔗 ${CONFIG.publicUrl}/listings/${listing.id}`
-    });
-  } catch (e) {
-    logger.warn("Photo send failed: " + (e as Error)?.message);
-  }
+// ============ Interactive Messages ============
+function sendMainMenu(sock: any, jid: string) {
+  return sock.sendMessage(jid, {
+    text: "🏠 *Welcome to MBPP Properties!*",
+    buttons: [
+      { buttonId: "buy", buttonText: { displayText: "🏠 Buy Property" }, type: 1 },
+      { buttonId: "rent", buttonText: { displayText: "🏡 Rent Property" }, type: 1 },
+      { buttonId: "sell", buttonText: { displayText: "💰 Sell Property" }, type: 1 },
+    ],
+    headerType: 1,
+  });
 }
 
-const CUSTOM_REQUEST_PROMPT = `📝 *Custom Search Request*
+function sendMoreMenu(sock: any, jid: string) {
+  return sock.sendMessage(jid, {
+    text: "More options:",
+    buttons: [
+      { buttonId: "agent", buttonText: { displayText: "🤝 Become Agent" }, type: 1 },
+      { buttonId: "support", buttonText: { displayText: "👤 Talk to Support" }, type: 1 },
+      { buttonId: "back_main", buttonText: { displayText: "← Back" }, type: 1 },
+    ],
+    headerType: 1,
+  });
+}
 
-We'll find it for you! Just tell us:
+function sendBudgetButtons(sock: any, jid: string) {
+  return sock.sendMessage(jid, {
+    text: "💰 *What's your budget?*",
+    buttons: [
+      { buttonId: "budget_0_5m", buttonText: { displayText: "₦ Under ₦5M" }, type: 1 },
+      { buttonId: "budget_5_10m", buttonText: { displayText: "₦5M – ₦10M" }, type: 1 },
+      { buttonId: "budget_any", buttonText: { displayText: "💰 Any Budget" }, type: 1 },
+    ],
+    headerType: 1,
+  });
+}
 
-1. Your name
-2. What you're looking for (type, location, budget)
-3. Your phone number
+function sendMoreBudget(sock: any, jid: string) {
+  return sock.sendMessage(jid, {
+    text: "More budget options:",
+    buttons: [
+      { buttonId: "budget_10_20m", buttonText: { displayText: "₦10M – ₦20M" }, type: 1 },
+      { buttonId: "budget_20m_plus", buttonText: { displayText: "₦20M+" }, type: 1 },
+      { buttonId: "budget_any", buttonText: { displayText: "💰 Any" }, type: 1 },
+    ],
+    headerType: 1,
+  });
+}
 
-_Type everything in one message and our team will follow up within 24 hours._`;
+function sendBedroomButtons(sock: any, jid: string) {
+  return sock.sendMessage(jid, {
+    text: "🛏️ *How many bedrooms?*",
+    buttons: [
+      { buttonId: "beds_2", buttonText: { displayText: "2 Bedrooms" }, type: 1 },
+      { buttonId: "beds_3", buttonText: { displayText: "3 Bedrooms" }, type: 1 },
+      { buttonId: "beds_any", buttonText: { displayText: "Any" }, type: 1 },
+    ],
+    headerType: 1,
+  });
+}
 
-const CUSTOM_REQUEST_CONFIRM = `✅ *Request submitted!*
+function sendSellTypeButtons(sock: any, jid: string) {
+  return sock.sendMessage(jid, {
+    text: "💰 *What type of property?*",
+    buttons: [
+      { buttonId: "sell_house", buttonText: { displayText: "🏠 House" }, type: 1 },
+      { buttonId: "sell_flat", buttonText: { displayText: "🏢 Flat" }, type: 1 },
+      { buttonId: "sell_land", buttonText: { displayText: "🏗️ Land" }, type: 1 },
+    ],
+    headerType: 1,
+  });
+}
 
-Our team will personally search for matching properties and contact you within 24 hours.
+function sendSellTypeMore(sock: any, jid: string) {
+  return sock.sendMessage(jid, {
+    text: "Or other type:",
+    buttons: [
+      { buttonId: "sell_commercial", buttonText: { displayText: "🏬 Commercial" }, type: 1 },
+      { buttonId: "back_main", buttonText: { displayText: "← Back" }, type: 1 },
+    ],
+    headerType: 1,
+  });
+}
 
-📞 For urgent requests: +234 707 422 2284
+function sendDetailButtons(sock: any, jid: string) {
+  return sock.sendMessage(jid, {
+    text: "What would you like to do?",
+    buttons: [
+      { buttonId: "view", buttonText: { displayText: "📅 Schedule Viewing" }, type: 1 },
+      { buttonId: "ask", buttonText: { displayText: "💬 Ask a Question" }, type: 1 },
+      { buttonId: "back_menu", buttonText: { displayText: "🔄 Back to Menu" }, type: 1 },
+    ],
+    headerType: 1,
+  });
+}
 
-Reply *menu* to start a new search.`;
+// ============ Send Photo Helper ============
+async function sendListingPhoto(sock: any, jid: string, listing: any, caption: string) {
+  const photoUrl = listing.photos?.[0]?.url;
+  if (photoUrl) {
+    const resolved = photoUrl.startsWith("http") ? photoUrl : `${CONFIG.publicUrl}${photoUrl.startsWith("/") ? "" : "/"}${photoUrl}`;
+    try {
+      await sock.sendMessage(jid, { image: { url: resolved }, caption });
+      return true;
+    } catch {}
+  }
+  return false;
+}
 
-const VIEWING_PROMPT = `📅 *Schedule a Viewing*
-
-Please provide:
-1. Preferred date and time
-2. Your name and phone number
-
-_Example: "Tomorrow 2pm, Ahmad, 08034567890"_`;
-
-const INQUIRY_PROMPT = `💬 *Send an Inquiry*
-
-What would you like to know about this property?
-
-_Type your question and our team will respond within 24 hours._`;
-
+// ============ Message Router ============
 async function startBot() {
   const { version } = await fetchLatestBaileysVersion();
   logger.info(`Baileys v${version.join(".")}`);
@@ -159,7 +193,6 @@ async function startBot() {
     getMessage: async (key: any) => msgCache.get(key.id || key.remoteJid + "_" + key.id) as any,
   });
 
-  // === Connection Events ===
   sock.ev.on("creds.update", saveCreds);
 
   sock.ev.on("connection.update", (update: any) => {
@@ -167,10 +200,7 @@ async function startBot() {
     if (qr) {
       logger.info("📱 QR code generated");
       try { fs.writeFileSync("/tmp/whatsapp-qr.txt", qr); } catch {}
-      try {
-        const qrcode = require("qrcode-terminal");
-        qrcode.generate(qr, { small: true });
-      } catch {}
+      try { require("qrcode-terminal").generate(qr, { small: true }); } catch {}
     }
     if (connection === "open") {
       logger.info("✅ WhatsApp bot connected!");
@@ -191,12 +221,31 @@ async function startBot() {
       if (!msg.message || msg.key.fromMe || m.type !== "notify") continue;
       if (msg.message) msgCache.set(msg.key.id || msg.key.remoteJid + "_" + msg.key.id, msg.message);
 
-      const text = (msg.message.conversation || msg.message.extendedTextMessage?.text || msg.message.imageMessage?.caption || "").trim();
-      if (!text) continue;
-
       const jid = msg.key.remoteJid!;
       const sender = msg.pushName || "Guest";
       const phone = jid.split("@")[0];
+
+      // Extract message text (handles buttons, lists, text, captions)
+      let text = "";
+
+      // Check for button response
+      const buttonId = (msg.message as any)?.buttonsResponseMessage?.selectedButtonId;
+      if (buttonId) {
+        text = buttonId;
+      }
+
+      // Check for list response
+      const listId = (msg.message as any)?.listResponseMessage?.singleSelectReply?.selectedRowId;
+      if (listId) {
+        text = listId;
+      }
+
+      // Regular text
+      if (!text) {
+        text = (msg.message.conversation || msg.message.extendedTextMessage?.text || msg.message.imageMessage?.caption || "").trim();
+      }
+
+      if (!text) continue;
 
       logger.info(`📩 ${sender}: ${text.substring(0, 80)}`);
 
@@ -212,9 +261,7 @@ async function startBot() {
     }
   });
 
-  // === Process admin-sent messages ===
   setInterval(() => processQueue(sock), 3000);
-
   return sock;
 }
 
@@ -228,10 +275,6 @@ async function processQueue(sock: any) {
       const data = JSON.parse(fs.readFileSync(`${dir}/${file}`, "utf-8"));
       const jid = `${data.phone}@s.whatsapp.net`;
       await sock.sendMessage(jid, { text: data.message });
-      await fetch(`${API}/api/whatsapp/message`, {
-        method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ phone: data.phone, message: data.message, direction: "outgoing", fromBot: true, senderName: "Admin" }),
-      }).catch(() => {});
       fs.unlinkSync(`${dir}/${file}`);
     } catch (e) { try { fs.unlinkSync(`${dir}/${file}`); } catch {} }
   }
@@ -243,240 +286,231 @@ async function handleConversation(sock: any, jid: string, text: string, phone: s
   const num = t === "1" ? 1 : t === "2" ? 2 : t === "3" ? 3 : t === "4" ? 4 : t === "5" ? 5 : 0;
   const step = getStep(phone);
 
-  // Cancel support
-  if (t === "cancel") {
+  // Cancel
+  if (t === "cancel" || t === "back_menu") {
     setStep(phone, "menu");
-    await sock.sendMessage(jid, { text: `✅ Cancelled. Reply *menu* to start over.` });
+    await sendMainMenu(sock, jid);
     return;
   }
 
-  // Menu triggers — always reset
-  if (t === "hi" || t === "hello" || t === "hey" || t === "menu" || t === "start" || t === "help" || t === "back") {
+  // Menu triggers (text)
+  if (t === "hi" || t === "hello" || t === "hey" || t === "menu" || t === "start" || t === "help") {
     setStep(phone, "menu");
-    await sock.sendMessage(jid, { text: WELCOME });
+    await sendMainMenu(sock, jid);
     return;
   }
 
-  // Human handoff — only from menu or awaiting_human step
-  if (step === "menu" && (t.includes("agent") || t.includes("human") || t.includes("support") || num === 5)) {
-    setStep(phone, "menu");
-    await sock.sendMessage(jid, { text: `👤 *Connecting you with our team...*\n\nAn agent will message you shortly.\n📞 Or call: +234 707 422 2284` });
-    try { fs.writeFileSync(`/tmp/whatsapp-queue/handoff_${Date.now()}.json`, JSON.stringify({ phone, name, intent: "handoff" })); } catch {}
+  // === MAIN MENU ===
+  if (step === "menu") {
+    if (t === "buy") {
+      setStep(phone, "buy_location");
+      await sock.sendMessage(jid, { text: "🏠 *Find a Property to Buy*\n\nWhich area are you interested in?\nExamples: \"GRA Kano\", \"Nassarawa\", \"Tarauni\"" });
+      return;
+    }
+    if (t === "rent") {
+      setStep(phone, "buy_location");
+      await sock.sendMessage(jid, { text: "🏡 *Find a Property to Rent*\n\nWhich area are you interested in?\nExamples: \"GRA Kano\", \"Nassarawa\", \"Tarauni\"" });
+      return;
+    }
+    if (t === "sell") {
+      setStep(phone, "sell_type");
+      await sendSellTypeButtons(sock, jid);
+      return;
+    }
+    if (t === "agent") {
+      setStep(phone, "menu");
+      await sock.sendMessage(jid, { text: "🤝 *Become an MBPP Agent*\n\nApply: https://mbpproperties.com/apply-as-agent\n\nReviewed within 48 hours." });
+      return;
+    }
+    if (t === "support" || t === "5") {
+      setStep(phone, "menu");
+      await sock.sendMessage(jid, { text: "👤 *Connecting you with support...*\n\n📞 +234 707 422 2284\n\nAn agent will message you shortly." });
+      return;
+    }
+    // Fallback — show buttons again
+    await sendMainMenu(sock, jid);
     return;
   }
 
-  // Results step — user replies with number or "yes"
+  // === BUY LOCATION ===
+  if (step === "buy_location") {
+    setData(phone, "location", text);
+    setStep(phone, "buy_budget");
+    await sendBudgetButtons(sock, jid);
+    return;
+  }
+
+  // === BUY BUDGET ===
+  if (step === "buy_budget") {
+    let budget = text;
+    if (t === "budget_0_5m") budget = "0-5M";
+    else if (t === "budget_5_10m") budget = "5-10M";
+    else if (t === "budget_10_20m") budget = "10-20M";
+    else if (t === "budget_20m_plus") budget = "20M+";
+    else if (t === "budget_any") budget = "any";
+
+    // Numeric fallback for older clients
+    if (num === 1) budget = "0-5M";
+    else if (num === 2) budget = "5-10M";
+    else if (num === 3) budget = "10-20M";
+    else if (num === 4) budget = "20M+";
+    else if (num === 5) budget = "any";
+
+    setData(phone, "budget", budget);
+    setStep(phone, "buy_bedrooms");
+    await sendBedroomButtons(sock, jid);
+    return;
+  }
+
+  // === BUY BEDROOMS ===
+  if (step === "buy_bedrooms") {
+    let beds = text;
+    if (t === "beds_2") beds = "2";
+    else if (t === "beds_3") beds = "3";
+    else if (t === "beds_any") beds = "any";
+
+    if (num === 1) beds = "2";
+    else if (num === 2) beds = "3";
+    else if (num === 3) beds = "any";
+
+    setData(phone, "bedrooms", beds);
+    await performSearch(sock, jid, phone);
+    return;
+  }
+
+  // === RESULTS ===
   if (step === "results") {
     const results = getData(phone).results ? JSON.parse(getData(phone).results) : [];
+
     if (num >= 1 && num <= Math.min(3, results.length)) {
       const listing = results[num - 1];
       setData(phone, "selectedListing", JSON.stringify(listing));
       setStep(phone, "detail");
       await sock.sendMessage(jid, { text: formatDetail(listing) });
-      // Send photo + link
-      await sendListingPhoto(sock, jid, listing);
-      await sock.sendMessage(jid, { text: `📅 *view* — Schedule a viewing\n💬 *ask* — Ask a question\n🔄 *menu* — Search again` });
+      await sendListingPhoto(sock, jid, listing, `📷 ${listing.title}`);
+      await sendDetailButtons(sock, jid);
       return;
     }
     if (t === "yes" || t.includes("custom") || t.includes("request")) {
       setStep(phone, "custom_request");
-      await sock.sendMessage(jid, { text: CUSTOM_REQUEST_PROMPT });
+      await sock.sendMessage(jid, { text: "📝 *Custom Search Request*\n\nJust tell us:\n1. Your name\n2. What you're looking for\n3. Your phone number\n\n_Type everything in one message._" });
       return;
     }
     if (num === 0 && t !== "menu") {
-      await sock.sendMessage(jid, { text: `Reply *1-3* for details, *yes* for custom request, or *menu* to search again.` });
+      await sock.sendMessage(jid, { text: "Reply 1-3 for details, yes for custom request, or menu to search again." });
       return;
     }
   }
 
-  // Detail step — viewing, inquiry, or back
+  // === DETAIL ACTIONS ===
   if (step === "detail") {
-    if (t.includes("view") || t === "📅" || t === "view") {
+    if (t === "view" || t.includes("view") || t === "📅") {
       setStep(phone, "viewing_input");
-      await sock.sendMessage(jid, { text: VIEWING_PROMPT });
+      await sock.sendMessage(jid, { text: "📅 *Schedule a Viewing*\n\nPreferred date/time? (e.g. 'Tomorrow 2pm')\nYour name and phone number?\n\n_Type everything in one message._" });
       return;
     }
-    if (t.includes("ask") || t === "💬" || t === "ask" || t.includes("inquiry")) {
+    if (t === "ask" || t.includes("ask") || t.includes("inquiry")) {
       setStep(phone, "inquiry_question");
-      await sock.sendMessage(jid, { text: INQUIRY_PROMPT });
+      await sock.sendMessage(jid, { text: "💬 *Ask a Question*\n\nType your question about this property." });
       return;
     }
-    if (t === "menu" || t === "back") {
-      setStep(phone, "menu");
-      await sock.sendMessage(jid, { text: WELCOME });
-      return;
-    }
-    // If user sends a number again, might be trying to go back to results
     if (num >= 1 && num <= 3) {
       const results = getData(phone).results ? JSON.parse(getData(phone).results) : [];
       if (num <= results.length) {
         const listing = results[num - 1];
         setData(phone, "selectedListing", JSON.stringify(listing));
         await sock.sendMessage(jid, { text: formatDetail(listing) });
-        await sendListingPhoto(sock, jid, listing);
+        await sendListingPhoto(sock, jid, listing, `📷 ${listing.title}`);
+        await sendDetailButtons(sock, jid);
         return;
       }
     }
-    await sock.sendMessage(jid, { text: `📅 *view* — Schedule viewing\n💬 *ask* — Ask a question\n🔄 *menu* — Search again` });
+    await sendDetailButtons(sock, jid);
     return;
   }
 
-  // Viewing input
+  // === VIEWING INPUT ===
   if (step === "viewing_input") {
-    setData(phone, "viewingDetails", text);
     setStep(phone, "menu");
-    // Save as inquiry
     try {
       fetch(`${API}/api/whatsapp/message`, {
         method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ phone, name, message: `[VIEWING REQUEST] ${text}`, direction: "incoming", fromBot: false }),
+        body: JSON.stringify({ phone, name, message: `[VIEWING REQUEST] ${text}`, direction: "incoming" }),
       }).catch(() => {});
     } catch {}
-    await sock.sendMessage(jid, { text: `✅ *Viewing request received!*\n\n📅 Details: ${text}\n\nOur team will confirm the appointment within 24 hours.\n📞 For urgent requests: +234 707 422 2284\n\nReply *menu* to continue.` });
+    await sock.sendMessage(jid, { text: `✅ *Viewing request received!*\n\n📅 ${text}\n\nOur team will confirm within 24 hours.\n📞 +234 707 422 2284\n\nType *menu* to continue.` });
     return;
   }
 
-  // Inquiry question
+  // === INQUIRY QUESTION ===
   if (step === "inquiry_question") {
     const listing = getData(phone).selectedListing ? JSON.parse(getData(phone).selectedListing) : null;
     setStep(phone, "menu");
     try {
       fetch(`${API}/api/whatsapp/message`, {
         method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ phone, name, message: `[INQUIRY${listing ? " - " + listing.title : ""}] ${text}`, direction: "incoming", fromBot: false }),
+        body: JSON.stringify({ phone, name, message: `[INQUIRY${listing ? " - " + listing.title : ""}] ${text}`, direction: "incoming" }),
       }).catch(() => {});
     } catch {}
-    await sock.sendMessage(jid, { text: `✅ *Inquiry submitted!*\n\nOur team will respond within 24 hours.\n📞 For urgent questions: +234 707 422 2284\n\nReply *menu* to continue.` });
+    await sock.sendMessage(jid, { text: `✅ *Inquiry submitted!*\n\nOur team will respond within 24 hours.\n📞 +234 707 422 2284\n\nType *menu* to continue.` });
     return;
   }
 
-  // Custom request
+  // === CUSTOM REQUEST ===
   if (step === "custom_request") {
     setStep(phone, "menu");
     try {
       fetch(`${API}/api/whatsapp/message`, {
         method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ phone, name, message: `[CUSTOM REQUEST] ${text}`, direction: "incoming", fromBot: false }),
+        body: JSON.stringify({ phone, name, message: `[CUSTOM REQUEST] ${text}`, direction: "incoming" }),
       }).catch(() => {});
     } catch {}
-    await sock.sendMessage(jid, { text: CUSTOM_REQUEST_CONFIRM });
+    await sock.sendMessage(jid, { text: `✅ *Request submitted!*\n\nOur team will search for matching properties and contact you within 24 hours.\n📞 +234 707 422 2284\n\nType *menu* to continue.` });
     return;
   }
 
-  // Main menu — numeric responses
-  if (num >= 1 && num <= 5) {
-    if (step === "menu") {
-      setStep(phone, getStepForNumber(num));
-      await sock.sendMessage(jid, { text: getStepMessage(num, name) });
-      return;
-    }
-    // Buy flow steps
-    if (step === "buy_budget") {
-      setData(phone, "budget", ["", "0-5M", "5-10M", "10-20M", "20M+"][num] || String(num));
-      setStep(phone, "buy_bedrooms");
-      await sock.sendMessage(jid, { text: `🛏️ *Bedrooms?*\n1️⃣ 2 bed\n2️⃣ 3 bed\n3️⃣ 4+ bed\n4️⃣ Any` });
-      return;
-    }
-    if (step === "buy_bedrooms") {
-      setData(phone, "bedrooms", ["", "2", "3", "4", "any"][num] || String(num));
-      await performSearch(sock, jid, phone);
-      return;
-    }
-    if (step === "sell_type") {
-      setData(phone, "sellType", ["", "House", "Flat", "Land", "Commercial"][num] || "House");
-      setStep(phone, "sell_location");
-      await sock.sendMessage(jid, { text: `📍 *Where is the property?*\n\nType the area/city name.\nExample: "GRA Kano" or "Nassarawa"` });
-      return;
-    }
+  // === SELL FLOW ===
+  if (step === "sell_type") {
+    let sellType = text;
+    if (t === "sell_house") sellType = "House";
+    else if (t === "sell_flat") sellType = "Flat";
+    else if (t === "sell_land") sellType = "Land";
+    else if (t === "sell_commercial") sellType = "Commercial";
+
+    if (num === 1) sellType = "House";
+    else if (num === 2) sellType = "Flat";
+    else if (num === 3) sellType = "Land";
+    else if (num === 4) sellType = "Commercial";
+
+    setData(phone, "sellType", sellType);
+    setStep(phone, "sell_location");
+    await sock.sendMessage(jid, { text: "📍 *Where is the property?*\n\nType the area/city name.\nExample: \"GRA Kano\" or \"Nassarawa\"" });
+    return;
   }
 
-  // Text input routing
-  switch (step) {
-    case "menu":
-      await sock.sendMessage(jid, { text: WELCOME });
-      break;
-    case "buy_location":
-      setData(phone, "location", text);
-      setStep(phone, "buy_budget");
-      await sock.sendMessage(jid, { text: `💰 *Budget?*\n1️⃣ Under ₦5M\n2️⃣ ₦5M–₦10M\n3️⃣ ₦10M–₦20M\n4️⃣ ₦20M+\n5️⃣ Any` });
-      break;
-    case "buy_budget":
-      setData(phone, "budget", text);
-      setStep(phone, "buy_bedrooms");
-      await sock.sendMessage(jid, { text: `🛏️ *Bedrooms?*\n1️⃣ 2 bed\n2️⃣ 3 bed\n3️⃣ 4+ bed\n4️⃣ Any` });
-      break;
-    case "buy_bedrooms":
-      setData(phone, "bedrooms", text);
-      await performSearch(sock, jid, phone);
-      break;
-    case "sell_location":
-      setData(phone, "sellLocation", text);
-      setStep(phone, "sell_price");
-      await sock.sendMessage(jid, { text: `💰 *Asking price?*\nType amount. Example: "15000000" for ₦15M` });
-      break;
-    case "sell_price":
-      setData(phone, "sellPrice", text);
-      setStep(phone, "menu");
-      try {
-        fetch(`${API}/api/whatsapp/message`, {
-          method: "POST", headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ phone, name, message: `[SELL REQUEST] ${getData(phone).sellType || "Property"} in ${getData(phone).sellLocation || "Kano"} - ₦${text}`, direction: "incoming", fromBot: false }),
-        }).catch(() => {});
-      } catch {}
-      await sock.sendMessage(jid, { text: `✅ *Property details collected!*\n\nA representative will contact you within 24 hours to verify and list your property.\n📞 +234 707 422 2284\n\nReply *menu* to continue.` });
-      break;
-    case "agent_info":
-      setStep(phone, "menu");
-      await sock.sendMessage(jid, { text: `🤝 *Become an MBPP Agent*\n\nApply here: https://mbpproperties.com/apply-as-agent\n\nOur team reviews applications within 48 hours.\n\nReply *menu* to continue.` });
-      break;
-    default:
-      setStep(phone, "menu");
-      await sock.sendMessage(jid, { text: WELCOME });
+  if (step === "sell_location") {
+    setData(phone, "sellLocation", text);
+    setStep(phone, "sell_price");
+    await sock.sendMessage(jid, { text: "💰 *Asking price?*\nType amount. Example: \"15000000\" for ₦15M" });
+    return;
   }
-}
 
-function getStepForNumber(num: number): string {
-  const steps: Record<number, string> = { 1: "buy_location", 2: "buy_location", 3: "sell_type", 4: "agent_info", 5: "menu" };
-  return steps[num] || "menu";
-}
-
-function getStepMessage(num: number, name: string): string {
-  switch (num) {
-    case 1: return `🏠 *Find a Property to Buy*
-
-Let me help you find the perfect property! 📍
-
-First, *which area* are you interested in?
-Just type the area name.
-Examples: "GRA Kano", "Nassarawa", "Tarauni", "Fagge"`;
-    case 2: return `🏡 *Find a Property to Rent*
-
-Let me help you find the perfect rental! 📍
-
-First, *which area* are you interested in?
-Just type the area name.
-Examples: "GRA Kano", "Nassarawa", "Tarauni", "Fagge"`;
-    case 3: return `💰 *Sell Your Property*
-
-I'll help you list your property on MBPP!
-
-*What type of property?*
-1️⃣ House
-2️⃣ Flat
-3️⃣ Land
-4️⃣ Commercial
-
-_Just reply with the number._`;
-    case 4: return `🤝 *Become an MBPP Agent*
-
-Join our team and earn commissions on every deal!
-
-_Reply "1" to continue or "back" for the menu._`;
-    case 5: return `👤 *Connecting you with support...*
-
-An agent will be with you shortly.`;
-    default: return WELCOME;
+  if (step === "sell_price") {
+    setData(phone, "sellPrice", text);
+    setStep(phone, "menu");
+    try {
+      fetch(`${API}/api/whatsapp/message`, {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phone, name, message: `[SELL REQUEST] ${getData(phone).sellType || "Property"} in ${getData(phone).sellLocation || "Kano"} - ₦${text}`, direction: "incoming" }),
+      }).catch(() => {});
+    } catch {}
+    await sock.sendMessage(jid, { text: "✅ *Property details collected!*\n\nA representative will contact you within 24 hours.\n📞 +234 707 422 2284\n\nType *menu* to continue." });
+    return;
   }
+
+  // Fallback — show menu
+  setStep(phone, "menu");
+  await sendMainMenu(sock, jid);
 }
 
 // ============ Property Search ============
@@ -491,7 +525,6 @@ async function performSearch(sock: any, jid: string, phone: string) {
   else if (bedrooms === "3") query += "&minBeds=3";
   else if (bedrooms === "4") query += "&minBeds=4";
 
-  // Apply budget filter
   if (budget === "0-5M") query += "&maxPrice=5000000";
   else if (budget === "5-10M") query += "&minPrice=5000000&maxPrice=10000000";
   else if (budget === "10-20M") query += "&minPrice=10000000&maxPrice=20000000";
@@ -501,7 +534,9 @@ async function performSearch(sock: any, jid: string, phone: string) {
 
   if (!result || !result.listings || result.listings.length === 0) {
     setStep(phone, "custom_request");
-    await sock.sendMessage(jid, { text: `🔍 *No properties found* in ${location}.\n\n*We can find it for you!*\n\nReply *yes* to submit a custom search request.\nOur team will personally look for matching properties.\n\nOr reply *menu* to search again.` });
+    await sock.sendMessage(jid, {
+      text: `🔍 *No properties found* in ${location}.\n\n*We can find it for you!*\n\nReply *yes* to submit a custom search request.\n\nOr type *menu* to search again.`,
+    });
     return;
   }
 
@@ -510,10 +545,7 @@ async function performSearch(sock: any, jid: string, phone: string) {
   setData(phone, "results", JSON.stringify(listings));
   setStep(phone, "results");
 
-  // Send header
-  await sock.sendMessage(jid, { text: `🏠 *Found ${result.total || count} properties:*` });
-
-  // Send each listing as ONE message: photo + full details + actions
+  // Send each listing as photo + details
   for (let i = 0; i < count; i++) {
     const listing = listings[i];
     const price = listing.price ? formatPrice(listing.price, listing.listingType === "rent" ? "year" : "") : "Contact";
@@ -523,29 +555,19 @@ async function performSearch(sock: any, jid: string, phone: string) {
 📍 ${listing.address || listing.city || "Kano"}
 💰 ${price} · ${type}
 🛏️ ${listing.bedrooms || "?"} bed | 🚿 ${listing.bathrooms || "?"} bath
-🔗 ${link}
+🔗 ${link}`;
 
-Reply *${i+1}* for full details`;
-
-    const photoUrl = listing.photos?.[0]?.url;
-    if (photoUrl) {
-      let resolved = photoUrl.startsWith("http") ? photoUrl : `${CONFIG.publicUrl}${photoUrl.startsWith("/") ? "" : "/"}${photoUrl}`;
-      try {
-        await sock.sendMessage(jid, { image: { url: resolved }, caption });
-      } catch {
-        // Photo failed, send as text
-        await sock.sendMessage(jid, { text: caption });
-      }
-    } else {
+    const sent = await sendListingPhoto(sock, jid, listing, caption);
+    if (!sent) {
       await sock.sendMessage(jid, { text: caption });
     }
   }
 
-  // Send action menu
+  // Send action prompt
   if (count === 1) {
-    await sock.sendMessage(jid, { text: `_Reply *1* for full details, *yes* for a custom request, or *menu* to search again._` });
+    await sock.sendMessage(jid, { text: "_Reply *1* for full details, *yes* for custom request, or *menu* to search again._" });
   } else {
-    await sock.sendMessage(jid, { text: `_Reply *1-${count}* for full details, *yes* for a custom request, or *menu* to search again._` });
+    await sock.sendMessage(jid, { text: `_Reply *1-${count}* for full details, *yes* for custom request, or *menu* to search again._` });
   }
 }
 
