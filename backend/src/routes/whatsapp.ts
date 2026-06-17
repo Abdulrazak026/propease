@@ -169,4 +169,19 @@ router.get("/status", async (_req, res: Response) => {
   }
 });
 
+// QR code viewer
+router.get("/qr", async (_req, res: Response) => {
+  try {
+    if (!fs.existsSync("/tmp/whatsapp-qr.txt")) {
+      return res.send(`<html><body style="font-family:sans-serif;text-align:center;padding:40px"><h2>No QR code available</h2><p>The bot may already be connected, or it hasn't generated a QR yet.</p><p>Check: pm2 logs mbpp-bot</p></body></html>`);
+    }
+    const qr = fs.readFileSync("/tmp/whatsapp-qr.txt", "utf-8");
+    // Use Google Charts API to render QR code as an image
+    const html = `<!DOCTYPE html><html><head><meta name="viewport" content="width=device-width"><title>WhatsApp QR</title><style>body{font-family:sans-serif;text-align:center;padding:20px;background:#f0f0f0}h2{color:#333}img{max-width:300px;border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,.1)}p{color:#666;margin-top:16px}</style></head><body><h2>Scan to Connect WhatsApp</h2><img src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(qr)}" alt="QR Code"><p>Open WhatsApp → Settings → Linked Devices → Scan QR</p><p style="font-size:12px;color:#999">https://mbpproperties.com/api/whatsapp/qr</p></body></html>`;
+    res.send(html);
+  } catch {
+    res.status(500).send("Error reading QR");
+  }
+});
+
 export default router;

@@ -70,7 +70,20 @@ async function startBot() {
 
   sock.ev.on("connection.update", (update: any) => {
     const { connection, lastDisconnect, qr } = update;
-    if (qr) { console.log("📱 Scan QR code to connect WhatsApp"); }
+    if (qr) {
+      console.log("📱 QR code ready. Scan with WhatsApp:");
+      // Save QR string to file for dashboard display
+      try { fs.writeFileSync("/tmp/whatsapp-qr.txt", qr); } catch {}
+      // Try to render QR in terminal using qrcode-terminal if available
+      try {
+        const qrcode = require("qrcode-terminal");
+        qrcode.generate(qr, { small: true });
+      } catch {
+        // qrcode-terminal not available, just save to file
+        console.log("QR saved to /tmp/whatsapp-qr.txt");
+        console.log("View QR: https://mbpproperties.com/api/whatsapp/qr");
+      }
+    }
     if (connection === "open") {
       logger.info("✅ WhatsApp bot connected!");
       try { fs.writeFileSync("/tmp/whatsapp-connected", "1"); } catch {}
