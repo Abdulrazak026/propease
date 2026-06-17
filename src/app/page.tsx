@@ -108,28 +108,32 @@ export default function HomePage() {
             </div>
             <h1 className="text-4xl sm:text-5xl lg:text-7xl font-bold text-white leading-[1.05] tracking-tight">
               Find Your Dream Home<br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-300 via-teal-200 to-emerald-400">in Kano.</span>
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-300 via-teal-200 to-emerald-400">in Kano &amp; Beyond.</span>
             </h1>
             <p className="text-base sm:text-lg text-white/60 mt-5 sm:mt-6 max-w-xl leading-relaxed">
               Trusted properties. Verified listings. Happy clients.
             </p>
-
-            <div className="mt-8 sm:mt-10 grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 max-w-xl">
-              {[
-                { v: "30+", l: "Verified Properties" },
-                { v: "14", l: "Neighborhoods" },
-                { v: "4", l: "Cities" },
-                { v: "100+", l: "Happy Clients" },
-              ].map(s => (
-                <div key={s.l} className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl px-3 py-3 sm:px-4 sm:py-3.5 hover:bg-white/10 transition-colors">
-                  <p className="text-xl sm:text-2xl font-bold text-white">{s.v}</p>
-                  <p className="text-[11px] sm:text-xs text-white/50 mt-0.5">{s.l}</p>
-                </div>
-              ))}
-            </div>
           </div>
         </div>
       </section>
+
+      <div className="bg-white border-b border-gray-200">
+        <div className="max-w-[1400px] mx-auto px-5 sm:px-6 lg:px-10 py-5">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+            {[
+              { v: "30+", l: "Verified Properties" },
+              { v: "14", l: "Neighborhoods" },
+              { v: "4", l: "Cities" },
+              { v: "100+", l: "Happy Clients" },
+            ].map(s => (
+              <div key={s.l} className="bg-gray-50 border border-gray-100 rounded-xl px-4 py-4 text-center hover:border-gray-200 hover:shadow-sm transition-all">
+                <p className="text-xl sm:text-2xl font-bold text-[var(--color-primary)]">{s.v}</p>
+                <p className="text-[11px] sm:text-xs text-gray-500 mt-1">{s.l}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
 
       <div className="bg-white border-b border-gray-200 shadow-sm" data-filter-search>
         <div className="max-w-[1400px] mx-auto px-5 sm:px-6 lg:px-10 py-4">
@@ -156,7 +160,7 @@ export default function HomePage() {
                     setFilters((prev: any) => ({ ...prev, propertyType: p.value }));
                     setShowCount(INITIAL_SHOW);
                   }}
-                  className={`shrink-0 px-4 py-2 text-sm font-medium rounded-full transition-all duration-200 active:scale-95 ${
+                  className={`shrink-0 px-3 py-1.5 text-xs font-medium rounded-full transition-all duration-200 active:scale-95 ${
                     active
                       ? "bg-gray-900 text-white shadow-md"
                       : "bg-gray-100 text-gray-600 hover:bg-gray-200"
