@@ -21,7 +21,6 @@ const sessions = new Map<string, { step: string; data: Record<string, string>; u
 function getStep(phone: string): string {
   const s = sessions.get(phone);
   if (!s) return "menu";
-  // Expire sessions after 30 minutes
   if (Date.now() - s.updatedAt > 30 * 60 * 1000) { sessions.delete(phone); return "menu"; }
   return s.step;
 }
@@ -61,6 +60,21 @@ function formatListing(item: any, idx: number): string {
 🛏️ ${item.bedrooms || "?"} bed | 🚿 ${item.bathrooms || "?"} bath`;
 }
 
+function formatDetail(item: any): string {
+  const price = item.price ? formatPrice(item.price, item.listingType === "rent" ? "year" : "") : "Contact";
+  const type = item.listingType === "rent" ? "Available for Rent" : "Available for Sale";
+  return `🏠 *${item.title || "Property"}*
+
+💰 *Price:* ${price}
+📍 *Location:* ${item.city || "Kano"}${item.address ? ", " + item.address : ""}
+🏷️ *Type:* ${type}
+🛏️ *Bedrooms:* ${item.bedrooms || "N/A"} | 🚿 *Bathrooms:* ${item.bathrooms || "N/A"}
+${item.sqft ? `📐 *Area:* ${item.sqft} sqft\n` : ""}
+${item.features && item.features.length > 0 ? `⚡ *Features:* ${Array.isArray(item.features) ? item.features.join(", ") : item.features}\n` : ""}
+${item.description ? `📝 ${item.description.substring(0, 200)}${item.description.length > 200 ? "..." : ""}\n` : ""}
+👤 *Agent:* ${item.postedBy?.name || "MBPP Team"}`;
+}
+
 const WELCOME = `🏠 *MBPP Properties*
 
 Welcome! What are you looking for?
@@ -72,6 +86,40 @@ Welcome! What are you looking for?
 *5️⃣* Talk to support
 
 _Just reply with a number._`;
+
+const RESULTS_MENU = `\n_Reply *1-3* for details, *yes* to submit a custom request, or *menu* to search again._`;
+
+const CUSTOM_REQUEST_PROMPT = `📝 *Custom Search Request*
+
+We'll find it for you! Just tell us:
+
+1. Your name
+2. What you're looking for (type, location, budget)
+3. Your phone number
+
+_Type everything in one message and our team will follow up within 24 hours._`;
+
+const CUSTOM_REQUEST_CONFIRM = `✅ *Request submitted!*
+
+Our team will personally search for matching properties and contact you within 24 hours.
+
+📞 For urgent requests: +234 707 422 2284
+
+Reply *menu* to start a new search.`;
+
+const VIEWING_PROMPT = `📅 *Schedule a Viewing*
+
+Please provide:
+1. Preferred date and time
+2. Your name and phone number
+
+_Example: "Tomorrow 2pm, Ahmad, 08034567890"_`;
+
+const INQUIRY_PROMPT = `💬 *Send an Inquiry*
+
+What would you like to know about this property?
+
+_Type your question and our team will respond within 24 hours._`;
 
 async function startBot() {
   const { version } = await fetchLatestBaileysVersion();
@@ -93,9 +141,8 @@ async function startBot() {
   sock.ev.on("connection.update", (update: any) => {
     const { connection, lastDisconnect, qr } = update;
     if (qr) {
-      console.log("📱 QR code generated");
+      logger.info("📱 QR code generated");
       try { fs.writeFileSync("/tmp/whatsapp-qr.txt", qr); } catch {}
-      // Try rendering in terminal if qrcode-terminal is available
       try {
         const qrcode = require("qrcode-terminal");
         qrcode.generate(qr, { small: true });
@@ -106,11 +153,8 @@ async function startBot() {
       try { fs.writeFileSync("/tmp/whatsapp-connected", "1"); } catch {}
       try { fs.unlinkSync("/tmp/whatsapp-qr.txt"); } catch {}
     }
-    if (connection === "open") {
-      logger.info("✅ WhatsApp bot connected!");
-      try { fs.writeFileSync("/tmp/whatsapp-connected", "1"); } catch {}
-    }
     if (connection === "close") {
+      try { fs.unlinkSync("/tmp/whatsapp-connected"); } catch {}
       const code = (lastDisconnect?.error as Boom)?.output?.statusCode;
       if (code !== DisconnectReason.loggedOut) setTimeout(startBot, 5000);
       else logger.error("Logged out. Re-scan QR.");
@@ -119,7 +163,6 @@ async function startBot() {
 
   // === Message Handler ===
   sock.ev.on("messages.upsert", async (m) => {
-
     for (const msg of m.messages) {
       if (!msg.message || msg.key.fromMe || m.type !== "notify") continue;
       if (msg.message) msgCache.set(msg.key.id || msg.key.remoteJid + "_" + msg.key.id, msg.message);
@@ -133,7 +176,7 @@ async function startBot() {
 
       logger.info(`📩 ${sender}: ${text.substring(0, 80)}`);
 
-      // Try to save to DB (best effort, don't block)
+      // Save to DB (best effort)
       try {
         fetch(`${API}/api/whatsapp/message`, {
           method: "POST", headers: { "Content-Type": "application/json" },
@@ -141,12 +184,11 @@ async function startBot() {
         }).catch(() => {});
       } catch {}
 
-      // Handle conversation flow using in-memory state
       await handleConversation(sock, jid, text, phone, sender);
     }
   });
 
-  // === Process admin-sent messages from file queue ===
+  // === Process admin-sent messages ===
   setInterval(() => processQueue(sock), 3000);
 
   return sock;
@@ -162,10 +204,8 @@ async function processQueue(sock: any) {
       const data = JSON.parse(fs.readFileSync(`${dir}/${file}`, "utf-8"));
       const jid = `${data.phone}@s.whatsapp.net`;
       await sock.sendMessage(jid, { text: data.message });
-      // Save outgoing
       await fetch(`${API}/api/whatsapp/message`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+        method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ phone: data.phone, message: data.message, direction: "outgoing", fromBot: true, senderName: "Admin" }),
       }).catch(() => {});
       fs.unlinkSync(`${dir}/${file}`);
@@ -174,11 +214,17 @@ async function processQueue(sock: any) {
 }
 
 // ============ Conversation Router ============
-// ============ Conversation Router (in-memory) ============
 async function handleConversation(sock: any, jid: string, text: string, phone: string, name: string) {
   const t = text.trim().toLowerCase();
   const num = t === "1" ? 1 : t === "2" ? 2 : t === "3" ? 3 : t === "4" ? 4 : t === "5" ? 5 : 0;
   const step = getStep(phone);
+
+  // Cancel support
+  if (t === "cancel") {
+    setStep(phone, "menu");
+    await sock.sendMessage(jid, { text: `✅ Cancelled. Reply *menu* to start over.` });
+    return;
+  }
 
   // Menu triggers — always reset
   if (t === "hi" || t === "hello" || t === "hey" || t === "menu" || t === "start" || t === "help" || t === "back") {
@@ -187,34 +233,202 @@ async function handleConversation(sock: any, jid: string, text: string, phone: s
     return;
   }
 
-  // Human handoff
-  if (t.includes("agent") || t.includes("human") || t.includes("support") || num === 5) {
+  // Human handoff — only from menu or awaiting_human step
+  if (step === "menu" && (t.includes("agent") || t.includes("human") || t.includes("support") || num === 5)) {
     setStep(phone, "menu");
     await sock.sendMessage(jid, { text: `👤 *Connecting you with our team...*\n\nAn agent will message you shortly.\n📞 Or call: +234 707 422 2284` });
+    try { fs.writeFileSync(`/tmp/whatsapp-queue/handoff_${Date.now()}.json`, JSON.stringify({ phone, name, intent: "handoff" })); } catch {}
     return;
   }
 
-  // Numeric responses depend on current step
-  if (num >= 1 && num <= 4) {
-    if (step === "menu") { setStep(phone, getStepForNumber(num)); await sock.sendMessage(jid, { text: getStepMessage(num, name) }); return; }
-    if (step === "buy_budget") { setData(phone, "budget", ["","0-5M","5-10M","10-20M","20M+"][num]||String(num)); setStep(phone,"buy_bedrooms"); await sock.sendMessage(jid,{text:`🛏️ *Bedrooms?*\n1️⃣ 2 bed\n2️⃣ 3 bed\n3️⃣ 4+ bed\n4️⃣ Any`}); return; }
-    if (step === "buy_bedrooms") { setData(phone,"bedrooms",["","2","3","4","any"][num]||String(num)); await performSearch(sock,jid,phone); return; }
+  // Results step — user replies with number or "yes"
+  if (step === "results") {
+    const results = getData(phone).results ? JSON.parse(getData(phone).results) : [];
+    if (num >= 1 && num <= Math.min(3, results.length)) {
+      const listing = results[num - 1];
+      setData(phone, "selectedListing", JSON.stringify(listing));
+      setStep(phone, "detail");
+      await sock.sendMessage(jid, { text: formatDetail(listing) });
+      // Send photo if available
+      if (listing.photos && listing.photos.length > 0) {
+        const photoUrl = listing.photos[0]?.url;
+        if (photoUrl) {
+          try {
+            const resolved = photoUrl.startsWith("http") ? photoUrl : `${API}/api/upload/file/${photoUrl}`;
+            await sock.sendMessage(jid, { image: { url: resolved }, caption: `📷 ${listing.title}` });
+          } catch {}
+        }
+      }
+      await sock.sendMessage(jid, { text: `📅 *view* — Schedule a viewing\n💬 *ask* — Ask a question\n🔄 *menu* — Search again` });
+      return;
+    }
+    if (t === "yes" || t.includes("custom") || t.includes("request")) {
+      setStep(phone, "custom_request");
+      await sock.sendMessage(jid, { text: CUSTOM_REQUEST_PROMPT });
+      return;
+    }
+    if (num === 0 && t !== "menu") {
+      await sock.sendMessage(jid, { text: `Reply *1-3* for details, *yes* for custom request, or *menu* to search again.` });
+      return;
+    }
+  }
+
+  // Detail step — viewing, inquiry, or back
+  if (step === "detail") {
+    if (t.includes("view") || t === "📅" || t === "view") {
+      setStep(phone, "viewing_input");
+      await sock.sendMessage(jid, { text: VIEWING_PROMPT });
+      return;
+    }
+    if (t.includes("ask") || t === "💬" || t === "ask" || t.includes("inquiry")) {
+      setStep(phone, "inquiry_question");
+      await sock.sendMessage(jid, { text: INQUIRY_PROMPT });
+      return;
+    }
+    if (t === "menu" || t === "back") {
+      setStep(phone, "menu");
+      await sock.sendMessage(jid, { text: WELCOME });
+      return;
+    }
+    // If user sends a number again, might be trying to go back to results
+    if (num >= 1 && num <= 3) {
+      const results = getData(phone).results ? JSON.parse(getData(phone).results) : [];
+      if (num <= results.length) {
+        const listing = results[num - 1];
+        setData(phone, "selectedListing", JSON.stringify(listing));
+        await sock.sendMessage(jid, { text: formatDetail(listing) });
+        if (listing.photos && listing.photos.length > 0) {
+          const photoUrl = listing.photos[0]?.url;
+          if (photoUrl) {
+            try {
+              const resolved = photoUrl.startsWith("http") ? photoUrl : `${API}/api/upload/file/${photoUrl}`;
+              await sock.sendMessage(jid, { image: { url: resolved }, caption: `📷 ${listing.title}` });
+            } catch {}
+          }
+        }
+        return;
+      }
+    }
+    await sock.sendMessage(jid, { text: `📅 *view* — Schedule viewing\n💬 *ask* — Ask a question\n🔄 *menu* — Search again` });
+    return;
+  }
+
+  // Viewing input
+  if (step === "viewing_input") {
+    setData(phone, "viewingDetails", text);
+    setStep(phone, "menu");
+    // Save as inquiry
+    try {
+      fetch(`${API}/api/whatsapp/message`, {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phone, name, message: `[VIEWING REQUEST] ${text}`, direction: "incoming", fromBot: false }),
+      }).catch(() => {});
+    } catch {}
+    await sock.sendMessage(jid, { text: `✅ *Viewing request received!*\n\n📅 Details: ${text}\n\nOur team will confirm the appointment within 24 hours.\n📞 For urgent requests: +234 707 422 2284\n\nReply *menu* to continue.` });
+    return;
+  }
+
+  // Inquiry question
+  if (step === "inquiry_question") {
+    const listing = getData(phone).selectedListing ? JSON.parse(getData(phone).selectedListing) : null;
+    setStep(phone, "menu");
+    try {
+      fetch(`${API}/api/whatsapp/message`, {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phone, name, message: `[INQUIRY${listing ? " - " + listing.title : ""}] ${text}`, direction: "incoming", fromBot: false }),
+      }).catch(() => {});
+    } catch {}
+    await sock.sendMessage(jid, { text: `✅ *Inquiry submitted!*\n\nOur team will respond within 24 hours.\n📞 For urgent questions: +234 707 422 2284\n\nReply *menu* to continue.` });
+    return;
+  }
+
+  // Custom request
+  if (step === "custom_request") {
+    setStep(phone, "menu");
+    try {
+      fetch(`${API}/api/whatsapp/message`, {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phone, name, message: `[CUSTOM REQUEST] ${text}`, direction: "incoming", fromBot: false }),
+      }).catch(() => {});
+    } catch {}
+    await sock.sendMessage(jid, { text: CUSTOM_REQUEST_CONFIRM });
+    return;
+  }
+
+  // Main menu — numeric responses
+  if (num >= 1 && num <= 5) {
+    if (step === "menu") {
+      setStep(phone, getStepForNumber(num));
+      await sock.sendMessage(jid, { text: getStepMessage(num, name) });
+      return;
+    }
+    // Buy flow steps
+    if (step === "buy_budget") {
+      setData(phone, "budget", ["", "0-5M", "5-10M", "10-20M", "20M+"][num] || String(num));
+      setStep(phone, "buy_bedrooms");
+      await sock.sendMessage(jid, { text: `🛏️ *Bedrooms?*\n1️⃣ 2 bed\n2️⃣ 3 bed\n3️⃣ 4+ bed\n4️⃣ Any` });
+      return;
+    }
+    if (step === "buy_bedrooms") {
+      setData(phone, "bedrooms", ["", "2", "3", "4", "any"][num] || String(num));
+      await performSearch(sock, jid, phone);
+      return;
+    }
+    if (step === "sell_type") {
+      setData(phone, "sellType", ["", "House", "Flat", "Land", "Commercial"][num] || "House");
+      setStep(phone, "sell_location");
+      await sock.sendMessage(jid, { text: `📍 *Where is the property?*\n\nType the area/city name.\nExample: "GRA Kano" or "Nassarawa"` });
+      return;
+    }
   }
 
   // Text input routing
   switch (step) {
-    case "menu": await sock.sendMessage(jid,{text:WELCOME}); break;
-    case "buy_location": setData(phone,"location",text); setStep(phone,"buy_budget"); await sock.sendMessage(jid,{text:`💰 *Budget?*\n1️⃣ Under ₦5M\n2️⃣ ₦5M–₦10M\n3️⃣ ₦10M–₦20M\n4️⃣ ₦20M+\n5️⃣ Any`}); break;
-    case "buy_budget": setData(phone,"budget",text); setStep(phone,"buy_bedrooms"); await sock.sendMessage(jid,{text:`🛏️ *Bedrooms?*\n1️⃣ 2 bed\n2️⃣ 3 bed\n3️⃣ 4+ bed\n4️⃣ Any`}); break;
-    case "buy_bedrooms": setData(phone,"bedrooms",text); await performSearch(sock,jid,phone); break;
-    case "sell_location": setData(phone,"sellLocation",text); setStep(phone,"sell_price"); await sock.sendMessage(jid,{text:`💰 *Asking price?*\nType amount. Example: "15000000" for ₦15M`}); break;
-    case "sell_price": setData(phone,"sellPrice",text); setStep(phone,"menu"); await sock.sendMessage(jid,{text:`✅ *Details collected!*\n\nA representative will contact you within 24 hours.\n📞 +234 707 422 2284`}); break;
-    default: setStep(phone,"menu"); await sock.sendMessage(jid,{text:WELCOME});
+    case "menu":
+      await sock.sendMessage(jid, { text: WELCOME });
+      break;
+    case "buy_location":
+      setData(phone, "location", text);
+      setStep(phone, "buy_budget");
+      await sock.sendMessage(jid, { text: `💰 *Budget?*\n1️⃣ Under ₦5M\n2️⃣ ₦5M–₦10M\n3️⃣ ₦10M–₦20M\n4️⃣ ₦20M+\n5️⃣ Any` });
+      break;
+    case "buy_budget":
+      setData(phone, "budget", text);
+      setStep(phone, "buy_bedrooms");
+      await sock.sendMessage(jid, { text: `🛏️ *Bedrooms?*\n1️⃣ 2 bed\n2️⃣ 3 bed\n3️⃣ 4+ bed\n4️⃣ Any` });
+      break;
+    case "buy_bedrooms":
+      setData(phone, "bedrooms", text);
+      await performSearch(sock, jid, phone);
+      break;
+    case "sell_location":
+      setData(phone, "sellLocation", text);
+      setStep(phone, "sell_price");
+      await sock.sendMessage(jid, { text: `💰 *Asking price?*\nType amount. Example: "15000000" for ₦15M` });
+      break;
+    case "sell_price":
+      setData(phone, "sellPrice", text);
+      setStep(phone, "menu");
+      try {
+        fetch(`${API}/api/whatsapp/message`, {
+          method: "POST", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ phone, name, message: `[SELL REQUEST] ${getData(phone).sellType || "Property"} in ${getData(phone).sellLocation || "Kano"} - ₦${text}`, direction: "incoming", fromBot: false }),
+        }).catch(() => {});
+      } catch {}
+      await sock.sendMessage(jid, { text: `✅ *Property details collected!*\n\nA representative will contact you within 24 hours to verify and list your property.\n📞 +234 707 422 2284\n\nReply *menu* to continue.` });
+      break;
+    case "agent_info":
+      setStep(phone, "menu");
+      await sock.sendMessage(jid, { text: `🤝 *Become an MBPP Agent*\n\nApply here: https://mbpproperties.com/apply-as-agent\n\nOur team reviews applications within 48 hours.\n\nReply *menu* to continue.` });
+      break;
+    default:
+      setStep(phone, "menu");
+      await sock.sendMessage(jid, { text: WELCOME });
   }
 }
 
 function getStepForNumber(num: number): string {
-  const steps: Record<number, string> = { 1: "buy_location", 2: "buy_location", 3: "sell_type", 4: "agent_info" };
+  const steps: Record<number, string> = { 1: "buy_location", 2: "buy_location", 3: "sell_type", 4: "agent_info", 5: "menu" };
   return steps[num] || "menu";
 }
 
@@ -257,32 +471,49 @@ An agent will be with you shortly.`;
   }
 }
 
-// ============ DB Update Helpers (in-memory) ============
+// ============ Property Search ============
 async function performSearch(sock: any, jid: string, phone: string) {
   const data = getData(phone);
   const location = data.location || "Kano";
-  const budget = data.budget || "";
   const bedrooms = data.bedrooms || "";
 
   let query = `search=${encodeURIComponent(location)}&limit=3`;
-  if (bedrooms && bedrooms !== "4" && bedrooms !== "4+") query += `&minBeds=2`;
-  if (bedrooms === "3") query += "&minBeds=3";
+  if (bedrooms === "2") query += "&minBeds=2&maxBeds=2";
+  else if (bedrooms === "3") query += "&minBeds=3";
   else if (bedrooms === "4") query += "&minBeds=4";
 
   const result = await apiGet(`/api/listings?${query}`);
+
   if (!result || !result.listings || result.listings.length === 0) {
-    setStep(phone, "menu");
-    await sock.sendMessage(jid, { text: `🔍 *No properties found matching your criteria.*\n\nTry a different area or budget. Reply *menu* to start over.` });
+    setStep(phone, "custom_request");
+    await sock.sendMessage(jid, { text: `🔍 *No properties found* in ${location}.\n\n*We can find it for you!*\n\nReply *yes* to submit a custom search request.\nOur team will personally look for matching properties.\n\nOr reply *menu* to search again.` });
     return;
   }
 
-  let response = `🏠 *Found ${result.total || result.listings.length} properties:*\n\n`;
-  for (let i = 0; i < Math.min(3, result.listings.length); i++) {
-    response += formatListing(result.listings[i], i) + "\n";
+  const listings = result.listings.slice(0, 3);
+  setData(phone, "results", JSON.stringify(listings));
+  setStep(phone, "results");
+
+  let response = `🏠 *Found ${result.total || listings.length} properties:*\n\n`;
+  for (let i = 0; i < listings.length; i++) {
+    response += formatListing(listings[i], i) + "\n\n";
   }
-  response += `\n_Reply *menu* to search again._`;
-  setStep(phone, "menu");
+  response += RESULTS_MENU;
   await sock.sendMessage(jid, { text: response });
+
+  // Send first photo of each listing
+  for (let i = 0; i < listings.length; i++) {
+    const listing = listings[i];
+    if (listing.photos && listing.photos.length > 0) {
+      const photoUrl = listing.photos[0]?.url;
+      if (photoUrl) {
+        try {
+          const resolved = photoUrl.startsWith("http") ? photoUrl : `${API}/api/upload/file/${photoUrl}`;
+          await sock.sendMessage(jid, { image: { url: resolved }, caption: `${i + 1}. ${listing.title} — ${formatPrice(listing.price)}` });
+        } catch {}
+      }
+    }
+  }
 }
 
 // ============ Start ============
