@@ -24,7 +24,10 @@ export async function generateMetadata(): Promise<Metadata> {
     description: s.meta_description || "Find verified houses, land, flats and commercial properties for rent and sale in Kano, Nigeria. Gidan siyarwa Kano, gidan haya, property for sale, house for rent.",
     manifest: "/manifest.webmanifest",
     icons: {
-      icon: "/icons/favicon.svg",
+      icon: [
+        { url: "/favicon.png", type: "image/png" },
+        { url: "/icons/favicon.svg", type: "image/svg+xml" },
+      ],
       apple: "/icons/icon-192x192.png",
     },
     openGraph: {
