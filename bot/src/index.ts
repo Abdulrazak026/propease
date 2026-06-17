@@ -15,16 +15,38 @@ const logger = pino({ level: "info" });
 const msgCache = new NodeCache({ stdTTL: 60 });
 const API = CONFIG.apiUrl;
 
+// ============ In-Memory Session Store ============
+const sessions = new Map<string, { step: string; data: Record<string, string>; updatedAt: number }>();
+
+function getStep(phone: string): string {
+  const s = sessions.get(phone);
+  if (!s) return "menu";
+  // Expire sessions after 30 minutes
+  if (Date.now() - s.updatedAt > 30 * 60 * 1000) { sessions.delete(phone); return "menu"; }
+  return s.step;
+}
+
+function setStep(phone: string, step: string) {
+  const s = sessions.get(phone) || { step: "menu", data: {}, updatedAt: Date.now() };
+  s.step = step;
+  s.updatedAt = Date.now();
+  sessions.set(phone, s);
+}
+
+function setData(phone: string, key: string, value: string) {
+  const s = sessions.get(phone) || { step: "menu", data: {}, updatedAt: Date.now() };
+  s.data[key] = value;
+  s.updatedAt = Date.now();
+  sessions.set(phone, s);
+}
+
+function getData(phone: string): Record<string, string> {
+  return sessions.get(phone)?.data || {};
+}
+
 // ============ API Helpers ============
 async function apiGet(p: string): Promise<any> {
   try { const r = await fetch(`${API}${p}`); if (!r.ok) return null; return await r.json(); } catch { return null; }
-}
-
-async function apiPost(p: string, body: any): Promise<any> {
-  try {
-    const r = await fetch(`${API}${p}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
-    return { status: r.status, data: await r.json() };
-  } catch { return null; }
 }
 
 // ============ Format Helpers ============
@@ -97,6 +119,7 @@ async function startBot() {
 
   // === Message Handler ===
   sock.ev.on("messages.upsert", async (m) => {
+
     for (const msg of m.messages) {
       if (!msg.message || msg.key.fromMe || m.type !== "notify") continue;
       if (msg.message) msgCache.set(msg.key.id || msg.key.remoteJid + "_" + msg.key.id, msg.message);
@@ -110,10 +133,15 @@ async function startBot() {
 
       logger.info(`📩 ${sender}: ${text.substring(0, 80)}`);
 
-      // Save incoming message to DB
-      await saveMessage(phone, sender, text, "incoming");
+      // Try to save to DB (best effort, don't block)
+      try {
+        fetch(`${API}/api/whatsapp/message`, {
+          method: "POST", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ phone, name: sender, message: text.substring(0, 2000), direction: "incoming" }),
+        }).catch(() => {});
+      } catch {}
 
-      // Handle conversation flow
+      // Handle conversation flow using in-memory state
       await handleConversation(sock, jid, text, phone, sender);
     }
   });
@@ -122,33 +150,6 @@ async function startBot() {
   setInterval(() => processQueue(sock), 3000);
 
   return sock;
-}
-
-// ============ DB Helpers ============
-async function getSession(phone: string) {
-  try { const r = await fetch(`${API}/api/whatsapp/conversations/${phone}`); if (r.ok) return ((await r.json()) as any).conversation; } catch {}
-  return null;
-}
-
-async function createSession(phone: string, name: string) {
-  await apiPost("/api/whatsapp/send", { phone, name, message: "__create_session__" });
-}
-
-async function saveMessage(phone: string, name: string, message: string, direction: string) {
-  try {
-    const r = await fetch(`${API}/api/whatsapp/conversations/${phone}`);
-    if (!r.ok) { await createSession(phone, name); }
-
-    const res = await fetch(`${API}/api/whatsapp/message`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ phone, name, message: message.substring(0, 2000), direction, fromBot: false }),
-    });
-    const text = await res.text();
-    if (!res.ok) logger.warn(`Save message failed: ${res.status} ${text}`);
-  } catch (e: any) {
-    logger.warn(`Save message error: ${e?.message || e}`);
-  }
 }
 
 // ============ Queue Processor ============
@@ -173,135 +174,47 @@ async function processQueue(sock: any) {
 }
 
 // ============ Conversation Router ============
+// ============ Conversation Router (in-memory) ============
 async function handleConversation(sock: any, jid: string, text: string, phone: string, name: string) {
-  const t = text.trim();
+  const t = text.trim().toLowerCase();
   const num = t === "1" ? 1 : t === "2" ? 2 : t === "3" ? 3 : t === "4" ? 4 : t === "5" ? 5 : 0;
+  const step = getStep(phone);
 
-  // === Step 1: Main Menu ===
-  if (num >= 1 && num <= 5) {
-    await updateStep(phone, getStepForNumber(num));
-    await sock.sendMessage(jid, { text: getStepMessage(num, name) });
-    return;
-  }
-
-  // === Welcome triggers ===
-  if (["hi","hello","hey","menu","start","help"].includes(t.toLowerCase())) {
-    await updateStep(phone, "menu");
+  // Menu triggers — always reset
+  if (t === "hi" || t === "hello" || t === "hey" || t === "menu" || t === "start" || t === "help" || t === "back") {
+    setStep(phone, "menu");
     await sock.sendMessage(jid, { text: WELCOME });
     return;
   }
 
-  // === Talk to human ===
-  if (t.toLowerCase().includes("agent") || t.toLowerCase().includes("human") || t.toLowerCase().includes("support") || num === 5) {
-    await updateStep(phone, "awaiting_human");
-    await updateStatus(phone, "waiting");
-    await sock.sendMessage(jid, { text: `👤 *Connecting you with our team...*
-
-An agent will message you shortly.
-Or call now: +234 707 422 2284
-
-_Someone will get back to you within minutes._` });
+  // Human handoff
+  if (t.includes("agent") || t.includes("human") || t.includes("support") || num === 5) {
+    setStep(phone, "menu");
+    await sock.sendMessage(jid, { text: `👤 *Connecting you with our team...*\n\nAn agent will message you shortly.\n📞 Or call: +234 707 422 2284` });
     return;
   }
 
-  // === Get current session ===
-  const session = await getSession(phone);
-  const step = session?.step || "menu";
+  // Numeric responses depend on current step
+  if (num >= 1 && num <= 4) {
+    if (step === "menu") { setStep(phone, getStepForNumber(num)); await sock.sendMessage(jid, { text: getStepMessage(num, name) }); return; }
+    if (step === "buy_budget") { setData(phone, "budget", ["","0-5M","5-10M","10-20M","20M+"][num]||String(num)); setStep(phone,"buy_bedrooms"); await sock.sendMessage(jid,{text:`🛏️ *Bedrooms?*\n1️⃣ 2 bed\n2️⃣ 3 bed\n3️⃣ 4+ bed\n4️⃣ Any`}); return; }
+    if (step === "buy_bedrooms") { setData(phone,"bedrooms",["","2","3","4","any"][num]||String(num)); await performSearch(sock,jid,phone); return; }
+  }
 
-  // === Route based on step ===
+  // Text input routing
   switch (step) {
-    case "menu": await sock.sendMessage(jid, { text: WELCOME }); break;
-
-    case "buy_location":
-      await updateData(phone, "location", t);
-      await updateStep(phone, "buy_budget");
-      await sock.sendMessage(jid, { text: `💰 What's your budget?
-
-*1️⃣* Under ₦5M
-*2️⃣* ₦5M – ₦10M
-*3️⃣* ₦10M – ₦20M
-*4️⃣* ₦20M+
-*5️⃣* Any budget` }); break;
-
-    case "buy_budget":
-      await updateData(phone, "budget", t);
-      await updateStep(phone, "buy_bedrooms");
-      await sock.sendMessage(jid, { text: `🛏️ How many bedrooms?
-
-*1️⃣* 2 bed
-*2️⃣* 3 bed
-*3️⃣* 4+ bed
-*4️⃣* Any` }); break;
-
-    case "buy_bedrooms":
-      await updateData(phone, "bedrooms", t);
-      await performSearch(sock, jid, phone);
-      break;
-
-    case "sell_type":
-      await updateData(phone, "sellType", t);
-      await updateStep(phone, "sell_location");
-      await sock.sendMessage(jid, { text: `📍 Where is the property located?
-
-Just type the area/city name.
-Example: "GRA Kano" or "Nassarawa"` }); break;
-
-    case "sell_location":
-      await updateData(phone, "sellLocation", t);
-      await updateStep(phone, "sell_price");
-      await sock.sendMessage(jid, { text: `💰 What's the asking price?
-
-Just type the amount.
-Example: "15000000" for ₦15M` }); break;
-
-    case "sell_price":
-      await updateData(phone, "sellPrice", t);
-      await updateStep(phone, "sell_agent");
-      await sock.sendMessage(jid, { text: `👤 *Property details collected!*
-
-A representative will contact you within 24 hours to:
-• Verify the property
-• Take photos
-• List it on the platform
-
-📞 For faster service, call: +234 707 422 2284` });
-      await updateStatus(phone, "waiting");
-      break;
-
-    case "agent_info":
-      await updateStep(phone, "closed");
-      await sock.sendMessage(jid, { text: `🤝 *Become an MBPP Agent*
-
-Apply here: https://mbpproperties.com/apply-as-agent
-
-*Requirements:*
-• Valid ID (NIN, BVN, or Driver's License)
-• Proof of address
-• 2 professional references
-
-*What you get:*
-• Commission on every sale/rental
-• Access to verified property inventory
-• Marketing support
-• Payment within 7 days of deal closure
-
-Our team reviews applications within 48 hours.` }); break;
-
-    case "awaiting_human":
-      await sock.sendMessage(jid, { text: `⏳ *You're in the support queue.*
-
-Our team will respond shortly. Thank you for your patience.
-
-For urgent matters, call: +234 707 422 2284` }); break;
-
-    default:
-      await sock.sendMessage(jid, { text: WELCOME });
+    case "menu": await sock.sendMessage(jid,{text:WELCOME}); break;
+    case "buy_location": setData(phone,"location",text); setStep(phone,"buy_budget"); await sock.sendMessage(jid,{text:`💰 *Budget?*\n1️⃣ Under ₦5M\n2️⃣ ₦5M–₦10M\n3️⃣ ₦10M–₦20M\n4️⃣ ₦20M+\n5️⃣ Any`}); break;
+    case "buy_budget": setData(phone,"budget",text); setStep(phone,"buy_bedrooms"); await sock.sendMessage(jid,{text:`🛏️ *Bedrooms?*\n1️⃣ 2 bed\n2️⃣ 3 bed\n3️⃣ 4+ bed\n4️⃣ Any`}); break;
+    case "buy_bedrooms": setData(phone,"bedrooms",text); await performSearch(sock,jid,phone); break;
+    case "sell_location": setData(phone,"sellLocation",text); setStep(phone,"sell_price"); await sock.sendMessage(jid,{text:`💰 *Asking price?*\nType amount. Example: "15000000" for ₦15M`}); break;
+    case "sell_price": setData(phone,"sellPrice",text); setStep(phone,"menu"); await sock.sendMessage(jid,{text:`✅ *Details collected!*\n\nA representative will contact you within 24 hours.\n📞 +234 707 422 2284`}); break;
+    default: setStep(phone,"menu"); await sock.sendMessage(jid,{text:WELCOME});
   }
 }
 
-// ============ Step Helpers ============
 function getStepForNumber(num: number): string {
-  const steps: Record<number, string> = { 1: "buy_location", 2: "buy_location", 3: "sell_type", 4: "agent_info", 5: "awaiting_human" };
+  const steps: Record<number, string> = { 1: "buy_location", 2: "buy_location", 3: "sell_type", 4: "agent_info" };
   return steps[num] || "menu";
 }
 
@@ -344,62 +257,32 @@ An agent will be with you shortly.`;
   }
 }
 
-// ============ DB Update Helpers ============
-async function updateStep(phone: string, step: string) {
-  try {
-    await fetch(`${API}/api/whatsapp/conversations/${phone}/status`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ step, status: step === "awaiting_human" ? "waiting" : "active" }),
-    }).catch(() => {});
-  } catch {}
-}
-
-async function updateData(phone: string, key: string, value: string) {
-  try {
-    await fetch(`${API}/api/whatsapp/conversations/${phone}/data`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ key, value }),
-    }).catch(() => {});
-  } catch {}
-}
-
-async function updateStatus(phone: string, status: string) {
-  try {
-    await fetch(`${API}/api/whatsapp/conversations/${phone}/status`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ status }),
-    }).catch(() => {});
-  } catch {}
-}
-
+// ============ DB Update Helpers (in-memory) ============
 async function performSearch(sock: any, jid: string, phone: string) {
-  const session = await getSession(phone);
-  const location = session?.data?.location || "Kano";
-  const budget = session?.data?.budget || "";
-  const bedrooms = session?.data?.bedrooms || "";
+  const data = getData(phone);
+  const location = data.location || "Kano";
+  const budget = data.budget || "";
+  const bedrooms = data.bedrooms || "";
 
-  let query = `search=${encodeURIComponent(location)}`;
-  if (bedrooms && bedrooms !== "4") query += `&minBeds=${bedrooms}`;
-  if (budget === "1") query += "&maxPrice=5000000";
-  else if (budget === "2") { query += "&minPrice=5000000&maxPrice=10000000"; }
+  let query = `search=${encodeURIComponent(location)}&limit=3`;
+  if (bedrooms && bedrooms !== "4" && bedrooms !== "4+") query += `&minBeds=2`;
+  if (bedrooms === "3") query += "&minBeds=3";
+  else if (bedrooms === "4") query += "&minBeds=4";
 
-  const data = await apiGet(`/api/listings?${query}&limit=3`);
-  if (!data || !data.listings || data.listings.length === 0) {
-    await sock.sendMessage(jid, { text: `🔍 No properties found.\n\nTry a different area or budget. Reply *menu* to start over.` });
-    await updateStep(phone, "menu");
+  const result = await apiGet(`/api/listings?${query}`);
+  if (!result || !result.listings || result.listings.length === 0) {
+    setStep(phone, "menu");
+    await sock.sendMessage(jid, { text: `🔍 *No properties found matching your criteria.*\n\nTry a different area or budget. Reply *menu* to start over.` });
     return;
   }
 
-  let response = `🏠 Found *${data.total || data.listings.length}* properties:\n\n`;
-  for (let i = 0; i < Math.min(3, data.listings.length); i++) {
-    response += formatListing(data.listings[i], i) + "\n";
+  let response = `🏠 *Found ${result.total || result.listings.length} properties:*\n\n`;
+  for (let i = 0; i < Math.min(3, result.listings.length); i++) {
+    response += formatListing(result.listings[i], i) + "\n";
   }
-  response += `\n_Reply *1*, *2*, or *3* for details, or *menu* to start over._`;
+  response += `\n_Reply *menu* to search again._`;
+  setStep(phone, "menu");
   await sock.sendMessage(jid, { text: response });
-  await updateStep(phone, "menu");
 }
 
 // ============ Start ============
