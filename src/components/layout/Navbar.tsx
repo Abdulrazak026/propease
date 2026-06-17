@@ -120,8 +120,8 @@ export default function Navbar() {
         scrolled ? "border-gray-200" : "border-transparent"
       } ${hidden ? "-translate-y-full" : "translate-y-0"}`}
     >
-      <Link href="/" className="flex items-center gap-2 min-w-0">
-        <img src={siteLogo || `https://mbpproperties.com/api/upload/file/7ea15ec8-11b2-4c34-a855-1469d56656a5.png`} alt={siteName} className="h-8 w-auto rounded object-contain shrink-0" />
+      <Link href="/" className="flex items-center gap-2 min-w-0 flex-shrink">
+        <img src={siteLogo || `https://mbpproperties.com/api/upload/file/7ea15ec8-11b2-4c34-a855-1469d56656a5.png`} alt={siteName} className="h-12 max-h-12 w-auto min-w-[35%] rounded object-contain shrink-0" />
         <div className="hidden xs:block min-w-0">
           <p className="text-[10px] font-bold text-gray-900 leading-tight truncate">MUTUAL BENEFIT PREMIER</p>
           <p className="text-[8px] text-gray-400 leading-tight tracking-wider">PROPERTIES LTD</p>

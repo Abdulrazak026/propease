@@ -10,12 +10,10 @@ export interface NavItem {
 export const dashboardNav: Record<string, NavItem[]> = {
   admin: [
     { label: "Dashboard", href: "/admin", icon: "dashboard", group: "Main" },
-    { label: "Analytics", href: "/admin/analytics", icon: "dashboard", group: "Main" },
     { label: "Users", href: "/admin/users", icon: "users", permission: "canManageUsers", group: "Main" },
     { label: "Staffs", href: "/admin/staffs", icon: "tasks", permission: "canManageUsers", group: "Main" },
     { label: "Listings", href: "/admin/outsourcing", icon: "post-listing", group: "Main" },
     { label: "Submissions", href: "/admin/submissions", icon: "inquiries", group: "Inbox" },
-    { label: "Leads", href: "/admin/leads", icon: "leads", group: "Inbox" },
     { label: "Inquiries", href: "/admin/crm", icon: "messages", group: "Inbox" },
     { label: "Tasks", href: "/admin/tasks", icon: "tasks", badge: "tasks", permission: "canCreateTasks", group: "Operations" },
     { label: "Applications", href: "/admin/applications", icon: "applications", group: "Operations" },
