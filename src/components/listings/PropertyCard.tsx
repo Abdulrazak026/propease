@@ -40,11 +40,8 @@ export default function PropertyCard({ listing }: PropertyCardProps) {
         <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
 
         <div className="absolute top-2 left-2 flex flex-wrap gap-1.5">
-          <Badge variant={listing.status === "available" ? "success" : listing.status === "reserved" ? "warning" : "default"}>
-            {listing.status}
-          </Badge>
-          <span className={`px-2 py-0.5 text-[11px] font-bold rounded-full ${forRent ? "bg-blue-600 text-white" : "bg-emerald-600 text-white"}`}>
-            {forRent ? "FOR RENT" : "FOR SALE"}
+          <span className="px-2 py-0.5 text-[11px] font-bold rounded-full bg-emerald-600 text-white">
+            {listing.status === "available" ? (forRent ? "Available for Rent" : "Available for Sale") : listing.status === "reserved" ? "Reserved" : listing.status === "sold" ? "Sold" : listing.status}
           </span>
           {listing.category === "partnership" && <Badge variant="info">Partner</Badge>}
           {listing.postedBy?.isVerified && <VerifiedBadge />}
