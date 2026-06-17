@@ -6,9 +6,10 @@ import * as fs from "fs";
 const router = Router();
 
 // Save incoming/outgoing message (called by bot)
-router.post("/message", async (req: { body: { phone: string; name?: string; message: string; direction: string; fromBot?: boolean; senderName?: string } }, res: Response) => {
+router.post("/message", async (req: { body: any }, res: Response) => {
   try {
     const { phone, name, message, direction, fromBot, senderName } = req.body;
+    console.log("WA MSG body:", JSON.stringify(req.body));
     if (!phone || !message) return res.status(400).json({ error: "Phone and message required" });
 
     // Find or create conversation
