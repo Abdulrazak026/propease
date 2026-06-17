@@ -8,7 +8,6 @@ import { Boom } from "@hapi/boom";
 import NodeCache from "node-cache";
 import pino from "pino";
 import * as fs from "fs";
-import * as path from "path";
 import { CONFIG } from "./config";
 
 const logger = pino({ level: "info" });
@@ -86,8 +85,6 @@ Welcome! What are you looking for?
 *5️⃣* Talk to support
 
 _Just reply with a number._`;
-
-const RESULTS_MENU = `\n_Reply *1-3* for details, *yes* to submit a custom request, or *menu* to search again._`;
 
 const CUSTOM_REQUEST_PROMPT = `📝 *Custom Search Request*
 
@@ -476,11 +473,18 @@ async function performSearch(sock: any, jid: string, phone: string) {
   const data = getData(phone);
   const location = data.location || "Kano";
   const bedrooms = data.bedrooms || "";
+  const budget = data.budget || "";
 
   let query = `search=${encodeURIComponent(location)}&limit=3`;
   if (bedrooms === "2") query += "&minBeds=2&maxBeds=2";
   else if (bedrooms === "3") query += "&minBeds=3";
   else if (bedrooms === "4") query += "&minBeds=4";
+
+  // Apply budget filter
+  if (budget === "0-5M") query += "&maxPrice=5000000";
+  else if (budget === "5-10M") query += "&minPrice=5000000&maxPrice=10000000";
+  else if (budget === "10-20M") query += "&minPrice=10000000&maxPrice=20000000";
+  else if (budget === "20M+") query += "&minPrice=20000000";
 
   const result = await apiGet(`/api/listings?${query}`);
 
@@ -491,24 +495,34 @@ async function performSearch(sock: any, jid: string, phone: string) {
   }
 
   const listings = result.listings.slice(0, 3);
+  const count = listings.length;
   setData(phone, "results", JSON.stringify(listings));
   setStep(phone, "results");
 
-  let response = `🏠 *Found ${result.total || listings.length} properties:*\n\n`;
-  for (let i = 0; i < listings.length; i++) {
+  let response = `🏠 *Found ${result.total || count} properties:*\n\n`;
+  for (let i = 0; i < count; i++) {
     response += formatListing(listings[i], i) + "\n\n";
   }
-  response += RESULTS_MENU;
+  if (count === 1) {
+    response += `_Reply *1* for details, *yes* for a custom request, or *menu* to search again._`;
+  } else {
+    response += `_Reply *1-${count}* for details, *yes* for a custom request, or *menu* to search again._`;
+  }
   await sock.sendMessage(jid, { text: response });
 
   // Send first photo of each listing
-  for (let i = 0; i < listings.length; i++) {
+  for (let i = 0; i < count; i++) {
     const listing = listings[i];
     if (listing.photos && listing.photos.length > 0) {
       const photoUrl = listing.photos[0]?.url;
       if (photoUrl) {
         try {
-          const resolved = photoUrl.startsWith("http") ? photoUrl : `${API}/api/upload/file/${photoUrl}`;
+          // Try local VPS first, then Railway as fallback
+          let resolved = photoUrl.startsWith("http") ? photoUrl : `https://mbpproperties.com/uploads/${photoUrl}`;
+          const res = await fetch(resolved, { method: "HEAD" });
+          if (!res.ok && !photoUrl.startsWith("http")) {
+            resolved = `https://propease-production.up.railway.app/api/upload/file/${photoUrl}`;
+          }
           await sock.sendMessage(jid, { image: { url: resolved }, caption: `${i + 1}. ${listing.title} — ${formatPrice(listing.price)}` });
         } catch {}
       }
