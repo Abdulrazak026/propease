@@ -25,10 +25,14 @@ export async function generateMetadata(): Promise<Metadata> {
     manifest: "/manifest.webmanifest",
     icons: {
       icon: [
-        { url: "/favicon.png", type: "image/png" },
+        { url: "/favicon.png", type: "image/png", sizes: "32x32" },
         { url: "/icons/favicon.svg", type: "image/svg+xml" },
+        { url: "/favicon-192.png", type: "image/png", sizes: "192x192" },
       ],
-      apple: "/icons/icon-192x192.png",
+      apple: "/apple-touch-icon.png",
+      other: [
+        { rel: "mask-icon", url: "/icons/favicon.svg", color: "#059669" },
+      ],
     },
     openGraph: {
       title: s.meta_title || "MBPP",
