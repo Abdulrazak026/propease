@@ -80,8 +80,12 @@ export default function AdminTasksPage() {
   };
 
   const updateOrderStatus = async (id: string, status: string) => {
-    await api.patch(`/api/custom-orders/${id}/status`, { status });
-    setOrders(prev => prev.map(o => o.id === id ? { ...o, status } : o));
+    try {
+      await api.patch(`/api/custom-orders/${id}/status`, { status });
+      setOrders(prev => prev.map(o => o.id === id ? { ...o, status } : o));
+    } catch (e) {
+      console.error("Failed to update order status:", e);
+    }
   };
 
   const grouped = {
