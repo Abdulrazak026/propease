@@ -1,6 +1,7 @@
 import { Router, Response, json } from "express";
 import prisma from "../lib/prisma";
 import { authenticate, AuthRequest } from "../middleware/auth";
+import { logger } from "../lib/logger";
 import * as fs from "fs";
 
 const router = Router();

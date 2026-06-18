@@ -56,7 +56,7 @@ async function sendMessage(to: string, message: any): Promise<SendMessageResult>
       }),
     });
 
-    const data = await res.json();
+    const data: any = await res.json();
 
     if (!res.ok) {
       logger.error({ error: data }, "WhatsApp API send failed");
