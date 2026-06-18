@@ -5,6 +5,7 @@ import { api } from "@/lib/api-client";
 import Button from "@/components/ui/Button";
 import Badge from "@/components/ui/Badge";
 import { usePermissions } from "@/lib/use-permissions";
+import ShareOrderModal from "@/components/admin/ShareOrderModal";
 
 interface AdminTask { id: string; title: string; description: string; propertyType: string; area: string; budget: number; deadline: string; status: string; createdAt: string; createdBy: { id: string; name: string }; assignedTo: { id: string; name: string }; }
 interface Agent { id: string; name: string; email: string; role: string; isApproved: boolean; }
@@ -36,6 +37,7 @@ export default function AdminTasksPage() {
   const [agents, setAgents] = useState<Agent[]>([]);
   const [form, setForm] = useState({ title: "", description: "", area: "Kano Municipal", propertyType: "flat", budget: "", deadline: "", assignedToId: "" });
   const [saving, setSaving] = useState(false);
+  const [shareOrderId, setShareOrderId] = useState<string | null>(null);
 
   const load = () => {
     setLoading(true);
@@ -246,13 +248,25 @@ export default function AdminTasksPage() {
                   </div>
                 )}
                 <div className="flex gap-2">
-                  <Button size="sm" variant="ghost" onClick={() => updateOrderStatus(o.id, "completed")}>Mark Complete</Button>
-                  <Button size="sm" variant="danger" onClick={() => updateOrderStatus(o.id, "cancelled")}>Cancel</Button>
+                  <button onClick={() => setShareOrderId(o.id)} className="px-3 py-1.5 text-xs font-medium text-white bg-[var(--color-primary)] rounded-lg hover:opacity-90 transition-opacity">
+                    Share to Agents
+                  </button>
+                  <button onClick={() => updateOrderStatus(o.id, "cancelled")} className="px-3 py-1.5 text-xs font-medium text-red-600 border border-red-200 rounded-lg hover:bg-red-50 transition-colors">
+                    Cancel
+                  </button>
                 </div>
               </div>
             ))}
           </div>
         )
+      )}
+      {/* Share Order Modal */}
+      {shareOrderId && (
+        <ShareOrderModal
+          orderId={shareOrderId}
+          onClose={() => setShareOrderId(null)}
+          onShared={load}
+        />
       )}
     </div>
   );
