@@ -64,10 +64,33 @@ ${item.features && item.features.length > 0 ? `⚡ *Features:* ${Array.isArray(i
 👤 *Agent:* ${item.postedBy?.name || "MBPP Team"}`;
 }
 
+// ============ Send Message + Save to DB ============
+async function saveBotMessage(phone: string, text: string) {
+  try {
+    await fetch(`${API}/api/whatsapp/message`, {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ phone, name: "MBPP Bot", message: text, direction: "outgoing", fromBot: true }),
+    }).catch(() => {});
+  } catch {}
+}
+
+// Wrapper for sendText that also saves to DB
+async function sendTextAndSave(to: string, text: string) {
+  await sendText(to, text);
+  await saveBotMessage(to, text.substring(0, 2000));
+}
+
+// Wrapper for sendButtons that also saves to DB
+async function sendButtonsAndSave(to: string, text: string, buttons: any[]) {
+  await sendButtons(to, text, buttons);
+  const buttonText = buttons.map(b => b.title).join(" | ");
+  await saveBotMessage(to, `[Buttons] ${text}\n${buttonText}`);
+}
+
 // ============ Main Menu (with buttons) ============
 
 async function sendMainMenu(to: string) {
-  await sendButtons(to,
+  await sendButtonsAndSave(to,
     "🏠 Welcome to MBPP Properties!\n\nWhat are you looking for?",
     [
       { id: "buy", title: "🏠 Buy Property" },
@@ -91,7 +114,7 @@ async function sendMoreOptions(to: string) {
 // ============ Budget Selector (with buttons) ============
 
 async function sendBudgetSelector(to: string) {
-  await sendButtons(to,
+  await sendButtonsAndSave(to,
     "💰 What's your budget?",
     [
       { id: "budget_0_5m", title: "Under ₦5M" },
@@ -104,7 +127,7 @@ async function sendBudgetSelector(to: string) {
 // ============ Bedroom Selector (with buttons) ============
 
 async function sendBedroomSelector(to: string) {
-  await sendButtons(to,
+  await sendButtonsAndSave(to,
     "🛏️ How many bedrooms?",
     [
       { id: "beds_2", title: "2 Bedrooms" },
@@ -117,7 +140,7 @@ async function sendBedroomSelector(to: string) {
 // ============ Sell Type Selector (with buttons) ============
 
 async function sendSellTypeSelector(to: string) {
-  await sendButtons(to,
+  await sendButtonsAndSave(to,
     "💰 What type of property?",
     [
       { id: "sell_house", title: "🏠 House" },
@@ -130,7 +153,7 @@ async function sendSellTypeSelector(to: string) {
 // ============ Detail Actions (with buttons) ============
 
 async function sendDetailActions(to: string) {
-  await sendButtons(to,
+  await sendButtonsAndSave(to,
     "What would you like to do?",
     [
       { id: "view", title: "📅 Schedule Viewing" },
@@ -188,12 +211,12 @@ export async function handleWhatsAppMessage(
   if (step === "menu") {
     if (num === 1 || t === "buy") {
       setStep(phone, "buy_location");
-      await sendText(to, "🏠 *Find a Property to Buy*\n\nWhich area are you interested in?\nExamples: \"GRA Kano\", \"Nassarawa\", \"Tarauni\"\n\n_Type the area name._");
+      await sendTextAndSave(to, "🏠 *Find a Property to Buy*\n\nWhich area are you interested in?\nExamples: \"GRA Kano\", \"Nassarawa\", \"Tarauni\"\n\n_Type the area name._");
       return;
     }
     if (num === 2 || t === "rent") {
       setStep(phone, "buy_location");
-      await sendText(to, "🏡 *Find a Property to Rent*\n\nWhich area are you interested in?\nExamples: \"GRA Kano\", \"Nassarawa\", \"Tarauni\"\n\n_Type the area name._");
+      await sendTextAndSave(to, "🏡 *Find a Property to Rent*\n\nWhich area are you interested in?\nExamples: \"GRA Kano\", \"Nassarawa\", \"Tarauni\"\n\n_Type the area name._");
       return;
     }
     if (num === 3 || t === "sell") {
@@ -203,7 +226,7 @@ export async function handleWhatsAppMessage(
     }
     if (num === 4 || t === "agent") {
       setStep(phone, "menu");
-      await sendText(to, "🤝 *Become an MBPP Agent*\n\nApply here: https://mbpproperties.com/apply-as-agent\n\nReviewed within 48 hours.");
+      await sendTextAndSave(to, "🤝 *Become an MBPP Agent*\n\nApply here: https://mbpproperties.com/apply-as-agent\n\nReviewed within 48 hours.");
       return;
     }
     if (num === 5 || t === "support") {
