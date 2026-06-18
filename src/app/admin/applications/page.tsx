@@ -50,8 +50,6 @@ export default function AdminApplicationsPage() {
   const filtered = filter === "all" ? apps : apps.filter(a => a.status === filter);
   const counts = {
     all: apps.length,
-    submitted: apps.filter(a => a.status === "submitted").length,
-    under_review: apps.filter(a => a.status === "under_review").length,
     approved: apps.filter(a => a.status === "approved").length,
     rejected: apps.filter(a => a.status === "rejected").length,
   };
@@ -66,7 +64,7 @@ export default function AdminApplicationsPage() {
       </div>
 
       <div className="flex gap-2 flex-wrap">
-        {[["all", `All (${counts.all})`], ["submitted", `Submitted (${counts.submitted})`], ["under_review", `Under Review (${counts.under_review})`], ["approved", `Approved (${counts.approved})`], ["rejected", `Rejected (${counts.rejected})`]].map(([v, l]) => (
+        {[["all", `All (${counts.all})`], ["approved", `Approved (${counts.approved})`], ["rejected", `Rejected (${counts.rejected})`]].map(([v, l]) => (
           <button key={v} onClick={() => setFilter(v!)} className={`px-3 py-1.5 text-xs font-medium rounded-lg border transition-all ${filter === v ? "bg-[var(--color-primary)] text-white border-[var(--color-primary)]" : "bg-white text-gray-600 border-gray-200 hover:border-gray-300"}`}>{l}</button>
         ))}
       </div>
