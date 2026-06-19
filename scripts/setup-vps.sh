@@ -93,6 +93,9 @@ info "Setting up database..."
 su - postgres -c "psql -tc \"SELECT 1 FROM pg_user WHERE usename='mbpp_user'\"" | grep -q 1 || \
     su - postgres -c "psql -c \"CREATE USER mbpp_user WITH PASSWORD 'Mbpp2026!Secure';\""
 
+# Force SCRAM-SHA-256 even if user already existed with md5
+su - postgres -c "psql -c \"ALTER USER mbpp_user WITH PASSWORD 'Mbpp2026!Secure';\""
+
 su - postgres -c "psql -tc \"SELECT 1 FROM pg_database WHERE datname='propease'\"" | grep -q 1 || \
     su - postgres -c "psql -c \"CREATE DATABASE propease OWNER mbpp_user;\""
 

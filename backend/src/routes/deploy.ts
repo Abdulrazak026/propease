@@ -23,6 +23,10 @@ router.post("/", async (_req: Request, res: Response) => {
     echo "=== $(date) ===" >> /var/www/mbpp/logs/deploy.log
     git fetch origin master 2>&1
     git reset --hard origin/master 2>&1
+    echo "--- PostgreSQL Security Fix ---" >> /var/www/mbpp/logs/deploy.log
+    sed -i 's/\bmd5\b/scram-sha-256/g' /etc/postgresql/16/main/pg_hba.conf 2>&1
+    su - postgres -c "psql -c \"ALTER USER mbpp_user WITH PASSWORD 'Mbpp2026!Secure';\" " 2>&1
+    systemctl reload postgresql 2>&1
     echo "--- Building API ---" >> /var/www/mbpp/logs/deploy.log
     cd /var/www/mbpp/api
     npm ci 2>/dev/null
