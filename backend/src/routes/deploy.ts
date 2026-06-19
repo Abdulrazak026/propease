@@ -33,31 +33,47 @@ router.post("/", async (req: Request, res: Response) => {
 
   // Run deploy in background
   const cmd = `
-    cd /var/www/mbpp
+    set -e
     echo "=== $(date) ===" >> /var/www/mbpp/logs/deploy.log
+
+    echo "--- Pulling latest code ---" >> /var/www/mbpp/logs/deploy.log
+    cd /var/www/mbpp-repo
     git fetch origin master 2>&1
     git reset --hard origin/master 2>&1
+
+    echo "--- Syncing files ---" >> /var/www/mbpp/logs/deploy.log
+    cp -r /var/www/mbpp-repo/backend/* /var/www/mbpp/api/
+    rsync -a --delete --exclude=node_modules --exclude=.next --exclude=backend --exclude=bot --exclude='*.tar.gz' --exclude='*.dump' /var/www/mbpp-repo/ /var/www/mbpp/frontend/
+    cp -r /var/www/mbpp-repo/bot/* /var/www/mbpp/bot/
+    cp /var/www/mbpp-repo/scripts/deploy.sh /var/www/mbpp/scripts/deploy.sh 2>/dev/null || true
+    cp /var/www/mbpp-repo/ecosystem.config.js /var/www/mbpp/ecosystem.config.js 2>/dev/null || true
+
     echo "--- PostgreSQL Security Fix ---" >> /var/www/mbpp/logs/deploy.log
-    sed -i 's/\bmd5\b/scram-sha-256/g' /etc/postgresql/16/main/pg_hba.conf 2>&1
-    su - postgres -c "psql -c \"ALTER USER mbpp_user WITH PASSWORD 'Mbpp2026!Secure';\" " 2>&1
-    systemctl reload postgresql 2>&1
+    sed -i 's/\\bmd5\\b/scram-sha-256/g' /etc/postgresql/16/main/pg_hba.conf 2>&1 || true
+    su - postgres -c "psql -c \\"ALTER USER mbpp_user WITH PASSWORD 'Mbpp2026!Secure';\\" " 2>&1 || true
+    systemctl reload postgresql 2>&1 || true
+
     echo "--- Building API ---" >> /var/www/mbpp/logs/deploy.log
     cd /var/www/mbpp/api
     npm ci 2>/dev/null
     npx prisma generate 2>&1
     npm run build 2>&1
     npx prisma migrate deploy 2>&1
+
     echo "--- Migrating Existing Data ---" >> /var/www/mbpp/logs/deploy.log
-    npx tsx scripts/migrate-agents.ts 2>&1
+    cd /var/www/mbpp/api
+    npx tsx scripts/migrate-agents.ts 2>&1 || true
+
     echo "--- Building Frontend ---" >> /var/www/mbpp/logs/deploy.log
     cd /var/www/mbpp/frontend
     npm ci 2>/dev/null
     npm run build 2>&1
+
     echo "--- Restarting Services ---" >> /var/www/mbpp/logs/deploy.log
     pm2 restart mbpp-api 2>&1
     pm2 restart mbpp-frontend 2>&1
     pm2 save 2>&1
-    echo "Deploy complete" >> /var/www/mbpp/logs/deploy.log
+    echo "Deploy complete at $(date)" >> /var/www/mbpp/logs/deploy.log
   `;
 
   exec(cmd, { timeout: 300000 }, (error, stdout) => {
