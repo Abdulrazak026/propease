@@ -15,12 +15,16 @@ export default function AgentInquiriesPage() {
   const [loadingConv, setLoadingConv] = useState(false);
   const [replyText, setReplyText] = useState("");
   const [sending, setSending] = useState(false);
+  const [myId, setMyId] = useState<string>("");
 
   useEffect(() => {
     api.get<{ inquiries: Inquiry[] }>("/api/inquiries/my").then(r => {
       if (r.data?.inquiries) setInquiries(r.data.inquiries);
       setLoading(false);
     }).catch(() => setLoading(false));
+    api.get<any>("/api/auth/me").then(r => {
+      if (r.data?.user?.id) setMyId(r.data.user.id);
+    }).catch(() => {});
   }, []);
 
   const openInquiry = async (i: Inquiry) => {
@@ -67,46 +71,57 @@ export default function AgentInquiriesPage() {
     } catch {}
   };
 
+  const isMyMessage = (msg: Message) => msg.senderId === "me" || (myId && msg.senderId === myId);
+
   if (loading) return <div className="flex items-center justify-center h-64"><div className="h-8 w-8 border-2 border-[var(--color-primary)] border-t-transparent rounded-full animate-spin" /></div>;
 
   if (selected) {
     return (
-      <div className="space-y-6">
-        <div className="flex items-center gap-3">
-          <button onClick={() => setSelected(null)} className="text-gray-400 hover:text-[var(--color-primary)]"><svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg></button>
+      <div className="min-h-[80vh] flex flex-col">
+        <div className="flex items-center gap-3 mb-4">
+          <button onClick={() => setSelected(null)} className="text-gray-400 hover:text-[var(--color-primary)] p-1"><svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg></button>
           <div className="min-w-0 flex-1">
-            <h1 className="text-xl font-bold text-gray-900 truncate">{selected.clientName}</h1>
-            <p className="text-xs text-gray-500 truncate">{selected.clientContact} — {selected.listing?.title || ""}</p>
+            <h1 className="text-lg font-bold text-gray-900">{selected.clientName}</h1>
+            <p className="text-xs text-gray-500">{selected.clientContact} — {selected.listing?.title || ""}</p>
           </div>
           <Badge variant={selected.status === "new" ? "warning" : selected.status === "responded" ? "success" : "default"}>{selected.status}</Badge>
         </div>
 
-        <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-4">
-          <div className="bg-gray-50 rounded-lg p-4 border border-gray-100">
-            <p className="text-xs text-gray-400 mb-1">Initial Inquiry</p>
-            <p className="text-sm text-gray-700">{selected.message}</p>
-            <p className="text-xs text-gray-400 mt-2">{new Date(selected.createdAt).toLocaleString()}</p>
+        <div className="flex-1 space-y-4 overflow-y-auto pb-4">
+          <div className="bg-amber-50 rounded-xl border border-amber-200 p-4">
+            <div className="flex items-center gap-2 mb-2">
+              <div className="w-6 h-6 rounded-full bg-amber-400 flex items-center justify-center text-white text-xs font-bold">{selected.clientName?.charAt(0) || "C"}</div>
+              <span className="text-xs font-semibold text-amber-700">{selected.clientName} — Client</span>
+              <span className="text-xs text-amber-500">{new Date(selected.createdAt).toLocaleString()}</span>
+            </div>
+            <p className="text-sm text-gray-800 leading-relaxed">{selected.message}</p>
           </div>
 
-          <div className="space-y-3 min-h-[120px]">
-            {loadingConv ? (
-              <div className="flex items-center justify-center py-8"><div className="w-6 h-6 border-2 border-[var(--color-primary)] border-t-transparent rounded-full animate-spin" /></div>
-            ) : conversation.length === 0 ? (
-              <div className="text-center py-8 text-sm text-gray-400">No replies yet</div>
-            ) : (
-              conversation.map(msg => (
-                <div key={msg.id} className={`flex ${msg.senderId === "me" ? "justify-end" : "justify-start"}`}>
-                  <div className={`max-w-[80%] px-4 py-2.5 text-sm leading-relaxed rounded-2xl ${msg.senderId === "me" ? "bg-[var(--color-primary)] text-white rounded-br-md" : "bg-white border border-gray-100 text-gray-900 rounded-bl-md"}`}>
-                    <p>{msg.content}</p>
-                    <p className={`text-xs mt-1 ${msg.senderId === "me" ? "text-emerald-200" : "text-gray-400"}`}>{new Date(msg.createdAt).toLocaleTimeString()}</p>
+          {loadingConv ? (
+            <div className="flex items-center justify-center py-8"><div className="w-6 h-6 border-2 border-[var(--color-primary)] border-t-transparent rounded-full animate-spin" /></div>
+          ) : conversation.length === 0 ? (
+            <div className="text-center py-6 text-sm text-gray-400">No replies yet. Type below to respond.</div>
+          ) : (
+            <div className="space-y-3">
+              <p className="text-xs text-gray-400 text-center">— Conversation —</p>
+              {conversation.map(msg => {
+                const mine = isMyMessage(msg);
+                const senderName = mine ? "You" : (msg.sender?.name || selected.clientName);
+                return (
+                  <div key={msg.id} className={`flex flex-col ${mine ? "items-end" : "items-start"}`}>
+                    <span className={`text-xs font-medium mb-1 px-1 ${mine ? "text-[var(--color-primary)]" : "text-amber-600"}`}>{senderName}</span>
+                    <div className={`max-w-[85%] px-4 py-3 text-sm leading-relaxed rounded-2xl ${mine ? "bg-[var(--color-primary)] text-white rounded-br-md" : "bg-amber-50 border border-amber-200 text-gray-900 rounded-bl-md"}`}>
+                      {msg.content}
+                    </div>
+                    <span className="text-xs text-gray-400 mt-1 px-1">{new Date(msg.createdAt).toLocaleTimeString()}</span>
                   </div>
-                </div>
-              ))
-            )}
-          </div>
+                );
+              })}
+            </div>
+          )}
         </div>
 
-        <div className="bg-white rounded-xl border border-gray-200 p-4 space-y-3">
+        <div className="border-t border-gray-200 pt-4 space-y-3 bg-white">
           <div className="flex items-center gap-2">
             {selected.status !== "read" && <button onClick={() => updateStatus("read")} className="text-xs px-3 py-1.5 rounded-full bg-gray-100 text-gray-600 hover:bg-gray-200">Mark Read</button>}
             {selected.status !== "responded" && <button onClick={() => updateStatus("responded")} className="text-xs px-3 py-1.5 rounded-full bg-gray-100 text-gray-600 hover:bg-gray-200">Mark Responded</button>}
