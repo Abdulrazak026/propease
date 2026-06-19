@@ -421,8 +421,97 @@ async function seedAuditLogs() {
   console.log(`Seeded ${logs.length} audit logs`);
 }
 
+async function seedInquiries() {
+  let agent = await prisma.user.findFirst({ where: { email: "agent@mbpproperties.com" } });
+  if (!agent) {
+    const password = await bcrypt.hash("password123", 12);
+    agent = await prisma.user.create({
+      data: {
+        name: "Agent Sani", email: "agent@mbpproperties.com", password, role: "agent", isApproved: true,
+      },
+    });
+    console.log("Created agent: agent@mbpproperties.com / password123");
+  }
+
+  const listings = await prisma.listing.findMany({ take: 4, orderBy: { createdAt: "desc" } });
+  for (const l of listings) {
+    if (!l.assignedAgentId) {
+      await prisma.listing.update({ where: { id: l.id }, data: { assignedAgentId: agent.id } });
+    }
+  }
+
+  const existingCount = await prisma.inquiry.count();
+  if (existingCount > 0) return;
+
+  const sampleInquiries = [
+    { clientName: "Aisha Bello", clientContact: "aisha.bello@email.com", message: "I am interested in this property. Is it still available? I would like to schedule a viewing this weekend.", listingIndex: 0 },
+    { clientName: "Musa Ibrahim", clientContact: "musa.i@email.com", message: "Please send me more details including the exact location and any additional fees involved.", listingIndex: 1 },
+    { clientName: "Fatima Umar", clientContact: "fatima.umar@email.com", message: "Hello, I would like to know if the rent price is negotiable and what documents are required.", listingIndex: 2 },
+  ];
+
+  let created = 0;
+  for (const data of sampleInquiries) {
+    const listing = listings[data.listingIndex];
+    if (!listing) continue;
+    await prisma.inquiry.create({
+      data: {
+        clientName: data.clientName,
+        clientContact: data.clientContact,
+        message: data.message,
+        listingId: listing.id,
+        assignedAgentId: agent.id,
+      },
+    });
+    created++;
+  }
+  console.log(`Seeded ${created} inquiries`);
+}
+
 async function main() {
   console.log("Seeding database...");
+
+  // Ensure admin user exists first so dependent functions can use it
+  let admin = await prisma.user.findFirst({ where: { email: ADMIN_EMAIL } });
+  if (!admin) {
+    const oldUsers = await prisma.user.findMany({ where: { email: { contains: "@propease.ng" } } });
+    for (const u of oldUsers) {
+      const newEmail = u.email.replace("@propease.ng", "@mbpproperties.com").replace("sani@", "admin@");
+      await prisma.user.update({ where: { id: u.id }, data: { email: newEmail } });
+    }
+
+    const password = await bcrypt.hash("password123", 12);
+    admin = await prisma.user.create({
+      data: {
+        name: "Admin", email: ADMIN_EMAIL, password, role: "head", isApproved: true,
+        canCreateTasks: true, canCloseDeals: true, canCreateListings: true,
+        canManageUsers: true, canManageContent: true, canViewAnalytics: true, canManageAgreements: true,
+      },
+    });
+
+    const cityData = [
+      { name: "Kano Municipal", state: "Kano" },
+      { name: "Fagge", state: "Kano" },
+      { name: "Tarauni", state: "Kano" },
+      { name: "Nassarawa", state: "Kano" },
+    ];
+    for (const c of cityData) {
+      await prisma.city.upsert({ where: { name_state: c }, update: {}, create: c });
+    }
+
+    await prisma.commissionRate.createMany({
+      data: [
+        { dealType: "rent_normal", totalRate: 5, ambassadorRate: 3, agentRate: 2 },
+        { dealType: "rent_damages", totalRate: 8, ambassadorRate: 5, agentRate: 3 },
+        { dealType: "rent_full", totalRate: 10, ambassadorRate: 6, agentRate: 4 },
+        { dealType: "sale", totalRate: 6, ambassadorRate: 3.5, agentRate: 2.5 },
+        { dealType: "partnership", totalRate: 15, ambassadorRate: 8, agentRate: 5 },
+      ],
+    });
+
+    console.log("Created admin account: admin@mbpproperties.com / password123");
+  } else {
+    console.log("Admin already exists.");
+  }
 
   // Always run these
   await seedSettings();
@@ -431,53 +520,9 @@ async function main() {
   await seedFaqs();
   await seedListings();
   await seedAuditLogs();
-
-  // Skip user creation if admin exists
-  const existing = await prisma.user.findFirst({ where: { email: ADMIN_EMAIL } });
-  if (existing) {
-    console.log("Admin already exists. Skipping user/commission creation.");
-    console.log("Seed complete!");
-    return;
-  }
-
-  // First-time setup below
-  const oldUsers = await prisma.user.findMany({ where: { email: { contains: "@propease.ng" } } });
-  for (const u of oldUsers) {
-    const newEmail = u.email.replace("@propease.ng", "@mbpproperties.com").replace("sani@", "admin@");
-    await prisma.user.update({ where: { id: u.id }, data: { email: newEmail } });
-  }
-
-  const cityData = [
-    { name: "Kano Municipal", state: "Kano" },
-    { name: "Fagge", state: "Kano" },
-    { name: "Tarauni", state: "Kano" },
-    { name: "Nassarawa", state: "Kano" },
-  ];
-  for (const c of cityData) {
-    await prisma.city.upsert({ where: { name_state: c }, update: {}, create: c });
-  }
-
-  const password = await bcrypt.hash("password123", 12);
-  await prisma.user.create({
-    data: {
-      name: "Admin", email: ADMIN_EMAIL, password, role: "head", isApproved: true,
-      canCreateTasks: true, canCloseDeals: true, canCreateListings: true,
-      canManageUsers: true, canManageContent: true, canViewAnalytics: true, canManageAgreements: true,
-    },
-  });
-
-  await prisma.commissionRate.createMany({
-    data: [
-      { dealType: "rent_normal", totalRate: 5, ambassadorRate: 3, agentRate: 2 },
-      { dealType: "rent_damages", totalRate: 8, ambassadorRate: 5, agentRate: 3 },
-      { dealType: "rent_full", totalRate: 10, ambassadorRate: 6, agentRate: 4 },
-      { dealType: "sale", totalRate: 6, ambassadorRate: 3.5, agentRate: 2.5 },
-      { dealType: "partnership", totalRate: 15, ambassadorRate: 8, agentRate: 5 },
-    ],
-  });
+  await seedInquiries();
 
   console.log("Seed complete!");
-  console.log("Admin account: admin@mbpproperties.com / password123");
 }
 
 main()

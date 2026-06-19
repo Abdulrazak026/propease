@@ -8,6 +8,29 @@ import { createInquirySchema } from "../validators";
 import { logger } from "../lib/logger";
 const router = Router();
 
+export async function resolveInquiryAgent(listingId: string, fallbackUserId?: string): Promise<string | null> {
+  const listing = await prisma.listing.findUnique({
+    where: { id: listingId },
+    select: { assignedAgentId: true, postedById: true },
+  });
+  if (!listing) return fallbackUserId || null;
+
+  if (listing.assignedAgentId) return listing.assignedAgentId;
+
+  const candidateId = fallbackUserId || listing.postedById;
+  if (candidateId) {
+    const user = await prisma.user.findUnique({ where: { id: candidateId }, select: { role: true } });
+    if (user && user.role === "agent") return candidateId;
+  }
+
+  const firstAgent = await prisma.user.findFirst({
+    where: { role: "agent", suspendedAt: null },
+    select: { id: true },
+    orderBy: { createdAt: "asc" },
+  });
+  return firstAgent?.id || candidateId || null;
+}
+
 router.post("/:listingId", validate(createInquirySchema), async (req, res: Response) => {
   try {
     const listingId = req.params.listingId as string;
@@ -16,11 +39,13 @@ router.post("/:listingId", validate(createInquirySchema), async (req, res: Respo
       return res.status(404).json({ error: "Listing not found" });
     }
 
+    const agentId = await resolveInquiryAgent(listingId);
+
     const inquiry = await prisma.inquiry.create({
       data: {
         ...req.body,
         listingId,
-        assignedAgentId: listing.assignedAgentId,
+        assignedAgentId: agentId,
       },
       include: {
         listing: { select: { id: true, title: true } },
@@ -42,16 +67,26 @@ router.post("/:listingId", validate(createInquirySchema), async (req, res: Respo
 
 router.get("/my", authenticate, async (req: AuthRequest, res: Response) => {
   try {
-    let where = {};
+    let where: any = {};
     if (req.user!.role === "agent") {
-      where = { assignedAgentId: req.user!.id };
+      where = {
+        OR: [
+          { assignedAgentId: req.user!.id },
+          { listing: { assignedAgentId: req.user!.id } },
+        ],
+      };
     } else if (req.user!.role === "ambassador") {
       const agents = await prisma.user.findMany({
         where: { ambassadorId: req.user!.id },
         select: { id: true },
       });
       const agentIds = agents.map((a) => a.id);
-      where = { assignedAgentId: { in: agentIds } };
+      where = {
+        OR: [
+          { assignedAgentId: { in: agentIds } },
+          { listing: { assignedAgentId: { in: agentIds } } },
+        ],
+      };
     } else if (req.user!.role === "head") {
       // head sees all
     }

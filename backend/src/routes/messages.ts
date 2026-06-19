@@ -3,6 +3,7 @@ import prisma from "../lib/prisma";
 import { authenticate, AuthRequest } from "../middleware/auth";
 import { emailService } from "../services/email";
 import { logger } from "../lib/logger";
+import { resolveInquiryAgent } from "./inquiries";
 
 const router = Router();
 
@@ -93,17 +94,17 @@ async function createInquiryFromConversation(senderId: string, recipientId: stri
     });
     if (existingInquiry) return;
 
+    const agentId = await resolveInquiryAgent(listingId, recipientId);
+
     const inquiry = await prisma.inquiry.create({
       data: {
         clientName: sender?.name || "Unknown",
         clientContact: sender?.email || "",
         message: content,
         listingId,
-        assignedAgentId: listing.assignedAgentId || recipientId,
+        assignedAgentId: agentId,
       },
     });
-
-    const agentId = listing.assignedAgentId || recipientId;
     if (agentId) {
       const agent = await prisma.user.findUnique({
         where: { id: agentId },
