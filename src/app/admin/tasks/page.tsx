@@ -207,8 +207,8 @@ export default function AdminTasksPage() {
                 </thead>
                 <tbody>
                   {tasks.slice(0, 50).map(t => (
-                    <tr key={t.id} className="border-b border-gray-50 hover:bg-gray-50/50">
-                      <td className="px-4 py-3 text-sm font-medium text-gray-900 max-w-[280px] truncate">{t.title}</td>
+                    <tr key={t.id} className="border-b border-gray-50 hover:bg-gray-50/50 cursor-pointer" onClick={() => window.location.href = `/admin/tasks/${t.id}`}>
+                      <td className="px-4 py-3 text-sm font-medium text-[var(--color-primary)] max-w-[280px] truncate hover:underline">{t.title}</td>
                       <td className="px-4 py-3 text-xs text-gray-600">{t.area}</td>
                       <td className="px-4 py-3 text-xs text-gray-600">{t.assignedTo?.name || "Unassigned"}</td>
                       <td className="px-4 py-3 text-xs font-medium text-gray-900">₦{t.budget.toLocaleString()}</td>
