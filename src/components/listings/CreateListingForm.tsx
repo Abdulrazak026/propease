@@ -226,8 +226,18 @@ export default function CreateListingForm({ backHref, title, subtitle, successRe
               <p className="text-sm font-medium text-gray-700">{uploading ? "Uploading..." : "Upload Photos"}</p>
               <p className="text-xs text-gray-400 mt-1">Click to browse</p>
               <p className="text-xs text-gray-300 mt-2">Max 10 files • JPG, PNG, WebP</p>
-              {uploadedUrls.length > 0 && <p className="text-xs text-emerald-600 mt-2">{uploadedUrls.length} uploaded</p>}
             </div>
+            {uploadedUrls.length > 0 && (
+              <div className="flex flex-wrap gap-2 mt-2">
+                {uploadedUrls.map((url, i) => (
+                  <div key={i} className="relative">
+                    <img src={url} alt="" className="w-20 h-20 object-cover rounded-lg border border-gray-200" />
+                    <button type="button" onClick={() => setUploadedUrls(prev => prev.filter((_, j) => j !== i))} className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-red-500 text-white rounded-full text-xs flex items-center justify-center hover:bg-red-600">×</button>
+                  </div>
+                ))}
+              </div>
+            )}
+            {uploadedUrls.length > 0 && <p className="text-xs text-emerald-600 mt-2">{uploadedUrls.length} uploaded</p>}
             <div className="bg-gray-50 rounded-lg p-4">
               <p className="text-sm font-medium text-gray-900 mb-3">📍 Location Coordinates</p>
               <div className="grid grid-cols-2 gap-3">

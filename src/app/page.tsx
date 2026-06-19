@@ -94,7 +94,7 @@ export default function HomePage() {
     <div className="flex flex-col">
       <section ref={heroRef} className="relative bg-gray-950 overflow-hidden">
         <div className="absolute inset-0">
-          {!settingsLoading && <img src={heroImage} alt="MBPP Properties - Find verified houses, land and flats in Kano, Nigeria" className="w-full h-full object-cover opacity-65 transition-opacity duration-500" />}
+          {!settingsLoading && <img src={heroImage} alt="MBPP Properties - Find verified houses, land and flats in Kano & Northern States, Nigeria" className="w-full h-full object-cover opacity-65 transition-opacity duration-500" />}
           <div className="absolute inset-0 bg-gradient-to-b from-gray-950/40 via-gray-950/25 to-gray-950" />
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--color-primary)_0%,_transparent_60%)] opacity-25 mix-blend-screen" />
         </div>
@@ -103,11 +103,11 @@ export default function HomePage() {
           <div className="max-w-3xl">
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 backdrop-blur-sm border border-white/10 text-white/70 text-xs font-medium mb-6">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-              Now serving 4 cities across Kano
+              Now serving across Northern Nigeria
             </div>
             <h1 className="text-4xl sm:text-5xl lg:text-7xl font-bold text-white leading-[1.05] tracking-tight">
               Find Your Dream Home<br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-300 via-teal-200 to-emerald-400">in Kano &amp; Beyond.</span>
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-300 via-teal-200 to-emerald-400">in Kano &amp; Northern States.</span>
             </h1>
             <p className="text-base sm:text-lg text-white/60 mt-5 sm:mt-6 max-w-xl leading-relaxed">
               Trusted properties. Verified listings. Happy clients.
@@ -268,7 +268,7 @@ export default function HomePage() {
           <div className="flex items-end justify-between mb-8">
             <div>
               <p className="text-xs font-semibold text-[var(--color-primary)] uppercase tracking-[0.15em] mb-2">Market research</p>
-              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight">Trends in Kano</h2>
+              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight">Market Trends</h2>
               <p className="text-sm text-gray-500 mt-1.5">Data-driven reports on the local property market.</p>
             </div>
             <Link href="/research" className="hidden sm:inline-flex items-center gap-1 text-sm font-medium text-gray-700 hover:text-gray-900">
@@ -297,10 +297,10 @@ export default function HomePage() {
 
       <section className="bg-gray-50 border-y border-gray-100">
         <div className="max-w-[1400px] mx-auto px-5 sm:px-6 lg:px-10 py-10 sm:py-14">
-          <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-2">Find Property in Kano</h2>
-          <p className="text-sm text-gray-600 mb-4 max-w-2xl">Whether you are looking to buy, rent, or sell — we have verified properties across Kano. Gidan siyarwa, gidan haya, flats, land, and commercial spaces.</p>
+          <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-2">Find Property in Northern Nigeria</h2>
+          <p className="text-sm text-gray-600 mb-4 max-w-2xl">Whether you are looking to buy, rent, or sell — we have verified properties across Northern Nigeria. Gidan siyarwa, gidan haya, flats, land, and commercial spaces.</p>
           <div className="flex flex-wrap gap-2">
-            {["House for sale Kano", "Gidan siyarwa Kano", "House for rent Kano", "Gidan haya Kano", "Flat Kano", "Land for sale Kano", "Plaza Kano", "Shop Kano", "Property Kano", "Sell house Kano", "Sayar da gida", "Siyan gida Kano", "Commercial property Kano"].map(tag => (
+            {["House for sale", "Gidan siyarwa", "House for rent", "Gidan haya", "Flat", "Land for sale", "Plaza", "Shop", "Commercial property", "Sell house", "Sayar da gida", "Siyan gida"].map(tag => (
               <Link key={tag} href={`/list-property?search=${encodeURIComponent(tag)}`} className="px-3 py-1.5 bg-white border border-gray-200 rounded-full text-xs text-gray-600 hover:border-[var(--color-primary)] hover:text-[var(--color-primary)] transition-colors">
                 {tag}
               </Link>

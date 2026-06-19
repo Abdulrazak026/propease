@@ -6,6 +6,7 @@ import { validate } from "../middleware/validate";
 import { createCustomOrderSchema } from "../validators";
 import { logger } from "../lib/logger";
 import { emailService } from "../services/email";
+import { notifyUser } from "../services/notifier";
 const router = Router();
 
 router.post("/", validate(createCustomOrderSchema), async (req, res: Response) => {
@@ -102,6 +103,9 @@ router.post("/:id/share", authenticate, authorize("head"), async (req: AuthReque
     if (!order) {
       return res.status(404).json({ error: "Custom order not found" });
     }
+    if (order.status === "cancelled" || order.status === "fulfilled") {
+      return res.status(409).json({ error: "Cannot share a cancelled or fulfilled order" });
+    }
 
     const tasks: any[] = [];
     for (const staffId of staffIds) {
@@ -121,21 +125,15 @@ router.post("/:id/share", authenticate, authorize("head"), async (req: AuthReque
       });
       tasks.push(task);
 
-      await prisma.notification.create({
-        data: {
-          userId: staffId,
-          type: "task_status",
-          title: "New Task Assigned",
-          body: `Custom order: ${order.propertyType} in ${order.area} — ${order.clientName}`,
-          link: `/agent/tasks/${task.id}`,
-        },
-      }).catch(() => {});
+      await notifyUser(staffId, "task_status", "New Task Assigned", `Custom order: ${order.propertyType} in ${order.area} — ${order.clientName}`, `/agent/tasks/${task.id}`);
     }
 
     await prisma.customOrder.update({
       where: { id: order.id },
       data: { status: "routed" },
     });
+
+    await notifyUser(req.user!.id, "task_status", "Custom Order Shared", `Shared "${order.propertyType} in ${order.area}" to ${staffIds.length} staff member(s)`, `/admin/tasks/${tasks[0]?.id || ""}`);
 
     res.status(201).json({ tasks, orderId: order.id });
   } catch (error) {

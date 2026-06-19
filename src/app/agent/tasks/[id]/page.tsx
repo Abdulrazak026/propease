@@ -25,6 +25,7 @@ export default function AgentTaskDetail() {
   const [submitting, setSubmitting] = useState(false);
   const photoFileRef = useRef<HTMLInputElement>(null);
   const [submissions, setSubmissions] = useState<any[]>([]);
+  const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
 
   useEffect(() => {
     api.get<any>(`/api/tasks/${id}`).then(r => {
@@ -185,7 +186,9 @@ export default function AgentTaskDetail() {
                 {s.photos?.length > 0 && (
                   <div className="flex gap-2 overflow-x-auto">
                     {s.photos.map((p: string, i: number) => (
-                      <img key={i} src={p} alt="" className="w-20 h-20 object-cover rounded-lg border border-gray-200" />
+                      <button key={i} type="button" onClick={() => setSelectedPhoto(p)} className="shrink-0">
+                        <img src={p} alt="" className="w-20 h-20 object-cover rounded-lg border border-gray-200 hover:opacity-80 transition-opacity cursor-pointer" />
+                      </button>
                     ))}
                   </div>
                 )}
@@ -194,6 +197,14 @@ export default function AgentTaskDetail() {
               </div>
             ))}
           </div>
+        </div>
+      )}
+
+      {/* Lightbox */}
+      {selectedPhoto && (
+        <div className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4" onClick={() => setSelectedPhoto(null)}>
+          <button onClick={() => setSelectedPhoto(null)} className="absolute top-4 right-4 w-10 h-10 bg-white/10 rounded-full flex items-center justify-center text-white hover:bg-white/20 transition-colors text-xl">&times;</button>
+          <img src={selectedPhoto} alt="" className="max-w-full max-h-full object-contain rounded-lg" onClick={e => e.stopPropagation()} />
         </div>
       )}
 

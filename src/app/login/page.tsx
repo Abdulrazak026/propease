@@ -37,7 +37,7 @@ function LoginForm() {
       <div className="hidden lg:flex lg:w-[45%] xl:w-1/2 relative overflow-hidden bg-gray-900">
         <img
           src="https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=800&h=1200&fit=crop"
-          alt="Property for sale in Kano, Nigeria"
+          alt="Property for sale in Kano & Northern States, Nigeria"
           className="absolute inset-0 w-full h-full object-cover opacity-60"
         />
         <div className="absolute inset-0 bg-gradient-to-br from-[var(--color-primary)]/90 to-gray-900/80" />
@@ -50,7 +50,7 @@ function LoginForm() {
               Your Property,<br />Your Future
             </h1>
             <p className="text-lg text-white/70 leading-relaxed mb-10">
-              {getSetting("site_tagline", "Find verified properties in Kano. Rent, buy, or sell with trusted agents.")}
+              {getSetting("site_tagline", "Find verified properties in Kano & Northern States. Rent, buy, or sell with trusted agents.")}
             </p>
             <div className="grid grid-cols-3 gap-6">
               {[

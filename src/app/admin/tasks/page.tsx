@@ -82,7 +82,7 @@ export default function AdminTasksPage() {
   const updateOrderStatus = async (id: string, status: string) => {
     try {
       await api.patch(`/api/custom-orders/${id}/status`, { status });
-      setOrders(prev => prev.map(o => o.id === id ? { ...o, status } : o));
+      load();
     } catch (e) {
       console.error("Failed to update order status:", e);
     }
@@ -236,7 +236,7 @@ export default function AdminTasksPage() {
                     <p className="text-sm font-semibold text-gray-900">{o.clientName}</p>
                     <p className="text-xs text-gray-500">{o.clientContact}</p>
                   </div>
-                  <Badge variant={o.status === "pending" ? "warning" : o.status === "completed" ? "success" : "default"}>{o.status}</Badge>
+                  <Badge variant={o.status === "pending" ? "warning" : o.status === "completed" || o.status === "fulfilled" ? "success" : o.status === "cancelled" ? "default" : "default"}>{o.status}</Badge>
                 </div>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs mb-3">
                   <div><span className="text-gray-400">Type</span><p className="font-medium text-gray-900 capitalize">{o.propertyType}</p></div>
@@ -252,12 +252,19 @@ export default function AdminTasksPage() {
                   </div>
                 )}
                 <div className="flex gap-2">
-                  <button onClick={() => setShareOrderId(o.id)} className="px-3 py-1.5 text-xs font-medium text-white bg-[var(--color-primary)] rounded-lg hover:opacity-90 transition-opacity">
-                    Share to Agents
-                  </button>
-                  <button onClick={() => updateOrderStatus(o.id, "cancelled")} className="px-3 py-1.5 text-xs font-medium text-red-600 border border-red-200 rounded-lg hover:bg-red-50 transition-colors">
-                    Cancel
-                  </button>
+                  {o.status !== "cancelled" && o.status !== "fulfilled" && (
+                    <button onClick={() => setShareOrderId(o.id)} className="px-3 py-1.5 text-xs font-medium text-white bg-[var(--color-primary)] rounded-lg hover:opacity-90 transition-opacity">
+                      {o.status === "routed" ? "Share Again" : "Share to Agents"}
+                    </button>
+                  )}
+                  {o.status !== "cancelled" && o.status !== "fulfilled" && (
+                    <button onClick={() => updateOrderStatus(o.id, "cancelled")} className="px-3 py-1.5 text-xs font-medium text-red-600 border border-red-200 rounded-lg hover:bg-red-50 transition-colors">
+                      Cancel
+                    </button>
+                  )}
+                  {o.status === "cancelled" && (
+                    <span className="text-xs font-medium text-gray-400 italic">Cancelled</span>
+                  )}
                 </div>
               </div>
             ))}

@@ -9,8 +9,8 @@ type Dict = Record<string, { en: string; ha: string; pi: string }>;
 
 const dictionary: Dict = {
   "hero.heading.line1": { en: "Find Your Home", ha: "Nemo Gidanku", pi: "Find Your House" },
-  "hero.heading.line2": { en: "in Kano.", ha: "a Kano.", pi: "for Kano." },
-  "hero.tagline": { en: "Find Your Dream Property in Kano", ha: "Nemo Gidanka da Kake So a Kano", pi: "Find the house wey you want for Kano" },
+  "hero.heading.line2": { en: "in Kano & Northern States.", ha: "a Kano da Arewacin Najeriya.", pi: "for Kano & Northern States." },
+  "hero.tagline": { en: "Find Your Dream Property in Kano & Northern States", ha: "Nemo Gidanka da Kake So a Kano da Arewacin Najeriya", pi: "Find the house wey you want for Kano & Northern States" },
   "hero.cta.search": { en: "Search", ha: "Bincike", pi: "Search" },
   "hero.cta.browse": { en: "Browse all", ha: "Duba Duka", pi: "See all" },
   "search.placeholder": { en: "Search by location, type, or keyword…", ha: "Nemo wurin, iri, ko kalma…", pi: "Search place, type, or word…" },

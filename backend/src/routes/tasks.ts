@@ -6,6 +6,7 @@ import { validate } from "../middleware/validate";
 import { createTaskSchema } from "../validators";
 import { logger } from "../lib/logger";
 import { emailService } from "../services/email";
+import { notifyUser } from "../services/notifier";
 const router = Router();
 
 router.get("/my", authenticate, authorize("agent", "ambassador", "head"), async (req: AuthRequest, res: Response) => {
@@ -288,15 +289,7 @@ router.post("/:id/submit", authenticate, async (req: AuthRequest, res: Response)
     const admins = await prisma.user.findMany({ where: { role: "head" }, select: { id: true } });
     const submitter = await prisma.user.findUnique({ where: { id: req.user!.id }, select: { name: true } });
     for (const admin of admins) {
-      await prisma.notification.create({
-        data: {
-          userId: admin.id,
-          type: "task_status",
-          title: "Task Submitted for Review",
-          body: `${submitter?.name || "Agent"} submitted task "${task.title}" with ${photos?.length || 0} photos.`,
-          link: `/admin/tasks/${taskId}`,
-        },
-      }).catch(() => {});
+      await notifyUser(admin.id, "task_status", "Task Submitted for Review", `${submitter?.name || "Agent"} submitted task "${task.title}" with ${photos?.length || 0} photos.`, `/admin/tasks/${taskId}`);
     }
 
     res.status(201).json({ submission });

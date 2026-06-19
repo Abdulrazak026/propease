@@ -1,0 +1,1 @@
+SELECT key, LEFT(value, 100) FROM "SiteSettings" WHERE value SIMILAR TO '%(📞|✉️|📍|🕐|🏢|🌐|🏢|📞|📧|📍|⏰|🕐|📞|📧)%' OR key LIKE '%email%' OR key LIKE '%phone%' OR key LIKE '%address%' OR key LIKE '%office%' ORDER BY key;

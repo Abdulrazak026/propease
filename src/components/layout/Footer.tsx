@@ -17,7 +17,7 @@ const SOCIAL_ICONS: Record<string, React.ReactNode> = {
 export default function Footer() {
   const { get: g } = useSettings();
   const brand = g("site_name", "Mutual Benefit Premier Properties");
-  const tagline = g("site_tagline", "Find Your Dream Property in Kano");
+  const tagline = g("site_tagline", "Find Your Dream Property in Kano & Northern States");
   const logo = g("site_logo");
   const address = g("office_address", "Kano Municipal, Kano State, Nigeria");
   const phone = g("support_phone");

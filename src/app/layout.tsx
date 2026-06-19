@@ -20,8 +20,8 @@ async function getPublicSettings() {
 export async function generateMetadata(): Promise<Metadata> {
   const s = await getPublicSettings();
   return {
-    title: s.meta_title || "MBPP Properties | Buy, Rent & Sell Houses in Kano | Gidan Siyarwa Kano",
-    description: s.meta_description || "Find verified houses, land, flats and commercial properties for rent and sale in Kano, Nigeria. Gidan siyarwa Kano, gidan haya, property for sale, house for rent.",
+    title: s.meta_title || "MBPP Properties | Buy, Rent & Sell Houses in Kano & Northern States",
+    description: s.meta_description || "Find verified houses, land, flats and commercial properties for rent and sale in Kano & Northern States, Nigeria.",
     manifest: "/manifest.webmanifest",
     icons: {
       icon: [

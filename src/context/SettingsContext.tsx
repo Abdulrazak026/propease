@@ -30,12 +30,12 @@ const defaultTeam = JSON.stringify([
 ]);
 
 const defaults: SettingsMap = {
-  site_name: "Mutual Benefit Premier Properties", site_tagline: "Find Your Dream Property in Kano",
+  site_name: "Mutual Benefit Premier Properties", site_tagline: "Find Your Dream Property in Kano & Northern States",
   support_email: "support@mbpproperties.com", support_phone: "", support_whatsapp: "",
   office_address: "", business_hours: "Mon-Fri 8AM-6PM",
   primary_color: "#0d6e4e", secondary_color: "#f97316", accent_color: "#facc15",
   heading_font: "Inter", body_font: "Inter",
-  meta_title: "Mutual Benefit Premier Properties | Real Estate in Kano", meta_description: "Verified properties for rent and sale in Kano.",
+  meta_title: "Mutual Benefit Premier Properties | Real Estate in Kano & Northern States", meta_description: "Verified properties for rent and sale in Kano & Northern States.",
   site_logo: "", site_favicon: "", about_hero_image: "",
   team_members: defaultTeam,
   research_reports: defaultResearch,
