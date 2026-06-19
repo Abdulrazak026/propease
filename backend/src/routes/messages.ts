@@ -113,6 +113,15 @@ async function createInquiryFromConversation(senderId: string, recipientId: stri
       if (agent) {
         emailService.inquiryNotification(agent.email, agent.name, sender?.name || "A user", listing.title, content).catch(() => {});
       }
+      await prisma.notification.create({
+        data: {
+          userId: agentId,
+          type: "message_received",
+          title: `New inquiry from ${sender?.name || "a client"}`,
+          body: content.slice(0, 120),
+          link: "/agent/inquiries",
+        },
+      }).catch(() => {});
     }
 
     // Notify all head users about the new inquiry

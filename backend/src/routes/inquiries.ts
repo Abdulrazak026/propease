@@ -152,7 +152,7 @@ router.get("/all", authenticate, authorize("head"), async (_req: AuthRequest, re
   }
 });
 
-router.get("/:id/conversation", authenticate, authorize("head"), async (req: AuthRequest, res: Response) => {
+router.get("/:id/conversation", authenticate, async (req: AuthRequest, res: Response) => {
   try {
     const inquiry = await prisma.inquiry.findUnique({
       where: { id: req.params.id as string },
@@ -162,6 +162,10 @@ router.get("/:id/conversation", authenticate, authorize("head"), async (req: Aut
       },
     });
     if (!inquiry) return res.status(404).json({ error: "Inquiry not found" });
+
+    const isHead = req.user!.role === "head";
+    const isOwner = inquiry.assignedAgentId === req.user!.id;
+    if (!isHead && !isOwner) return res.status(403).json({ error: "Not your inquiry" });
 
     let conversation: any = null;
     if (inquiry.listingId && inquiry.clientContact) {
@@ -184,7 +188,7 @@ router.get("/:id/conversation", authenticate, authorize("head"), async (req: Aut
   }
 });
 
-router.post("/:id/reply", authenticate, authorize("head"), async (req: AuthRequest, res: Response) => {
+router.post("/:id/reply", authenticate, async (req: AuthRequest, res: Response) => {
   try {
     const { message } = req.body;
     if (!message) return res.status(400).json({ error: "Message is required" });
@@ -194,6 +198,10 @@ router.post("/:id/reply", authenticate, authorize("head"), async (req: AuthReque
       include: { listing: { select: { id: true, title: true, postedById: true } }, assignedAgent: { select: { id: true, name: true, email: true } } },
     });
     if (!inquiry) return res.status(404).json({ error: "Inquiry not found" });
+
+    const isHead = req.user!.role === "head";
+    const isOwner = inquiry.assignedAgentId === req.user!.id;
+    if (!isHead && !isOwner) return res.status(403).json({ error: "Not your inquiry" });
 
     // Find or create conversation
     let conversation: any = null;
