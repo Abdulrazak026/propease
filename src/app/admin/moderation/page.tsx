@@ -29,6 +29,7 @@ export default function ModerationPage() {
   const [filter, setFilter] = useState("all");
   const [preview, setPreview] = useState<Listing | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
+  const [toast, setToast] = useState<string | null>(null);
 
   const load = () => {
     setLoading(true);
@@ -42,14 +43,24 @@ export default function ModerationPage() {
 
   const approve = async (id: string) => {
     setBusy(id);
-    await api.post(`/api/listings/${id}/approve`);
-    setListings(prev => prev.map(l => l.id === id ? { ...l, status: "approved" } : l));
+    setToast(null);
+    const r = await api.post(`/api/listings/${id}/approve`);
+    if (r.status === 200) {
+      setListings(prev => prev.map(l => l.id === id ? { ...l, status: "approved" } : l));
+    } else {
+      setToast(r.error || "Approve failed — listing must be in 'review' status first");
+    }
     setBusy(null);
   };
   const reject = async (id: string) => {
     setBusy(id);
-    await api.post(`/api/listings/${id}/reject`);
-    setListings(prev => prev.map(l => l.id === id ? { ...l, status: "draft" } : l));
+    setToast(null);
+    const r = await api.post(`/api/listings/${id}/reject`);
+    if (r.status === 200) {
+      setListings(prev => prev.map(l => l.id === id ? { ...l, status: "draft" } : l));
+    } else {
+      setToast(r.error || "Reject failed");
+    }
     setBusy(null);
   };
   const remove = async (id: string) => {
@@ -87,6 +98,12 @@ export default function ModerationPage() {
         ))}
       </div>
 
+      {toast && (
+        <div className="bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3 rounded-lg flex items-center justify-between">
+          <span>{toast}</span>
+          <button onClick={() => setToast(null)} className="text-red-400 hover:text-red-600 ml-2">&times;</button>
+        </div>
+      )}
       {loading ? (
         <div className="flex items-center justify-center h-64"><div className="h-8 w-8 border-2 border-[var(--color-primary)] border-t-transparent rounded-full animate-spin" /></div>
       ) : (

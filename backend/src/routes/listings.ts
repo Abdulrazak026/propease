@@ -97,6 +97,11 @@ router.post("/", authenticate, authorize("head", "ambassador", "agent"), validat
 
     const { assignedAgentId, photos, ...listingData } = data;
 
+    // Head/admin-created listings skip draft and go straight to review
+    if (req.user!.role === "head" && listingData.status === "draft") {
+      listingData.status = "review";
+    }
+
     const listing = await prisma.listing.create({
       data: {
         ...listingData,
