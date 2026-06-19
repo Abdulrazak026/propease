@@ -1,11 +1,12 @@
 import { Router, Request, Response } from "express";
 import { exec } from "child_process";
-import { createHmac, timingSafeEqual } from "crypto";
+import { createHmac, timingSafeEqual, existsSync, writeFileSync, unlinkSync } from "crypto";
 import { logger } from "../lib/logger";
 
 const router = Router();
 
 const DEPLOY_SECRET = process.env.DEPLOY_WEBHOOK_SECRET || "mbpp-deploy-secret-change-me";
+const LOCKFILE = "/tmp/mbpp-deploy.lock";
 
 function verifyGitHubSignature(payload: string, signatureHeader: string | undefined): boolean {
   if (!signatureHeader || !DEPLOY_SECRET) return false;
@@ -17,7 +18,6 @@ function verifyGitHubSignature(payload: string, signatureHeader: string | undefi
 }
 
 router.post("/", async (req: Request, res: Response) => {
-  // Accept either x-deploy-token header (manual) or GitHub webhook signature
   const token = req.headers["x-deploy-token"] as string;
   const rawBody = (req as any).rawBody || JSON.stringify(req.body);
   const ghSignature = req.headers["x-hub-signature-256"] as string;
@@ -26,22 +26,28 @@ router.post("/", async (req: Request, res: Response) => {
     return res.status(403).json({ error: "Unauthorized" });
   }
 
-  logger.info("Deploy triggered via webhook");
+  if (existsSync(LOCKFILE)) {
+    logger.warn("Deploy already in progress, skipping");
+    return res.json({ status: "ok", message: "Deploy already in progress" });
+  }
 
-  // Respond immediately, then deploy asynchronously
+  writeFileSync(LOCKFILE, new Date().toISOString());
+  logger.info("Deploy triggered");
+
   res.json({ status: "ok", message: "Deploy started" });
 
-  // Run deploy in background
   const cmd = `
-    set -e
-    echo "=== $(date) ===" >> /var/www/mbpp/logs/deploy.log
+    trap 'rm -f ${LOCKFILE}' EXIT
+
+    echo "=== Deploy started at $(date) ===" >> /var/www/mbpp/logs/deploy.log
 
     echo "--- Pulling latest code ---" >> /var/www/mbpp/logs/deploy.log
     cd /var/www/mbpp-repo
-    git fetch origin master 2>&1
-    git reset --hard origin/master 2>&1
+    git fetch origin master >> /var/www/mbpp/logs/deploy.log 2>&1
+    git reset --hard origin/master >> /var/www/mbpp/logs/deploy.log 2>&1
 
     echo "--- Syncing files ---" >> /var/www/mbpp/logs/deploy.log
+    mkdir -p /var/www/mbpp/scripts /var/www/mbpp/logs
     cp -r /var/www/mbpp-repo/backend/* /var/www/mbpp/api/
     rsync -a --delete --exclude=node_modules --exclude=.next --exclude=backend --exclude=bot --exclude='*.tar.gz' --exclude='*.dump' /var/www/mbpp-repo/ /var/www/mbpp/frontend/
     cp -r /var/www/mbpp-repo/bot/* /var/www/mbpp/bot/
@@ -55,30 +61,43 @@ router.post("/", async (req: Request, res: Response) => {
 
     echo "--- Building API ---" >> /var/www/mbpp/logs/deploy.log
     cd /var/www/mbpp/api
-    npm install 2>&1
-    npx prisma generate 2>&1
-    npm run build 2>&1
-    npx prisma migrate deploy 2>&1
+    npm install 2>&1 | tail -5 >> /var/www/mbpp/logs/deploy.log
+    npx prisma generate 2>&1 >> /var/www/mbpp/logs/deploy.log
+    npm run build 2>&1 | tail -20 >> /var/www/mbpp/logs/deploy.log
+    if [ $? -ne 0 ]; then
+      echo "!!! API BUILD FAILED !!!" >> /var/www/mbpp/logs/deploy.log
+      rm -f ${LOCKFILE}
+      exit 1
+    fi
+    npx prisma migrate deploy 2>&1 >> /var/www/mbpp/logs/deploy.log
 
-    echo "--- Migrating Existing Data ---" >> /var/www/mbpp/logs/deploy.log
-    cd /var/www/mbpp/api
-    npx tsx scripts/migrate-agents.ts 2>&1 || true
+    echo "--- Migrating Data ---" >> /var/www/mbpp/logs/deploy.log
+    npx tsx scripts/migrate-agents.ts 2>&1 >> /var/www/mbpp/logs/deploy.log || true
 
     echo "--- Building Frontend ---" >> /var/www/mbpp/logs/deploy.log
     cd /var/www/mbpp/frontend
-    npm install 2>&1
-    npm run build 2>&1
+    rm -rf .next
+    npm install 2>&1 | tail -5 >> /var/www/mbpp/logs/deploy.log
+    npm run build 2>&1 | tail -30 >> /var/www/mbpp/logs/deploy.log
+    if [ $? -ne 0 ]; then
+      echo "!!! FRONTEND BUILD FAILED !!!" >> /var/www/mbpp/logs/deploy.log
+      rm -f ${LOCKFILE}
+      exit 1
+    fi
 
     echo "--- Restarting Services ---" >> /var/www/mbpp/logs/deploy.log
-    pm2 restart mbpp-api 2>&1
-    pm2 restart mbpp-frontend 2>&1
-    pm2 save 2>&1
-    echo "Deploy complete at $(date)" >> /var/www/mbpp/logs/deploy.log
+    pm2 restart mbpp-api 2>&1 >> /var/www/mbpp/logs/deploy.log
+    pm2 restart mbpp-frontend 2>&1 >> /var/www/mbpp/logs/deploy.log
+    pm2 save 2>&1 >> /var/www/mbpp/logs/deploy.log
+
+    echo "=== Deploy complete at $(date) ===" >> /var/www/mbpp/logs/deploy.log
   `;
 
-  exec(cmd, { timeout: 300000 }, (error, stdout) => {
+  exec(cmd, { timeout: 600000 }, (error, stdout) => {
+    try { unlinkSync(LOCKFILE); } catch {}
     if (error) {
       logger.error({ err: error }, "Deploy failed");
+      logger.error("Check /var/www/mbpp/logs/deploy.log for details");
     } else {
       logger.info("Deploy succeeded");
     }
