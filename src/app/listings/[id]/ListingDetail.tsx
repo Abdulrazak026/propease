@@ -232,16 +232,16 @@ export default function ListingDetail() {
 
               <div className="pt-5 space-y-3">
                 {listing.status === "available" && listing.listingType === "rent" && (
-                  <Button className="w-full bg-[var(--color-primary)]" onClick={() => setShowReserveModal(true)}>
+                  <Button className="w-full" onClick={() => setShowReserveModal(true)}>
                     Reserve This Property
                   </Button>
                 )}
                 {listing.status === "available" && listing.listingType !== "rent" && (
                   <>
-                    <Button className="w-full bg-[var(--color-primary)]" onClick={() => setShowBuyModal(true)}>
+                    <Button className="w-full" onClick={() => setShowBuyModal(true)}>
                       Buy Now - {formatNaira(listing.price)}
                     </Button>
-                    <Button variant="outline" className="w-full" onClick={() => setShowReserveModal(true)}>
+                    <Button className="w-full" onClick={() => setShowReserveModal(true)}>
                       Reserve - {formatNaira(reserveDeposit)}
                     </Button>
                   </>
@@ -290,11 +290,7 @@ export default function ListingDetail() {
                   </Link>
                 )}
 
-                {listing.listingType !== "rent" && listing.assignedAgent && (
-                  <Link href={`/agents/${listing.assignedAgent.id}`} className="inline-flex items-center justify-center gap-2 w-full px-4 py-2.5 rounded-lg text-sm font-medium border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors">
-                    Contact Agent
-                  </Link>
-                )}
+
               </div>
 
               {bookingSuccess && (
