@@ -21,11 +21,24 @@ router.post("/", async (_req: Request, res: Response) => {
   const cmd = `
     cd /var/www/mbpp
     echo "=== $(date) ===" >> /var/www/mbpp/logs/deploy.log
-    cd /var/www/mbpp/frontend
     git fetch origin master 2>&1
     git reset --hard origin/master 2>&1
+    echo "--- Building API ---" >> /var/www/mbpp/logs/deploy.log
+    cd /var/www/mbpp/api
+    npm ci 2>/dev/null
+    npx prisma generate 2>&1
     npm run build 2>&1
+    npx prisma migrate deploy 2>&1
+    echo "--- Migrating Existing Data ---" >> /var/www/mbpp/logs/deploy.log
+    npx tsx scripts/migrate-agents.ts 2>&1
+    echo "--- Building Frontend ---" >> /var/www/mbpp/logs/deploy.log
+    cd /var/www/mbpp/frontend
+    npm ci 2>/dev/null
+    npm run build 2>&1
+    echo "--- Restarting Services ---" >> /var/www/mbpp/logs/deploy.log
+    pm2 restart mbpp-api 2>&1
     pm2 restart mbpp-frontend 2>&1
+    pm2 save 2>&1
     echo "Deploy complete" >> /var/www/mbpp/logs/deploy.log
   `;
 
