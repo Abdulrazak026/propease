@@ -55,7 +55,7 @@ router.post("/", async (req: Request, res: Response) => {
 
     echo "--- Building API ---" >> /var/www/mbpp/logs/deploy.log
     cd /var/www/mbpp/api
-    npm ci 2>/dev/null
+    npm install 2>&1
     npx prisma generate 2>&1
     npm run build 2>&1
     npx prisma migrate deploy 2>&1
@@ -66,7 +66,7 @@ router.post("/", async (req: Request, res: Response) => {
 
     echo "--- Building Frontend ---" >> /var/www/mbpp/logs/deploy.log
     cd /var/www/mbpp/frontend
-    npm ci 2>/dev/null
+    npm install 2>&1
     npm run build 2>&1
 
     echo "--- Restarting Services ---" >> /var/www/mbpp/logs/deploy.log
