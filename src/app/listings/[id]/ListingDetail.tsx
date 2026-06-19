@@ -160,7 +160,7 @@ export default function ListingDetail() {
                 )}
                 {listing.bedrooms && <span className="text-xs bg-gray-100 px-3 py-1.5 rounded-md text-gray-700">{listing.bedrooms} Bedrooms</span>}
                 {listing.bathrooms && <span className="text-xs bg-gray-100 px-3 py-1.5 rounded-md text-gray-700">{listing.bathrooms} Bathrooms</span>}
-                {listing.sqft && <span className="text-xs bg-gray-100 px-3 py-1.5 rounded-md text-gray-700">{listing.sqft.toLocaleString()} sqft</span>}
+                {listing.size && <span className="text-xs bg-gray-100 px-3 py-1.5 rounded-md text-gray-700">{listing.size}</span>}
               </div>
 
               <p className="text-sm text-gray-600 mt-5 leading-relaxed">{listing.description}</p>

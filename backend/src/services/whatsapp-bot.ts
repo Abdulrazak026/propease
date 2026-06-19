@@ -58,7 +58,7 @@ function formatDetail(item: any): string {
 📍 *Location:* ${item.city || "Kano"}${item.address ? ", " + item.address : ""}
 🏷️ *Type:* ${type}
 🛏️ *Bedrooms:* ${item.bedrooms || "N/A"} | 🚿 *Bathrooms:* ${item.bathrooms || "N/A"}
-${item.sqft ? `📐 *Area:* ${item.sqft} sqft\n` : ""}
+${item.size ? `📐 *Size:* ${item.size}\n` : ""}
 ${item.features && item.features.length > 0 ? `⚡ *Features:* ${Array.isArray(item.features) ? item.features.join(", ") : item.features}\n` : ""}
 🔗 *View online:* ${link}
 👤 *Agent:* ${item.postedBy?.name || "MBPP Team"}`;

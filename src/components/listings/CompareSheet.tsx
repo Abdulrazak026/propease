@@ -66,7 +66,7 @@ export default function CompareSheet() {
                     { l: "City", r: (i: any) => i.city },
                     { l: "Bedrooms", r: (i: any) => i.bedrooms ?? "N/A" },
                     { l: "Bathrooms", r: (i: any) => i.bathrooms ?? "N/A" },
-                    { l: "Size", r: (i: any) => i.sqft ? `${i.sqft.toLocaleString()} sqft` : "N/A" },
+                    { l: "Size", r: (i: any) => i.size ? i.size : "N/A" },
                   ].map(row => (
                     <tr key={row.l}>
                       <td className="text-xs text-gray-500 p-3 sticky left-0 bg-white">{row.l}</td>

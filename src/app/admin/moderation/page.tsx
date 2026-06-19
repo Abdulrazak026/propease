@@ -10,7 +10,7 @@ import { resolveImageUrl } from "@/lib/utils";
 interface Listing {
   id: string; title: string; description?: string; propertyType: string; listingType: string;
   city: string; price: number; status: string; createdAt: string; bedrooms?: number;
-  bathrooms?: number; sqft?: number; address?: string;
+  bathrooms?: number; size?: string; address?: string;
   photos?: { id: string; url: string; alt: string }[];
   postedBy?: { id: string; name: string } | null;
 }
@@ -201,7 +201,7 @@ export default function ModerationPage() {
                 {preview.address && <div><span className="text-xs text-gray-400">Address</span><p className="font-medium">{preview.address}</p></div>}
                 {preview.bedrooms && <div><span className="text-xs text-gray-400">Bedrooms</span><p className="font-medium">{preview.bedrooms}</p></div>}
                 {preview.bathrooms && <div><span className="text-xs text-gray-400">Bathrooms</span><p className="font-medium">{preview.bathrooms}</p></div>}
-                {preview.sqft && <div><span className="text-xs text-gray-400">Area</span><p className="font-medium">{preview.sqft} sqft</p></div>}
+                {preview.size && <div><span className="text-xs text-gray-400">Size</span><p className="font-medium">{preview.size}</p></div>}
                 <div><span className="text-xs text-gray-400">Listed By</span><p className="font-medium">{preview.postedBy?.name || "Unknown"}</p></div>
                 <div><span className="text-xs text-gray-400">Created</span><p className="font-medium">{new Date(preview.createdAt).toLocaleDateString()}</p></div>
               </div>

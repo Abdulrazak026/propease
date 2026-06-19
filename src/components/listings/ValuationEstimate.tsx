@@ -9,28 +9,18 @@ interface ValuationEstimateProps {
 }
 
 interface ValuationResult {
- rangeLow: number; rangeHigh: number; estimatedValue: number;
- confidence: "high" | "medium" | "low";
- avgPricePerSqft: number | null;
+  rangeLow: number; rangeHigh: number; estimatedValue: number;
+  confidence: "high" | "medium" | "low";
 }
 
 function computeValuation(listing: Listing, cityComps: Listing[]): ValuationResult {
-  const avgPricePerSqft =
-    cityComps.filter((c) => c.sqft && c.sqft > 0).length > 1
-      ? cityComps
-          .filter((c) => c.sqft && c.sqft > 0)
-          .reduce((sum, c) => sum + c.price / c.sqft!, 0) /
-        cityComps.filter((c) => c.sqft && c.sqft > 0).length
-      : null;
-
   const avgPrice = cityComps.length > 0 ? cityComps.reduce((s, c) => s + c.price, 0) / cityComps.length : listing.price;
-  const sqftEstimate = avgPricePerSqft && listing.sqft ? avgPricePerSqft * listing.sqft : null;
-  const estimatedValue = sqftEstimate || avgPrice;
+  const estimatedValue = avgPrice;
   const rangeLow = Math.round(estimatedValue * 0.85);
   const rangeHigh = Math.round(estimatedValue * 1.15);
   const confidence = cityComps.length >= 5 ? "high" : cityComps.length >= 2 ? "medium" : "low";
 
-  return { rangeLow, rangeHigh, estimatedValue: Math.round(estimatedValue), confidence, avgPricePerSqft };
+  return { rangeLow, rangeHigh, estimatedValue: Math.round(estimatedValue), confidence };
 }
 
 export default function ValuationEstimate({ listing }: ValuationEstimateProps) {
@@ -62,12 +52,7 @@ export default function ValuationEstimate({ listing }: ValuationEstimateProps) {
           {result.confidence} ({comps.length} comparable{comps.length !== 1 ? "s" : ""})
         </span>
       </div>
-      {result.avgPricePerSqft && (
-        <div className="flex items-center justify-between text-xs mt-2">
-          <span className="text-gray-500">Avg Price / Sqft</span>
-          <span className="font-medium">{formatNaira(result.avgPricePerSqft)}</span>
-        </div>
-      )}
+
     </div>
   );
 }

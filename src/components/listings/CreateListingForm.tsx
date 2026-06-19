@@ -53,15 +53,17 @@ export default function CreateListingForm({ backHref, title, subtitle, successRe
     listingType: "rent",
     bedrooms: "",
     bathrooms: "",
-    sqft: "",
+    size: "",
     city: defaultCity || "Kano Municipal",
     lat: "11.9950",
     lng: "8.5350",
     rentTier: "normal",
     price: "",
+    annualRent: "",
     damageDeposit: "",
     maintenanceCharge: "",
-    category: "portfolio",
+    salePrice: "",
+    category: "company",
   });
 
   const updateForm = (field: string, value: string) => {
@@ -75,7 +77,6 @@ export default function CreateListingForm({ backHref, title, subtitle, successRe
     const token = getAccessToken();
     for (const file of Array.from(files).slice(0, 10)) {
       try {
-        // Compress image before upload
         const compressed = await compressImage(file);
         const fd = new FormData();
         fd.append("file", compressed, file.name);
@@ -99,25 +100,36 @@ export default function CreateListingForm({ backHref, title, subtitle, successRe
     setSubmitting(true);
     setError("");
 
-    const { status } = await api.post("/api/listings", {
+    const body: any = {
       title: form.title,
       description: form.description,
       propertyType: form.propertyType,
       listingType: form.listingType,
       city: form.city,
-      address: "",
+      address: "Awaiting address",
       bedrooms: form.bedrooms ? parseInt(form.bedrooms) : undefined,
       bathrooms: form.bathrooms ? parseInt(form.bathrooms) : undefined,
-      sqft: form.sqft ? parseInt(form.sqft) : undefined,
-      price: form.price ? parseInt(form.price) : 0,
-      rentTier: form.rentTier,
+      size: form.size || undefined,
       category: form.category,
       features: [],
       lat: form.lat ? parseFloat(form.lat) : undefined,
       lng: form.lng ? parseFloat(form.lng) : undefined,
       photos: uploadedUrls.map(u => ({ url: u })),
       status: "draft",
-    });
+    };
+
+    if (form.listingType === "rent") {
+      body.annualRent = form.annualRent ? parseInt(form.annualRent) : 0;
+      body.rentTier = form.rentTier;
+      body.damageDeposit = form.damageDeposit ? parseInt(form.damageDeposit) : undefined;
+      body.maintenanceCharge = form.maintenanceCharge ? parseInt(form.maintenanceCharge) : undefined;
+      body.price = body.annualRent;
+    } else {
+      body.price = form.price ? parseInt(form.price) : 0;
+      body.salePrice = form.salePrice ? parseInt(form.salePrice) : undefined;
+    }
+
+    const { status } = await api.post("/api/listings", body);
     setSubmitting(false);
     if (status === 201) {
       setSuccess(true);
@@ -192,8 +204,8 @@ export default function CreateListingForm({ backHref, title, subtitle, successRe
               <Input label="Bedrooms" name="bedrooms" type="number" placeholder="3" value={form.bedrooms} onChange={e => updateForm("bedrooms", e.target.value)} />
               <Input label="Bathrooms" name="bathrooms" type="number" placeholder="2" value={form.bathrooms} onChange={e => updateForm("bathrooms", e.target.value)} />
             </div>
+            <Input label="Plot Size (e.g. 50x100)" name="size" placeholder="50x100" value={form.size} onChange={e => updateForm("size", e.target.value)} />
             <div className="grid grid-cols-2 gap-4">
-              <Input label="Area (sqft)" name="sqft" type="number" placeholder="1500" value={form.sqft} onChange={e => updateForm("sqft", e.target.value)} />
               <div className="space-y-1">
                 <label className="block text-sm font-medium text-gray-700">City</label>
                 <select name="city" className="w-full rounded-lg border border-gray-200 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]" value={form.city} onChange={e => updateForm("city", e.target.value)}>
@@ -233,23 +245,36 @@ export default function CreateListingForm({ backHref, title, subtitle, successRe
         {step === 3 && (
           <>
             <h2 className="font-semibold text-gray-900 text-sm">Pricing</h2>
-            <div className="space-y-1">
-              <label className="block text-sm font-medium text-gray-700">Rent Tier</label>
-              <div className="flex gap-2">
-                {["normal", "damages", "full"].map((tier) => (
-                  <button key={tier} type="button" onClick={() => updateForm("rentTier", tier)} className={`flex-1 px-3 py-2 rounded-lg text-xs font-medium border transition ${form.rentTier === tier ? "bg-[var(--color-primary)] text-white border-[var(--color-primary)]" : "bg-gray-50 hover:bg-gray-100 text-gray-700 border-gray-200 hover:border-[var(--color-primary)]"}`}>
-                    {tier === "normal" ? "Normal" : tier === "damages" ? "Rent + Damages" : "Full Package"}
-                  </button>
-                ))}
-              </div>
-            </div>
-            <Input label="Annual Rent (₦)" name="price" type="number" required placeholder="e.g. 1200000" value={form.price} onChange={e => updateForm("price", e.target.value)} />
-            <Input label="Damage Deposit (₦)" name="damageDeposit" type="number" placeholder="e.g. 150000" value={form.damageDeposit} onChange={e => updateForm("damageDeposit", e.target.value)} />
-            <Input label="Maintenance Charge (₦)" name="maintenanceCharge" type="number" placeholder="e.g. 80000" value={form.maintenanceCharge} onChange={e => updateForm("maintenanceCharge", e.target.value)} />
+
+            {form.listingType === "rent" && (
+              <>
+                <div className="space-y-1">
+                  <label className="block text-sm font-medium text-gray-700">Rent Tier</label>
+                  <div className="flex gap-2">
+                    {["normal", "damages", "full"].map((tier) => (
+                      <button key={tier} type="button" onClick={() => updateForm("rentTier", tier)} className={`flex-1 px-3 py-2 rounded-lg text-xs font-medium border transition ${form.rentTier === tier ? "bg-[var(--color-primary)] text-white border-[var(--color-primary)]" : "bg-gray-50 hover:bg-gray-100 text-gray-700 border-gray-200 hover:border-[var(--color-primary)]"}`}>
+                        {tier === "normal" ? "Basic" : tier === "damages" ? "Rent + Damages" : "Full Package"}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <Input label="Annual Rent (₦) *" name="annualRent" type="number" required placeholder="e.g. 1200000" value={form.annualRent} onChange={e => updateForm("annualRent", e.target.value)} />
+                <Input label="Damage Deposit (₦) *" name="damageDeposit" type="number" required placeholder="e.g. 150000" value={form.damageDeposit} onChange={e => updateForm("damageDeposit", e.target.value)} />
+                <Input label="Service Charge (₦) *" name="maintenanceCharge" type="number" required placeholder="e.g. 80000" value={form.maintenanceCharge} onChange={e => updateForm("maintenanceCharge", e.target.value)} />
+              </>
+            )}
+
+            {form.listingType === "sale" && (
+              <>
+                <Input label="Price (₦) *" name="price" type="number" required placeholder="e.g. 15000000" value={form.price} onChange={e => updateForm("price", e.target.value)} />
+                <Input label="Sale Price (₦)" name="salePrice" type="number" placeholder="Same as price if not set" value={form.salePrice} onChange={e => updateForm("salePrice", e.target.value)} />
+              </>
+            )}
+
             <div className="space-y-1">
               <label className="block text-sm font-medium text-gray-700">Category</label>
               <select name="category" className="w-full rounded-lg border border-gray-200 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]" value={form.category} onChange={e => updateForm("category", e.target.value)}>
-                <option value="portfolio">Own Portfolio</option><option value="partnership">Partnership</option>
+                <option value="company">Company</option><option value="partnership">Partnership</option>
               </select>
             </div>
             <div className="flex gap-3">

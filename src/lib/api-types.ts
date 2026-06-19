@@ -46,7 +46,7 @@ export interface ApiListing {
   city: string;
   bedrooms?: number;
   bathrooms?: number;
-  sqft?: number;
+  size?: string;
   features?: string[];
   lat: number;
   lng: number;

@@ -4,7 +4,7 @@ import { api } from "@/lib/api-client";
 import { formatNaira, resolveImageUrl } from "@/lib/utils";
 import { usePermissions } from "@/lib/use-permissions";
 
-interface Listing { id: string; title: string; description?: string; propertyType: string; listingType: string; category: string; city: string; address: string; price: number; status: string; bedrooms?: number; bathrooms?: number; sqft?: number; features?: string[]; photos?: { url: string }[]; negotiable?: boolean; createdAt?: string; }
+interface Listing { id: string; title: string; description?: string; propertyType: string; listingType: string; category: string; city: string; address: string; price: number; status: string;   bedrooms?: number; bathrooms?: number; size?: string; features?: string[]; photos?: { url: string }[]; negotiable?: boolean; createdAt?: string; }
 
 export default function OutsourcingPage() {
   const perms = usePermissions();
@@ -186,7 +186,7 @@ export default function OutsourcingPage() {
                 <div><span className="text-gray-400 block text-xs">Address</span><span className="font-medium">{preview.address || "N/A"}</span></div>
                 {preview.bedrooms ? <div><span className="text-gray-400 block text-xs">Bedrooms</span><span className="font-medium">{preview.bedrooms}</span></div> : null}
                 {preview.bathrooms ? <div><span className="text-gray-400 block text-xs">Bathrooms</span><span className="font-medium">{preview.bathrooms}</span></div> : null}
-                {preview.sqft ? <div><span className="text-gray-400 block text-xs">Area</span><span className="font-medium">{preview.sqft} sqft</span></div> : null}
+                {preview.size ? <div><span className="text-gray-400 block text-xs">Size</span><span className="font-medium">{preview.size}</span></div> : null}
                 <div><span className="text-gray-400 block text-xs">Category</span><span className="font-medium capitalize">{preview.category}</span></div>
                 <div><span className="text-gray-400 block text-xs">Negotiable</span><span className="font-medium">{preview.negotiable ? "Yes" : "No"}</span></div>
               </div>

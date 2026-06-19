@@ -68,7 +68,7 @@ export default function PropertyCard({ listing }: PropertyCardProps) {
           <div className="flex items-center gap-3 text-sm">
             {listing.bedrooms && <span className="font-bold text-gray-800">{listing.bedrooms} <span className="font-normal text-gray-500">bed</span></span>}
             {listing.bathrooms && <span className="font-bold text-gray-800">{listing.bathrooms} <span className="font-normal text-gray-500">bath</span></span>}
-            {listing.sqft && <span className="font-bold text-gray-800">{listing.sqft.toLocaleString()} <span className="font-normal text-gray-500">sqft</span></span>}
+            {listing.size && <span className="font-bold text-gray-800">{listing.size} <span className="font-normal text-gray-500"></span></span>}
           </div>
           <button
             onClick={handleFav}

@@ -59,8 +59,8 @@ export function useListings() {
       if (filters.maxBeds && (l.bedrooms || 0) > parseInt(filters.maxBeds)) return false;
       if (filters.minBaths && (l.bathrooms || 0) < parseInt(filters.minBaths)) return false;
       if (filters.maxBaths && (l.bathrooms || 0) > parseInt(filters.maxBaths)) return false;
-      if (filters.minSqft && (l.sqft || 0) < parseInt(filters.minSqft)) return false;
-      if (filters.maxSqft && (l.sqft || 0) > parseInt(filters.maxSqft)) return false;
+      if (filters.minSqft && !l.size) return false;
+      if (filters.maxSqft && !l.size) return false;
       return true;
     });
   }, [filters, listings]);

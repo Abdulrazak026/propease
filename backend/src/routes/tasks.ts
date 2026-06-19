@@ -14,7 +14,7 @@ router.get("/my", authenticate, authorize("agent", "ambassador", "head"), async 
       where: {
         OR: [
           { assignedToId: req.user!.id },
-          { assignedToId: { equals: null as any }, status: "open" },
+          { assignedToId: null, status: "open" },
         ],
       },
       include: {
@@ -181,8 +181,10 @@ router.patch("/:id/status", authenticate, async (req: AuthRequest, res: Response
     });
 
     res.json({ task: updated });
-    const assignee = await prisma.user.findUnique({ where: { id: task.assignedToId }, select: { email: true, name: true } });
-    emailService.taskStatusChanged(assignee?.email || "", assignee?.name || "", task.title, status).catch(() => {});
+    if (task.assignedToId) {
+      const assignee = await prisma.user.findUnique({ where: { id: task.assignedToId }, select: { email: true, name: true } });
+      emailService.taskStatusChanged(assignee?.email || "", assignee?.name || "", task.title, status).catch(() => {});
+    }
   } catch (error) {
     logger.error({ err: error }, "Update task status error:");
     res.status(500).json({ error: "Failed to update task status" });

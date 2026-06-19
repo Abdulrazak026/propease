@@ -28,9 +28,9 @@ export function slugify(text: string): string {
 }
 
 export const rentTierLabels: Record<string, string> = {
-  rent_only: "Rent Only",
-  rent_management: "Rent + Management",
-  rent_full: "Rent + Management + Inspection",
+  normal: "Rent Only",
+  damages: "Rent + Damages",
+  full: "Full Package",
 };
 
 export const propertyTypeLabels: Record<string, string> = {

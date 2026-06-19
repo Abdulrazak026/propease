@@ -36,7 +36,7 @@ enum ListingStatus {
 }
 
 enum ListingCategory {
-  portfolio
+  company
   partnership
 }
 
@@ -97,6 +97,7 @@ enum CustomOrderStatus {
   pending
   routed
   fulfilled
+  cancelled
 }
 
 enum WithdrawalStatus {
@@ -220,7 +221,7 @@ model Listing {
   city             String
   bedrooms         Int?
   bathrooms        Int?
-  sqft             Int?
+  size             String?
   price            Int            @default(0)
   features         String[]
   negotiable       Boolean        @default(false)
@@ -279,8 +280,8 @@ model Task {
   createdById String
   createdBy   User   @relation("CreatedTasks", fields: [createdById], references: [id])
 
-  assignedToId String
-  assignedTo   User   @relation("AssignedTasks", fields: [assignedToId], references: [id])
+  assignedToId String?
+  assignedTo   User?   @relation("AssignedTasks", fields: [assignedToId], references: [id])
 
   submittedListingId String?
 

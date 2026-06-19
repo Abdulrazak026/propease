@@ -13,12 +13,12 @@ export default function RentTierBreakdown({ listing }: RentTierBreakdownProps) {
 
  breakdown.push({ label: "Annual Rent", amount: listing.annualRent || 0, info: "Paid yearly upfront" });
 
- if (listing.rentTier === "rent_management" || listing.rentTier === "rent_full") {
- breakdown.push({ label: "Management Fee", amount: listing.managementFee || 0, info: "Property management" });
+ if (listing.rentTier === "damages" || listing.rentTier === "full") {
+   breakdown.push({ label: "Damage Deposit", amount: listing.damageDeposit || 0, info: "Refundable deposit" });
  }
 
- if (listing.rentTier === "rent_full") {
- breakdown.push({ label: "Inspection Fee", amount: listing.inspectionFee || 0, info: "Annual inspection" });
+ if (listing.rentTier === "full") {
+   breakdown.push({ label: "Service Charge", amount: listing.maintenanceCharge || 0, info: "Maintenance fee" });
  }
 
  const total = breakdown.reduce((s, i) => s + i.amount, 0);

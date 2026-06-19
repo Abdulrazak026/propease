@@ -24,20 +24,25 @@ export const createListingSchema = z.object({
   damageDeposit: z.number().int().min(0).optional(),
   maintenanceCharge: z.number().int().min(0).optional(),
   salePrice: z.number().int().positive().optional(),
-  category: z.enum(["portfolio", "partnership"]),
+  category: z.enum(["company", "partnership"]),
   partnerCompany: z.string().optional(),
   lat: z.number().min(-90).max(90).optional(),
   lng: z.number().min(-180).max(180).optional(),
-  address: z.string().min(5),
+  address: z.string().optional(),
   city: z.string().min(2),
   bedrooms: z.number().int().min(0).optional(),
   bathrooms: z.number().int().min(0).optional(),
-  sqft: z.number().int().min(0).optional(),
+  size: z.string().optional(),
   assignedAgentId: z.string().uuid().optional(),
   photos: z.array(z.object({ url: z.string() })).optional(),
   status: z.nativeEnum(ListingStatus).optional(),
   features: z.array(z.string()).optional(),
-});
+  price: z.number().int().min(0).optional(),
+}).refine((data) => {
+  if (data.listingType === "rent" && !data.annualRent) return false;
+  if (data.listingType === "sale" && !data.salePrice && !data.price) return false;
+  return true;
+}, { message: "Price or annual rent is required based on listing type" });
 
 export const createTaskSchema = z.object({
   title: z.string().min(5).max(200),

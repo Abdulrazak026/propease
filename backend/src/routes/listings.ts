@@ -138,7 +138,7 @@ router.post("/", authenticate, authorize("head", "ambassador", "agent"), validat
   }
 });
 
-router.put("/:id", authenticate, authorize("head", "ambassador", "agent"), async (req: AuthRequest, res: Response) => {
+router.put("/:id", authenticate, authorize("head", "ambassador", "agent"), validate(createListingSchema), async (req: AuthRequest, res: Response) => {
   try {
     const listingId = req.params.id as string;
     const listing = await prisma.listing.findUnique({ where: { id: listingId } });
@@ -150,11 +150,16 @@ router.put("/:id", authenticate, authorize("head", "ambassador", "agent"), async
       return res.status(403).json({ error: "You can only edit your own listings" });
     }
 
-    const { photos: newPhotos, ...listingData } = req.body;
+    const data = req.body;
+    const { photos: newPhotos, ...listingData } = data;
 
     const updated = await prisma.listing.update({
       where: { id: listingId },
-      data: listingData,
+      data: {
+        ...listingData,
+        price: data.listingType === "rent" ? data.annualRent || 0 : data.salePrice || 0,
+        features: listingData.features || [],
+      },
       include: { photos: true, postedBy: { select: { id: true, name: true } } },
     });
 

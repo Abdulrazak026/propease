@@ -1,6 +1,7 @@
 import { Router, Response } from "express";
 import prisma from "../lib/prisma";
 import { authenticate, AuthRequest } from "../middleware/auth";
+import { authorize } from "../middleware/rbac";
 import { validate } from "../middleware/validate";
 import { createCustomOrderSchema } from "../validators";
 import { logger } from "../lib/logger";
@@ -75,6 +76,10 @@ router.get("/", authenticate, async (req: AuthRequest, res: Response) => {
 router.patch("/:id/status", authenticate, async (req: AuthRequest, res: Response) => {
   try {
     const { status } = req.body;
+    const validStatuses: readonly string[] = ["pending", "routed", "fulfilled", "cancelled"];
+    if (!validStatuses.includes(status)) {
+      return res.status(400).json({ error: "Invalid status" });
+    }
     const order = await prisma.customOrder.update({
       where: { id: req.params.id as string },
       data: { status },
@@ -83,6 +88,59 @@ router.patch("/:id/status", authenticate, async (req: AuthRequest, res: Response
   } catch (error) {
     logger.error({ err: error }, "Update custom order error:");
     res.status(500).json({ error: "Failed to update order" });
+  }
+});
+
+router.post("/:id/share", authenticate, authorize("head"), async (req: AuthRequest, res: Response) => {
+  try {
+    const { staffIds } = req.body;
+    if (!staffIds || !Array.isArray(staffIds) || staffIds.length === 0) {
+      return res.status(400).json({ error: "staffIds array is required" });
+    }
+
+    const order = await prisma.customOrder.findUnique({ where: { id: req.params.id as string } });
+    if (!order) {
+      return res.status(404).json({ error: "Custom order not found" });
+    }
+
+    const tasks: any[] = [];
+    for (const staffId of staffIds) {
+      const task = await prisma.task.create({
+        data: {
+          title: `Custom order: ${order.propertyType} in ${order.area}`,
+          description: `Client ${order.clientName} (${order.clientContact}) is looking for a ${order.propertyType} in ${order.area}. Budget: ₦${order.budget.toLocaleString()}. ${order.notes || ""}\n\nShared from custom order by ${req.user!.email}`,
+          propertyType: order.propertyType,
+          area: order.area,
+          budget: order.budget,
+          deadline: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
+          notes: order.notes,
+          source: "client_request",
+          createdById: req.user!.id,
+          assignedToId: staffId,
+        },
+      });
+      tasks.push(task);
+
+      await prisma.notification.create({
+        data: {
+          userId: staffId,
+          type: "task_status",
+          title: "New Task Assigned",
+          body: `Custom order: ${order.propertyType} in ${order.area} — ${order.clientName}`,
+          link: `/agent/tasks/${task.id}`,
+        },
+      }).catch(() => {});
+    }
+
+    await prisma.customOrder.update({
+      where: { id: order.id },
+      data: { status: "routed" },
+    });
+
+    res.status(201).json({ tasks, orderId: order.id });
+  } catch (error) {
+    logger.error({ err: error }, "Share custom order error:");
+    res.status(500).json({ error: "Failed to share order" });
   }
 });
 

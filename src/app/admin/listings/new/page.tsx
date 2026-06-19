@@ -9,7 +9,7 @@ const API = process.env.NEXT_PUBLIC_API_URL || "https://mbpproperties.com";
 
 const PROPERTY_TYPES = ["house", "flat", "land", "commercial", "other"] as const;
 const LISTING_TYPES = ["sale", "rent"] as const;
-const RENT_TIERS = ["rent_only", "rent_management", "rent_full"] as const;
+const RENT_TIERS = ["normal", "damages", "full"] as const;
 const FEATURES = ["Borehole", "Parking", "Security", "Pool", "Gym", "Solar", "Furnished", "CCTV"];
 
 export default function AdminNewListingPage() {
@@ -18,8 +18,8 @@ export default function AdminNewListingPage() {
     title: "", description: "", propertyType: "house", listingType: "sale",
     city: "Kano Municipal", address: "", price: "", salePrice: "",
     annualRent: "", damageDeposit: "", maintenanceCharge: "",
-    rentTier: "rent_only", bedrooms: "", bathrooms: "", sqft: "",
-    features: [] as string[], category: "portfolio" as "portfolio" | "partnership",
+    rentTier: "normal", bedrooms: "", bathrooms: "", size: "",
+    features: [] as string[], category: "company" as "company" | "partnership",
     partnerCompany: "", negotiable: false,
   });
   const [uploadedUrls, setUploadedUrls] = useState<string[]>([]);
@@ -65,30 +65,37 @@ export default function AdminNewListingPage() {
     setSubmitting(true);
     setError("");
     try {
-      const price = parseInt(form.price) || 0;
-      const r = await api.post("/api/listings", {
+      const body: any = {
         title: form.title,
         description: form.description,
         propertyType: form.propertyType,
         listingType: form.listingType,
         city: form.city,
-        address: form.address,
-        price,
-        salePrice: form.listingType === "sale" ? parseInt(form.salePrice) || price : undefined,
-        annualRent: form.listingType === "rent" ? parseInt(form.annualRent) || price : undefined,
-        damageDeposit: form.damageDeposit ? parseInt(form.damageDeposit) : undefined,
-        maintenanceCharge: form.maintenanceCharge ? parseInt(form.maintenanceCharge) : undefined,
-        rentTier: form.listingType === "rent" ? form.rentTier : undefined,
+        address: form.address || form.city,
         bedrooms: form.bedrooms ? parseInt(form.bedrooms) : undefined,
         bathrooms: form.bathrooms ? parseInt(form.bathrooms) : undefined,
-        sqft: form.sqft ? parseInt(form.sqft) : undefined,
+        size: form.size || undefined,
         features: form.features,
         category: form.category,
         partnerCompany: form.category === "partnership" ? form.partnerCompany : undefined,
         negotiable: form.negotiable,
-        photos: uploadedUrls,
+        photos: uploadedUrls.map(url => ({ url })),
         status: "draft",
-      });
+      };
+
+      if (form.listingType === "rent") {
+        body.annualRent = form.annualRent ? parseInt(form.annualRent) : 0;
+        body.rentTier = form.rentTier;
+        body.damageDeposit = form.damageDeposit ? parseInt(form.damageDeposit) : undefined;
+        body.maintenanceCharge = form.maintenanceCharge ? parseInt(form.maintenanceCharge) : undefined;
+        body.price = body.annualRent;
+      } else {
+        const price = parseInt(form.price) || 0;
+        body.price = price;
+        body.salePrice = form.salePrice ? parseInt(form.salePrice) || price : undefined;
+      }
+
+      const r = await api.post("/api/listings", body);
       if (r.error) { setError(r.error); setSubmitting(false); return; }
       setSuccess(true);
     } catch (err: any) {
@@ -106,7 +113,7 @@ export default function AdminNewListingPage() {
       <p className="text-sm text-gray-500 mt-2">Your listing is now in draft mode. Submit for review to publish.</p>
       <div className="flex items-center justify-center gap-3 mt-6">
         <Button variant="outline" onClick={() => router.push("/admin/moderation")}>View in Moderation</Button>
-        <Button onClick={() => { setSuccess(false); setForm(p => ({ ...p, title: "", description: "", price: "", salePrice: "", annualRent: "", address: "", bedrooms: "", bathrooms: "", sqft: "", partnerCompany: "" })); setUploadedUrls([]); }}>Create Another</Button>
+        <Button onClick={() => { setSuccess(false); setForm(p => ({ ...p, title: "", description: "", price: "", salePrice: "", annualRent: "", address: "", bedrooms: "", bathrooms: "", size: "", partnerCompany: "" })); setUploadedUrls([]); }}>Create Another</Button>
       </div>
     </div>
   );
@@ -161,32 +168,34 @@ export default function AdminNewListingPage() {
 
         {/* Pricing */}
         <h3 className="text-sm font-semibold text-gray-900 pt-2">Pricing</h3>
-        <div>
-          <label className="block text-xs font-medium text-gray-700 mb-1">Price (NGN) *</label>
-          <input type="number" required min="0" value={form.price} onChange={tf("price")} placeholder="e.g. 15000000" className="w-full rounded-lg border border-gray-200 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20" />
-        </div>
 
         {form.listingType === "sale" && (
-          <div>
-            <label className="block text-xs font-medium text-gray-700 mb-1">Sale Price (NGN)</label>
-            <input type="number" value={form.salePrice} onChange={tf("salePrice")} placeholder="Same as price if not set" className="w-full rounded-lg border border-gray-200 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20" />
-          </div>
+          <>
+            <div>
+              <label className="block text-xs font-medium text-gray-700 mb-1">Price (NGN) *</label>
+              <input type="number" required min="0" value={form.price} onChange={tf("price")} placeholder="e.g. 15000000" className="w-full rounded-lg border border-gray-200 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20" />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-gray-700 mb-1">Sale Price (NGN)</label>
+              <input type="number" value={form.salePrice} onChange={tf("salePrice")} placeholder="Same as price if not set" className="w-full rounded-lg border border-gray-200 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20" />
+            </div>
+          </>
         )}
 
         {form.listingType === "rent" && (
           <>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1">Annual Rent (NGN)</label>
-                <input type="number" value={form.annualRent} onChange={tf("annualRent")} placeholder="e.g. 1200000" className="w-full rounded-lg border border-gray-200 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20" />
+                <label className="block text-xs font-medium text-gray-700 mb-1">Annual Rent (NGN) *</label>
+                <input type="number" required min="0" value={form.annualRent} onChange={tf("annualRent")} placeholder="e.g. 1200000" className="w-full rounded-lg border border-gray-200 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20" />
               </div>
               <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1">Damage Deposit</label>
-                <input type="number" value={form.damageDeposit} onChange={tf("damageDeposit")} placeholder="e.g. 150000" className="w-full rounded-lg border border-gray-200 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20" />
+                <label className="block text-xs font-medium text-gray-700 mb-1">Damage Deposit *</label>
+                <input type="number" required min="0" value={form.damageDeposit} onChange={tf("damageDeposit")} placeholder="e.g. 150000" className="w-full rounded-lg border border-gray-200 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20" />
               </div>
               <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1">Service Charge</label>
-                <input type="number" value={form.maintenanceCharge} onChange={tf("maintenanceCharge")} placeholder="e.g. 50000" className="w-full rounded-lg border border-gray-200 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20" />
+                <label className="block text-xs font-medium text-gray-700 mb-1">Service Charge *</label>
+                <input type="number" required min="0" value={form.maintenanceCharge} onChange={tf("maintenanceCharge")} placeholder="e.g. 50000" className="w-full rounded-lg border border-gray-200 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20" />
               </div>
             </div>
             <div>
@@ -194,7 +203,7 @@ export default function AdminNewListingPage() {
               <div className="flex gap-2">
                 {RENT_TIERS.map(tier => (
                   <button key={tier} type="button" onClick={() => u("rentTier", tier)} className={`px-4 py-2 rounded-lg text-xs font-medium border transition-all ${form.rentTier === tier ? "bg-[var(--color-primary)] text-white border-[var(--color-primary)]" : "bg-white text-gray-600 border-gray-200 hover:border-gray-300"}`}>
-                    {tier === "rent_only" ? "Basic" : tier === "rent_management" ? "With Damages" : "Full Package"}
+                    {tier === "normal" ? "Basic" : tier === "damages" ? "With Damages" : "Full Package"}
                   </button>
                 ))}
               </div>
@@ -219,8 +228,8 @@ export default function AdminNewListingPage() {
             <input type="number" min="0" value={form.bathrooms} onChange={tf("bathrooms")} placeholder="e.g. 2" className="w-full rounded-lg border border-gray-200 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20" />
           </div>
           <div>
-            <label className="block text-xs font-medium text-gray-700 mb-1">Area (sqft)</label>
-            <input type="number" min="0" value={form.sqft} onChange={tf("sqft")} placeholder="e.g. 1500" className="w-full rounded-lg border border-gray-200 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20" />
+            <label className="block text-xs font-medium text-gray-700 mb-1">Plot Size (e.g. 50x100)</label>
+            <input value={form.size} onChange={tf("size")} placeholder="e.g. 50x100" className="w-full rounded-lg border border-gray-200 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20" />
           </div>
         </div>
 
@@ -239,7 +248,7 @@ export default function AdminNewListingPage() {
           <div>
             <label className="block text-xs font-medium text-gray-700 mb-1">Category</label>
             <select value={form.category} onChange={tf("category")} className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20">
-              <option value="portfolio">Own Portfolio</option>
+              <option value="company">Company</option>
               <option value="partnership">Partnership</option>
             </select>
           </div>
@@ -269,7 +278,7 @@ export default function AdminNewListingPage() {
 
         <div className="flex items-center justify-end gap-3 pt-3 border-t border-gray-100">
           <a href="/admin"><Button variant="outline">Cancel</Button></a>
-          <Button type="submit" disabled={submitting || !form.title || !form.description || !parseInt(form.price)}>{submitting ? "Creating..." : "Create Listing"}</Button>
+          <Button type="submit" disabled={submitting || !form.title || !form.description}>{submitting ? "Creating..." : "Create Listing"}</Button>
         </div>
       </form>
     </div>

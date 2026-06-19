@@ -13,7 +13,7 @@ export interface FilterState {
   search: string; propertyType: PropertyType | ""; listingType: ListingType | "";
   rentTier: RentTier | ""; category: ListingCategory | ""; city: string;
   minPrice: string; maxPrice: string; minBeds: string; maxBeds: string;
-  minBaths: string; maxBaths: string; minSqft: string; maxSqft: string;
+  minBaths: string; maxBaths: string; size: string;
   paymentOption: string;
 }
 
@@ -28,7 +28,7 @@ export default function PropertyFilters({ onFilterChange }: PropertyFiltersProps
     search: "", propertyType: "", listingType: "", rentTier: "",
     category: "", city: "", minPrice: "", maxPrice: "",
     minBeds: "", maxBeds: "", minBaths: "", maxBaths: "",
-    minSqft: "", maxSqft: "", paymentOption: "",
+    size: "", paymentOption: "",
   });
   const [showMore, setShowMore] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -44,7 +44,7 @@ export default function PropertyFilters({ onFilterChange }: PropertyFiltersProps
       search: "", propertyType: "", listingType: "", rentTier: "",
       category: "", city: "", minPrice: "", maxPrice: "",
       minBeds: "", maxBeds: "", minBaths: "", maxBaths: "",
-      minSqft: "", maxSqft: "", paymentOption: "",
+      size: "", paymentOption: "",
     };
     setFilters(empty);
     onFilterChange(empty);
@@ -95,7 +95,7 @@ export default function PropertyFilters({ onFilterChange }: PropertyFiltersProps
         <div className="grid grid-cols-2 gap-3 pt-2">
           <select value={filters.rentTier} onChange={(e) => update("rentTier", e.target.value)}
             className="min-h-[44px] rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)]">
-            <option value="">Rent Tier</option><option value="rent_only">Basic</option><option value="rent_management">+Damages</option><option value="rent_full">Full</option>
+            <option value="">Rent Tier</option><option value="normal">Basic</option><option value="damages">+Damages</option><option value="full">Full</option>
           </select>
           <select value={filters.paymentOption} onChange={(e) => update("paymentOption", e.target.value)}
             className="min-h-[44px] rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)]">
@@ -105,7 +105,7 @@ export default function PropertyFilters({ onFilterChange }: PropertyFiltersProps
             className="min-h-[44px] rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)]" />
           <input type="number" placeholder="Min baths" value={filters.minBaths} onChange={(e) => update("minBaths", e.target.value)}
             className="min-h-[44px] rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)]" />
-          <input type="number" placeholder="Min sqft" value={filters.minSqft} onChange={(e) => update("minSqft", e.target.value)}
+          <input type="text" placeholder="Plot size (e.g. 50x100)" value={filters.size} onChange={(e) => update("size", e.target.value)}
             className="min-h-[44px] rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)]" />
         </div>
       )}
@@ -159,7 +159,7 @@ export default function PropertyFilters({ onFilterChange }: PropertyFiltersProps
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1.5 border-t border-gray-100">
             <select value={filters.rentTier} onChange={(e) => update("rentTier", e.target.value)}
               className="rounded-md border border-gray-300 bg-white px-2 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)]">
-              <option value="">Rent Tier</option><option value="rent_only">Basic</option><option value="rent_management">+Damages</option><option value="rent_full">Full</option>
+              <option value="">Rent Tier</option><option value="normal">Basic</option><option value="damages">+Damages</option><option value="full">Full</option>
             </select>
             <select value={filters.paymentOption} onChange={(e) => update("paymentOption", e.target.value)}
               className="rounded-md border border-gray-300 bg-white px-2 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)]">
@@ -169,7 +169,7 @@ export default function PropertyFilters({ onFilterChange }: PropertyFiltersProps
               className="rounded-md border border-gray-300 bg-white px-2 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)]" />
             <input type="number" placeholder="Min baths" value={filters.minBaths} onChange={(e) => update("minBaths", e.target.value)}
               className="rounded-md border border-gray-300 bg-white px-2 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)]" />
-            <input type="number" placeholder="Min sqft" value={filters.minSqft} onChange={(e) => update("minSqft", e.target.value)}
+            <input type="text" placeholder="Plot size (e.g. 50x100)" value={filters.size} onChange={(e) => update("size", e.target.value)}
               className="rounded-md border border-gray-300 bg-white px-2 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)]" />
           </div>
         )}

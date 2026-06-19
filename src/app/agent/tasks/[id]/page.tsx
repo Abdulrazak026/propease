@@ -5,7 +5,7 @@ import { useState, useEffect, useRef } from "react";
 import Badge from "@/components/ui/Badge";
 import Button from "@/components/ui/Button";
 import { formatNaira, formatDate, propertyTypeLabels } from "@/lib/utils";
-import { api } from "@/lib/api-client";
+import { api, getAccessToken } from "@/lib/api-client";
 import { usePermissions } from "@/lib/use-permissions";
 
 export default function AgentTaskDetail() {
@@ -21,7 +21,9 @@ export default function AgentTaskDetail() {
   const [showSubmit, setShowSubmit] = useState(false);
   const [submitDesc, setSubmitDesc] = useState("");
   const [submitPhotos, setSubmitPhotos] = useState<string[]>([]);
+  const [uploading, setUploading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const photoFileRef = useRef<HTMLInputElement>(null);
   const [submissions, setSubmissions] = useState<any[]>([]);
 
   useEffect(() => {
@@ -56,6 +58,23 @@ export default function AgentTaskDetail() {
       commentRef.current?.focus();
     } catch {}
     setSendingComment(false);
+  };
+
+  const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files?.length) return;
+    setUploading(true);
+    const token = getAccessToken();
+    for (const file of Array.from(files).slice(0, 10)) {
+      const fd = new FormData();
+      fd.append("file", file);
+      try {
+        const res = await fetch(`https://mbpproperties.com/api/upload`, { method: "POST", headers: token ? { Authorization: `Bearer ${token}` } : {}, body: fd });
+        if (res.ok) { const { url } = await res.json(); setSubmitPhotos(prev => [...prev, url]); }
+      } catch {}
+    }
+    setUploading(false);
+    if (photoFileRef.current) photoFileRef.current.value = "";
   };
 
   const submitTask = async () => {
@@ -125,14 +144,22 @@ export default function AgentTaskDetail() {
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium text-gray-600 mb-1">Photos (URLs, one per line)</label>
-                <textarea
-                  value={submitPhotos.join("\n")}
-                  onChange={e => setSubmitPhotos(e.target.value.split("\n").filter(Boolean))}
-                  placeholder="https://example.com/photo1.jpg&#10;https://example.com/photo2.jpg"
-                  rows={2}
-                  className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm font-mono resize-none focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)]"
-                />
+                <label className="block text-xs font-medium text-gray-600 mb-1">Photos</label>
+                <input type="file" ref={photoFileRef} multiple accept="image/*" onChange={handlePhotoUpload} className="hidden" />
+                <div onClick={() => photoFileRef.current?.click()} className="border-2 border-dashed border-gray-200 rounded-lg p-4 text-center hover:border-[var(--color-primary)] transition cursor-pointer">
+                  <p className="text-sm font-medium text-gray-700">{uploading ? "Uploading..." : "Upload Photos"}</p>
+                  <p className="text-xs text-gray-400 mt-1">Click to browse</p>
+                </div>
+                {submitPhotos.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mt-2">
+                    {submitPhotos.map((url, i) => (
+                      <div key={i} className="relative">
+                        <img src={url} alt="" className="w-16 h-16 object-cover rounded-lg border border-gray-200" />
+                        <button type="button" onClick={() => setSubmitPhotos(prev => prev.filter((_, j) => j !== i))} className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-red-500 text-white rounded-full text-xs flex items-center justify-center hover:bg-red-600">×</button>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
               <div className="flex gap-2">
                 <Button size="sm" variant="outline" onClick={() => setShowSubmit(false)}>Cancel</Button>
