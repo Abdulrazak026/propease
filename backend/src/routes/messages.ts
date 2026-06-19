@@ -132,12 +132,13 @@ router.post("/conversations", authenticate, async (req: AuthRequest, res: Respon
               clientContact: sender?.email || "",
               message: content,
               listingId,
-              assignedAgentId: listing.assignedAgentId,
+              assignedAgentId: listing.assignedAgentId || recipientId,
             },
           });
-          if (listing.assignedAgentId) {
+          const agentId = listing.assignedAgentId || recipientId;
+          if (agentId) {
             const agent = await prisma.user.findUnique({
-              where: { id: listing.assignedAgentId },
+              where: { id: agentId },
               select: { name: true, email: true },
             });
             if (agent) {
