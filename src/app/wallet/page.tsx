@@ -1,20 +1,16 @@
 "use client";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 import { useRole } from "@/context/RoleContext";
 import { formatNaira } from "@/lib/utils";
 import Button from "@/components/ui/Button";
 import Badge from "@/components/ui/Badge";
-import PaystackButton from "@/components/payments/PaystackButton";
 import { api } from "@/lib/api-client";
 
-const API = process.env.NEXT_PUBLIC_API_URL || "https://mbpproperties.com";
-
-type Tab = "overview" | "top" | "withdraw";
+type Tab = "overview" | "withdraw";
 
 export default function WalletPage() {
-  const { currentUser, setCurrentUser } = useRole();
+  const { currentUser } = useRole();
   const [tab, setTab] = useState<Tab>("overview");
-  const [topUpAmount, setTopUpAmount] = useState("");
   const [withdrawAmount, setWithdrawAmount] = useState("");
   const [bankName, setBankName] = useState("");
   const [accountNumber, setAccountNumber] = useState("");
@@ -46,26 +42,11 @@ export default function WalletPage() {
   const pending = myTxs.filter((t: any) => t.status === "pending");
   const balance = currentUser?.walletBalance || 0;
 
-  const handlePaySuccess = async (reference: string) => {
-    const amount = parseInt(topUpAmount);
-    if (!currentUser || !amount) return;
-    // Verify with Paystack
-    try {
-      const res = await fetch(`${API}/api/payments/verify/${reference}`);
-      if (res.ok) {
-        const updated = { ...currentUser, walletBalance: currentUser.walletBalance + amount };
-        setCurrentUser(updated);
-        setTopUpAmount("");
-        setSuccessMsg(`\u20A6${amount.toLocaleString()} added to wallet`);
-      }
-    } catch {}
-    setTimeout(() => setSuccessMsg(""), 4000);
-  };
-
   const handleWithdraw = async () => {
     if (!withdrawAmount || !currentUser) return;
     const amount = parseInt(withdrawAmount);
     if (amount > balance) { setErrorMsg("Insufficient balance"); return; }
+    if (amount < 1000) { setErrorMsg("Minimum withdrawal is ₦1,000"); return; }
     setErrorMsg("");
     try {
       const r = await api.post("/api/wallet/withdraw", {
@@ -79,7 +60,7 @@ export default function WalletPage() {
       setBankName("");
       setAccountNumber("");
       setAccountName("");
-      setSuccessMsg(`Withdrawal of \u20A6${amount.toLocaleString()} submitted for approval`);
+      setSuccessMsg(`Withdrawal of ${formatNaira(amount)} submitted for approval`);
     } catch (err: any) {
       setErrorMsg(err?.message || "Withdrawal failed");
     }
@@ -88,14 +69,13 @@ export default function WalletPage() {
 
   const tabs: { key: Tab; label: string }[] = [
     { key: "overview", label: "Transactions" },
-    { key: "top", label: "Top Up" },
     { key: "withdraw", label: "Withdraw" },
   ];
 
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
-        <div><h1 className="text-xl font-bold text-gray-900">Wallet</h1><p className="text-sm text-gray-500 mt-0.5">Manage your funds and transactions</p></div>
+        <div><h1 className="text-xl font-bold text-gray-900">Wallet</h1><p className="text-sm text-gray-500 mt-0.5">Commission earnings and withdrawals</p></div>
         <div className="text-left sm:text-right"><p className="text-xs text-gray-500">Available Balance</p><p className="text-2xl font-bold text-[var(--color-primary)]">{formatNaira(balance)}</p></div>
       </div>
 
@@ -119,7 +99,7 @@ export default function WalletPage() {
                   {myTxs.map((tx: any) => (
                     <tr key={tx.id} className="border-b border-gray-50 hover:bg-gray-50/50 transition-colors">
                       <td className="px-4 py-3.5 text-xs font-mono text-gray-500">{tx.reference}</td>
-                      <td className="px-4 py-3.5 text-xs capitalize text-gray-700">{tx.type?.replace("_", " ")}</td>
+                      <td className="px-4 py-3.5 text-xs capitalize text-gray-700">{tx.type?.replace(/_/g, " ")}</td>
                       <td className={`px-4 py-3.5 text-sm text-right font-medium whitespace-nowrap ${tx.type === "payment" || tx.type === "withdrawal" ? "text-red-600" : "text-emerald-600"}`}>{(tx.type === "payment" || tx.type === "withdrawal") ? "-" : "+"}{formatNaira(tx.amount)}</td>
                       <td className="px-4 py-3.5 text-xs capitalize text-gray-500">{tx.method}</td>
                       <td className="px-4 py-3.5"><Badge variant={tx.status === "completed" ? "success" : tx.status === "pending" ? "warning" : "danger"}>{tx.status}</Badge></td>
@@ -130,20 +110,6 @@ export default function WalletPage() {
               </table>
             </div>
           ) : <p className="text-sm text-gray-400 py-8 text-center">No transactions yet</p>}
-        </div>
-      )}
-
-      {tab === "top" && (
-        <div className="bg-white rounded-lg border border-gray-200 p-6 max-w-md">
-          <h2 className="text-sm font-semibold text-gray-900 mb-1">Add Funds</h2>
-          <p className="text-xs text-gray-500 mb-4">Enter amount to add to your wallet.</p>
-          <div className="flex gap-2 mb-3">
-            {[10000, 25000, 50000, 100000].map((amt) => (
-              <button key={amt} onClick={() => setTopUpAmount(amt.toString())} className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-all ${topUpAmount === amt.toString() ? "bg-[var(--color-primary)] text-white border-[var(--color-primary)]" : "bg-white text-gray-600 border-gray-200 hover:border-gray-300"}`}>{formatNaira(amt)}</button>
-            ))}
-          </div>
-          <input type="number" value={topUpAmount} onChange={(e) => setTopUpAmount(e.target.value)} placeholder="Or enter custom amount" min="1000" className="w-full rounded-lg border border-gray-200 bg-white px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20 mb-4" />
-          <PaystackButton email={currentUser?.email || "user@example.com"} amount={parseInt(topUpAmount) || 0} label={`Pay ${topUpAmount ? formatNaira(parseInt(topUpAmount)) : "with Paystack"}`} metadata={{ userId: currentUser?.id, purpose: "wallet_top_up" }} onSuccess={handlePaySuccess} disabled={!topUpAmount || parseInt(topUpAmount) < 1000} className="w-full" />
         </div>
       )}
 

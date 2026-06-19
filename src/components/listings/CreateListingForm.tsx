@@ -64,6 +64,9 @@ export default function CreateListingForm({ backHref, title, subtitle, successRe
     maintenanceCharge: "",
     salePrice: "",
     category: "company",
+    depositAmount: "",
+    reservationDays: "2",
+    downPaymentPercent: "10",
   });
 
   const updateForm = (field: string, value: string) => {
@@ -116,6 +119,9 @@ export default function CreateListingForm({ backHref, title, subtitle, successRe
       lng: form.lng ? parseFloat(form.lng) : undefined,
       photos: uploadedUrls.map(u => ({ url: u })),
       status: "draft",
+      depositAmount: form.depositAmount ? parseInt(form.depositAmount) : undefined,
+      reservationDays: form.reservationDays ? parseInt(form.reservationDays) : undefined,
+      downPaymentPercent: form.downPaymentPercent ? parseInt(form.downPaymentPercent) : undefined,
     };
 
     if (form.listingType === "rent") {
@@ -287,6 +293,15 @@ export default function CreateListingForm({ backHref, title, subtitle, successRe
                 <option value="company">Company</option><option value="partnership">Partnership</option>
               </select>
             </div>
+
+            <h3 className="font-semibold text-gray-900 text-sm pt-2">Reservation Settings</h3>
+            <div className="grid grid-cols-2 gap-4">
+              <Input label="Holding Deposit (₦)" name="depositAmount" type="number" placeholder="Auto if empty" value={form.depositAmount} onChange={e => updateForm("depositAmount", e.target.value)} />
+              <Input label="Reservation Duration (days)" name="reservationDays" type="number" placeholder="2" value={form.reservationDays} onChange={e => updateForm("reservationDays", e.target.value)} />
+            </div>
+            {form.listingType === "sale" && (
+              <Input label="Down Payment (%)" name="downPaymentPercent" type="number" placeholder="10" value={form.downPaymentPercent} onChange={e => updateForm("downPaymentPercent", e.target.value)} />
+            )}
             <div className="flex gap-3">
               <Button variant="outline" className="w-1/2" onClick={() => setStep(2)}>← Back</Button>
               <Button type="submit" className="w-1/2" disabled={submitting}>{submitting ? "Posting..." : "Post Listing"}</Button>

@@ -29,6 +29,18 @@ export default function ListingDetail() {
   const [showReserveModal, setShowReserveModal] = useState(false);
   const [reserveStep, setReserveStep] = useState<"confirm" | "pay" | "done">("confirm");
   const [bookingSuccess, setBookingSuccess] = useState(false);
+  const [showBuyModal, setShowBuyModal] = useState(false);
+  const [buyStep, setBuyStep] = useState<"choose" | "pay" | "done">("choose");
+  const [buyType, setBuyType] = useState<"full" | "down_payment">("full");
+
+  const reserveDeposit = listing.depositAmount
+    || (listing.listingType === "rent"
+      ? (listing.damageDeposit || Math.round(listing.price * 0.1))
+      : Math.round(listing.price * 0.05));
+  const reserveDays = listing.reservationDays || 2;
+  const downPaymentAmt = listing.downPaymentPercent
+    ? Math.round(listing.price * (listing.downPaymentPercent / 100))
+    : Math.round(listing.price * 0.1);
   const [fav, setFav] = useState(false);
   const [priceHistory, setPriceHistory] = useState<any[]>([]);
   const [showInquiryModal, setShowInquiryModal] = useState(false);
@@ -205,6 +217,7 @@ export default function ListingDetail() {
                   </button>
                 </div>
                 {listing.listingType === "rent" && <p className="text-xs text-gray-400 mt-1">Due upfront on signing</p>}
+                {listing.listingType !== "rent" && <p className="text-xs text-gray-400 mt-1">Full price or pay {listing.downPaymentPercent || 10}% down payment</p>}
               </div>
 
               {listing.listingType === "rent" && listing.assignedAgent && (
@@ -223,9 +236,26 @@ export default function ListingDetail() {
               )}
 
               <div className="pt-5 space-y-3">
-                <Button className="w-full" disabled={listing.status !== "available"} onClick={() => setShowReserveModal(true)}>
-                  {listing.status === "available" ? "Reserve This Property" : "Already Reserved"}
-                </Button>
+                {listing.status === "available" && listing.listingType === "rent" && (
+                  <Button className="w-full" onClick={() => setShowReserveModal(true)}>
+                    Reserve This Property
+                  </Button>
+                )}
+                {listing.status === "available" && listing.listingType !== "rent" && (
+                  <>
+                    <Button className="w-full bg-[var(--color-primary)]" onClick={() => setShowBuyModal(true)}>
+                      Buy Now - {formatNaira(listing.price)}
+                    </Button>
+                    <Button variant="outline" className="w-full" onClick={() => setShowReserveModal(true)}>
+                      Reserve - {formatNaira(reserveDeposit)}
+                    </Button>
+                  </>
+                )}
+                {listing.status !== "available" && (
+                  <Button className="w-full" disabled>
+                    {listing.status === "reserved" ? "Reserved" : listing.status === "sold" ? "Sold" : "Rented"}
+                  </Button>
+                )}
 
                 <Button variant="outline" className="w-full" onClick={() => {
                   setInquiryForm({
@@ -289,13 +319,13 @@ export default function ListingDetail() {
               {bookingSuccess && (
                 <div className="bg-green-50 border border-green-200 rounded-lg p-4 mt-4 text-center">
                   <p className="text-sm font-medium text-green-800">Reservation Confirmed!</p>
-                  <p className="text-xs text-green-600 mt-1">Holding deposit received. Expires in 48 hours.</p>
+                  <p className="text-xs text-green-600 mt-1">Holding deposit received. Expires in {reserveDays} days.</p>
                 </div>
               )}
 
               <p className="text-xs text-gray-400 text-center mt-4 flex items-center justify-center gap-1">
                 <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
-                Pay via wallet or card at checkout
+                Pay securely via Paystack
               </p>
             </div>
 
@@ -403,18 +433,17 @@ export default function ListingDetail() {
         </div>
       )}
 
-      {/* Reservation Modal - Centered popup */}
+      {/* Reservation Modal */}
       {showReserveModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => { if (reserveStep !== "done") { setShowReserveModal(false); setReserveStep("confirm"); } }} />
           <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
-            {/* Header */}
             <div className="bg-gradient-to-r from-emerald-600 to-teal-600 px-6 py-5">
               <h3 className="text-lg font-bold text-white">
                 {reserveStep === "done" ? "Reservation Confirmed" : reserveStep === "pay" ? "Pay Holding Deposit" : "Reserve This Property"}
               </h3>
               <p className="text-sm text-emerald-100 mt-0.5">
-                {reserveStep === "done" ? "Your property is secured" : reserveStep === "pay" ? "Complete payment to confirm" : "Secure this property for 48 hours"}
+                {reserveStep === "done" ? "Your property is secured" : reserveStep === "pay" ? "Complete payment to confirm" : `Secure this property for ${reserveDays} days`}
               </p>
             </div>
 
@@ -424,8 +453,8 @@ export default function ListingDetail() {
                   <div className="bg-gray-50 rounded-xl p-4 space-y-3">
                     <div className="flex justify-between text-sm"><span className="text-gray-500">Property</span><span className="text-gray-900 font-medium">{listing.title}</span></div>
                     <div className="flex justify-between text-sm"><span className="text-gray-500">Price</span><span className="text-gray-900 font-semibold">{formatNaira(listing.price)}{listing.listingType === "rent" ? "/yr" : ""}</span></div>
-                    <div className="border-t border-gray-200 pt-2 flex justify-between text-sm"><span className="text-gray-500">Holding Deposit</span><span className="text-emerald-600 font-bold text-base">{formatNaira(listing.listingType === "rent" ? (listing.damageDeposit || Math.round(listing.price * 0.1)) : Math.round((listing.salePrice || listing.price) * 0.05))}</span></div>
-                    <div className="flex justify-between text-sm"><span className="text-gray-500">Valid For</span><span className="text-gray-900">48 hours</span></div>
+                    <div className="border-t border-gray-200 pt-2 flex justify-between text-sm"><span className="text-gray-500">Holding Deposit</span><span className="text-emerald-600 font-bold text-base">{formatNaira(reserveDeposit)}</span></div>
+                    <div className="flex justify-between text-sm"><span className="text-gray-500">Valid For</span><span className="text-gray-900">{reserveDays} days</span></div>
                   </div>
                   <p className="text-xs text-gray-500 leading-relaxed">The holding deposit secures the property and is deducted from your first payment. Refundable per our cancellation policy.</p>
                   <div className="flex gap-3 pt-2">
@@ -438,14 +467,19 @@ export default function ListingDetail() {
                 <div className="space-y-4">
                   <div className="bg-gray-50 rounded-xl p-4 space-y-2">
                     <div className="flex justify-between text-sm"><span className="text-gray-500">Property</span><span className="text-gray-900 font-medium">{listing.title}</span></div>
-                    <div className="flex justify-between text-sm"><span className="text-gray-500">Deposit</span><span className="text-emerald-600 font-bold">{formatNaira(listing.listingType === "rent" ? (listing.damageDeposit || Math.round(listing.price * 0.1)) : Math.round((listing.salePrice || listing.price) * 0.05))}</span></div>
+                    <div className="flex justify-between text-sm"><span className="text-gray-500">Deposit</span><span className="text-emerald-600 font-bold">{formatNaira(reserveDeposit)}</span></div>
                   </div>
                   <PaystackButton
                     email={currentUser?.email || "user@example.com"}
-                    amount={listing.listingType === "rent" ? (listing.damageDeposit || Math.round(listing.price * 0.1)) : Math.round((listing.salePrice || listing.price) * 0.05)}
+                    amount={reserveDeposit}
                     label="Pay with Paystack"
-                    metadata={{ listingId: listing.id, userId: currentUser?.id, purpose: "reservation_deposit" }}
-                    onSuccess={() => setReserveStep("done")}
+                    metadata={{ listingId: listing.id, userId: currentUser?.id, purpose: "reservation_deposit", reservationDays: reserveDays }}
+                    onSuccess={async () => {
+                      try {
+                        await api.post(`/api/reservations/${listing.id}`, {});
+                      } catch { /* reservation was created via webhook */ }
+                      setReserveStep("done");
+                    }}
                     className="w-full min-h-[44px]"
                   />
                   <Button variant="ghost" className="w-full min-h-[44px]" onClick={() => setReserveStep("confirm")}>Back</Button>
@@ -457,8 +491,107 @@ export default function ListingDetail() {
                     <svg className="w-8 h-8 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
                   </div>
                   <h3 className="text-xl font-bold text-gray-900 mb-2">Reserved!</h3>
-                  <p className="text-sm text-gray-500 mb-4">The property is secured for 48 hours. The agent will contact you shortly.</p>
+                  <p className="text-sm text-gray-500 mb-4">The property is secured for {reserveDays} days. The agent will contact you shortly.</p>
                   <Button className="w-full min-h-[44px]" onClick={() => { setShowReserveModal(false); setReserveStep("confirm"); setBookingSuccess(true); }}>Done</Button>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Buy Now Modal */}
+      {showBuyModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => { if (buyStep !== "done") { setShowBuyModal(false); setBuyStep("choose"); } }} />
+          <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
+            <div className="bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-5">
+              <h3 className="text-lg font-bold text-white">
+                {buyStep === "done" ? "Purchase Initiated" : buyStep === "pay" ? "Complete Payment" : "Buy This Property"}
+              </h3>
+              <p className="text-sm text-blue-100 mt-0.5">
+                {buyStep === "done" ? "Payment received" : buyStep === "pay" ? "Confirm and pay" : "Choose your payment option"}
+              </p>
+            </div>
+
+            <div className="p-6">
+              {buyStep === "choose" && (
+                <div className="space-y-4">
+                  <div className="bg-gray-50 rounded-xl p-4 space-y-3">
+                    <div className="flex justify-between text-sm"><span className="text-gray-500">Property</span><span className="text-gray-900 font-medium">{listing.title}</span></div>
+                    <div className="flex justify-between text-sm"><span className="text-gray-500">Full Price</span><span className="text-gray-900 font-semibold">{formatNaira(listing.price)}</span></div>
+                  </div>
+
+                  <div
+                    className={`border-2 rounded-xl p-4 cursor-pointer transition-all ${buyType === "full" ? "border-blue-500 bg-blue-50" : "border-gray-200 hover:border-gray-300"}`}
+                    onClick={() => setBuyType("full")}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${buyType === "full" ? "border-blue-500" : "border-gray-300"}`}>
+                        {buyType === "full" && <div className="w-2.5 h-2.5 bg-blue-500 rounded-full" />}
+                      </div>
+                      <div>
+                        <p className="font-semibold text-gray-900">Pay Full Price</p>
+                        <p className="text-sm text-gray-500">{formatNaira(listing.price)}</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div
+                    className={`border-2 rounded-xl p-4 cursor-pointer transition-all ${buyType === "down_payment" ? "border-blue-500 bg-blue-50" : "border-gray-200 hover:border-gray-300"}`}
+                    onClick={() => setBuyType("down_payment")}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${buyType === "down_payment" ? "border-blue-500" : "border-gray-300"}`}>
+                        {buyType === "down_payment" && <div className="w-2.5 h-2.5 bg-blue-500 rounded-full" />}
+                      </div>
+                      <div>
+                        <p className="font-semibold text-gray-900">Down Payment ({listing.downPaymentPercent || 10}%)</p>
+                        <p className="text-sm text-gray-500">{formatNaira(downPaymentAmt)} now, balance on completion</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex gap-3 pt-2">
+                    <Button variant="outline" className="flex-1 min-h-[44px]" onClick={() => { setShowBuyModal(false); setBuyStep("choose"); }}>Cancel</Button>
+                    <Button className="flex-1 min-h-[44px]" onClick={() => { if (!currentUser) { router.push(`/login?redirect=${encodeURIComponent(window.location.pathname)}`); return; } setBuyStep("pay"); }}>Continue to Pay</Button>
+                  </div>
+                </div>
+              )}
+              {buyStep === "pay" && (
+                <div className="space-y-4">
+                  <div className="bg-gray-50 rounded-xl p-4 space-y-2">
+                    <div className="flex justify-between text-sm"><span className="text-gray-500">Property</span><span className="text-gray-900 font-medium">{listing.title}</span></div>
+                    <div className="flex justify-between text-sm"><span className="text-gray-500">Payment</span><span className="text-blue-600 font-bold">{buyType === "full" ? "Full Price" : `${listing.downPaymentPercent || 10}% Down Payment`}</span></div>
+                    <div className="flex justify-between text-sm"><span className="text-gray-500">Amount</span><span className="text-blue-600 font-bold text-lg">{formatNaira(buyType === "full" ? listing.price : downPaymentAmt)}</span></div>
+                  </div>
+                  <PaystackButton
+                    email={currentUser?.email || "user@example.com"}
+                    amount={buyType === "full" ? listing.price : downPaymentAmt}
+                    label="Pay with Paystack"
+                    metadata={{
+                      listingId: listing.id,
+                      userId: currentUser?.id,
+                      purpose: buyType === "full" ? "property_full_payment" : "property_down_payment",
+                    }}
+                    onSuccess={() => setBuyStep("done")}
+                    className="w-full min-h-[44px]"
+                  />
+                  <Button variant="ghost" className="w-full min-h-[44px]" onClick={() => setBuyStep("choose")}>Back</Button>
+                </div>
+              )}
+              {buyStep === "done" && (
+                <div className="text-center py-4">
+                  <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg className="w-8 h-8 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
+                  </div>
+                  <h3 className="text-xl font-bold text-gray-900 mb-2">Payment Received!</h3>
+                  <p className="text-sm text-gray-500 mb-4">
+                    {buyType === "full"
+                      ? "The property has been purchased. The agent will contact you shortly."
+                      : `Down payment received. The agent will contact you to complete the remaining balance of ${formatNaira(listing.price - downPaymentAmt)}.`}
+                  </p>
+                  <Button className="w-full min-h-[44px]" onClick={() => { setShowBuyModal(false); setBuyStep("choose"); setBookingSuccess(true); }}>Done</Button>
                 </div>
               )}
             </div>

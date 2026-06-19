@@ -105,7 +105,8 @@ export async function calculateAndDistributeCommission(
   dealType: string,
   totalAmount: number,
   ambassadorId: string,
-  agentId: string
+  agentId: string,
+  dealCategory?: "rent" | "sale"
 ) {
   // Idempotency guard — check if commission already exists for this deal
   const existing = await prisma.commission.findUnique({ where: { dealId } });
@@ -114,15 +115,17 @@ export async function calculateAndDistributeCommission(
     return { ambassadorCut: existing.ambassadorCut, agentCut: existing.agentCut, companyCut: existing.companyCut };
   }
 
-  // Check agreement commission flag
-  const agreement = await prisma.rentAgreement.findUnique({
-    where: { id: dealId },
-    select: { commissionPaid: true },
-  });
-  if (agreement?.commissionPaid) {
-    logger.warn({ dealId }, "Agreement commission already marked paid — skipping");
-    const existingCommission = await prisma.commission.findUnique({ where: { dealId } });
-    if (existingCommission) return existingCommission;
+  // Check agreement commission flag (rent agreements only)
+  if (dealCategory !== "sale") {
+    const agreement = await prisma.rentAgreement.findUnique({
+      where: { id: dealId },
+      select: { commissionPaid: true },
+    });
+    if (agreement?.commissionPaid) {
+      logger.warn({ dealId }, "Agreement commission already marked paid — skipping");
+      const existingCommission = await prisma.commission.findUnique({ where: { dealId } });
+      if (existingCommission) return existingCommission;
+    }
   }
 
   const rate = await prisma.commissionRate.findUnique({ where: { dealType } });
@@ -135,7 +138,7 @@ export async function calculateAndDistributeCommission(
   const agentCut = Math.round(totalAmount * (rate.agentRate / 100));
   const companyCut = totalAmount - ambassadorCut - agentCut;
 
-  await prisma.$transaction([
+  const txns = [
     prisma.commission.create({
       data: {
         dealId,
@@ -179,11 +182,25 @@ export async function calculateAndDistributeCommission(
         userId: agentId,
       },
     }),
-    prisma.rentAgreement.update({
-      where: { id: dealId },
-      data: { commissionPaid: true, commissionPaidAt: new Date() },
-    }),
-  ]);
+  ];
+
+  if (dealCategory === "sale") {
+    txns.push(
+      prisma.soldProperty.update({
+        where: { id: dealId },
+        data: { commissionPaid: true },
+      })
+    );
+  } else {
+    txns.push(
+      prisma.rentAgreement.update({
+        where: { id: dealId },
+        data: { commissionPaid: true, commissionPaidAt: new Date() },
+      })
+    );
+  }
+
+  await prisma.$transaction(txns);
 
   const agent = await prisma.user.findUnique({ where: { id: agentId }, select: { email: true, name: true } });
   const ambassador = await prisma.user.findUnique({ where: { id: ambassadorId }, select: { email: true, name: true } });

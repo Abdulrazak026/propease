@@ -67,6 +67,9 @@ enum TransactionType {
   commission_payout
   withdrawal
   listing_fee
+  reservation_deposit
+  property_down_payment
+  property_full_payment
 }
 
 enum TransactionMethod {
@@ -89,8 +92,10 @@ enum InquiryStatus {
 
 enum ReservationStatus {
   pending
+  pending_payment
   confirmed
   expired
+  cancelled
 }
 
 enum CustomOrderStatus {
@@ -212,6 +217,9 @@ model Listing {
   damageDeposit    Int?
   maintenanceCharge Int?
   salePrice        Int?
+  depositAmount    Int?
+  reservationDays  Int        @default(2)
+  downPaymentPercent Int      @default(10)
   status           ListingStatus  @default(draft)
   category         ListingCategory
   partnerCompany   String?
@@ -400,6 +408,7 @@ model Reservation {
   clientName     String
   holdingDeposit Int
   status         ReservationStatus @default(pending)
+  paymentRef     String?
   expiresAt      DateTime
   createdAt      DateTime          @default(now())
 
@@ -832,16 +841,19 @@ model JobApplication {
 }
 
 model SoldProperty {
-  id          String   @id @default(uuid())
-  listingId   String?  @unique
-  title       String
-  city        String
-  salePrice   Int
-  coverPhoto  String?
-  soldAt      DateTime @default(now())
-  agentId     String?
-  agentName   String?
-  createdAt   DateTime @default(now())
+  id            String   @id @default(uuid())
+  listingId     String?  @unique
+  title         String
+  city          String
+  salePrice     Int
+  coverPhoto    String?
+  paymentRef    String?
+  buyerId       String?
+  agentId       String?
+  agentName     String?
+  commissionPaid Boolean @default(false)
+  soldAt        DateTime @default(now())
+  createdAt     DateTime @default(now())
 
   @@index([city])
   @@index([soldAt])

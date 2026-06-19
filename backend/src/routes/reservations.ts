@@ -7,20 +7,26 @@ const router = Router();
 router.post("/:listingId", authenticate, async (req: AuthRequest, res: Response) => {
   try {
     const listingId = req.params.listingId as string;
+    const { paymentRef } = req.body;
+
     const listing = await prisma.listing.findUnique({
       where: { id: listingId },
-      select: { id: true, status: true, title: true },
+      select: { id: true, status: true, title: true, depositAmount: true, reservationDays: true, listingType: true, price: true, damageDeposit: true, salePrice: true },
     });
 
     if (!listing) return res.status(404).json({ error: "Listing not found" });
     if (listing.status !== "available") return res.status(400).json({ error: "Listing is not available" });
 
+    // Calculate deposit: use listing's depositAmount, or fallback to listing-type logic
+    const depositAmount = listing.depositAmount
+      || (listing.listingType === "rent" ? (listing.damageDeposit || Math.round(listing.price * 0.1)) : Math.round((listing.salePrice || listing.price) * 0.05));
+
+    const days = listing.reservationDays || 2;
+
     const user = await prisma.user.findUnique({
       where: { id: req.user!.id },
-      select: { name: true },
+      select: { name: true, email: true },
     });
-
-    const depositAmount = Math.round(50000);
 
     const reservation = await prisma.reservation.create({
       data: {
@@ -28,7 +34,9 @@ router.post("/:listingId", authenticate, async (req: AuthRequest, res: Response)
         userId: req.user!.id,
         clientName: user?.name || "Unknown",
         holdingDeposit: depositAmount,
-        expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
+        status: paymentRef ? "confirmed" : "pending_payment",
+        paymentRef: paymentRef || null,
+        expiresAt: new Date(Date.now() + days * 24 * 60 * 60 * 1000),
       },
     });
 
@@ -45,13 +53,13 @@ router.post("/:listingId", authenticate, async (req: AuthRequest, res: Response)
           userId: admin.id,
           type: "application_status",
           title: "New Reservation",
-          body: `${user?.name || "A user"} reserved "${listing.title}" with ₦${depositAmount.toLocaleString()} deposit.`,
+          body: `${user?.name || "A user"} reserved "${listing.title}" with ${depositAmount.toLocaleString()} deposit.`,
           link: "/admin/reservations",
         },
       }).catch(() => {});
     }
 
-    res.status(201).json({ reservation });
+    res.status(201).json({ reservation, depositAmount, reservationDays: days });
   } catch (error) {
     logger.error({ err: error }, "Create reservation error:");
     res.status(500).json({ error: "Failed to create reservation" });
@@ -62,7 +70,7 @@ router.get("/my", authenticate, async (req: AuthRequest, res: Response) => {
   try {
     const reservations = await prisma.reservation.findMany({
       where: { userId: req.user!.id },
-      include: { listing: { select: { id: true, title: true, address: true, price: true } } },
+      include: { listing: { select: { id: true, title: true, address: true, price: true, salePrice: true, listingType: true } } },
       orderBy: { createdAt: "desc" },
     });
 
@@ -90,5 +98,3 @@ router.get("/all", authenticate, async (req: AuthRequest, res: Response) => {
 });
 
 export default router;
-
-

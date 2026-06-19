@@ -21,6 +21,7 @@ export default function AdminNewListingPage() {
     rentTier: "normal", bedrooms: "", bathrooms: "", size: "",
     features: [] as string[], category: "company" as "company" | "partnership",
     partnerCompany: "", negotiable: false,
+    depositAmount: "", reservationDays: "2", downPaymentPercent: "10",
   });
   const [uploadedUrls, setUploadedUrls] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
@@ -81,6 +82,9 @@ export default function AdminNewListingPage() {
         negotiable: form.negotiable,
         photos: uploadedUrls.map(url => ({ url })),
         status: "draft",
+        depositAmount: form.depositAmount ? parseInt(form.depositAmount) : undefined,
+        reservationDays: form.reservationDays ? parseInt(form.reservationDays) : undefined,
+        downPaymentPercent: form.downPaymentPercent ? parseInt(form.downPaymentPercent) : undefined,
       };
 
       if (form.listingType === "rent") {
@@ -215,6 +219,27 @@ export default function AdminNewListingPage() {
           <input type="checkbox" id="negotiable" checked={form.negotiable} onChange={tf("negotiable")} className="rounded border-gray-300 text-[var(--color-primary)] focus:ring-[var(--color-primary)]" />
           <label htmlFor="negotiable" className="text-sm text-gray-700">Price is negotiable</label>
         </div>
+
+        {/* Reservation Settings */}
+        <h3 className="text-sm font-semibold text-gray-900 pt-2">Reservation Settings</h3>
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label className="block text-xs font-medium text-gray-700 mb-1">Holding Deposit (NGN)</label>
+            <input type="number" min="0" value={form.depositAmount} onChange={tf("depositAmount")} placeholder="Auto-calculated if empty" className="w-full rounded-lg border border-gray-200 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20" />
+            <p className="text-xs text-gray-400 mt-1">Leave empty for 10% (rent) or 5% (sale)</p>
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-gray-700 mb-1">Reservation Duration (days)</label>
+            <input type="number" min="1" max="30" value={form.reservationDays} onChange={tf("reservationDays")} placeholder="2" className="w-full rounded-lg border border-gray-200 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20" />
+          </div>
+        </div>
+        {form.listingType === "sale" && (
+          <div>
+            <label className="block text-xs font-medium text-gray-700 mb-1">Down Payment (%)</label>
+            <input type="number" min="1" max="100" value={form.downPaymentPercent} onChange={tf("downPaymentPercent")} placeholder="10" className="w-full rounded-lg border border-gray-200 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20" />
+            <p className="text-xs text-gray-400 mt-1">Percentage paid upfront when using "Buy Now - Down Payment"</p>
+          </div>
+        )}
 
         {/* Details */}
         <h3 className="text-sm font-semibold text-gray-900 pt-2">Property Details</h3>

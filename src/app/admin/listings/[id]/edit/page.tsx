@@ -38,6 +38,8 @@ export default function AdminEditListingPage() {
           rentTier: l.rentTier || "normal", bedrooms: String(l.bedrooms || ""), bathrooms: String(l.bathrooms || ""),
           size: l.size || "", features: l.features || [], category: l.category || "company",
           partnerCompany: l.partnerCompany || "", negotiable: l.negotiable || false,
+          depositAmount: String(l.depositAmount || ""), reservationDays: String(l.reservationDays || "2"),
+          downPaymentPercent: String(l.downPaymentPercent || "10"),
         });
         if (l.photos) setUploadedUrls(l.photos.map((p: any) => p.url));
       }
@@ -83,6 +85,9 @@ export default function AdminEditListingPage() {
         partnerCompany: form.category === "partnership" ? form.partnerCompany : undefined,
         negotiable: form.negotiable,
         photos: uploadedUrls.map(url => ({ url })),
+        depositAmount: form.depositAmount ? parseInt(form.depositAmount) : undefined,
+        reservationDays: form.reservationDays ? parseInt(form.reservationDays) : undefined,
+        downPaymentPercent: form.downPaymentPercent ? parseInt(form.downPaymentPercent) : undefined,
       };
 
       if (form.listingType === "rent") {
@@ -160,6 +165,15 @@ export default function AdminEditListingPage() {
         )}
 
         <div className="flex items-center gap-2"><input type="checkbox" id="negotiable" checked={form.negotiable} onChange={tf("negotiable")} className="rounded" /><label htmlFor="negotiable" className="text-sm text-gray-700">Price negotiable</label></div>
+
+        <h3 className="text-sm font-semibold text-gray-900 pt-2">Reservation Settings</h3>
+        <div className="grid grid-cols-2 gap-3">
+          <div><label className="block text-xs font-medium text-gray-700 mb-1">Holding Deposit (NGN)</label><input type="number" min="0" value={form.depositAmount} onChange={tf("depositAmount")} placeholder="Auto if empty" className="w-full rounded-lg border border-gray-200 px-4 py-2.5 text-sm" /></div>
+          <div><label className="block text-xs font-medium text-gray-700 mb-1">Reservation Duration (days)</label><input type="number" min="1" max="30" value={form.reservationDays} onChange={tf("reservationDays")} className="w-full rounded-lg border border-gray-200 px-4 py-2.5 text-sm" /></div>
+        </div>
+        {form.listingType === "sale" && (
+          <div><label className="block text-xs font-medium text-gray-700 mb-1">Down Payment (%)</label><input type="number" min="1" max="100" value={form.downPaymentPercent} onChange={tf("downPaymentPercent")} className="w-full rounded-lg border border-gray-200 px-4 py-2.5 text-sm" /></div>
+        )}
 
         <h3 className="text-sm font-semibold text-gray-900 pt-2">Details</h3>
         <div className="grid grid-cols-3 gap-3">
