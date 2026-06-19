@@ -62,7 +62,6 @@ router.post("/conversations/:id/messages", authenticate, async (req: AuthRequest
     });
     res.status(201).json({ message });
 
-    // Notify recipient about new message
     const conversation = await prisma.conversation.findUnique({
       where: { id: convId },
       include: { participants: { include: { user: { select: { id: true, name: true, email: true } } } } },
@@ -75,6 +74,81 @@ router.post("/conversations/:id/messages", authenticate, async (req: AuthRequest
     }
   } catch (error) { logger.error({ err: error }, "Failed to send message"); res.status(500).json({ error: "Failed to send message" }); }
 });
+
+async function createInquiryFromConversation(senderId: string, recipientId: string, listingId: string, content: string) {
+  try {
+    const sender = await prisma.user.findUnique({
+      where: { id: senderId },
+      select: { name: true, email: true },
+    });
+    const listing = await prisma.listing.findUnique({
+      where: { id: listingId },
+      select: { assignedAgentId: true, title: true },
+    });
+    if (!listing) return;
+
+    // Check if inquiry already exists for this sender + listing
+    const existingInquiry = await prisma.inquiry.findFirst({
+      where: { listingId, clientContact: sender?.email || "" },
+    });
+    if (existingInquiry) return;
+
+    const inquiry = await prisma.inquiry.create({
+      data: {
+        clientName: sender?.name || "Unknown",
+        clientContact: sender?.email || "",
+        message: content,
+        listingId,
+        assignedAgentId: listing.assignedAgentId || recipientId,
+      },
+    });
+
+    const agentId = listing.assignedAgentId || recipientId;
+    if (agentId) {
+      const agent = await prisma.user.findUnique({
+        where: { id: agentId },
+        select: { name: true, email: true },
+      });
+      if (agent) {
+        emailService.inquiryNotification(agent.email, agent.name, sender?.name || "A user", listing.title, content).catch(() => {});
+      }
+    }
+
+    // Notify all head users about the new inquiry
+    try {
+      const heads = await prisma.user.findMany({
+        where: { role: "head", suspendedAt: null },
+        select: { id: true, email: true, name: true },
+      });
+      const supportEmail = process.env.SUPPORT_EMAIL || "support@mbpproperties.com";
+      for (const head of heads) {
+        await prisma.notification.create({
+          data: {
+            userId: head.id,
+            type: "message_received",
+            title: `New inquiry from ${sender?.name || "a client"}`,
+            body: content.slice(0, 120),
+            link: "/admin/crm",
+          },
+        }).catch(() => {});
+        emailService.inquiryNotification(
+          head.email, head.name,
+          sender?.name || "A user",
+          listing?.title || "a property",
+          content,
+        ).catch(() => {});
+      }
+      if (supportEmail && !heads.find(h => h.email === supportEmail)) {
+        emailService.inquiryNotification(
+          supportEmail, "Support",
+          sender?.name || "A user",
+          listing?.title || "a property",
+          content,
+        ).catch(() => {});
+      }
+    } catch (e) { logger.error({ err: e }, "Failed to notify admins about inquiry"); }
+  } catch (e) { logger.error({ err: e }, "Failed to create inquiry from message"); }
+}
 
 router.post("/conversations", authenticate, async (req: AuthRequest, res: Response) => {
   try {
@@ -93,6 +167,12 @@ router.post("/conversations", authenticate, async (req: AuthRequest, res: Respon
         include: { sender: { select: { id: true, name: true, email: true } } },
       });
       await prisma.conversation.update({ where: { id: existing.id }, data: { updatedAt: new Date() } });
+
+      // Create inquiry for existing conversation if not already present
+      if (listingId) {
+        await createInquiryFromConversation(senderId, recipientId, listingId, content);
+      }
+
       return res.status(201).json({ conversation: existing, message });
     }
     const conversation = await prisma.conversation.create({
@@ -116,72 +196,7 @@ router.post("/conversations", authenticate, async (req: AuthRequest, res: Respon
     });
 
     if (listingId) {
-      try {
-        const listing = await prisma.listing.findUnique({
-          where: { id: listingId },
-          select: { assignedAgentId: true, title: true },
-        });
-        if (listing) {
-          const sender = await prisma.user.findUnique({
-            where: { id: senderId },
-            select: { name: true, email: true },
-          });
-          const inquiry = await prisma.inquiry.create({
-            data: {
-              clientName: sender?.name || "Unknown",
-              clientContact: sender?.email || "",
-              message: content,
-              listingId,
-              assignedAgentId: listing.assignedAgentId || recipientId,
-            },
-          });
-          const agentId = listing.assignedAgentId || recipientId;
-          if (agentId) {
-            const agent = await prisma.user.findUnique({
-              where: { id: agentId },
-              select: { name: true, email: true },
-            });
-            if (agent) {
-              emailService.inquiryNotification(agent.email, agent.name, sender?.name || "A user", listing.title, content).catch(() => {});
-            }
-          }
-
-          // Notify all head users about the new inquiry
-          try {
-            const heads = await prisma.user.findMany({
-              where: { role: "head", suspendedAt: null },
-              select: { id: true, email: true, name: true },
-            });
-            const supportEmail = process.env.SUPPORT_EMAIL || "support@mbpproperties.com";
-            for (const head of heads) {
-              await prisma.notification.create({
-                data: {
-                  userId: head.id,
-                  type: "message_received",
-                  title: `New inquiry from ${sender?.name || "a client"}`,
-                  body: content.slice(0, 120),
-                  link: "/admin/crm",
-                },
-              }).catch(() => {});
-              emailService.inquiryNotification(
-                head.email, head.name,
-                sender?.name || "A user",
-                listing?.title || "a property",
-                content,
-              ).catch(() => {});
-            }
-            // Also notify the general support email
-            if (supportEmail && !heads.find(h => h.email === supportEmail)) {
-              emailService.inquiryNotification(
-                supportEmail, "Support",
-                sender?.name || "A user",
-                listing?.title || "a property",
-                content,
-              ).catch(() => {});
-            }
-          } catch (e) { logger.error({ err: e }, "Failed to notify admins about inquiry"); }
-        }
-      } catch (e) { logger.error({ err: e }, "Failed to create inquiry from message"); }
+      await createInquiryFromConversation(senderId, recipientId, listingId, content);
     }
 
     res.status(201).json({ conversation });
