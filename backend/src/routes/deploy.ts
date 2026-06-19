@@ -1,14 +1,28 @@
 import { Router, Request, Response } from "express";
 import { exec } from "child_process";
+import { createHmac, timingSafeEqual } from "crypto";
 import { logger } from "../lib/logger";
 
 const router = Router();
 
 const DEPLOY_SECRET = process.env.DEPLOY_WEBHOOK_SECRET || "mbpp-deploy-secret-change-me";
 
-router.post("/", async (_req: Request, res: Response) => {
-  const token = _req.headers["x-deploy-token"] as string;
-  if (!token || token !== DEPLOY_SECRET) {
+function verifyGitHubSignature(payload: string, signatureHeader: string | undefined): boolean {
+  if (!signatureHeader || !DEPLOY_SECRET) return false;
+  const sig = signatureHeader.startsWith("sha256=") ? signatureHeader.slice(7) : signatureHeader;
+  const expected = createHmac("sha256", DEPLOY_SECRET).update(payload).digest("hex");
+  try {
+    return timingSafeEqual(Buffer.from(sig), Buffer.from(expected));
+  } catch { return false; }
+}
+
+router.post("/", async (req: Request, res: Response) => {
+  // Accept either x-deploy-token header (manual) or GitHub webhook signature
+  const token = req.headers["x-deploy-token"] as string;
+  const rawBody = (req as any).rawBody || JSON.stringify(req.body);
+  const ghSignature = req.headers["x-hub-signature-256"] as string;
+  const authorized = token === DEPLOY_SECRET || verifyGitHubSignature(rawBody, ghSignature);
+  if (!authorized) {
     return res.status(403).json({ error: "Unauthorized" });
   }
 

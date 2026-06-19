@@ -93,9 +93,9 @@ app.use("/api/auth/register", authLimiter);
 app.use("/api/auth/forgot-password", authLimiter);
 app.use("/api/auth/reset-password", authLimiter);
 
-// Body parsing
-app.use(express.json({ limit: "10mb" }));
-app.use(express.urlencoded({ extended: true }));
+// Body parsing — capture raw body first for webhook signature verification
+app.use(express.json({ limit: "10mb", verify: (req: any, _res, buf) => { req.rawBody = buf.toString(); } }));
+app.use(express.urlencoded({ extended: true, verify: (req: any, _res, buf) => { if (!req.rawBody) req.rawBody = buf.toString(); } }));
 
 // Logging
 app.use(morgan("dev"));
