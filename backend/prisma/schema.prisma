@@ -867,9 +867,20 @@ model ContactSubmission {
   message   String
   read      Boolean  @default(false)
   createdAt DateTime @default(now())
+  replies   ContactReply[]
 
   @@index([createdAt])
   @@index([read])
+}
+
+model ContactReply {
+  id        String   @id @default(uuid())
+  contactId String
+  contact   ContactSubmission @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  body      String
+  createdAt DateTime @default(now())
+
+  @@index([contactId])
 }
 
 model WhatsAppConversation {

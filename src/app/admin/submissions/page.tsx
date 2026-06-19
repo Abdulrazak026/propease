@@ -8,9 +8,13 @@ interface AgentApp {
   id: string; name: string; email: string; city: string | null; whatsapp: string | null; createdAt: string;
   phone?: string; experience?: string; whyAgent?: string; heardAbout?: string;
 }
-interface ContactSub { id: string; name: string; email: string; phone: string | null; subject: string | null; message: string; read: boolean; createdAt: string; }
-interface Inquiry { id: string; clientName: string; clientContact: string; message: string; status: string; createdAt: string; listing?: { id: string; title: string } | null; assignedAgent?: { id: string; name: string } | null; }
-interface Conversation { id: string; messages: { id: string; content: string; senderId: string; sender?: { name: string }; createdAt: string }[]; participants: { user: { id: string; name: string } }[]; }
+interface ContactReply {
+  id: string; body: string; createdAt: string;
+}
+interface ContactSub {
+  id: string; name: string; email: string; phone: string | null; subject: string | null;
+  message: string; read: boolean; createdAt: string; replies: ContactReply[];
+}
 
 export default function SubmissionsPage() {
   const [tab, setTab] = useState<"agents" | "contacts">("agents");
@@ -21,6 +25,7 @@ export default function SubmissionsPage() {
   const [selectedContact, setSelectedContact] = useState<ContactSub | null>(null);
   const [replyText, setReplyText] = useState("");
   const [sendingReply, setSendingReply] = useState(false);
+  const threadEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     api.get<{ agentApplications: AgentApp[]; contactSubmissions: ContactSub[] }>("/api/admin/submissions").then(r => {
@@ -29,6 +34,10 @@ export default function SubmissionsPage() {
       setLoading(false);
     }).catch(() => setLoading(false));
   }, []);
+
+  useEffect(() => {
+    threadEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [selectedContact]);
 
   const approveAgent = async (id: string) => {
     await api.patch(`/api/admin/users/${id}`, { isApproved: true, suspendedAt: null });
@@ -58,14 +67,24 @@ export default function SubmissionsPage() {
   const sendReply = async (contact: ContactSub) => {
     if (!replyText.trim()) return;
     setSendingReply(true);
+    const body = replyText;
+    setReplyText("");
     try {
-      const { status } = await api.post("/api/contact/reply", { contactId: contact.id, email: contact.email, name: contact.name, message: replyText });
-      if (status === 200 || status === 201) {
-        setReplyText("");
-        setSelectedContact(null);
+      const { status, data } = await api.post<{ reply?: ContactReply }>("/api/contact/reply", { contactId: contact.id, email: contact.email, name: contact.name, message: body });
+      if ((status === 200 || status === 201) && data) {
+        const newReply: ContactReply = { id: data.reply?.id || crypto.randomUUID(), body, createdAt: new Date().toISOString() };
+        setContacts(prev => prev.map(c => c.id === contact.id ? { ...c, replies: [...c.replies, newReply], read: true } : c));
+        setSelectedContact(prev => prev?.id === contact.id ? { ...prev, replies: [...prev.replies, newReply], read: true } : prev);
       }
-    } catch {}
+    } catch {
+      setReplyText(body);
+    }
     setSendingReply(false);
+  };
+
+  const selectContact = (c: ContactSub) => {
+    setSelectedContact(c);
+    if (!c.read) markRead(c.id);
   };
 
   const unreadCount = contacts.filter(c => !c.read).length;
@@ -132,7 +151,7 @@ export default function SubmissionsPage() {
             ) : (
               <div className="divide-y divide-gray-100 max-h-[600px] overflow-y-auto">
                 {contacts.map(c => (
-                  <button key={c.id} onClick={() => { setSelectedContact(c); if (!c.read) markRead(c.id); }} className={`w-full text-left px-4 py-3 hover:bg-gray-50/50 transition-colors ${selectedContact?.id === c.id ? "bg-blue-50/50 border-l-2 border-blue-500" : ""} ${!c.read ? "bg-blue-50/30" : ""}`}>
+                  <button key={c.id} onClick={() => selectContact(c)} className={`w-full text-left px-4 py-3 hover:bg-gray-50/50 transition-colors ${selectedContact?.id === c.id ? "bg-blue-50/50 border-l-2 border-blue-500" : ""} ${!c.read ? "bg-blue-50/30" : ""}`}>
                     <div className="flex items-center gap-2 mb-1">
                       <span className="text-xs font-semibold text-gray-900">{c.name}</span>
                       {!c.read && <span className="w-2 h-2 rounded-full bg-blue-500 shrink-0" />}
@@ -140,14 +159,17 @@ export default function SubmissionsPage() {
                     <p className="text-[10px] text-gray-500 mb-0.5">{c.email}</p>
                     <p className="text-xs text-gray-700 font-medium mb-0.5">{c.subject || "General Inquiry"}</p>
                     <p className="text-xs text-gray-500 line-clamp-1">{c.message}</p>
-                    <p className="text-[10px] text-gray-400 mt-1">{new Date(c.createdAt).toLocaleString()}</p>
+                    <p className="text-[10px] text-gray-400 mt-1">
+                      {new Date(c.createdAt).toLocaleString()}
+                      {c.replies.length > 0 && <span className="ml-2 text-[var(--color-primary)]">{c.replies.length} reply{c.replies.length !== 1 ? "ies" : "y"}</span>}
+                    </p>
                   </button>
                 ))}
               </div>
             )}
           </div>
 
-          {/* Contact detail + reply */}
+          {/* Contact detail + thread */}
           {selectedContact && (
             <div className="lg:col-span-2 bg-white rounded-xl border border-gray-200 overflow-hidden flex flex-col max-h-[600px]">
               <div className="px-4 py-3 border-b border-gray-100 flex items-center justify-between shrink-0">
@@ -157,22 +179,43 @@ export default function SubmissionsPage() {
                   </button>
                   <div>
                     <h3 className="text-sm font-semibold text-gray-900">{selectedContact.name}</h3>
-                    <p className="text-[10px] text-gray-500">{selectedContact.email} · {selectedContact.phone || "No phone"}</p>
+                    <p className="text-[10px] text-gray-500">
+                      {selectedContact.email} · {selectedContact.phone || "No phone"}
+                      {selectedContact.replies.length > 0 && <span className="ml-2 text-[var(--color-primary)]">{selectedContact.replies.length} reply{selectedContact.replies.length !== 1 ? "ies" : "y"}</span>}
+                    </p>
                   </div>
                 </div>
-                <div className="flex gap-1">
-                  <Button size="sm" variant="danger" onClick={() => deleteContact(selectedContact.id)}>Delete</Button>
-                </div>
+                <Button size="sm" variant="danger" onClick={() => deleteContact(selectedContact.id)}>Delete</Button>
               </div>
 
-              <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
-                <div className="bg-white rounded-xl border border-gray-200 p-4">
-                  <p className="text-xs text-gray-400 mb-2">Subject: <span className="font-medium text-gray-700">{selectedContact.subject || "General Inquiry"}</span></p>
-                  <p className="text-xs text-gray-400 mb-3">Received: <span className="text-gray-600">{new Date(selectedContact.createdAt).toLocaleString()}</span></p>
-                  <div className="border-t border-gray-100 pt-3">
+              <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-gray-50">
+                {/* Original message */}
+                <div className="flex justify-start">
+                  <div className="max-w-[80%] bg-white rounded-xl border border-gray-200 px-4 py-2.5 shadow-sm">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="text-[11px] font-semibold text-gray-700">{selectedContact.name}</span>
+                      <span className="text-[10px] text-gray-400">{new Date(selectedContact.createdAt).toLocaleString()}</span>
+                    </div>
+                    {selectedContact.subject && (
+                      <p className="text-[11px] text-gray-500 mb-1">Subject: <span className="font-medium">{selectedContact.subject}</span></p>
+                    )}
                     <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">{selectedContact.message}</p>
                   </div>
                 </div>
+
+                {/* Reply thread */}
+                {selectedContact.replies.map(r => (
+                  <div key={r.id} className="flex justify-end">
+                    <div className="max-w-[80%] bg-[var(--color-primary)]/10 rounded-xl border border-[var(--color-primary)]/20 px-4 py-2.5">
+                      <div className="flex items-center gap-2 mb-1 justify-end">
+                        <span className="text-[10px] text-gray-400">{new Date(r.createdAt).toLocaleString()}</span>
+                        <span className="text-[11px] font-semibold text-[var(--color-primary)]">MBPP Support</span>
+                      </div>
+                      <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">{r.body}</p>
+                    </div>
+                  </div>
+                ))}
+                <div ref={threadEndRef} />
               </div>
 
               <div className="shrink-0 border-t border-gray-100 p-3 bg-white">

@@ -17,6 +17,7 @@ router.get("/", authenticate, authorize("head"), requirePermission("canManageUse
       prisma.contactSubmission.findMany({
         orderBy: { createdAt: "desc" },
         take: 100,
+        include: { replies: { orderBy: { createdAt: "asc" } } },
       }),
     ]);
 

@@ -14,13 +14,36 @@ router.post("/", async (req, res: Response) => {
       return res.status(400).json({ error: "Name, email, and message are required" });
     }
 
-    await prisma.contactSubmission.create({
+    const submission = await prisma.contactSubmission.create({
       data: { name, email, phone: phone || null, subject: subject || "General Inquiry", message },
     });
 
     await emailService.contactFormSubmission({
       name, email, phone: phone || "", subject: subject || "General Inquiry", message,
     });
+
+    // Notify head admins if this is a follow-up (existing replies on any previous submission from this email)
+    const existingReplies = await prisma.contactReply.findFirst({
+      where: { contact: { email } },
+    });
+    if (existingReplies) {
+      const admins = await prisma.user.findMany({
+        where: { role: "head", suspendedAt: null },
+        select: { id: true },
+      });
+      const link = "/admin/submissions";
+      for (const admin of admins) {
+        prisma.notification.create({
+          data: {
+            userId: admin.id,
+            type: "message_received",
+            title: `New follow-up from ${name}`,
+            body: message.slice(0, 120),
+            link,
+          },
+        }).catch(() => {});
+      }
+    }
 
     res.json({ success: true, message: "Message sent successfully" });
   } catch (error) {
@@ -45,7 +68,12 @@ router.post("/reply", authenticate, authorize("head"), async (req: AuthRequest, 
       }).catch(() => {});
     }
 
-    res.json({ success: true, message: "Reply sent" });
+    // Store reply in DB for conversation history
+    const reply = await prisma.contactReply.create({
+      data: { contactId, body: message },
+    });
+
+    res.json({ success: true, reply: { id: reply.id, body: reply.body, createdAt: reply.createdAt } });
   } catch (error) {
     logger.error({ err: error }, "Contact reply error:");
     res.status(500).json({ error: "Failed to send reply" });
