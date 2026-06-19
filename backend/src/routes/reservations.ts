@@ -83,6 +83,9 @@ router.get("/my", authenticate, async (req: AuthRequest, res: Response) => {
 
 router.get("/all", authenticate, async (req: AuthRequest, res: Response) => {
   try {
+    if (req.user!.role !== "head" && req.user!.role !== "admin") {
+      return res.status(403).json({ error: "Unauthorized" });
+    }
     const reservations = await prisma.reservation.findMany({
       include: {
         listing: { select: { id: true, title: true, address: true, price: true } },

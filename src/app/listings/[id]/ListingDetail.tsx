@@ -43,11 +43,6 @@ export default function ListingDetail() {
     : Math.round(listing.price * 0.1);
   const [fav, setFav] = useState(false);
   const [priceHistory, setPriceHistory] = useState<any[]>([]);
-  const [showInquiryModal, setShowInquiryModal] = useState(false);
-  const [inquirySubmitting, setInquirySubmitting] = useState(false);
-  const [inquiryDone, setInquiryDone] = useState(false);
-  const [inquiryError, setInquiryError] = useState("");
-  const [inquiryForm, setInquiryForm] = useState({ clientName: "", clientContact: "", message: "" });
 
   useEffect(() => {
     api.get<any>(`/api/listings/${id}`).then(r => {
@@ -257,20 +252,6 @@ export default function ListingDetail() {
                   </Button>
                 )}
 
-                <Button variant="outline" className="w-full" onClick={() => {
-                  setInquiryForm({
-                    clientName: currentUser?.name || "",
-                    clientContact: currentUser?.email || "",
-                    message: "",
-                  });
-                  setInquiryError("");
-                  setInquiryDone(false);
-                  setShowInquiryModal(true);
-                }}>
-                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" /></svg>
-                  Inquire
-                </Button>
-
                 <Link
                   href={currentUser ? `/messages?listing=${listing.id}&agent=${listing.assignedAgent?.id || listing.postedBy?.id || ""}` : `/login?redirect=${encodeURIComponent(`/messages?listing=${listing.id}&agent=${listing.assignedAgent?.id || listing.postedBy?.id || ""}`)}`}
                   className="inline-flex items-center justify-center gap-2 w-full px-4 py-2.5 rounded-lg text-sm font-medium text-white bg-[var(--color-primary)] hover:bg-[var(--color-primary-light)] transition-colors"
@@ -352,86 +333,6 @@ export default function ListingDetail() {
           />
         </div>
       </div>
-
-      {/* Inquiry Modal */}
-      {showInquiryModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => { if (!inquirySubmitting) { setShowInquiryModal(false); } }} />
-          <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
-            <div className="bg-gradient-to-r from-[var(--color-primary)] to-teal-600 px-6 py-5">
-              <h3 className="text-lg font-bold text-white">Inquire About This Property</h3>
-              <p className="text-sm text-emerald-100 mt-0.5">Send your inquiry to the agent</p>
-            </div>
-            <div className="p-6">
-              {inquiryDone ? (
-                <div className="text-center py-4">
-                  <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <svg className="w-8 h-8 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
-                  </div>
-                  <h3 className="text-xl font-bold text-gray-900 mb-2">Inquiry Sent!</h3>
-                  <p className="text-sm text-gray-500 mb-4">The agent will contact you shortly.</p>
-                  <Button className="w-full min-h-[44px]" onClick={() => { setShowInquiryModal(false); setInquiryDone(false); }}>Done</Button>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  {inquiryError && <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-sm text-red-700">{inquiryError}</div>}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Your Name</label>
-                    <input
-                      type="text"
-                      className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent"
-                      placeholder="Enter your full name"
-                      value={inquiryForm.clientName}
-                      onChange={e => setInquiryForm(p => ({ ...p, clientName: e.target.value }))}
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Email or Phone</label>
-                    <input
-                      type="text"
-                      className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent"
-                      placeholder="Enter your email or phone number"
-                      value={inquiryForm.clientContact}
-                      onChange={e => setInquiryForm(p => ({ ...p, clientContact: e.target.value }))}
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Message</label>
-                    <textarea
-                      className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent resize-none"
-                      rows={4}
-                      placeholder="Write your message here (min 10 characters)"
-                      value={inquiryForm.message}
-                      onChange={e => setInquiryForm(p => ({ ...p, message: e.target.value }))}
-                    />
-                  </div>
-                  <div className="flex gap-3 pt-2">
-                    <Button variant="outline" className="flex-1 min-h-[44px]" onClick={() => setShowInquiryModal(false)} disabled={inquirySubmitting}>Cancel</Button>
-                    <Button className="flex-1 min-h-[44px]" loading={inquirySubmitting} onClick={async () => {
-                      const { clientName, clientContact, message } = inquiryForm;
-                      if (!clientName || !clientContact || message.length < 10) {
-                        setInquiryError("Please fill in all fields. Message must be at least 10 characters.");
-                        return;
-                      }
-                      setInquirySubmitting(true);
-                      setInquiryError("");
-                      try {
-                        const res = await api.post(`/api/inquiries/${listing.id}`, { clientName, clientContact, message });
-                        if ((res as any).error) { setInquiryError((res as any).error); setInquirySubmitting(false); return; }
-                        setInquiryDone(true);
-                      } catch {
-                        setInquiryError("Failed to send inquiry. Please try again.");
-                      } finally {
-                        setInquirySubmitting(false);
-                      }
-                    }}>Send Inquiry</Button>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Reservation Modal */}
       {showReserveModal && (
