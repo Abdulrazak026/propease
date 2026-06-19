@@ -37,60 +37,111 @@ router.post("/", async (req: Request, res: Response) => {
   res.json({ status: "ok", message: "Deploy started" });
 
   const cmd = `
-    trap 'rm -f ${LOCKFILE}' EXIT
+    set -o pipefail
+    trap 'rm -f ${LOCKFILE}; rm -rf /tmp/mbpp-frontend-build' EXIT
 
-    echo "=== Deploy started at $(date) ===" >> /var/www/mbpp/logs/deploy.log
+    LOG="/var/www/mbpp/logs/deploy.log"
+    FRONTEND="/var/www/mbpp/frontend"
+    TMPBUILD="/tmp/mbpp-frontend-build"
+    PREV_BUILD="$FRONTEND/.next.prev"
 
-    echo "--- Pulling latest code ---" >> /var/www/mbpp/logs/deploy.log
+    echo "=== Deploy started at $(date) ===" >> "$LOG"
+
+    echo "--- Pulling latest code ---" >> "$LOG"
     cd /var/www/mbpp-repo
-    git fetch origin master >> /var/www/mbpp/logs/deploy.log 2>&1
-    git reset --hard origin/master >> /var/www/mbpp/logs/deploy.log 2>&1
+    git fetch origin master >> "$LOG" 2>&1
+    git reset --hard origin/master >> "$LOG" 2>&1
+    echo "Commit: $(git rev-parse --short HEAD)" >> "$LOG"
 
-    echo "--- Syncing files ---" >> /var/www/mbpp/logs/deploy.log
+    echo "--- Syncing files ---" >> "$LOG"
     mkdir -p /var/www/mbpp/scripts /var/www/mbpp/logs
     cp -r /var/www/mbpp-repo/backend/* /var/www/mbpp/api/
-    rsync -a --delete --exclude=node_modules --exclude=.next --exclude=backend --exclude=bot --exclude='*.tar.gz' --exclude='*.dump' /var/www/mbpp-repo/ /var/www/mbpp/frontend/
+    rsync -a --delete --exclude=node_modules --exclude=.next --exclude=backend --exclude=bot --exclude='*.tar.gz' --exclude='*.dump' /var/www/mbpp-repo/ "$FRONTEND/"
     cp -r /var/www/mbpp-repo/bot/* /var/www/mbpp/bot/
     cp /var/www/mbpp-repo/scripts/deploy.sh /var/www/mbpp/scripts/deploy.sh 2>/dev/null || true
     cp /var/www/mbpp-repo/ecosystem.config.js /var/www/mbpp/ecosystem.config.js 2>/dev/null || true
 
-    echo "--- PostgreSQL Security Fix ---" >> /var/www/mbpp/logs/deploy.log
-    sed -i 's/\\bmd5\\b/scram-sha-256/g' /etc/postgresql/16/main/pg_hba.conf 2>&1 || true
-    su - postgres -c "psql -c \\"ALTER USER mbpp_user WITH PASSWORD 'Mbpp2026!Secure';\\" " 2>&1 || true
-    systemctl reload postgresql 2>&1 || true
-
-    echo "--- Building API ---" >> /var/www/mbpp/logs/deploy.log
+    echo "--- Building API ---" >> "$LOG"
     cd /var/www/mbpp/api
-    npm install 2>&1 | tail -5 >> /var/www/mbpp/logs/deploy.log
-    npx prisma generate 2>&1 >> /var/www/mbpp/logs/deploy.log
-    npm run build 2>&1 | tail -20 >> /var/www/mbpp/logs/deploy.log
+    npm install 2>&1 | tail -5 >> "$LOG"
+    npx prisma generate 2>&1 >> "$LOG"
+    npm run build 2>&1 | tail -20 >> "$LOG"
     if [ $? -ne 0 ]; then
-      echo "!!! API BUILD FAILED !!!" >> /var/www/mbpp/logs/deploy.log
-      rm -f ${LOCKFILE}
+      echo "!!! API BUILD FAILED at $(date) !!!" >> "$LOG"
       exit 1
     fi
-    npx prisma migrate deploy 2>&1 >> /var/www/mbpp/logs/deploy.log
+    npx prisma migrate deploy 2>&1 >> "$LOG"
 
-    echo "--- Migrating Data ---" >> /var/www/mbpp/logs/deploy.log
-    npx tsx scripts/migrate-agents.ts 2>&1 >> /var/www/mbpp/logs/deploy.log || true
+    echo "--- Migrating Data ---" >> "$LOG"
+    npx tsx scripts/migrate-agents.ts 2>&1 >> "$LOG" || true
 
-    echo "--- Building Frontend ---" >> /var/www/mbpp/logs/deploy.log
-    cd /var/www/mbpp/frontend
-    rm -rf .next
-    npm install 2>&1 | tail -5 >> /var/www/mbpp/logs/deploy.log
-    npm run build 2>&1 | tail -30 >> /var/www/mbpp/logs/deploy.log
-    if [ $? -ne 0 ]; then
-      echo "!!! FRONTEND BUILD FAILED !!!" >> /var/www/mbpp/logs/deploy.log
-      rm -f ${LOCKFILE}
+    echo "--- Building Frontend (atomic) ---" >> "$LOG"
+
+    # Step 1: Save the current working .next as backup
+    rm -rf "$PREV_BUILD"
+    if [ -d "$FRONTEND/.next" ]; then
+      mv "$FRONTEND/.next" "$PREV_BUILD"
+      echo "Saved previous .next build as backup" >> "$LOG"
+    fi
+
+    # Step 2: Build fresh in the actual directory
+    cd "$FRONTEND"
+    npm install 2>&1 | tail -5 >> "$LOG"
+    npm run build 2>&1 >> "$LOG" 2>&1
+    BUILD_EXIT=$?
+
+    # Step 3: Verify the build produced working output
+    BUILD_OK=0
+    if [ $BUILD_EXIT -eq 0 ]; then
+      # Check critical build artifacts exist
+      if [ -d "$FRONTEND/.next/static" ] && [ "$(ls -A $FRONTEND/.next/static 2>/dev/null)" ]; then
+        # Check at least one CSS file exists
+        CSS_COUNT=$(find "$FRONTEND/.next" -name "*.css" 2>/dev/null | wc -l)
+        if [ "$CSS_COUNT" -gt 0 ]; then
+          BUILD_OK=1
+          echo "Build verified: found $CSS_COUNT CSS files in .next" >> "$LOG"
+        else
+          echo "!!! BUILD VERIFICATION FAILED: no CSS files generated !!!" >> "$LOG"
+        fi
+      else
+        echo "!!! BUILD VERIFICATION FAILED: .next/static is missing or empty !!!" >> "$LOG"
+      fi
+    else
+      echo "!!! Frontend build exited with code $BUILD_EXIT !!!" >> "$LOG"
+    fi
+
+    # Step 4: If build failed or verification failed, restore previous working build
+    if [ $BUILD_OK -eq 0 ]; then
+      echo "!!! FRONTEND BUILD FAILED - Restoring previous working build !!!" >> "$LOG"
+      rm -rf "$FRONTEND/.next"
+      if [ -d "$PREV_BUILD" ]; then
+        mv "$PREV_BUILD" "$FRONTEND/.next"
+        echo "Previous .next restored successfully" >> "$LOG"
+      else
+        echo "!!! NO PREVIOUS BUILD TO RESTORE - SITE MAY BE DOWN !!!" >> "$LOG"
+      fi
       exit 1
     fi
 
-    echo "--- Restarting Services ---" >> /var/www/mbpp/logs/deploy.log
-    pm2 restart mbpp-api 2>&1 >> /var/www/mbpp/logs/deploy.log
-    pm2 restart mbpp-frontend 2>&1 >> /var/www/mbpp/logs/deploy.log
-    pm2 save 2>&1 >> /var/www/mbpp/logs/deploy.log
+    # Step 5: Build succeeded — remove backup
+    rm -rf "$PREV_BUILD"
+    echo "Frontend build verified OK - old backup removed" >> "$LOG"
 
-    echo "=== Deploy complete at $(date) ===" >> /var/www/mbpp/logs/deploy.log
+    echo "--- Restarting Services ---" >> "$LOG"
+    pm2 restart mbpp-api 2>&1 >> "$LOG"
+    pm2 restart mbpp-frontend 2>&1 >> "$LOG"
+    pm2 save 2>&1 >> "$LOG"
+
+    # Step 6: Health check after restart
+    sleep 3
+    HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:9799/ 2>/dev/null || echo "000")
+    if [ "$HTTP_STATUS" = "200" ]; then
+      echo "Health check passed: frontend returned HTTP $HTTP_STATUS" >> "$LOG"
+    else
+      echo "WARNING: Health check returned HTTP $HTTP_STATUS" >> "$LOG"
+    fi
+
+    echo "=== Deploy complete at $(date) ===" >> "$LOG"
   `;
 
   exec(cmd, { timeout: 600000 }, (error, stdout) => {

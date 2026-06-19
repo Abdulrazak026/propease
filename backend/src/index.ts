@@ -147,6 +147,11 @@ app.use("/api/deploy", deployRoutes);
 app.use("/api/whatsapp/webhook", whatsappWebhookRoutes);
 app.use("/api/whatsapp", whatsappRoutes);
 
+// Health check — used by deploy to verify frontend
+app.get("/api/health", (_req, res) => {
+  res.json({ ok: true, uptime: process.uptime() });
+});
+
 // 404 handler
 app.use((_req, res) => {
   res.status(404).json({ error: "Not found" });
