@@ -1,7 +1,7 @@
 import { Router, Response } from "express";
 import prisma from "../lib/prisma";
 import { authenticate, AuthRequest } from "../middleware/auth";
-import { FEES } from "../config/fees";
+
 import { authorize } from "../middleware/rbac";
 import { validate } from "../middleware/validate";
 import { createListingSchema } from "../validators";
@@ -219,44 +219,17 @@ router.post("/:id/submit", authenticate, async (req: AuthRequest, res: Response)
 
 router.post("/:id/approve", authenticate, authorize("head", "ambassador"), async (req: AuthRequest, res: Response) => {
   try {
-    const listing = await prisma.listing.findUnique({
-      where: { id: req.params.id as string },
-      include: { postedBy: { select: { id: true, walletBalance: true } } },
-    });
+    const listing = await prisma.listing.findUnique({ where: { id: req.params.id as string } });
     if (!listing || listing.status !== "review") return res.status(400).json({ error: "Listing not in review" });
 
-    const fee = FEES.LISTING_PUBLICATION_NGN;
-    if (listing.postedBy.walletBalance < fee) {
-      return res.status(402).json({
-        error: "Owner has insufficient wallet balance to publish",
-        required: fee,
-        current: listing.postedBy.walletBalance,
-      });
-    }
-
-    await prisma.$transaction(async (tx: any) => {
-      await tx.user.update({
-        where: { id: listing.postedById },
-        data: { walletBalance: { decrement: fee } },
-      });
-      await tx.transaction.create({
-        data: {
-          userId: listing.postedById,
-          type: "listing_fee",
-          amount: -fee,
-          reference: listing.id,
-          method: "wallet",
-          status: "completed",
-        },
-      });
-      await tx.listing.update({
-        where: { id: listing.id },
-        data: { status: "approved" },
-      });
+    const updated = await prisma.listing.update({
+      where: { id: listing.id },
+      data: { status: "available" },
     });
+
     invalidate("listings:*");
     invalidate("dashboard:stats");
-    res.json({ listing: { ...listing, status: "approved" }, message: "Listing approved and published" });
+    res.json({ listing: updated, message: "Listing approved and published" });
     const owner = await prisma.user.findUnique({ where: { id: listing.postedById }, select: { email: true, name: true } });
     emailService.listingPublished(owner?.email || "", owner?.name || "", listing.title, listing.id).catch(() => {});
   } catch (error) {

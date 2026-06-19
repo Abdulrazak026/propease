@@ -57,7 +57,6 @@ export default function AgentPage() {
 
   if (isAgent) {
     const activeTasks = tasks.filter(t => t.status === "in_progress" || t.status === "open");
-    const myTasks = tasks.filter(t => t.status !== "closed");
     const taskCounts = {
       open: tasks.filter(t => t.status === "open").length,
       inProgress: tasks.filter(t => t.status === "in_progress").length,
@@ -67,7 +66,7 @@ export default function AgentPage() {
     const counts = {
       total: listings.length,
       review: listings.filter(l => l.status === "review").length,
-      approved: listings.filter(l => l.status === "approved" || l.status === "available").length,
+      approved: listings.filter(l => l.status === "available").length,
       rented: listings.filter(l => l.status === "rented" || l.status === "sold").length,
     };
     return (
@@ -78,10 +77,6 @@ export default function AgentPage() {
             <p className="text-sm text-gray-500 mt-1">Manage your listings and tasks</p>
           </div>
           <div className="flex gap-2">
-            <Link href="/agent/tasks" className="inline-flex items-center gap-2 px-4 py-2.5 bg-blue-600 text-white text-sm font-semibold rounded-xl hover:bg-blue-700 transition-all shadow-lg shadow-blue-500/20">
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M11.35 3.836c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664M12 8.25V12m0 0v3.75M12 12h-1.5m1.5 0h1.5M20.25 8.25a2.25 2.25 0 00-2.25-2.25h-1.5A2.25 2.25 0 0014.25 3h-1.5a2.25 2.25 0 00-2.25 2.25H9a2.25 2.25 0 00-2.25 2.25" /></svg>
-              My Tasks ({myTasks.length})
-            </Link>
             {perms.canCreateListings && <Link href="/agent/listings/new" className="inline-flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 text-white text-sm font-semibold rounded-xl hover:from-emerald-700 hover:to-teal-700 transition-all shadow-lg shadow-emerald-500/20">
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
               New Listing

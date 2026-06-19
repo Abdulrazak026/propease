@@ -33,9 +33,9 @@ export default function ModerationPage() {
 
   const approve = async (id: string) => {
     setBusy(id);
-    const r = await api.post(`/api/listings/${id}/approve`);
-    if (r.status === 200) {
-      setListings(prev => prev.map(l => l.id === id ? { ...l, status: "approved" } : l));
+    const r = await api.post<{ listing: { status: string } }>(`/api/listings/${id}/approve`);
+    if (r.status === 200 && r.data?.listing) {
+      setListings(prev => prev.map(l => l.id === id ? { ...l, status: r.data!.listing.status } : l));
     }
     setBusy(null);
   };

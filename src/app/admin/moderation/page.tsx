@@ -44,9 +44,9 @@ export default function ModerationPage() {
   const approve = async (id: string) => {
     setBusy(id);
     setToast(null);
-    const r = await api.post(`/api/listings/${id}/approve`);
-    if (r.status === 200) {
-      setListings(prev => prev.map(l => l.id === id ? { ...l, status: "approved" } : l));
+    const r = await api.post<{ listing: Listing }>(`/api/listings/${id}/approve`);
+    if (r.status === 200 && r.data?.listing) {
+      setListings(prev => prev.map(l => l.id === id ? { ...l, status: r.data!.listing.status } : l));
     } else {
       setToast(r.error || "Approve failed — listing must be in 'review' status first");
     }

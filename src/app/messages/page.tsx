@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { formatDate } from "@/lib/utils";
 import { api } from "@/lib/api-client";
 import Button from "@/components/ui/Button";
+import { useRole } from "@/context/RoleContext";
 
 interface User { id: string; name: string; avatar?: string; }
 interface Conversation {
@@ -55,6 +56,7 @@ export default function MessagesPageWrapper() {
 }
 
 function MessagesPage() {
+  const { currentUser } = useRole();
   const searchParams = useSearchParams();
   const newListingId = searchParams.get("listing");
   const newAgentId = searchParams.get("agent");
@@ -73,7 +75,6 @@ function MessagesPage() {
       api.get<{ conversations: Conversation[] }>("/api/messages/conversations").then(r => {
         if (!isMounted) return;
         if (r.data?.conversations) {
-          // Merge: keep existing entries, add new ones from API
           setConversations(prev => {
             const merged = [...prev];
             for (const c of r.data!.conversations) {
@@ -100,7 +101,6 @@ function MessagesPage() {
 
   useEffect(() => {
     if (newListingId && newAgentId && newAgentId.trim() && newAgentId !== "undefined" && newAgentId !== "null") {
-      // Show the new conversation form directly
       setNewConvo({ subject: "", recipientId: newAgentId, listingId: newListingId });
     }
   }, [newListingId, newAgentId]);
@@ -116,13 +116,11 @@ function MessagesPage() {
       if (r.status === 201 || r.status === 200) {
         const conv = (r.data as any)?.conversation || (r.data as any);
         if (conv?.id) {
-          // Add to list immediately so it shows
           setConversations(prev => {
             const exists = prev.find(c => c.id === conv.id);
             if (exists) return prev;
             return [{ ...conv, lastMessage: newMessage.trim(), lastMessageAt: new Date().toISOString(), unread: 0 }, ...prev];
           });
-          // Open the chat
           setSelectedId(conv.id);
           setNewConvo(null);
           setNewMessage("");
@@ -134,7 +132,8 @@ function MessagesPage() {
   const selected = conversations.find((c) => c.id === selectedId);
   const filtered = query
     ? conversations.filter(c => {
-        const name = c?.participants?.[0]?.user?.name || "";
+        const other = c?.participants?.find(p => p.user.id !== currentUser?.id)?.user;
+        const name = other?.name || "";
         const subj = c.subject || "";
         const lst = c.listing?.title || "";
         return [name, subj, lst].some(s => s.toLowerCase().includes(query.toLowerCase()));
@@ -144,8 +143,8 @@ function MessagesPage() {
   // Show conversation detail full-screen
   if (selectedId && selected) {
     return (
-      <div className="h-full flex flex-col min-h-0 max-w-2xl mx-auto w-full">
-        <ConversationDetail conversation={selected} onBack={() => setSelectedId(null)} />
+      <div className="flex-1 flex flex-col min-h-0 max-w-2xl mx-auto w-full">
+        <ConversationDetail conversation={selected} onBack={() => setSelectedId(null)} currentUserId={currentUser?.id} />
       </div>
     );
   }
@@ -153,7 +152,7 @@ function MessagesPage() {
   // Show new conversation form full-screen
   if (newConvo) {
     return (
-      <div className="h-full flex flex-col min-h-0 max-w-2xl mx-auto w-full">
+      <div className="flex-1 flex flex-col min-h-0 max-w-2xl mx-auto w-full">
         <div className="flex items-center gap-3 px-5 py-3.5 bg-white border-b border-gray-100 shrink-0">
           <button onClick={() => { setNewConvo(null); setNewMessage(""); }} className="p-1.5 text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded-lg">
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" /></svg>
@@ -181,7 +180,7 @@ function MessagesPage() {
 
   // Show inbox list
   return (
-    <div className="h-full flex flex-col min-h-0 max-w-2xl mx-auto w-full">
+    <div className="flex-1 flex flex-col min-h-0 max-w-2xl mx-auto w-full">
       <div className="px-5 pt-5 pb-3 border-b border-gray-100 bg-white shrink-0">
         <div className="flex items-end justify-between mb-3">
           <div>
@@ -218,7 +217,7 @@ function MessagesPage() {
             ))}
           </div>
         ) : filtered.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-20 px-6 text-center" style={{ minHeight: "calc(100vh - 200px)" }}>
+          <div className="flex flex-col items-center justify-center py-20 px-6 text-center flex-1">
             <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center mx-auto mb-4">
               <svg className="w-7 h-7 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
@@ -234,10 +233,7 @@ function MessagesPage() {
         ) : (
           <div className="divide-y divide-gray-50">
             {filtered.map((conv) => {
-              // Find the OTHER participant (not the current user)
-              const other = conv?.participants?.length > 1 
-                ? conv.participants.find((p: any) => p.user?.name !== "Admin User" && p.user?.name !== "You")?.user 
-                : conv?.participants?.[0]?.user;
+              const other = conv?.participants?.find(p => p.user.id !== currentUser?.id)?.user || conv?.participants?.[0]?.user;
               const name = other?.name || conv?.listing?.title || conv?.subject || "New conversation";
               return (
                 <button
@@ -278,13 +274,14 @@ function MessagesPage() {
   );
 }
 
-function ConversationDetail({ conversation, onBack }: { conversation: Conversation; onBack: () => void }) {
+function ConversationDetail({ conversation, onBack, currentUserId }: { conversation: Conversation; onBack: () => void; currentUserId?: string }) {
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
-  const name = conversation?.participants?.[0]?.user?.name || "Unknown";
+  const other = conversation?.participants?.find(p => p.user.id !== currentUserId)?.user || conversation?.participants?.[0]?.user;
+  const name = other?.name || "Unknown";
 
   useEffect(() => {
     setLoading(true);
@@ -312,7 +309,7 @@ function ConversationDetail({ conversation, onBack }: { conversation: Conversati
     try {
       const r = await api.post(`/api/messages/conversations/${conversation.id}/messages`, { content: txt });
       if (r.data) {
-        const newMsg = (r.data as any)?.message || { id: crypto.randomUUID(), content: txt, senderId: "me", createdAt: new Date().toISOString() };
+        const newMsg = (r.data as any)?.message || { id: crypto.randomUUID(), content: txt, senderId: currentUserId, createdAt: new Date().toISOString() };
         setMessages(prev => [...prev, newMsg]);
         setInput("");
       }
@@ -354,10 +351,13 @@ function ConversationDetail({ conversation, onBack }: { conversation: Conversati
         ) : (
           <div className="space-y-2 max-w-2xl mx-auto">
             {messages.map((msg: any) => {
-              const isMe = msg.senderId !== conversation?.participants?.[0]?.user?.id;
+              const isMe = msg.senderId === currentUserId;
               return (
                 <div key={msg.id} className={`flex ${isMe ? "justify-end" : "justify-start"}`}>
                   <div className="max-w-[80%]">
+                    {!isMe && msg.sender?.name && (
+                      <p className="text-[10px] text-gray-500 mb-0.5 px-1 font-medium">{msg.sender.name}</p>
+                    )}
                     <div className={`px-4 py-2.5 text-sm leading-relaxed shadow-sm ${
                       isMe
                         ? "bg-[var(--color-primary)] text-white rounded-2xl rounded-br-md"

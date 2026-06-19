@@ -144,6 +144,41 @@ router.post("/conversations", authenticate, async (req: AuthRequest, res: Respon
               emailService.inquiryNotification(agent.email, agent.name, sender?.name || "A user", listing.title, content).catch(() => {});
             }
           }
+
+          // Notify all head users about the new inquiry
+          try {
+            const heads = await prisma.user.findMany({
+              where: { role: "head", suspendedAt: null },
+              select: { id: true, email: true, name: true },
+            });
+            const supportEmail = process.env.SUPPORT_EMAIL || "support@mbpproperties.com";
+            for (const head of heads) {
+              await prisma.notification.create({
+                data: {
+                  userId: head.id,
+                  type: "message_received",
+                  title: `New inquiry from ${sender?.name || "a client"}`,
+                  body: content.slice(0, 120),
+                  link: "/admin/crm",
+                },
+              }).catch(() => {});
+              emailService.inquiryNotification(
+                head.email, head.name,
+                sender?.name || "A user",
+                listing?.title || "a property",
+                content,
+              ).catch(() => {});
+            }
+            // Also notify the general support email
+            if (supportEmail && !heads.find(h => h.email === supportEmail)) {
+              emailService.inquiryNotification(
+                supportEmail, "Support",
+                sender?.name || "A user",
+                listing?.title || "a property",
+                content,
+              ).catch(() => {});
+            }
+          } catch (e) { logger.error({ err: e }, "Failed to notify admins about inquiry"); }
         }
       } catch (e) { logger.error({ err: e }, "Failed to create inquiry from message"); }
     }
