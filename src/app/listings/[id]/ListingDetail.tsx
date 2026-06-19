@@ -232,7 +232,7 @@ export default function ListingDetail() {
 
               <div className="pt-5 space-y-3">
                 {listing.status === "available" && listing.listingType === "rent" && (
-                  <Button className="w-full" onClick={() => setShowReserveModal(true)}>
+                  <Button className="w-full bg-[var(--color-primary)]" onClick={() => setShowReserveModal(true)}>
                     Reserve This Property
                   </Button>
                 )}
