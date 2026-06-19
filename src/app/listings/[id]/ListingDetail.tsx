@@ -33,14 +33,14 @@ export default function ListingDetail() {
   const [buyStep, setBuyStep] = useState<"choose" | "pay" | "done">("choose");
   const [buyType, setBuyType] = useState<"full" | "down_payment">("full");
 
-  const reserveDeposit = listing.depositAmount
-    || (listing.listingType === "rent"
+  const reserveDeposit = listing?.depositAmount
+    || (listing?.listingType === "rent"
       ? (listing.damageDeposit || Math.round(listing.price * 0.1))
-      : Math.round(listing.price * 0.05));
-  const reserveDays = listing.reservationDays || 2;
-  const downPaymentAmt = listing.downPaymentPercent
+      : Math.round(listing?.price * 0.05 || 0));
+  const reserveDays = listing?.reservationDays || 2;
+  const downPaymentAmt = listing?.downPaymentPercent
     ? Math.round(listing.price * (listing.downPaymentPercent / 100))
-    : Math.round(listing.price * 0.1);
+    : Math.round(listing?.price * 0.1 || 0);
   const [fav, setFav] = useState(false);
   const [priceHistory, setPriceHistory] = useState<any[]>([]);
 
