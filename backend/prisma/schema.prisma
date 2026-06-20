@@ -70,6 +70,7 @@ enum TransactionType {
   reservation_deposit
   property_down_payment
   property_full_payment
+  refund
 }
 
 enum TransactionMethod {
@@ -96,6 +97,25 @@ enum ReservationStatus {
   confirmed
   expired
   cancelled
+  refunded
+}
+
+enum CancellationPolicy {
+  flexible
+  moderate
+  firm
+  strict
+}
+
+enum ReservationAction {
+  created
+  confirmed
+  rejected
+  cancelled
+  rescheduled
+  expired
+  refunded
+  payment_completed
 }
 
 enum CustomOrderStatus {
@@ -151,6 +171,7 @@ model User {
   assignedInquiries   Inquiry[]
   transactions  Transaction[]
   reservations  Reservation[]
+  reservationLogs ReservationLog[]
   withdrawals   Withdrawal[]
   comments      TaskComment[]
   taskSubmissions TaskSubmission[]
@@ -220,6 +241,7 @@ model Listing {
   depositAmount    Int?
   reservationDays  Int        @default(2)
   downPaymentPercent Int      @default(10)
+  cancellationPolicy  CancellationPolicy @default(flexible)
   status           ListingStatus  @default(draft)
   category         ListingCategory
   partnerCompany   String?
@@ -415,15 +437,42 @@ model Reservation {
   meetingTime    String?
   confirmedById  String?
 
+  cancelledAt       DateTime?
+  cancelledByUserId String?
+  cancellationReason String?
+
+  refundedAt  DateTime?
+  refundRef   String?
+  refundAmount Int?
+
   listingId String
   listing   Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
 
   userId String?
   user   User?   @relation(fields: [userId], references: [id])
 
+  logs ReservationLog[]
+
   @@index([listingId])
  @@index([status])
  @@index([expiresAt])
+}
+
+model ReservationLog {
+  id         String            @id @default(uuid())
+  action     ReservationAction
+  oldStatus  ReservationStatus?
+  newStatus  ReservationStatus
+  reason     String?
+  createdAt  DateTime          @default(now())
+
+  reservationId String
+  reservation   Reservation @relation(fields: [reservationId], references: [id], onDelete: Cascade)
+
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id])
+
+  @@index([reservationId])
 }
 
 enum ApplicationStatus {

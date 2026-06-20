@@ -8,6 +8,8 @@ import Link from "next/link";
 interface Reservation {
   id: string; clientName: string; holdingDeposit: number; status: string;
   expiresAt: string; createdAt: string; meetingDate?: string | null; meetingTime?: string | null;
+  paymentRef?: string | null;
+  refundAmount?: number | null; refundedAt?: string | null; cancelledAt?: string | null;
   listing?: { id: string; title: string; address: string; price: number } | null;
 }
 
@@ -18,6 +20,128 @@ interface Transaction {
 
 type Tab = "reservations" | "transactions";
 
+function CancellationModal({ reservation, onClose, onSuccess }: { reservation: Reservation; onClose: () => void; onSuccess: () => void }) {
+  const [step, setStep] = useState<"confirm" | "processing" | "done">("confirm");
+  const [error, setError] = useState("");
+  const [result, setResult] = useState<{ refundAmount: number; fee: number } | null>(null);
+
+  const handleCancel = async () => {
+    setStep("processing");
+    setError("");
+    try {
+      const res = await api.post<{ refundAmount: number; fee: number }>(`/api/reservations/${reservation.id}/cancel`, {});
+      if (res.error) { setError(res.error); setStep("confirm"); return; }
+      if (res.data) setResult(res.data);
+      setStep("done");
+      setTimeout(() => { onSuccess(); onClose(); }, 3000);
+    } catch {
+      setError("Failed to cancel. Try again.");
+      setStep("confirm");
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40" onClick={onClose}>
+      <div className="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl" onClick={e => e.stopPropagation()}>
+        {step === "confirm" && (
+          <>
+            <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg className="w-6 h-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+            </div>
+            <h3 className="text-lg font-bold text-gray-900 text-center mb-2">Cancel Reservation?</h3>
+            <p className="text-sm text-gray-500 text-center mb-1">Reservation for <strong>{reservation.listing?.title}</strong></p>
+            <p className="text-xs text-amber-600 bg-amber-50 rounded-lg px-3 py-2 text-center mb-4">
+              Refund is calculated based on the property&apos;s cancellation policy and time remaining.
+            </p>
+            {error && <p className="text-xs text-red-500 text-center mb-3">{error}</p>}
+            <div className="flex gap-2">
+              <button onClick={onClose} className="flex-1 py-2.5 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors">Keep Reservation</button>
+              <button onClick={handleCancel} className="flex-1 py-2.5 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors">Yes, Cancel</button>
+            </div>
+          </>
+        )}
+        {step === "processing" && (
+          <div className="text-center py-8">
+            <div className="h-8 w-8 border-2 border-red-600 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+            <p className="text-sm text-gray-600">Processing cancellation...</p>
+          </div>
+        )}
+        {step === "done" && (
+          <>
+            <div className="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg className="w-6 h-6 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg>
+            </div>
+            <h3 className="text-lg font-bold text-gray-900 text-center mb-2">Cancelled</h3>
+            <p className="text-sm text-gray-500 text-center">Refund: <strong className="text-emerald-600">₦{(result?.refundAmount || 0).toLocaleString()}</strong></p>
+            <p className="text-xs text-gray-400 text-center mt-1">Redirecting...</p>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function RescheduleModal({ reservation, onClose, onSuccess }: { reservation: Reservation; onClose: () => void; onSuccess: () => void }) {
+  const [date, setDate] = useState("");
+  const [time, setTime] = useState("");
+  const [step, setStep] = useState<"form" | "processing" | "done">("form");
+  const [error, setError] = useState("");
+
+  const handleSubmit = async () => {
+    if (!date || !time) { setError("Select a date and time"); return; }
+    setStep("processing");
+    setError("");
+    try {
+      const res = await api.post(`/api/reservations/${reservation.id}/reschedule`, { meetingDate: date, meetingTime: time });
+      if (res.error) { setError(res.error); setStep("form"); return; }
+      setStep("done");
+      setTimeout(() => { onSuccess(); onClose(); }, 3000);
+    } catch {
+      setError("Failed to reschedule. Try again.");
+      setStep("form");
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40" onClick={onClose}>
+      <div className="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl" onClick={e => e.stopPropagation()}>
+        {step === "form" && (
+          <>
+            <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg className="w-6 h-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" /></svg>
+            </div>
+            <h3 className="text-lg font-bold text-gray-900 text-center mb-4">Reschedule Meeting</h3>
+            <label className="block text-xs font-medium text-gray-700 mb-1">New Date</label>
+            <input type="date" value={date} onChange={e => setDate(e.target.value)} className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20 mb-3" />
+            <label className="block text-xs font-medium text-gray-700 mb-1">New Time</label>
+            <input type="time" value={time} onChange={e => setTime(e.target.value)} className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20 mb-3" />
+            {error && <p className="text-xs text-red-500 text-center mb-2">{error}</p>}
+            <div className="flex gap-2">
+              <button onClick={onClose} className="flex-1 py-2.5 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors">Cancel</button>
+              <button onClick={handleSubmit} className="flex-1 py-2.5 text-sm font-medium text-white bg-[var(--color-primary)] rounded-lg hover:opacity-90 transition-opacity">Reschedule</button>
+            </div>
+          </>
+        )}
+        {step === "processing" && (
+          <div className="text-center py-8">
+            <div className="h-8 w-8 border-2 border-[var(--color-primary)] border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+            <p className="text-sm text-gray-600">Rescheduling...</p>
+          </div>
+        )}
+        {step === "done" && (
+          <div className="text-center py-4">
+            <div className="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg className="w-6 h-6 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg>
+            </div>
+            <h3 className="text-lg font-bold text-gray-900 text-center mb-2">Rescheduled!</h3>
+            <p className="text-sm text-emerald-600 font-medium text-center">Meeting updated to {new Date(date).toLocaleDateString("en-NG", { weekday: "long", month: "long", day: "numeric" })} at {time}</p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export default function DealsPage() {
   const { currentUser, isAuthenticated, loading: authLoading } = useRole();
   const [tab, setTab] = useState<Tab>("reservations");
@@ -27,6 +151,8 @@ export default function DealsPage() {
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
   const [showDateFilter, setShowDateFilter] = useState(false);
+  const [cancelling, setCancelling] = useState<Reservation | null>(null);
+  const [rescheduling, setRescheduling] = useState<Reservation | null>(null);
 
   useEffect(() => {
     if (authLoading) return;
@@ -91,6 +217,9 @@ export default function DealsPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 pb-24">
+      {cancelling && <CancellationModal reservation={cancelling} onClose={() => setCancelling(null)} onSuccess={() => setCancelling(null)} />}
+      {rescheduling && <RescheduleModal reservation={rescheduling} onClose={() => setRescheduling(null)} onSuccess={() => setRescheduling(null)} />}
+
       <div className="bg-white border-b border-gray-200 sticky top-0 z-30">
         <div className="max-w-4xl mx-auto px-4 py-4">
           <div className="flex items-center gap-3 mb-4">
@@ -162,12 +291,31 @@ export default function DealsPage() {
                         <div><span className="text-gray-400">Expires</span><p className="font-medium text-gray-900">{r.expiresAt ? new Date(r.expiresAt).toLocaleDateString() : "—"}</p></div>
                         <div><span className="text-gray-400">Created</span><p className="font-medium text-gray-900">{new Date(r.createdAt).toLocaleDateString()}</p></div>
                       </div>
+
                       {r.status === "confirmed" && r.meetingDate && (
                         <div className="mt-3 bg-emerald-50 border border-emerald-200 rounded-lg px-3 py-2 flex items-center gap-2">
                           <svg className="w-4 h-4 text-emerald-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" /></svg>
                           <span className="text-xs font-medium text-emerald-700">Meeting: {new Date(r.meetingDate).toLocaleDateString("en-NG", { weekday: "long", month: "long", day: "numeric" })} {r.meetingTime ? `at ${r.meetingTime}` : ""}</span>
                         </div>
                       )}
+
+                      <div className="flex items-center gap-2 mt-3 pt-3 border-t border-gray-100">
+                        {r.status === "confirmed" && (
+                          <button onClick={() => setRescheduling(r)} className="text-xs font-medium text-[var(--color-primary)] hover:underline">
+                            Reschedule
+                          </button>
+                        )}
+                        {r.status === "pending_payment" && !r.paymentRef && false /* retry button hidden — handled by the payment flow */ && (
+                          <button className="text-xs font-medium text-amber-600 hover:underline">
+                            Complete Payment
+                          </button>
+                        )}
+                        {(r.status === "pending" || r.status === "pending_payment" || r.status === "confirmed") && (
+                          <button onClick={() => setCancelling(r)} className="text-xs font-medium text-red-500 hover:underline ml-auto">
+                            Cancel
+                          </button>
+                        )}
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -182,9 +330,12 @@ export default function DealsPage() {
                     <div key={r.id} className="bg-white rounded-xl border border-gray-100 p-3 flex items-center justify-between">
                       <div className="min-w-0">
                         <p className="text-sm text-gray-800 truncate">{r.listing?.title || "Property"}</p>
-                        <p className="text-[11px] text-gray-400">₦{r.holdingDeposit?.toLocaleString()} &middot; {new Date(r.createdAt).toLocaleDateString()}</p>
+                        <p className="text-[11px] text-gray-400">
+                          ₦{r.holdingDeposit?.toLocaleString()} &middot; {new Date(r.createdAt).toLocaleDateString()}
+                          {r.refundAmount ? <span className="text-emerald-600 ml-1">Refund: ₦{r.refundAmount.toLocaleString()}</span> : ""}
+                        </p>
                       </div>
-                      <span className="shrink-0 px-2 py-0.5 text-[10px] font-medium rounded-full bg-gray-100 text-gray-500 capitalize">{r.status}</span>
+                      <span className={`shrink-0 px-2 py-0.5 text-[10px] font-medium rounded-full ${r.status === "cancelled" ? "bg-red-100 text-red-600" : "bg-gray-100 text-gray-500"} capitalize`}>{r.status}</span>
                     </div>
                   ))}
                 </div>

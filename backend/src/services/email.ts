@@ -189,4 +189,13 @@ export const emailService = {
   async reservationRejected(email: string, name: string, propertyTitle: string, reason: string) {
     return send(email, `Reservation Update — ${propertyTitle}`, defaultTemplates.reservationRejected(name, propertyTitle, reason));
   },
+  async reservationCancelled(email: string, name: string, propertyTitle: string, refundAmount: number, depositAmount: number) {
+    return send(email, `Reservation Cancelled — ${propertyTitle}`, defaultTemplates.reservationCancelled(name, propertyTitle, refundAmount, depositAmount));
+  },
+  async reservationRescheduled(email: string, name: string, propertyTitle: string, oldDate: string, oldTime: string, newDate: string, newTime: string) {
+    return send(email, `Reservation Rescheduled — ${propertyTitle}`, defaultTemplates.reservationRescheduled(name, propertyTitle, oldDate, oldTime, newDate, newTime));
+  },
+  async adminReservationCancelled(email: string, name: string, propertyTitle: string, reason: string, refundAmount: number) {
+    return send(email, `Reservation Cancelled by Admin — ${propertyTitle}`, defaultTemplates.adminReservationCancelled(name, propertyTitle, reason, refundAmount));
+  },
 };

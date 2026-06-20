@@ -7,7 +7,15 @@ import { formatNaira } from "@/lib/utils";
 interface Reservation {
   id: string; clientName: string; holdingDeposit: number; status: string;
   expiresAt: string; createdAt: string; meetingDate?: string | null; meetingTime?: string | null;
+  refundAmount?: number | null; refundedAt?: string | null; cancelledAt?: string | null;
+  cancelledByUserId?: string | null; cancellationReason?: string | null;
   listing?: { id: string; title: string; address: string; price: number } | null;
+  user?: { id: string; name: string; email: string } | null;
+}
+
+interface LogEntry {
+  id: string; action: string; oldStatus: string | null; newStatus: string;
+  reason: string | null; createdAt: string;
   user?: { id: string; name: string; email: string } | null;
 }
 
@@ -22,6 +30,12 @@ export default function ReservationsPage() {
   const [submitting, setSubmitting] = useState(false);
   const [rejectModal, setRejectModal] = useState<Reservation | null>(null);
   const [rejectReason, setRejectReason] = useState("");
+  const [adminCancelModal, setAdminCancelModal] = useState<Reservation | null>(null);
+  const [adminCancelReason, setAdminCancelReason] = useState("");
+  const [adminCancelRefund, setAdminCancelRefund] = useState(true);
+  const [logModal, setLogModal] = useState<Reservation | null>(null);
+  const [logs, setLogs] = useState<LogEntry[]>([]);
+  const [logsLoading, setLogsLoading] = useState(false);
 
   const fetchReservations = () => {
     api.get<{ reservations: Reservation[] }>("/api/reservations/all").then(r => {
@@ -77,6 +91,47 @@ export default function ReservationsPage() {
     setSubmitting(false);
   };
 
+  const handleAdminCancel = async () => {
+    if (!adminCancelModal) return;
+    setSubmitting(true);
+    try {
+      const res = await api.post(`/api/reservations/${adminCancelModal.id}/admin-cancel`, {
+        reason: adminCancelReason,
+        processRefund: adminCancelRefund,
+      });
+      if (res.error) { alert(res.error); setSubmitting(false); return; }
+      fetchReservations();
+      setAdminCancelModal(null);
+      setAdminCancelReason("");
+      setAdminCancelRefund(true);
+    } catch (e) { alert("Failed to cancel: " + String(e)); }
+    setSubmitting(false);
+  };
+
+  const fetchLogs = async (reservation: Reservation) => {
+    setLogModal(reservation);
+    setLogsLoading(true);
+    try {
+      const res = await api.get<{ logs: LogEntry[] }>(`/api/reservations/${reservation.id}/logs`);
+      if (res.data?.logs) setLogs(res.data.logs);
+    } catch {}
+    setLogsLoading(false);
+  };
+
+  const handleReschedule = async (r: Reservation) => {
+    const date = prompt("New meeting date (YYYY-MM-DD):", r.meetingDate?.split("T")[0] || "");
+    if (!date) return;
+    const time = prompt("New meeting time (HH:MM):", r.meetingTime || "");
+    if (!time) return;
+    setSubmitting(true);
+    try {
+      const res = await api.post(`/api/reservations/${r.id}/reschedule`, { meetingDate: date, meetingTime: time });
+      if (res.error) { alert(res.error); setSubmitting(false); return; }
+      fetchReservations();
+    } catch (e) { alert("Failed to reschedule: " + String(e)); }
+    setSubmitting(false);
+  };
+
   if (loading) return <div className="flex items-center justify-center h-64"><div className="h-8 w-8 border-2 border-[var(--color-primary)] border-t-transparent rounded-full animate-spin" /></div>;
 
   return (
@@ -110,6 +165,7 @@ export default function ReservationsPage() {
                 <th className="px-4 py-3 text-xs font-medium text-gray-600">Property</th>
                 <th className="px-4 py-3 text-xs font-medium text-gray-600">Deposit</th>
                 <th className="px-4 py-3 text-xs font-medium text-gray-600">Status</th>
+                <th className="px-4 py-3 text-xs font-medium text-gray-600">Refund</th>
                 <th className="px-4 py-3 text-xs font-medium text-gray-600">Expires</th>
                 <th className="px-4 py-3 text-xs font-medium text-gray-600">Date</th>
                 <th className="px-4 py-3 text-xs font-medium text-gray-600">Actions</th>
@@ -121,33 +177,41 @@ export default function ReservationsPage() {
                     <td className="px-4 py-3 text-xs text-gray-600 max-w-[200px] truncate">{r.listing?.title || "—"}</td>
                     <td className="px-4 py-3 text-xs font-medium text-gray-900">{formatNaira(r.holdingDeposit)}</td>
                     <td className="px-4 py-3">
-                      <Badge variant={r.status === "confirmed" ? "success" : r.status === "pending" ? "warning" : r.status === "cancelled" ? "danger" : "default"}>
+                      <Badge variant={r.status === "confirmed" ? "success" : r.status === "pending" ? "warning" : r.status === "cancelled" ? "danger" : r.status === "expired" ? "default" : "default"}>
                         {r.status === "pending" ? "Awaiting Confirmation" : r.status}
                       </Badge>
+                    </td>
+                    <td className="px-4 py-3 text-xs">
+                      {r.refundAmount ? <span className="text-emerald-600 font-medium">₦{r.refundAmount.toLocaleString()}</span> : <span className="text-gray-400">—</span>}
                     </td>
                     <td className="px-4 py-3 text-xs text-gray-500">{r.expiresAt ? new Date(r.expiresAt).toLocaleString() : "—"}</td>
                     <td className="px-4 py-3 text-xs text-gray-500">{new Date(r.createdAt).toLocaleDateString()}</td>
                     <td className="px-4 py-3">
                       {r.status === "pending" && (
                         <div className="flex items-center gap-1.5">
-                          <button
-                            onClick={() => setConfirmModal(r)}
-                            className="px-3 py-1.5 text-xs font-medium bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition-colors"
-                          >
-                            Confirm
-                          </button>
-                          <button
-                            onClick={() => setRejectModal(r)}
-                            className="px-3 py-1.5 text-xs font-medium bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors"
-                          >
-                            Reject
-                          </button>
+                          <button onClick={() => setConfirmModal(r)} className="px-3 py-1.5 text-xs font-medium bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition-colors">Confirm</button>
+                          <button onClick={() => setRejectModal(r)} className="px-3 py-1.5 text-xs font-medium bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors">Reject</button>
                         </div>
                       )}
-                      {r.status === "confirmed" && r.meetingDate && (
-                        <div className="text-xs text-emerald-600">
-                          <p className="font-medium">Meeting set</p>
-                          <p>{new Date(r.meetingDate).toLocaleDateString()} at {r.meetingTime}</p>
+                      {r.status === "confirmed" && (
+                        <div className="flex flex-wrap items-center gap-1.5">
+                          <button onClick={() => handleReschedule(r)} className="px-3 py-1.5 text-xs font-medium bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors">Reschedule</button>
+                          <button onClick={() => { setAdminCancelModal(r); setAdminCancelRefund(true); }} className="px-3 py-1.5 text-xs font-medium bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors">Cancel</button>
+                        </div>
+                      )}
+                      {r.status === "pending_payment" && (
+                        <div className="flex items-center gap-1.5">
+                          <button onClick={() => { setAdminCancelModal(r); setAdminCancelRefund(false); }} className="px-3 py-1.5 text-xs font-medium bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors">Cancel</button>
+                        </div>
+                      )}
+                      {r.status === "cancelled" && (
+                        <div className="flex items-center gap-1.5">
+                          <button onClick={() => fetchLogs(r)} className="px-3 py-1.5 text-xs font-medium bg-gray-50 text-gray-600 rounded-lg hover:bg-gray-100 transition-colors">Logs</button>
+                        </div>
+                      )}
+                      {r.status === "expired" && (
+                        <div className="flex items-center gap-1.5">
+                          <button onClick={() => fetchLogs(r)} className="px-3 py-1.5 text-xs font-medium bg-gray-50 text-gray-600 rounded-lg hover:bg-gray-100 transition-colors">Logs</button>
                         </div>
                       )}
                     </td>
@@ -165,42 +229,24 @@ export default function ReservationsPage() {
           <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md p-6">
             <h3 className="text-lg font-bold text-gray-900 mb-1">Confirm Reservation</h3>
             <p className="text-sm text-gray-500 mb-4">Set a meeting date and time for <strong>{confirmModal.listing?.title}</strong></p>
-
             <div className="space-y-3">
               <div>
                 <label className="text-xs font-medium text-gray-700 mb-1 block">Meeting Date</label>
-                <input
-                  type="date"
-                  value={meetingDate}
-                  onChange={e => setMeetingDate(e.target.value)}
+                <input type="date" value={meetingDate} onChange={e => setMeetingDate(e.target.value)}
                   min={new Date().toISOString().split("T")[0]}
-                  className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20 focus:border-[var(--color-primary)]"
-                />
+                  className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20 focus:border-[var(--color-primary)]" />
               </div>
               <div>
                 <label className="text-xs font-medium text-gray-700 mb-1 block">Meeting Time</label>
-                <input
-                  type="time"
-                  value={meetingTime}
-                  onChange={e => setMeetingTime(e.target.value)}
-                  className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20 focus:border-[var(--color-primary)]"
-                />
+                <input type="time" value={meetingTime} onChange={e => setMeetingTime(e.target.value)}
+                  className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20 focus:border-[var(--color-primary)]" />
               </div>
             </div>
-
             <div className="flex gap-3 mt-6">
-              <button
-                onClick={() => setConfirmModal(null)}
-                disabled={submitting}
-                className="flex-1 px-4 py-2.5 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleConfirm}
-                disabled={!meetingDate || !meetingTime || submitting}
-                className="flex-1 px-4 py-2.5 text-sm font-medium text-white bg-emerald-500 rounded-lg hover:bg-emerald-600 transition-colors disabled:opacity-50"
-              >
+              <button onClick={() => setConfirmModal(null)} disabled={submitting}
+                className="flex-1 px-4 py-2.5 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50">Cancel</button>
+              <button onClick={handleConfirm} disabled={!meetingDate || !meetingTime || submitting}
+                className="flex-1 px-4 py-2.5 text-sm font-medium text-white bg-emerald-500 rounded-lg hover:bg-emerald-600 transition-colors disabled:opacity-50">
                 {submitting ? "Confirming..." : "Confirm & Send Email"}
               </button>
             </div>
@@ -214,34 +260,95 @@ export default function ReservationsPage() {
           <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md p-6">
             <h3 className="text-lg font-bold text-gray-900 mb-1">Reject Reservation</h3>
             <p className="text-sm text-gray-500 mb-4">Reject the reservation for <strong>{rejectModal.listing?.title}</strong></p>
-
             <div>
               <label className="text-xs font-medium text-gray-700 mb-1 block">Reason (optional)</label>
-              <textarea
-                value={rejectReason}
-                onChange={e => setRejectReason(e.target.value)}
-                rows={3}
+              <textarea value={rejectReason} onChange={e => setRejectReason(e.target.value)} rows={3}
                 placeholder="Reason for rejection..."
-                className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20 focus:border-[var(--color-primary)] resize-none"
-              />
+                className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20 focus:border-[var(--color-primary)] resize-none" />
             </div>
-
             <div className="flex gap-3 mt-6">
-              <button
-                onClick={() => setRejectModal(null)}
-                disabled={submitting}
-                className="flex-1 px-4 py-2.5 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleReject}
-                disabled={submitting}
-                className="flex-1 px-4 py-2.5 text-sm font-medium text-white bg-red-500 rounded-lg hover:bg-red-600 transition-colors disabled:opacity-50"
-              >
+              <button onClick={() => setRejectModal(null)} disabled={submitting}
+                className="flex-1 px-4 py-2.5 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50">Cancel</button>
+              <button onClick={handleReject} disabled={submitting}
+                className="flex-1 px-4 py-2.5 text-sm font-medium text-white bg-red-500 rounded-lg hover:bg-red-600 transition-colors disabled:opacity-50">
                 {submitting ? "Rejecting..." : "Reject Reservation"}
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {adminCancelModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/50" onClick={() => !submitting && setAdminCancelModal(null)} />
+          <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md p-6">
+            <h3 className="text-lg font-bold text-gray-900 mb-1">Cancel Reservation</h3>
+            <p className="text-sm text-gray-500 mb-4">
+              Cancel reservation for <strong>{adminCancelModal.listing?.title}</strong>
+              <br />Deposit: <strong>{formatNaira(adminCancelModal.holdingDeposit)}</strong>
+            </p>
+            <div className="space-y-3">
+              <div>
+                <label className="text-xs font-medium text-gray-700 mb-1 block">Reason</label>
+                <textarea value={adminCancelReason} onChange={e => setAdminCancelReason(e.target.value)} rows={2}
+                  placeholder="Reason for cancellation..."
+                  className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20 focus:border-[var(--color-primary)] resize-none" />
+              </div>
+              <label className="flex items-center gap-2 text-sm text-gray-700">
+                <input type="checkbox" checked={adminCancelRefund}
+                  onChange={e => setAdminCancelRefund(e.target.checked)}
+                  className="rounded border-gray-300 text-[var(--color-primary)] focus:ring-[var(--color-primary)]" />
+                Process full refund
+              </label>
+            </div>
+            <div className="flex gap-3 mt-6">
+              <button onClick={() => setAdminCancelModal(null)} disabled={submitting}
+                className="flex-1 px-4 py-2.5 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50">Keep</button>
+              <button onClick={handleAdminCancel} disabled={submitting}
+                className="flex-1 px-4 py-2.5 text-sm font-medium text-white bg-red-500 rounded-lg hover:bg-red-600 transition-colors disabled:opacity-50">
+                {submitting ? "Processing..." : "Cancel & " + (adminCancelRefund ? "Refund" : "Mark Cancelled")}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {logModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/50" onClick={() => setLogModal(null)} />
+          <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg p-6 max-h-[80vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-bold text-gray-900">Audit Log</h3>
+              <button onClick={() => setLogModal(null)} className="text-gray-400 hover:text-gray-600">
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+              </button>
+            </div>
+            <p className="text-sm text-gray-500 mb-4">Reservation: <strong>{logModal.listing?.title}</strong></p>
+            {logsLoading ? (
+              <div className="flex justify-center py-8"><div className="h-6 w-6 border-2 border-[var(--color-primary)] border-t-transparent rounded-full animate-spin" /></div>
+            ) : logs.length === 0 ? (
+              <p className="text-sm text-gray-400 text-center py-4">No audit logs found</p>
+            ) : (
+              <div className="space-y-3">
+                {logs.map(log => (
+                  <div key={log.id} className="bg-gray-50 rounded-lg p-3 border border-gray-100">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-semibold text-gray-900 capitalize">{log.action}</span>
+                      <span className="text-[10px] text-gray-400">{new Date(log.createdAt).toLocaleString()}</span>
+                    </div>
+                    <div className="flex items-center gap-2 mt-1 text-[11px] text-gray-500">
+                      {log.oldStatus && <span className="text-gray-400">{log.oldStatus}</span>}
+                      {log.oldStatus && <span>→</span>}
+                      <span className="font-medium text-gray-700">{log.newStatus}</span>
+                    </div>
+                    {log.reason && <p className="text-[11px] text-gray-500 mt-1 italic">{log.reason}</p>}
+                    {log.user && <p className="text-[10px] text-gray-400 mt-1">by {log.user.name} ({log.user.email})</p>}
+                  </div>
+                ))}
+              </div>
+            )}
+            <button onClick={() => setLogModal(null)}
+              className="w-full mt-4 py-2.5 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors">Close</button>
           </div>
         </div>
       )}

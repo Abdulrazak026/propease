@@ -831,4 +831,65 @@ export const templates = {
         `Reservation update for ${propertyTitle}`
       );
     },
+
+    reservationCancelled(name: string, propertyTitle: string, refundAmount: number, depositAmount: number) {
+      const isFullRefund = refundAmount >= depositAmount;
+      return base(
+        isFullRefund ? "Reservation Cancelled — Refund Issued ✅" : "Reservation Cancelled — Partial Refund Issued",
+        `<p>Hello <strong>${name}</strong>,</p>
+         <p>Your reservation for <strong>${propertyTitle}</strong> has been cancelled as requested.</p>
+         <table class="detail-box">
+           <tr><td>Property</td><td>${propertyTitle}</td></tr>
+           <tr><td>Deposit Paid</td><td>₦${depositAmount.toLocaleString()}</td></tr>
+           <tr><td>Refund Amount</td><td style="color:#059669;font-weight:700">₦${refundAmount.toLocaleString()}</td></tr>
+           <tr><td>Status</td><td style="color:#059669">${isFullRefund ? "✅ Full Refund" : "🔄 Partial Refund"}</td></tr>
+         </table>
+         ${isFullRefund
+           ? `<div class="highlight-box"><p><strong>✅ Full refund processed</strong> — Your holding deposit has been fully refunded. It may take 3-5 business days to reflect in your account.</p></div>`
+           : `<div class="warning-box"><p><strong>🔄 Partial refund processed</strong> — A partial refund of ₦${refundAmount.toLocaleString()} has been issued based on the cancellation policy. It may take 3-5 business days to reflect in your account.</p></div>`
+         }
+         <p>If you have any questions about this cancellation or refund, please contact our support team.</p>`,
+        ["Browse Properties", `${URL}/`],
+        `Your reservation for ${propertyTitle} has been cancelled. Refund: ₦${refundAmount.toLocaleString()}`
+      );
+    },
+
+    reservationRescheduled(name: string, propertyTitle: string, oldDate: string, oldTime: string, newDate: string, newTime: string) {
+      return base(
+        "Reservation Rescheduled 📅",
+        `<p>Hello <strong>${name}</strong>,</p>
+         <p>Your reservation meeting for <strong>${propertyTitle}</strong> has been rescheduled.</p>
+         <table class="detail-box">
+           <tr><td>Property</td><td>${propertyTitle}</td></tr>
+           <tr><td>Previous</td><td style="text-decoration:line-through;color:#94a3b8">${oldDate} at ${oldTime}</td></tr>
+           <tr><td>New Date</td><td style="color:#059669;font-weight:700">${newDate}</td></tr>
+           <tr><td>New Time</td><td style="color:#059669;font-weight:700">${newTime}</td></tr>
+         </table>
+         <div class="highlight-box">
+           <p><strong>📅 Updated Meeting</strong> — Please update your calendar. If this new time doesn't work for you, contact our support team.</p>
+         </div>
+         <p>Thank you for choosing MBPP Properties!</p>`,
+        ["View Your Deals", `${URL}/deals`],
+        `Your reservation for ${propertyTitle} has been rescheduled to ${newDate} at ${newTime}`
+      );
+    },
+
+    adminReservationCancelled(name: string, propertyTitle: string, reason: string, refundAmount: number) {
+      return base(
+        "Reservation Cancelled by Admin",
+        `<p>Hello <strong>${name}</strong>,</p>
+         <p>An administrator has cancelled your reservation for <strong>${propertyTitle}</strong>.</p>
+         <table class="detail-box">
+           <tr><td>Property</td><td>${propertyTitle}</td></tr>
+           <tr><td>Reason</td><td>${reason || "No reason provided"}</td></tr>
+           <tr><td>Refund</td><td style="color:#059669;font-weight:700">₦${refundAmount.toLocaleString()}</td></tr>
+         </table>
+         <div class="warning-box">
+           <p><strong>ℹ️ Cancelled</strong> — Your holding deposit has been refunded. It may take 3-5 business days to reflect in your account.</p>
+         </div>
+         <p>If you have any questions, please contact our support team.</p>`,
+        ["Browse Properties", `${URL}/`],
+        `Your reservation for ${propertyTitle} has been cancelled by admin. Refund: ₦${refundAmount.toLocaleString()}`
+      );
+    },
 };

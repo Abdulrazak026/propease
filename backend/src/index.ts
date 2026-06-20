@@ -50,6 +50,7 @@ import newsletterRoutes from "./routes/newsletter";
 import adminSubmissionsRoutes from "./routes/admin-submissions";
 import prisma from "./lib/prisma";
 import { logger } from "./lib/logger";
+import { startExpiryCron, stopExpiryCron } from "./cron/expire-reservations";
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -162,6 +163,8 @@ app.use((err: Error, _req: express.Request, res: express.Response, _next: expres
   logger.error(err, "Unhandled error");
   res.status(500).json({ error: "Internal server error" });
 });
+
+startExpiryCron();
 
 const HOST = process.env.HOST || "127.0.0.1";
 const server = app.listen(Number(PORT), HOST, () => {

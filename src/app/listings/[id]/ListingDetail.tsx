@@ -353,6 +353,23 @@ export default function ListingDetail() {
                     <div className="border-t border-gray-200 pt-2 flex justify-between text-sm"><span className="text-gray-500">Holding Deposit</span><span className="text-emerald-600 font-bold text-base">{formatNaira(reserveDeposit)}</span></div>
                     <div className="flex justify-between text-sm"><span className="text-gray-500">Valid For</span><span className="text-gray-900">{reserveDays} days</span></div>
                   </div>
+                  <div className="bg-amber-50 border border-amber-200 rounded-xl p-3">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="text-[10px] font-semibold uppercase tracking-wider text-amber-700">
+                        Cancellation Policy: {listing.cancellationPolicy || "flexible"}
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-amber-800 leading-relaxed">
+                      {listing.cancellationPolicy === "strict"
+                        ? "No refund after 24 hours of booking. Full refund only within the first 24 hours."
+                        : listing.cancellationPolicy === "firm"
+                        ? "50% refund if cancelled at least 48 hours before the meeting. No refund after that."
+                        : listing.cancellationPolicy === "moderate"
+                        ? "Full refund if cancelled at least 48 hours before the meeting. 50% refund if cancelled after that."
+                        : "Full refund if cancelled at least 24 hours before the meeting. 50% refund after that."
+                      }
+                    </p>
+                  </div>
                   <p className="text-xs text-gray-500 leading-relaxed">The holding deposit secures the property and is deducted from your first payment. Refundable per our cancellation policy.</p>
                   <div className="flex gap-3 pt-2">
                     <Button variant="outline" className="flex-1 min-h-[44px]" onClick={() => { setShowReserveModal(false); setReserveStep("confirm"); }}>Cancel</Button>
