@@ -2,6 +2,7 @@ import { Router, Response } from "express";
 import prisma from "../lib/prisma";
 import { authenticate, AuthRequest } from "../middleware/auth";
 import { logger } from "../lib/logger";
+import { emailService } from "../services/email";
 const router = Router();
 
 router.post("/:listingId", authenticate, async (req: AuthRequest, res: Response) => {
@@ -97,6 +98,99 @@ router.get("/all", authenticate, async (req: AuthRequest, res: Response) => {
   } catch (error) {
     logger.error({ err: error }, "List all reservations error:");
     res.status(500).json({ error: "Failed to fetch reservations" });
+  }
+});
+
+router.patch("/:id/confirm", authenticate, async (req: AuthRequest, res: Response) => {
+  try {
+    if (req.user!.role !== "head" && req.user!.role !== "admin") {
+      return res.status(403).json({ error: "Unauthorized" });
+    }
+
+    const { meetingDate, meetingTime } = req.body;
+    if (!meetingDate || !meetingTime) {
+      return res.status(400).json({ error: "Meeting date and time are required" });
+    }
+
+    const reservation = await prisma.reservation.findUnique({
+      where: { id: req.params.id },
+      include: {
+        listing: { select: { id: true, title: true } },
+        user: { select: { id: true, name: true, email: true } },
+      },
+    });
+
+    if (!reservation) return res.status(404).json({ error: "Reservation not found" });
+
+    const updated = await prisma.reservation.update({
+      where: { id: req.params.id },
+      data: {
+        status: "confirmed",
+        meetingDate: new Date(meetingDate),
+        meetingTime,
+        confirmedById: req.user!.id,
+      },
+    });
+
+    if (reservation.user?.email) {
+      const meetingDateStr = new Date(meetingDate).toLocaleDateString("en-NG", { weekday: "long", year: "numeric", month: "long", day: "numeric" });
+      emailService.reservationConfirmed(
+        reservation.user.email,
+        reservation.user.name || "Customer",
+        reservation.listing.title,
+        meetingDateStr,
+        meetingTime,
+      ).catch(() => {});
+    }
+
+    res.json({ reservation: updated });
+  } catch (error) {
+    logger.error({ err: error }, "Confirm reservation error:");
+    res.status(500).json({ error: "Failed to confirm reservation" });
+  }
+});
+
+router.patch("/:id/reject", authenticate, async (req: AuthRequest, res: Response) => {
+  try {
+    if (req.user!.role !== "head" && req.user!.role !== "admin") {
+      return res.status(403).json({ error: "Unauthorized" });
+    }
+
+    const { reason } = req.body;
+
+    const reservation = await prisma.reservation.findUnique({
+      where: { id: req.params.id },
+      include: {
+        listing: { select: { id: true, title: true } },
+        user: { select: { id: true, name: true, email: true } },
+      },
+    });
+
+    if (!reservation) return res.status(404).json({ error: "Reservation not found" });
+
+    const updated = await prisma.reservation.update({
+      where: { id: req.params.id },
+      data: { status: "cancelled" },
+    });
+
+    await prisma.listing.update({
+      where: { id: reservation.listingId },
+      data: { status: "available" },
+    }).catch(() => {});
+
+    if (reservation.user?.email) {
+      emailService.reservationRejected(
+        reservation.user.email,
+        reservation.user.name || "Customer",
+        reservation.listing.title,
+        reason || "",
+      ).catch(() => {});
+    }
+
+    res.json({ reservation: updated });
+  } catch (error) {
+    logger.error({ err: error }, "Reject reservation error:");
+    res.status(500).json({ error: "Failed to reject reservation" });
   }
 });
 

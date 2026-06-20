@@ -183,4 +183,10 @@ export const emailService = {
   async supportMessage(email: string, name: string, message: string) {
     return send(email, "Message from MBPP Support", defaultTemplates.supportMessage(name, message));
   },
+  async reservationConfirmed(email: string, name: string, propertyTitle: string, meetingDate: string, meetingTime: string) {
+    return send(email, `Reservation Confirmed — ${propertyTitle}`, defaultTemplates.reservationConfirmed(name, propertyTitle, meetingDate, meetingTime));
+  },
+  async reservationRejected(email: string, name: string, propertyTitle: string, reason: string) {
+    return send(email, `Reservation Update — ${propertyTitle}`, defaultTemplates.reservationRejected(name, propertyTitle, reason));
+  },
 };

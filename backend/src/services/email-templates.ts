@@ -795,4 +795,40 @@ export const templates = {
         `You have a new message from MBPP support.`
       );
     },
+    reservationConfirmed(name: string, propertyTitle: string, meetingDate: string, meetingTime: string) {
+      return base(
+        "Reservation Confirmed ✅",
+        `<p>Hello <strong>${name}</strong>,</p>
+         <p>Great news! Your reservation has been confirmed by our team.</p>
+         <div class="highlight-box">
+           <p><strong>Your reservation is confirmed!</strong></p>
+         </div>
+         <table class="detail-box">
+           <tr><td>Property</td><td>${propertyTitle}</td></tr>
+           <tr><td>Meeting Date</td><td>${meetingDate}</td></tr>
+         </table>
+         <div style="background:#ecfdf5;border:1px solid #a7f3d0;border-radius:12px;padding:18px 20px;margin:20px 0;text-align:center">
+           <p style="color:#065f46;font-size:13px;margin:0 0 4px;font-weight:600">📅 Your Meeting is Scheduled For</p>
+           <p style="color:#065f46;font-size:20px;font-weight:700;margin:0">${meetingDate} at ${meetingTime}</p>
+         </div>
+         <p>Please arrive on time for your scheduled meeting. If you need to reschedule, contact our support team as soon as possible.</p>
+         <p>Thank you for choosing MBPP Properties!</p>`,
+        ["View Your Deals", `${URL}/deals`],
+        `Your reservation for ${propertyTitle} is confirmed! Meeting: ${meetingDate} at ${meetingTime}`
+      );
+    },
+    reservationRejected(name: string, propertyTitle: string, reason: string) {
+      return base(
+        "Reservation Update",
+        `<p>Hello <strong>${name}</strong>,</p>
+         <p>We regret to inform you that your reservation could not be confirmed at this time.</p>
+         <table class="detail-box">
+           <tr><td>Property</td><td>${propertyTitle}</td></tr>
+           ${reason ? `<tr><td>Reason</td><td>${reason}</td></tr>` : ""}
+         </table>
+         <p>Your holding deposit has been refunded. Please contact our support team if you have any questions.</p>`,
+        ["Browse Properties", `${URL}/`],
+        `Reservation update for ${propertyTitle}`
+      );
+    },
 };
