@@ -66,6 +66,19 @@ router.post("/register", validate(registerSchema), async (req, res: Response) =>
       select: { id: true, name: true, email: true, role: true, city: true, isApproved: true },
     });
 
+    if (city) {
+      const cityRecord = await prisma.city.findFirst({
+        where: { name: { equals: city, mode: "insensitive" } },
+      });
+      if (cityRecord) {
+        await prisma.userCity.upsert({
+          where: { userId_cityId: { userId: user.id, cityId: cityRecord.id } },
+          update: {},
+          create: { userId: user.id, cityId: cityRecord.id },
+        });
+      }
+    }
+
     // Auto-login after signup
     const accessToken = generateAccessToken(user);
     const refreshTokenValue = generateRefreshToken();

@@ -89,6 +89,35 @@ router.get("/agents", authenticate, authorize("ambassador"), async (req: AuthReq
   }
 });
 
+router.get("/tasks", authenticate, authorize("ambassador"), async (req: AuthRequest, res: Response) => {
+  try {
+    const userCities = await prisma.userCity.findMany({
+      where: { userId: req.user!.id },
+      include: { city: true },
+    });
+    const cityNames = userCities.map((uc) => uc.city.name);
+
+    const tasks = await prisma.task.findMany({
+      where: {
+        OR: [
+          { assignedToId: req.user!.id },
+          ...(cityNames.length > 0 ? [{ area: { in: cityNames } }] : []),
+        ],
+      },
+      include: {
+        createdBy: { select: { id: true, name: true, role: true } },
+        assignedTo: { select: { id: true, name: true } },
+      },
+      orderBy: { createdAt: "desc" },
+    });
+
+    res.json({ tasks });
+  } catch (error) {
+    logger.error({ err: error }, "Ambassador tasks error:");
+    res.status(500).json({ error: "Failed to fetch tasks" });
+  }
+});
+
 router.get("/city-listings", authenticate, authorize("ambassador"), async (req: AuthRequest, res: Response) => {
   try {
     const userCities = await prisma.userCity.findMany({

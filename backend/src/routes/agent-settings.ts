@@ -41,6 +41,19 @@ router.patch("/me", authenticate, async (req: AuthRequest, res: Response) => {
       select: { id: true, name: true, whatsapp: true, city: true },
     });
 
+    if (city) {
+      const cityRecord = await prisma.city.findFirst({
+        where: { name: { equals: city, mode: "insensitive" } },
+      });
+      if (cityRecord) {
+        await prisma.userCity.upsert({
+          where: { userId_cityId: { userId: user.id, cityId: cityRecord.id } },
+          update: {},
+          create: { userId: user.id, cityId: cityRecord.id },
+        });
+      }
+    }
+
     res.json({ profile: user });
   } catch (error) {
     logger.error({ err: error }, "Agent profile update error:");

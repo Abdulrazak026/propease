@@ -5,7 +5,7 @@ import Button from "@/components/ui/Button";
 import { api } from "@/lib/api-client";
 
 export default function AmbassadorSettings() {
-  const { currentUser } = useRole();
+  const { currentUser, refresh } = useRole();
   const [displayName, setDisplayName] = useState(currentUser?.name || "");
   const [whatsapp, setWhatsapp] = useState(currentUser?.whatsapp || "");
   const [notifyNewTasks, setNotifyNewTasks] = useState(true);
@@ -20,6 +20,7 @@ export default function AmbassadorSettings() {
     setMsg(null);
     try {
       await api.patch("/api/agent/settings/me", { name: displayName, whatsapp });
+      await refresh();
       setMsg({ type: "success", text: "Profile saved" });
     } catch {
       setMsg({ type: "error", text: "Failed to save" });

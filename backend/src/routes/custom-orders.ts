@@ -18,7 +18,11 @@ router.post("/", validate(createCustomOrderSchema), async (req, res: Response) =
     emailService.customOrderReceived(req.body.clientName, req.body.clientContact || "", req.body.propertyType, req.body.area, req.body.budget).catch(() => {});
 
     // Find an ambassador for the area and create a task
-    const ambassador = await prisma.user.findFirst({
+    const ambassadorLink = await prisma.userCity.findFirst({
+      where: { city: { name: req.body.area } },
+      include: { user: true },
+    });
+    const ambassador = ambassadorLink?.user || await prisma.user.findFirst({
       where: { role: "ambassador", city: req.body.area },
     });
 
@@ -57,7 +61,12 @@ router.get("/", authenticate, async (req: AuthRequest, res: Response) => {
   try {
     let where = {};
     if (req.user!.role === "ambassador") {
-      where = { area: req.user!.city || "" };
+      const userCities = await prisma.userCity.findMany({
+        where: { userId: req.user!.id },
+        include: { city: true },
+      });
+      const cityNames = userCities.map((uc) => uc.city.name);
+      where = cityNames.length > 0 ? { area: { in: cityNames } } : { area: req.user!.city || "" };
     }
     // head/admin sees all - no filter
 

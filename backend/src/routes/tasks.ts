@@ -39,8 +39,13 @@ router.get("/my", authenticate, authorize("agent", "ambassador", "head"), async 
 router.get("/city/:city", authenticate, authorize("ambassador"), async (req: AuthRequest, res: Response) => {
   try {
     const city = req.params.city as string;
-    if (req.user!.city && req.user!.city.toLowerCase() !== city.toLowerCase()) {
-      return res.status(403).json({ error: "You can only view tasks in your assigned city" });
+    const userCities = await prisma.userCity.findMany({
+      where: { userId: req.user!.id },
+      include: { city: true },
+    });
+    const cityNames = userCities.map((uc) => uc.city.name);
+    if (cityNames.length > 0 && !cityNames.some(c => c.toLowerCase() === city.toLowerCase())) {
+      return res.status(403).json({ error: "You can only view tasks in your assigned cities" });
     }
     const tasks = await prisma.task.findMany({
       where: { area: city },
@@ -116,7 +121,13 @@ router.post("/", authenticate, authorize("head", "ambassador"), validate(createT
       if (!ambassador || !ambassador.canCreateTasks) {
         return res.status(403).json({ error: "You don't have permission to create tasks" });
       }
-      req.body.area = ambassador.city || req.body.area;
+      const userCities = await prisma.userCity.findMany({
+        where: { userId: req.user!.id },
+        include: { city: true },
+      });
+      if (!req.body.area && userCities.length > 0) {
+        req.body.area = userCities[0].city.name;
+      }
     }
 
     const task = await prisma.task.create({
@@ -169,8 +180,15 @@ router.patch("/:id/status", authenticate, async (req: AuthRequest, res: Response
     if (req.user!.role === "agent" && task.assignedToId !== req.user!.id) {
       return res.status(403).json({ error: "Not your task" });
     }
-    if (req.user!.role === "ambassador" && req.user!.city && task.area !== req.user!.city) {
-      return res.status(403).json({ error: "You can only modify tasks in your assigned city" });
+    if (req.user!.role === "ambassador") {
+      const userCities = await prisma.userCity.findMany({
+        where: { userId: req.user!.id },
+        include: { city: true },
+      });
+      const cityNames = userCities.map((uc) => uc.city.name);
+      if (cityNames.length > 0 && !cityNames.includes(task.area)) {
+        return res.status(403).json({ error: "You can only modify tasks in your assigned cities" });
+      }
     }
 
     const updated = await prisma.task.update({

@@ -11,6 +11,8 @@ interface ApiUser {
   canCreateTasks: boolean; canCloseDeals: boolean;
   canCreateListings?: boolean; canManageUsers?: boolean;
   canManageContent?: boolean; canViewAnalytics?: boolean; canManageAgreements?: boolean;
+  ambassadorId?: string | null;
+  _count?: { agents: number; listings: number; assignedTasks: number };
 }
 
 const PERMISSIONS = [
@@ -48,6 +50,8 @@ export default function StaffsPage() {
 
   const permTrue = (u: ApiUser) => PERMISSIONS.filter(p => !!(u as any)[p.k]).length;
 
+  const ambassadorMap = Object.fromEntries(users.filter(u => u.role === "ambassador").map(u => [u.id, u.name]));
+
   if (loading) return <div className="flex items-center justify-center h-64"><div className="h-8 w-8 border-2 border-[var(--color-primary)] border-t-transparent rounded-full animate-spin" /></div>;
 
   return (
@@ -76,12 +80,13 @@ export default function StaffsPage() {
       <div className="hidden md:block bg-white rounded-xl border border-gray-200 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
-            <thead><tr className="border-b border-gray-100 bg-gray-50 text-left"><th className="px-4 py-3 text-xs font-medium text-gray-600">Name</th><th className="px-4 py-3 text-xs font-medium text-gray-600">City</th><th className="px-4 py-3 text-xs font-medium text-gray-600">Status</th><th className="px-4 py-3 text-xs font-medium text-gray-600">Permissions</th><th className="px-4 py-3 text-xs font-medium text-gray-600">Actions</th></tr></thead>
+            <thead><tr className="border-b border-gray-100 bg-gray-50 text-left"><th className="px-4 py-3 text-xs font-medium text-gray-600">Name</th><th className="px-4 py-3 text-xs font-medium text-gray-600">City</th><th className="px-4 py-3 text-xs font-medium text-gray-600">Reports To</th><th className="px-4 py-3 text-xs font-medium text-gray-600">Status</th><th className="px-4 py-3 text-xs font-medium text-gray-600">Permissions</th><th className="px-4 py-3 text-xs font-medium text-gray-600">Actions</th></tr></thead>
             <tbody>
               {list.map(user => (
                 <tr key={user.id} className="border-b border-gray-50 hover:bg-gray-50/50">
                   <td className="px-4 py-3"><div className="flex items-center gap-2"><div className="w-8 h-8 rounded-full bg-[var(--color-primary)]/10 flex items-center justify-center text-xs font-bold text-[var(--color-primary)]">{user.name.split(" ").map(n => n[0]).join("")}</div><div><p className="font-medium text-gray-900 text-xs">{user.name}</p><p className="text-[10px] text-gray-400">{user.email}</p></div></div></td>
                   <td className="px-4 py-3 text-xs text-gray-600">{user.city || "N/A"}</td>
+                  <td className="px-4 py-3 text-xs text-gray-600">{user.ambassadorId ? (ambassadorMap[user.ambassadorId] || "Unknown") : user.role === "ambassador" ? <span className="text-[10px] text-gray-400">Head</span> : "—"}</td>
                   <td className="px-4 py-3"><Badge variant={user.isApproved ? "success" : "warning"}>{user.isApproved ? "Active" : "Pending"}</Badge></td>
                   <td className="px-4 py-3"><span className="text-[10px] bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded">{permTrue(user)}/{PERMISSIONS.length} active</span></td>
                   <td className="px-4 py-3"><Button size="sm" variant="outline" onClick={() => setEditUser(user.id)}>Edit Permissions</Button></td>
@@ -105,6 +110,7 @@ export default function StaffsPage() {
             </div>
             <div className="grid grid-cols-2 gap-2 text-xs mb-3">
               <div><span className="text-gray-400">City</span><p className="font-medium">{user.city || "N/A"}</p></div>
+              <div><span className="text-gray-400">Reports To</span><p className="font-medium">{user.ambassadorId ? (ambassadorMap[user.ambassadorId] || "Unknown") : user.role === "ambassador" ? "Head" : "—"}</p></div>
               <div><span className="text-gray-400">Permissions</span><p className="font-medium">{permTrue(user)}/{PERMISSIONS.length} active</p></div>
             </div>
             {perms.canManageUsers && <Button size="sm" variant="outline" className="w-full" onClick={() => setEditUser(user.id)}>Edit Permissions</Button>}
@@ -126,7 +132,29 @@ function RolesModal({ userId, users, onClose, onUpdate }: { userId: string; user
   const u = users.find(x => x.id === userId)!;
   const [saving, setSaving] = useState(false);
   const [localPerms, setLocalPerms] = useState<Record<string, boolean>>({});
+  const [cities, setCities] = useState<{ id: string; name: string; state: string }[]>([]);
+  const [selectedCityIds, setSelectedCityIds] = useState<string[]>([]);
+  const [loadingCities, setLoadingCities] = useState(false);
   if (!u) return null;
+
+  const ambassadors = users.filter(x => x.role === "ambassador");
+
+  useEffect(() => {
+    Promise.all([
+      api.get<{ cities: { id: string; name: string; state: string }[] }>("/api/admin/cities"),
+      api.get<{ cityIds: string[] }>(`/api/admin/cities/users/${userId}`),
+    ]).then(([citiesR, userCitiesR]) => {
+      if (citiesR.data?.cities) setCities(citiesR.data.cities);
+      if (userCitiesR.data?.cityIds) setSelectedCityIds(userCitiesR.data.cityIds);
+      setLoadingCities(false);
+    }).catch(() => setLoadingCities(false));
+  }, [userId]);
+
+  const toggleCity = (cityId: string) => {
+    setSelectedCityIds(prev =>
+      prev.includes(cityId) ? prev.filter(id => id !== cityId) : [...prev, cityId]
+    );
+  };
 
   const getPerm = (k: string) => localPerms[k] !== undefined ? localPerms[k] : !!(u as any)[k];
 
@@ -153,6 +181,15 @@ function RolesModal({ userId, users, onClose, onUpdate }: { userId: string; user
               <option value="agent">Agent</option>
             </select>
           </div>
+          {u.role === "agent" && (
+            <div>
+              <label className="text-xs font-semibold text-gray-700">Reports To (Ambassador)</label>
+              <select defaultValue={u.ambassadorId || ""} className="w-full mt-1 rounded-lg border border-gray-200 px-3 py-2 text-sm" onChange={async e => { await update({ ambassadorId: e.target.value || null }); }}>
+                <option value="">— Not assigned —</option>
+                {ambassadors.map(a => <option key={a.id} value={a.id}>{a.name} ({a.city || "No city"})</option>)}
+              </select>
+            </div>
+          )}
           <div>
             <label className="text-xs font-semibold text-gray-700 mb-2 block">Permissions</label>
             <div className="space-y-2">
@@ -170,6 +207,29 @@ function RolesModal({ userId, users, onClose, onUpdate }: { userId: string; user
               ))}
             </div>
           </div>
+          {cities.length > 0 && (
+            <div>
+              <label className="text-xs font-semibold text-gray-700 mb-2 block">
+                Cities/Areas ({selectedCityIds.length} selected)
+              </label>
+              <div className="max-h-40 overflow-y-auto space-y-1 border border-gray-200 rounded-lg p-2">
+                {cities.map(c => (
+                  <label key={c.id} className="flex items-center gap-2 px-2 py-1 rounded hover:bg-gray-50 cursor-pointer text-xs">
+                    <input type="checkbox" checked={selectedCityIds.includes(c.id)} onChange={() => toggleCity(c.id)} className="rounded border-gray-300" />
+                    {c.name}, {c.state}
+                  </label>
+                ))}
+              </div>
+              <Button size="sm" variant="outline" className="mt-2" disabled={saving} onClick={async () => {
+                setSaving(true);
+                await api.put(`/api/admin/cities/users/${userId}`, { cityIds: selectedCityIds });
+                setSaving(false);
+                onUpdate?.();
+              }}>
+                {saving ? "Saving..." : "Save Cities"}
+              </Button>
+            </div>
+          )}
           <div>
             <label className="text-xs font-semibold text-gray-700">Status</label>
             <Button size="sm" variant={u.isApproved ? "outline" : "primary"} className="mt-1 w-full" onClick={async () => { await update({ isApproved: !u.isApproved, suspendedAt: u.isApproved ? new Date().toISOString() : null }); }} disabled={saving}>
@@ -183,15 +243,28 @@ function RolesModal({ userId, users, onClose, onUpdate }: { userId: string; user
 }
 
 function AddStaffModal({ onClose }: { onClose: () => void }) {
-  const [form, setForm] = useState({ name: "", email: "", role: "agent", password: "", city: "" });
+  const [users, setUsers] = useState<ApiUser[]>([]);
+  const [form, setForm] = useState({ name: "", email: "", role: "agent", password: "", city: "", ambassadorId: "" });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    api.get<{ users: ApiUser[] }>("/api/admin/users").then(r => {
+      if (r.data?.users) setUsers(r.data.users);
+    }).catch(() => {});
+  }, []);
+
+  const ambassadors = users.filter(u => u.role === "ambassador");
 
   const handleCreate = async () => {
     if (!form.name || !form.email || !form.password) { setError("Name, email and password are required"); return; }
     setSaving(true);
     setError("");
-    const r = await api.post("/api/admin/users", { name: form.name, email: form.email, role: form.role, password: form.password, city: form.city || undefined });
+    const r = await api.post("/api/admin/users", {
+      name: form.name, email: form.email, role: form.role,
+      password: form.password, city: form.city || undefined,
+      ambassadorId: form.ambassadorId || undefined,
+    });
     setSaving(false);
     if (r.status === 201 || r.status === 200) { onClose(); }
     else { setError("Failed to create staff"); }
@@ -209,6 +282,12 @@ function AddStaffModal({ onClose }: { onClose: () => void }) {
             <option value="ambassador">Ambassador</option>
             <option value="agent">Agent</option>
           </select>
+          {form.role === "agent" && (
+            <select value={form.ambassadorId} onChange={e => setForm({ ...form, ambassadorId: e.target.value })} className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm">
+              <option value="">— No ambassador —</option>
+              {ambassadors.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
+            </select>
+          )}
           <input placeholder="City (optional)" value={form.city} onChange={e => setForm({ ...form, city: e.target.value })} className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm" />
           <input type="password" placeholder="Password" value={form.password} onChange={e => setForm({ ...form, password: e.target.value })} className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm" />
         </div>

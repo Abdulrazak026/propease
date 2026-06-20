@@ -16,6 +16,8 @@ interface ContactSub {
   message: string; read: boolean; createdAt: string; replies: ContactReply[];
 }
 
+interface Ambassador { id: string; name: string; city: string | null; }
+
 export default function SubmissionsPage() {
   const [tab, setTab] = useState<"agents" | "contacts">("agents");
   const [agents, setAgents] = useState<AgentApp[]>([]);
@@ -25,12 +27,18 @@ export default function SubmissionsPage() {
   const [selectedContact, setSelectedContact] = useState<ContactSub | null>(null);
   const [replyText, setReplyText] = useState("");
   const [sendingReply, setSendingReply] = useState(false);
+  const [ambassadors, setAmbassadors] = useState<Ambassador[]>([]);
+  const [selectedAmbassadorId, setSelectedAmbassadorId] = useState("");
   const threadEndRef = useRef<HTMLDivElement>(null);
 
   const fetchSubmissions = () => {
-    api.get<{ agentApplications: AgentApp[]; contactSubmissions: ContactSub[] }>("/api/admin/submissions").then(r => {
-      if (r.data?.agentApplications) setAgents(r.data.agentApplications);
-      if (r.data?.contactSubmissions) setContacts(r.data.contactSubmissions);
+    Promise.all([
+      api.get<{ agentApplications: AgentApp[]; contactSubmissions: ContactSub[] }>("/api/admin/submissions"),
+      api.get<{ users: any[] }>("/api/admin/users"),
+    ]).then(([subR, usersR]) => {
+      if (subR.data?.agentApplications) setAgents(subR.data.agentApplications);
+      if (subR.data?.contactSubmissions) setContacts(subR.data.contactSubmissions);
+      if (usersR.data?.users) setAmbassadors(usersR.data.users.filter(u => u.role === "ambassador").map(u => ({ id: u.id, name: u.name, city: u.city })));
     }).catch(() => {}).finally(() => setLoading(false));
   };
 
@@ -42,10 +50,11 @@ export default function SubmissionsPage() {
     threadEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [selectedContact]);
 
-  const approveAgent = async (id: string) => {
-    await api.patch(`/api/admin/users/${id}`, { isApproved: true, suspendedAt: null });
+  const approveAgent = async (id: string, ambassadorId?: string) => {
+    await api.patch(`/api/admin/users/${id}`, { isApproved: true, suspendedAt: null, ambassadorId: ambassadorId || null });
     fetchSubmissions();
     setViewAgent(null);
+    setSelectedAmbassadorId("");
   };
 
   const deleteAgent = async (id: string) => {
@@ -287,9 +296,16 @@ export default function SubmissionsPage() {
                   <p className="text-sm text-gray-700 leading-relaxed">{viewAgent.whyAgent}</p>
                 </div>
               )}
-              <div className="flex gap-2 pt-2">
-                <Button variant="outline" className="flex-1" onClick={() => { approveAgent(viewAgent.id); }}>Approve</Button>
-                <Button variant="danger" className="flex-1" onClick={() => { deleteAgent(viewAgent.id); }}>Reject</Button>
+              <div className="space-y-2 pt-2">
+                <label className="text-xs font-semibold text-gray-700">Assign to Ambassador (optional)</label>
+                <select value={selectedAmbassadorId} onChange={e => setSelectedAmbassadorId(e.target.value)} className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm">
+                  <option value="">Partner — No ambassador</option>
+                  {ambassadors.map(a => <option key={a.id} value={a.id}>{a.name} ({a.city || "No city"})</option>)}
+                </select>
+                <div className="flex gap-2">
+                  <Button variant="outline" className="flex-1" onClick={() => { approveAgent(viewAgent.id, selectedAmbassadorId || undefined); }}>Approve</Button>
+                  <Button variant="danger" className="flex-1" onClick={() => { deleteAgent(viewAgent.id); }}>Reject</Button>
+                </div>
               </div>
             </div>
           </div>

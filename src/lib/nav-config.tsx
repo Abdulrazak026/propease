@@ -43,6 +43,7 @@ export const dashboardNav: Record<string, NavItem[]> = {
   ],
   ambassador: [
     { label: "City Overview", href: "/ambassador", icon: "city-overview" },
+    { label: "My Agents", href: "/ambassador/agents", icon: "users" },
     { label: "Listings", href: "/ambassador/listings", icon: "post-listing" },
     { label: "Moderation", href: "/ambassador/moderation", icon: "agreements", permission: "canManageContent" },
     { label: "Tasks", href: "/ambassador/tasks", icon: "create-task", permission: "canCreateTasks" },

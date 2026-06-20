@@ -38,12 +38,12 @@ export default function LayoutShell({ children }: { children: React.ReactNode })
   if (isAuth) return <>{children}</>;
 
   // Staff dashboards: DashboardLayout handles its own sidebar nav — no BottomNav
-  if (isStaffDashboard) {
+  // Staff users on client dashboards (wallet, messages, notifications) also use DashboardLayout
+  if (isStaffDashboard || (isStaff && isClientDashboard)) {
     return <div className="flex h-full">{children}</div>;
   }
 
   // Client dashboards (wallet, messages, notifications): Navbar + BottomNav
-  // Staff users on client dashboards: also get Navbar + BottomNav (BottomNav hides itself for staff)
   if (isClientDashboard) {
     return (
       <div className="flex flex-col min-h-full">

@@ -43,12 +43,26 @@ router.patch("/:id", authenticate, authorize("head"), requirePermission("canMana
 router.post("/", authenticate, authorize("head"), requirePermission("canManageUsers"), async (req: AuthRequest, res: Response) => {
   try {
     const bcrypt = (await import("bcryptjs")).default;
-    const { name, email, password, role, city } = req.body;
+    const { name, email, password, role, city, ambassadorId } = req.body;
     const hashed = await bcrypt.hash(password || "password123", 12);
     const user = await prisma.user.create({
-      data: { name, email, password: hashed, role, city, isApproved: role === "head" },
-      select: { id: true, name: true, email: true, role: true },
+      data: { name, email, password: hashed, role, city, ambassadorId, isApproved: role === "head" },
+      select: { id: true, name: true, email: true, role: true, city: true },
     });
+
+    if (city) {
+      const cityRecord = await prisma.city.findFirst({
+        where: { name: { equals: city, mode: "insensitive" } },
+      });
+      if (cityRecord) {
+        await prisma.userCity.upsert({
+          where: { userId_cityId: { userId: user.id, cityId: cityRecord.id } },
+          update: {},
+          create: { userId: user.id, cityId: cityRecord.id },
+        });
+      }
+    }
+
     res.status(201).json({ user });
   } catch (error) { logger.error({ err: error }, "Failed to create user"); res.status(500).json({ error: "Failed to create user" }); }
 });

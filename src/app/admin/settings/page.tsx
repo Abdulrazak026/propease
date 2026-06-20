@@ -683,6 +683,16 @@ function S({ label, v, onChange, opts }: { label: string; v: string; onChange: (
 function CityManager({ value, onChange }: { value: string; onChange: (v: string) => void }) {
   const [newCity, setNewCity] = useState("");
   const [newState, setNewState] = useState("Kano State");
+  const [syncing, setSyncing] = useState(false);
+
+  const syncToDb = async () => {
+    setSyncing(true);
+    try {
+      const r = await api.post<{ created: number; updated: number; total: number }>("/api/admin/cities/sync");
+      if (r.data) alert(`Synced! ${r.data.created} created, ${r.data.updated} updated (${r.data.total} total).`);
+    } catch { alert("Sync failed"); }
+    setSyncing(false);
+  };
   const cities = value.split(";").map(c => c.trim()).filter(Boolean).map(c => {
     const parts = c.split(",");
     return { name: parts[0]?.trim() || "", state: parts[1]?.trim() || "Kano State" };
@@ -718,6 +728,9 @@ function CityManager({ value, onChange }: { value: string; onChange: (v: string)
         <input value={newState} onChange={e => setNewState(e.target.value)} placeholder="State" className="w-28 rounded-lg border border-gray-200 px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)]" />
         <button type="button" onClick={add} className="px-4 py-2 bg-[var(--color-primary)] text-white text-xs font-medium rounded-lg hover:opacity-90">Add</button>
       </div>
+      <button type="button" disabled={syncing} onClick={syncToDb} className="text-xs font-medium px-3 py-1.5 rounded-lg border border-gray-300 text-gray-600 hover:bg-gray-50 disabled:opacity-50">
+        {syncing ? "Syncing..." : "Sync to Database"}
+      </button>
     </div>
   );
 }

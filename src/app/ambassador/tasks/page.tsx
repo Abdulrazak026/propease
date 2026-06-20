@@ -17,7 +17,6 @@ interface Agent { id: string; name: string; email?: string; }
 export default function AmbassadorTasksPage() {
   const { currentUser } = useRole();
   const perms = usePermissions();
-  const city = currentUser?.city;
 
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
@@ -29,15 +28,14 @@ export default function AmbassadorTasksPage() {
   });
 
   const load = () => {
-    if (!city) { setLoading(false); return; }
     setLoading(true);
-    api.get<{ tasks: Task[] }>(`/api/tasks/city/${encodeURIComponent(city)}`)
+    api.get<{ tasks: Task[] }>("/api/ambassador/tasks")
       .then(r => setTasks(r.data?.tasks || []))
       .catch(() => setTasks([]))
       .finally(() => setLoading(false));
   };
 
-  useEffect(load, [city]);
+  useEffect(load, []);
 
   useEffect(() => {
     if (!perms.canCreateTasks) return;
@@ -52,7 +50,7 @@ export default function AmbassadorTasksPage() {
     await api.post("/api/tasks", {
       title: form.title,
       description: form.description,
-      area: city,
+      area: currentUser?.city || "",
       propertyType: form.propertyType,
       budget: form.budget ? Number(form.budget) : 0,
       deadline: form.deadline || undefined,
@@ -64,22 +62,6 @@ export default function AmbassadorTasksPage() {
     load();
   };
 
-  if (!city) {
-    return (
-      <div className="space-y-6">
-        <div className="flex items-center gap-3">
-          <a href="/ambassador" className="text-gray-400 hover:text-[var(--color-primary)]">
-            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
-          </a>
-          <div><h1 className="text-xl font-bold text-gray-900">Tasks</h1><p className="text-xs text-gray-500">Manage city assignments</p></div>
-        </div>
-        <div className="bg-white rounded-xl border border-gray-200 p-8 text-center">
-          <p className="text-sm text-gray-500">City not assigned — contact admin to set your city before creating tasks.</p>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between gap-3 flex-wrap">
@@ -87,7 +69,7 @@ export default function AmbassadorTasksPage() {
           <a href="/ambassador" className="text-gray-400 hover:text-[var(--color-primary)]">
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
           </a>
-          <div><h1 className="text-xl font-bold text-gray-900">Tasks</h1><p className="text-xs text-gray-500">Manage assignments in {city}</p></div>
+          <div><h1 className="text-xl font-bold text-gray-900">Tasks</h1><p className="text-xs text-gray-500">Manage city assignments</p></div>
         </div>
         {perms.canCreateTasks && (
           <button onClick={() => setShowCreate(!showCreate)} className="text-xs font-semibold px-3.5 py-2.5 bg-[var(--color-primary)] text-white rounded-lg hover:bg-[var(--color-primary)]/90">+ Create Task</button>
@@ -156,7 +138,7 @@ export default function AmbassadorTasksPage() {
               </div>
             </div>
           ))}
-          {tasks.length === 0 && <div className="bg-white rounded-xl border border-gray-200 p-8 text-center text-gray-400 text-sm">No tasks in {city} yet.</div>}
+          {tasks.length === 0 && <div className="bg-white rounded-xl border border-gray-200 p-8 text-center text-gray-400 text-sm">No tasks in your cities yet.</div>}
         </div>
       )}
     </div>
