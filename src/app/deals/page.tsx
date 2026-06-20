@@ -32,13 +32,19 @@ export default function DealsPage() {
     if (authLoading) return;
     if (!isAuthenticated) { setLoading(false); return; }
 
-    Promise.all([
-      api.get<{ reservations: Reservation[] }>("/api/reservations/my"),
-      api.get<{ transactions: Transaction[] }>("/api/wallet/transactions"),
-    ]).then(([rRes, rTx]) => {
-      if (rRes.data?.reservations) setReservations(rRes.data.reservations);
-      if (rTx.data?.transactions) setTransactions(rTx.data.transactions);
-    }).catch(() => {}).finally(() => setLoading(false));
+    const fetchData = () => {
+      Promise.all([
+        api.get<{ reservations: Reservation[] }>("/api/reservations/my"),
+        api.get<{ transactions: Transaction[] }>("/api/wallet/transactions"),
+      ]).then(([rRes, rTx]) => {
+        if (rRes.data?.reservations) setReservations(rRes.data.reservations);
+        if (rTx.data?.transactions) setTransactions(rTx.data.transactions);
+      }).catch(() => {}).finally(() => setLoading(false));
+    };
+
+    fetchData();
+    const interval = setInterval(fetchData, 30000);
+    return () => clearInterval(interval);
   }, [authLoading, isAuthenticated]);
 
   if (authLoading || loading) {
@@ -94,8 +100,8 @@ export default function DealsPage() {
               </svg>
             </Link>
             <div>
-              <h1 className="text-xl font-bold text-gray-900">My Deals</h1>
-              <p className="text-xs text-gray-500">Reserved properties &amp; transactions</p>
+              <h1 className="text-xl font-bold text-gray-900">My Transactions</h1>
+              <p className="text-xs text-gray-500">Reservations &amp; transactions</p>
             </div>
           </div>
 
@@ -148,7 +154,7 @@ export default function DealsPage() {
                           <p className="text-xs text-gray-500 mt-0.5">{r.listing?.address || "Kano"}</p>
                         </div>
                         <span className={`shrink-0 px-2 py-0.5 text-[10px] font-medium rounded-full ${r.status === "active" || r.status === "confirmed" ? "bg-emerald-100 text-emerald-700" : r.status === "pending" || r.status === "pending_payment" ? "bg-amber-100 text-amber-700" : "bg-gray-100 text-gray-500"}`}>
-                          {r.status === "pending" || r.status === "pending_payment" ? "Paid, Awaiting Confirmation" : r.status === "confirmed" ? "Confirmed" : r.status}
+                          {r.status === "pending" || r.status === "pending_payment" ? "Paid, Awaiting Confirmation" : r.status === "confirmed" ? "Confirmed by Admin" : r.status}
                         </span>
                       </div>
                       <div className="flex items-center gap-4 mt-3 text-xs">

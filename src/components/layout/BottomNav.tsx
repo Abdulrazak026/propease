@@ -102,7 +102,7 @@ export default function BottomNav() {
   const tabs = [
     ...TABS.slice(0, 2),
     {
-      label: "Deals",
+      label: "Transactions",
       href: "/deals",
       icon: (active: boolean) => (
         <svg className="w-5 h-5" fill={active ? "currentColor" : "none"} viewBox="0 0 24 24" stroke="currentColor" strokeWidth={active ? 0 : 1.5}>

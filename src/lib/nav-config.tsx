@@ -19,7 +19,7 @@ export const dashboardNav: Record<string, NavItem[]> = {
     { label: "Applications", href: "/admin/applications", icon: "applications", group: "Operations" },
     { label: "Reservations", href: "/admin/reservations", icon: "agreements", group: "Operations" },
     { label: "Agreements", href: "/admin/agreements", icon: "agreements", permission: "canManageAgreements", group: "Operations" },
-    { label: "Deals", href: "/admin/deals", icon: "audit", permission: "canCloseDeals", group: "Operations" },
+    { label: "Transactions", href: "/admin/deals", icon: "audit", permission: "canCloseDeals", group: "Operations" },
     { label: "Commissions", href: "/admin/commissions", icon: "commissions", group: "Operations" },
     { label: "Careers", href: "/admin/careers", icon: "agreements", group: "Operations" },
     { label: "Moderation", href: "/admin/moderation", icon: "agreements", permission: "canManageContent", group: "Content" },

@@ -160,7 +160,7 @@ export default function Navbar() {
                   Dashboard
                 </Link>
                 <Link href="/deals" onClick={() => setUserOpen(false)} className="flex items-center gap-2.5 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md">
-                  My Deals
+                  My Transactions
                 </Link>
                 <Link href="/messages" onClick={() => setUserOpen(false)} className="flex items-center gap-2.5 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md">
                   Messages

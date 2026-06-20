@@ -174,6 +174,19 @@ router.get("/all-listings", authenticate, authorize("head"), async (req: AuthReq
   }
 });
 
+router.get("/transactions", authenticate, authorize("head"), async (req: AuthRequest, res: Response) => {
+  try {
+    const transactions = await prisma.transaction.findMany({
+      include: { user: { select: { id: true, name: true, email: true } } },
+      orderBy: { createdAt: "desc" },
+    });
+    res.json({ transactions });
+  } catch (error) {
+    logger.error({ err: error }, "List transactions error:");
+    res.status(500).json({ error: "Failed to fetch transactions" });
+  }
+});
+
 export default router;
 
 
