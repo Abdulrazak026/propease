@@ -187,6 +187,41 @@ router.get("/transactions", authenticate, authorize("head"), async (req: AuthReq
   }
 });
 
+router.get("/financials", authenticate, authorize("head"), async (req: AuthRequest, res: Response) => {
+  try {
+    const [transactions, reservations, withdrawals] = await Promise.all([
+      prisma.transaction.findMany({
+        include: { user: { select: { id: true, name: true, email: true } } },
+        orderBy: { createdAt: "desc" },
+      }),
+      prisma.reservation.findMany({
+        include: {
+          listing: { select: { id: true, title: true, address: true, cancellationPolicy: true } },
+          user: { select: { id: true, name: true, email: true } },
+        },
+        orderBy: { createdAt: "desc" },
+      }),
+      prisma.withdrawal.findMany({
+        include: { user: { select: { id: true, name: true, email: true } } },
+        orderBy: { createdAt: "desc" },
+      }),
+    ]);
+
+    const summary = {
+      totalPayments: transactions.filter(t => t.status === "completed").reduce((s, t) => s + t.amount, 0),
+      totalRefunds: reservations.filter(r => r.refundAmount).reduce((s, r) => s + (r.refundAmount || 0), 0),
+      activeDeposits: reservations.filter(r => ["pending", "pending_payment", "confirmed"].includes(r.status)).reduce((s, r) => s + r.holdingDeposit, 0),
+      pendingWithdrawals: withdrawals.filter(w => w.status === "pending").length,
+      pendingWithdrawalAmount: withdrawals.filter(w => w.status === "pending").reduce((s, w) => s + w.amount, 0),
+    };
+
+    res.json({ transactions, reservations, withdrawals, summary });
+  } catch (error) {
+    logger.error({ err: error }, "Financials error:");
+    res.status(500).json({ error: "Failed to fetch financials" });
+  }
+});
+
 export default router;
 
 

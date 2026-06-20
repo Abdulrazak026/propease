@@ -120,17 +120,18 @@ export default function HomePage() {
         <div className="max-w-[1400px] mx-auto px-5 sm:px-6 lg:px-10 py-3">
           <div className="flex items-center justify-between rounded-xl bg-gray-50/50 px-4 py-3">
             {[
-              { v: "30+", l: "Properties" },
-              { v: "14", l: "Areas" },
-              { v: "4", l: "Cities" },
-              { v: "100+", l: "Clients" },
+              { v: "30+", l: "Properties", icon: "bi-shield-check", c: "text-emerald-500" },
+              { v: "14", l: "Areas", icon: "bi-buildings", c: "text-blue-500" },
+              { v: "4", l: "Cities", icon: "bi-geo-alt", c: "text-purple-500" },
+              { v: "100+", l: "Clients", icon: "bi-people", c: "text-orange-500" },
             ].map((s, i) => (
-              <div key={s.l} className="flex items-center gap-1">
+              <div key={s.l} className="flex items-center gap-2 sm:gap-3">
+                <i className={`bi ${s.icon} ${s.c} text-lg sm:text-xl`}></i>
                 <div className="text-center">
                   <p className="text-base sm:text-lg font-extrabold text-[var(--color-primary)]">{s.v}</p>
                   <p className="text-[10px] text-gray-400 font-medium uppercase tracking-wider">{s.l}</p>
                 </div>
-                {i < 3 && <div className="h-8 w-px bg-gray-200 ml-1" />}
+                {i < 3 && <div className="h-8 w-px bg-gray-200 ml-1 sm:ml-2" />}
               </div>
             ))}
           </div>

@@ -7,6 +7,7 @@ import { formatNaira } from "@/lib/utils";
 interface Reservation {
   id: string; clientName: string; holdingDeposit: number; status: string;
   expiresAt: string; createdAt: string; meetingDate?: string | null; meetingTime?: string | null;
+  paymentRef?: string | null;
   refundAmount?: number | null; refundedAt?: string | null; cancelledAt?: string | null;
   cancelledByUserId?: string | null; cancellationReason?: string | null;
   listing?: { id: string; title: string; address: string; price: number } | null;
@@ -30,6 +31,7 @@ export default function ReservationsPage() {
   const [submitting, setSubmitting] = useState(false);
   const [rejectModal, setRejectModal] = useState<Reservation | null>(null);
   const [rejectReason, setRejectReason] = useState("");
+  const [detailRes, setDetailRes] = useState<Reservation | null>(null);
   const [adminCancelModal, setAdminCancelModal] = useState<Reservation | null>(null);
   const [adminCancelReason, setAdminCancelReason] = useState("");
   const [adminCancelRefund, setAdminCancelRefund] = useState(true);
@@ -172,7 +174,7 @@ export default function ReservationsPage() {
               </tr></thead>
               <tbody>
                 {filtered.map(r => (
-                  <tr key={r.id} className="border-b border-gray-50 hover:bg-gray-50/50">
+                  <tr key={r.id} onClick={() => setDetailRes(r)} className="border-b border-gray-50 hover:bg-gray-50/50 cursor-pointer">
                     <td className="px-4 py-3"><p className="text-xs font-medium text-gray-900">{r.clientName || r.user?.name || "—"}</p><p className="text-[10px] text-gray-400">{r.user?.email || ""}</p></td>
                     <td className="px-4 py-3 text-xs text-gray-600 max-w-[200px] truncate">{r.listing?.title || "—"}</td>
                     <td className="px-4 py-3 text-xs font-medium text-gray-900">{formatNaira(r.holdingDeposit)}</td>
@@ -182,11 +184,11 @@ export default function ReservationsPage() {
                       </Badge>
                     </td>
                     <td className="px-4 py-3 text-xs">
-                      {r.refundAmount ? <span className="text-emerald-600 font-medium">₦{r.refundAmount.toLocaleString()}</span> : <span className="text-gray-400">—</span>}
+                      {r.refundAmount ? <span className="text-emerald-600 font-medium">{formatNaira(r.refundAmount)}</span> : <span className="text-gray-400">—</span>}
                     </td>
                     <td className="px-4 py-3 text-xs text-gray-500">{r.expiresAt ? new Date(r.expiresAt).toLocaleString() : "—"}</td>
                     <td className="px-4 py-3 text-xs text-gray-500">{new Date(r.createdAt).toLocaleDateString()}</td>
-                    <td className="px-4 py-3">
+                    <td className="px-4 py-3" onClick={e => e.stopPropagation()}>
                       {r.status === "pending" && (
                         <div className="flex items-center gap-1.5">
                           <button onClick={() => setConfirmModal(r)} className="px-3 py-1.5 text-xs font-medium bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition-colors">Confirm</button>
@@ -273,6 +275,43 @@ export default function ReservationsPage() {
                 className="flex-1 px-4 py-2.5 text-sm font-medium text-white bg-red-500 rounded-lg hover:bg-red-600 transition-colors disabled:opacity-50">
                 {submitting ? "Rejecting..." : "Reject Reservation"}
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {detailRes && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={() => setDetailRes(null)}>
+          <div className="absolute inset-0 bg-black/40" />
+          <div className="relative bg-white rounded-2xl max-w-md w-full shadow-2xl overflow-hidden" onClick={e => e.stopPropagation()}>
+            <div className="bg-gradient-to-r from-emerald-600 to-teal-600 px-5 py-4 flex items-center justify-between">
+              <div><h3 className="text-base font-bold text-white truncate max-w-[260px]">{detailRes.listing?.title || "Property"}</h3><p className="text-xs text-emerald-100">{detailRes.listing?.address || ""}</p></div>
+              <button onClick={() => setDetailRes(null)} className="text-white/80 hover:text-white"><i className="bi bi-x-lg text-sm"></i></button>
+            </div>
+            <div className="p-5 space-y-4">
+              <div className="flex items-center justify-between">
+                <Badge variant={detailRes.status === "confirmed" ? "success" : detailRes.status === "pending" ? "warning" : detailRes.status === "cancelled" ? "danger" : "default"}>
+                  {detailRes.status === "pending" ? "Awaiting Confirmation" : detailRes.status}
+                </Badge>
+                <span className="text-xs text-gray-400">ID: {detailRes.id.slice(0, 8)}</span>
+              </div>
+              <div className="bg-gray-50 rounded-xl p-4 space-y-2.5">
+                <div className="flex justify-between text-sm"><span className="text-gray-500">Client</span><span className="font-medium text-gray-900">{detailRes.clientName || detailRes.user?.name || "—"}</span></div>
+                {detailRes.user?.email && <div className="flex justify-between text-sm"><span className="text-gray-500">Email</span><span className="font-medium text-gray-900">{detailRes.user.email}</span></div>}
+                <div className="flex justify-between text-sm"><span className="text-gray-500">Deposit</span><span className="font-bold text-gray-900">{formatNaira(detailRes.holdingDeposit)}</span></div>
+                <div className="flex justify-between text-sm"><span className="text-gray-500">Created</span><span className="font-medium text-gray-900">{new Date(detailRes.createdAt).toLocaleDateString()}</span></div>
+                <div className="flex justify-between text-sm"><span className="text-gray-500">Expires</span><span className={`font-medium ${new Date(detailRes.expiresAt) < new Date() ? "text-red-600" : "text-gray-900"}`}>{new Date(detailRes.expiresAt).toLocaleDateString()}</span></div>
+                {detailRes.paymentRef && <div className="flex justify-between text-sm"><span className="text-gray-500">Payment Ref</span><span className="text-xs font-mono text-gray-600">{detailRes.paymentRef}</span></div>}
+                {detailRes.refundAmount ? <div className="flex justify-between text-sm"><span className="text-gray-500">Refund</span><span className="font-bold text-emerald-600">{formatNaira(detailRes.refundAmount)}</span></div> : null}
+                {detailRes.cancelledAt && <div className="flex justify-between text-sm"><span className="text-gray-500">Cancelled</span><span className="font-medium text-gray-900">{new Date(detailRes.cancelledAt).toLocaleDateString()}</span></div>}
+              </div>
+              {detailRes.status === "confirmed" && detailRes.meetingDate && (
+                <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-3 flex items-center gap-2">
+                  <i className="bi bi-calendar-check text-emerald-600 text-lg"></i>
+                  <p className="text-sm font-bold text-emerald-700">{new Date(detailRes.meetingDate).toLocaleDateString("en-NG", { weekday: "long", month: "long", day: "numeric" })} {detailRes.meetingTime ? `at ${detailRes.meetingTime}` : ""}</p>
+                </div>
+              )}
+              <button onClick={() => setDetailRes(null)} className="w-full py-2.5 text-sm font-medium text-gray-700 bg-gray-100 rounded-xl hover:bg-gray-200 transition-colors">Close</button>
             </div>
           </div>
         </div>
