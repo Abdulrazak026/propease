@@ -12,6 +12,7 @@ interface RoleContextType {
   loading: boolean;
   login: (email: string, password: string) => Promise<{ role: string } | string>;
   logout: () => Promise<void>;
+  refresh: () => Promise<void>;
 }
 
 const RoleContext = createContext<RoleContextType>({
@@ -22,6 +23,7 @@ const RoleContext = createContext<RoleContextType>({
   loading: true,
   login: async () => "Not initialized",
   logout: async () => {},
+  refresh: async () => {},
 });
 
 function toUser(a: ApiUser): User {
@@ -95,6 +97,17 @@ export function RoleProvider({ children }: { children: ReactNode }) {
     return { role: user.role };
   }, []);
 
+  const refresh = useCallback(async () => {
+    try {
+      const { data } = await api.get<{ user: ApiUser }>("/api/auth/me");
+      if (data?.user) {
+        setCurrentUserState(toUser(data.user));
+      }
+    } catch {
+      // ignore
+    }
+  }, []);
+
   const logout = useCallback(async () => {
     await api.post("/api/auth/logout");
     setAccessToken(null);
@@ -111,6 +124,7 @@ export function RoleProvider({ children }: { children: ReactNode }) {
         loading,
         login,
         logout,
+        refresh,
       }}
     >
       {children}
