@@ -56,11 +56,12 @@ router.post("/", async (req: Request, res: Response) => {
 
     echo "--- Syncing files ---" >> "$LOG"
     mkdir -p /var/www/mbpp/scripts /var/www/mbpp/logs
-    cp -r /var/www/mbpp-repo/backend/* /var/www/mbpp/api/
+    rsync -a --delete --exclude=node_modules --exclude=dist --exclude=.env --exclude=uploads /var/www/mbpp-repo/backend/ /var/www/mbpp/api/
     rsync -a --delete --exclude=node_modules --exclude=.next --exclude=backend --exclude=bot --exclude='*.tar.gz' --exclude='*.dump' /var/www/mbpp-repo/ "$FRONTEND/"
-    cp -r /var/www/mbpp-repo/bot/* /var/www/mbpp/bot/
+    rsync -a --delete --exclude=node_modules /var/www/mbpp-repo/bot/ /var/www/mbpp/bot/
     cp /var/www/mbpp-repo/scripts/deploy.sh /var/www/mbpp/scripts/deploy.sh 2>/dev/null || true
     cp /var/www/mbpp-repo/ecosystem.config.js /var/www/mbpp/ecosystem.config.js 2>/dev/null || true
+    cp /var/www/mbpp-repo/nginx/propease.conf /etc/nginx/sites-available/propease.conf 2>/dev/null || true
 
     echo "--- Building API ---" >> "$LOG"
     cd /var/www/mbpp/api
@@ -85,27 +86,34 @@ router.post("/", async (req: Request, res: Response) => {
       echo "Saved previous .next build as backup" >> "$LOG"
     fi
 
-    # Step 2: Build fresh in the actual directory
+    # Step 2: Install deps and build fresh
     cd "$FRONTEND"
-    npm install 2>&1 | tail -5 >> "$LOG"
-    npm run build 2>&1 >> "$LOG" 2>&1
+    echo "--- Installing frontend dependencies ---" >> "$LOG"
+    npm install 2>&1 >> "$LOG"
+    echo "--- Building frontend ---" >> "$LOG"
+    npm run build 2>&1 >> "$LOG"
     BUILD_EXIT=$?
 
     # Step 3: Verify the build produced working output
     BUILD_OK=0
     if [ $BUILD_EXIT -eq 0 ]; then
-      # Check critical build artifacts exist
-      if [ -d "$FRONTEND/.next/static" ] && [ "$(ls -A $FRONTEND/.next/static 2>/dev/null)" ]; then
-        # Check at least one CSS file exists
-        CSS_COUNT=$(find "$FRONTEND/.next" -name "*.css" 2>/dev/null | wc -l)
-        if [ "$CSS_COUNT" -gt 0 ]; then
-          BUILD_OK=1
-          echo "Build verified: found $CSS_COUNT CSS files in .next" >> "$LOG"
+      # Check that BUILD_ID exists (required by next start)
+      if [ -f "$FRONTEND/.next/BUILD_ID" ]; then
+        BUILD_ID=$(cat "$FRONTEND/.next/BUILD_ID")
+        echo "BUILD_ID: $BUILD_ID" >> "$LOG"
+        if [ -d "$FRONTEND/.next/static" ] && [ "$(ls -A $FRONTEND/.next/static 2>/dev/null)" ]; then
+          CSS_COUNT=$(find "$FRONTEND/.next" -name "*.css" 2>/dev/null | wc -l)
+          if [ "$CSS_COUNT" -gt 0 ]; then
+            BUILD_OK=1
+            echo "Build verified: BUILD_ID=$BUILD_ID, $CSS_COUNT CSS files" >> "$LOG"
+          else
+            echo "!!! BUILD VERIFICATION FAILED: no CSS files generated !!!" >> "$LOG"
+          fi
         else
-          echo "!!! BUILD VERIFICATION FAILED: no CSS files generated !!!" >> "$LOG"
+          echo "!!! BUILD VERIFICATION FAILED: .next/static is missing or empty !!!" >> "$LOG"
         fi
       else
-        echo "!!! BUILD VERIFICATION FAILED: .next/static is missing or empty !!!" >> "$LOG"
+        echo "!!! BUILD VERIFICATION FAILED: BUILD_ID missing from .next !!!" >> "$LOG"
       fi
     else
       echo "!!! Frontend build exited with code $BUILD_EXIT !!!" >> "$LOG"
@@ -124,9 +132,20 @@ router.post("/", async (req: Request, res: Response) => {
       exit 1
     fi
 
-    # Step 5: Build succeeded — remove backup
+    # Step 5: Build succeeded — remove backup and reload nginx
     rm -rf "$PREV_BUILD"
     echo "Frontend build verified OK - old backup removed" >> "$LOG"
+
+    echo "--- Updating nginx config and reloading ---" >> "$LOG"
+    cp /var/www/mbpp-repo/nginx/propease.conf /etc/nginx/sites-available/propease.conf 2>/dev/null || true
+    # Ensure active nginx config points to port 9799 and serves static files directly
+    if [ -f /etc/nginx/sites-enabled/mbpproperties.com ]; then
+      if grep -q 'proxy_pass http://127.0.0.1:3000' /etc/nginx/sites-enabled/mbpproperties.com; then
+        sed -i 's|proxy_pass http://127.0.0.1:3000;|proxy_pass http://127.0.0.1:9799;|g' /etc/nginx/sites-enabled/mbpproperties.com
+        echo "Fixed proxy_pass from 3000 to 9799 in active nginx config" >> "$LOG"
+      fi
+    fi
+    nginx -t 2>&1 >> "$LOG" && systemctl reload nginx 2>&1 >> "$LOG" && echo "nginx reloaded OK" >> "$LOG"
 
     echo "--- Restarting Services ---" >> "$LOG"
     pm2 restart mbpp-api 2>&1 >> "$LOG"
@@ -139,7 +158,11 @@ router.post("/", async (req: Request, res: Response) => {
     if [ "$HTTP_STATUS" = "200" ]; then
       echo "Health check passed: frontend returned HTTP $HTTP_STATUS" >> "$LOG"
     else
-      echo "WARNING: Health check returned HTTP $HTTP_STATUS" >> "$LOG"
+      echo "WARNING: Health check returned HTTP $HTTP_STATUS - rolling back..." >> "$LOG"
+      pm2 restart mbpp-frontend 2>&1 >> "$LOG"
+      sleep 3
+      RETRY_STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:9799/ 2>/dev/null || echo "000")
+      echo "Retry health check: HTTP $RETRY_STATUS" >> "$LOG"
     fi
 
     echo "=== Deploy complete at $(date) ===" >> "$LOG"
