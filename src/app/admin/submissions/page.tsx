@@ -27,12 +27,15 @@ export default function SubmissionsPage() {
   const [sendingReply, setSendingReply] = useState(false);
   const threadEndRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
+  const fetchSubmissions = () => {
     api.get<{ agentApplications: AgentApp[]; contactSubmissions: ContactSub[] }>("/api/admin/submissions").then(r => {
       if (r.data?.agentApplications) setAgents(r.data.agentApplications);
       if (r.data?.contactSubmissions) setContacts(r.data.contactSubmissions);
-      setLoading(false);
-    }).catch(() => setLoading(false));
+    }).catch(() => {}).finally(() => setLoading(false));
+  };
+
+  useEffect(() => {
+    fetchSubmissions();
   }, []);
 
   useEffect(() => {
@@ -41,26 +44,26 @@ export default function SubmissionsPage() {
 
   const approveAgent = async (id: string) => {
     await api.patch(`/api/admin/users/${id}`, { isApproved: true, suspendedAt: null });
-    setAgents(prev => prev.filter(a => a.id !== id));
+    fetchSubmissions();
     setViewAgent(null);
   };
 
   const deleteAgent = async (id: string) => {
     if (!confirm("Delete this application?")) return;
     await api.delete(`/api/admin/submissions/agent/${id}`);
-    setAgents(prev => prev.filter(a => a.id !== id));
+    fetchSubmissions();
     setViewAgent(null);
   };
 
   const markRead = async (id: string) => {
     await api.patch(`/api/admin/submissions/contact/${id}/read`);
-    setContacts(prev => prev.map(c => c.id === id ? { ...c, read: true } : c));
+    fetchSubmissions();
   };
 
   const deleteContact = async (id: string) => {
     if (!confirm("Delete this submission?")) return;
     await api.delete(`/api/admin/submissions/contact/${id}`);
-    setContacts(prev => prev.filter(c => c.id !== id));
+    fetchSubmissions();
     setSelectedContact(null);
   };
 

@@ -68,7 +68,7 @@ export default function ReservationsPage() {
         setSubmitting(false);
         return;
       }
-      setReservations(prev => prev.map(r => r.id === confirmModal.id ? { ...r, status: "confirmed", meetingDate, meetingTime } : r));
+      fetchReservations();
       setConfirmModal(null);
       setMeetingDate("");
       setMeetingTime("");
@@ -86,7 +86,7 @@ export default function ReservationsPage() {
         setSubmitting(false);
         return;
       }
-      setReservations(prev => prev.map(r => r.id === rejectModal.id ? { ...r, status: "cancelled" } : r));
+      fetchReservations();
       setRejectModal(null);
       setRejectReason("");
     } catch (e) { alert("Failed to reject reservation: " + String(e)); }

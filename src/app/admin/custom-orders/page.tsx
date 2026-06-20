@@ -39,7 +39,7 @@ export default function CustomOrdersPage() {
 
   const cancelOrder = async (id: string) => {
     await api.patch(`/api/custom-orders/${id}/status`, { status: "cancelled" });
-    setOrders(prev => prev.map(o => o.id === id ? { ...o, status: "cancelled" } : o));
+    fetchOrders();
   };
 
   if (loading) return <div className="flex items-center justify-center h-64"><div className="h-8 w-8 border-2 border-[var(--color-primary)] border-t-transparent rounded-full animate-spin" /></div>;

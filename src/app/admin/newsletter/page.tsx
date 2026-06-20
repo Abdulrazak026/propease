@@ -16,6 +16,12 @@ export default function AdminNewsletterPage() {
   const [body, setBody] = useState("");
   const [msg, setMsg] = useState<string | null>(null);
 
+  const refetchSubs = () => {
+    api.get<{ subscribers: Subscriber[]; total: number }>("/api/newsletter/subscribers")
+      .then(r => setSubs(r.data?.subscribers || []))
+      .catch(() => {});
+  };
+
   useEffect(() => {
     setLoading(true);
     api.get<{ subscribers: Subscriber[]; total: number }>("/api/newsletter/subscribers")
@@ -29,7 +35,7 @@ export default function AdminNewsletterPage() {
   const remove = async (id: string) => {
     if (!confirm("Remove this subscriber?")) return;
     await api.delete(`/api/newsletter/subscribers/${id}`);
-    setSubs(subs.filter(s => s.id !== id));
+    refetchSubs();
   };
 
   const sendNewsletter = async () => {

@@ -64,7 +64,7 @@ export default function MediaPage() {
   const handleDelete = async (id: string) => {
     if (!confirm("Delete this file?")) return;
     await api.delete(`/api/upload/${id}`);
-    setFiles(files.filter(f => f.id !== id));
+    loadFiles();
   };
 
   return (

@@ -23,7 +23,7 @@ export default function ProfilePage() {
       if (newPassword) { body.currentPassword = currentPassword; body.newPassword = newPassword; }
       const { data, error } = await api.put<{ user: any; message: string }>("/api/auth/profile", body);
       if (data?.user) {
-        setCurrentUser({ ...currentUser!, name: data.user.name });
+        setCurrentUser({ ...currentUser!, ...data.user });
         setMsg({ type: "success", text: data.message || "Profile updated" });
         setCurrentPassword(""); setNewPassword(""); setConfirmPassword("");
       } else {

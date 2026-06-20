@@ -116,13 +116,13 @@ export default function StaffsPage() {
       {editUser && editUser === "new" ? (
         <AddStaffModal onClose={() => { setEditUser(null); fetchUsers(); }} />
       ) : editUser ? (
-        <RolesModal userId={editUser} users={users} onClose={() => { setEditUser(null); fetchUsers(); }} />
+        <RolesModal userId={editUser} users={users} onClose={() => { setEditUser(null); fetchUsers(); }} onUpdate={fetchUsers} />
       ) : null}
     </div>
   );
 }
 
-function RolesModal({ userId, users, onClose }: { userId: string; users: ApiUser[]; onClose: () => void }) {
+function RolesModal({ userId, users, onClose, onUpdate }: { userId: string; users: ApiUser[]; onClose: () => void; onUpdate?: () => void }) {
   const u = users.find(x => x.id === userId)!;
   const [saving, setSaving] = useState(false);
   const [localPerms, setLocalPerms] = useState<Record<string, boolean>>({});
@@ -134,6 +134,7 @@ function RolesModal({ userId, users, onClose }: { userId: string; users: ApiUser
     setSaving(true);
     await api.patch(`/api/admin/users/${userId}`, data);
     setSaving(false);
+    onUpdate?.();
   };
 
   return (

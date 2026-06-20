@@ -30,15 +30,15 @@ export default function CrmPage() {
   const [sendingReply, setSendingReply] = useState(false);
   const chatRef = useRef<HTMLDivElement>(null);
 
+  const fetchInquiries = () => {
+    api.get<{ inquiries: Inquiry[] }>("/api/inquiries/all").then(r => {
+      if (r.data?.inquiries) setInquiries(r.data.inquiries);
+    }).catch(() => {}).finally(() => setLoading(false));
+  };
+
   useEffect(() => {
-    const fetch = () => {
-      api.get<{ inquiries: Inquiry[] }>("/api/inquiries/all").then(r => {
-        if (r.data?.inquiries) setInquiries(r.data.inquiries);
-        setLoading(false);
-      }).catch(() => setLoading(false));
-    };
-    fetch();
-    const interval = setInterval(fetch, 15000);
+    fetchInquiries();
+    const interval = setInterval(fetchInquiries, 15000);
     return () => clearInterval(interval);
   }, []);
 
@@ -87,7 +87,7 @@ export default function CrmPage() {
 
   const updateStatus = async (id: string, status: string) => {
     await api.patch(`/api/inquiries/${id}/status`, { status });
-    setInquiries(prev => prev.map(i => i.id === id ? { ...i, status } : i));
+    fetchInquiries();
     if (selected?.id === id) setSelected(prev => prev ? { ...prev, status } : null);
   };
 

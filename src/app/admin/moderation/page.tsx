@@ -46,7 +46,7 @@ export default function ModerationPage() {
     setToast(null);
     const r = await api.post<{ listing: Listing }>(`/api/listings/${id}/approve`);
     if (r.status === 200 && r.data?.listing) {
-      setListings(prev => prev.map(l => l.id === id ? { ...l, status: r.data!.listing.status } : l));
+      load();
     } else {
       setToast(r.error || "Approve failed — listing must be in 'review' status first");
     }
@@ -57,7 +57,7 @@ export default function ModerationPage() {
     setToast(null);
     const r = await api.post(`/api/listings/${id}/reject`);
     if (r.status === 200) {
-      setListings(prev => prev.map(l => l.id === id ? { ...l, status: "draft" } : l));
+      load();
     } else {
       setToast(r.error || "Reject failed");
     }
@@ -67,7 +67,7 @@ export default function ModerationPage() {
     if (!confirm("Delete this listing permanently?")) return;
     setBusy(id);
     await api.delete(`/api/listings/${id}`);
-    setListings(prev => prev.filter(l => l.id !== id));
+    load();
     setBusy(null);
     if (preview?.id === id) setPreview(null);
   };

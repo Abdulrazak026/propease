@@ -17,21 +17,28 @@ export default function NotificationsPage() {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [filter, setFilter] = useState<"all" | "unread">("all");
   const [loading, setLoading] = useState(true);
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  const fetchNotifications = () => {
+    api.get<{ notifications: Notification[]; unread: number }>("/api/notifications").then((r) => {
+      if (r.data?.notifications) setNotifications(r.data.notifications);
+    });
+  };
 
   useEffect(() => {
     api.get<{ notifications: Notification[]; unread: number }>("/api/notifications").then((r) => {
       if (r.data?.notifications) setNotifications(r.data.notifications);
     }).finally(() => setLoading(false));
-  }, []);
+  }, [refreshKey]);
 
   const markAllRead = async () => {
     await api.patch("/api/notifications/read-all");
-    setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
+    setRefreshKey(k => k + 1);
   };
 
   const markRead = async (id: string) => {
     await api.patch(`/api/notifications/${id}/read`);
-    setNotifications((prev) => prev.map((p) => p.id === id ? { ...p, read: true } : p));
+    setRefreshKey(k => k + 1);
   };
 
   const filtered = filter === "unread" ? notifications.filter((n) => !n.read) : notifications;

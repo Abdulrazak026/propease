@@ -239,6 +239,7 @@ export default function DealsPage() {
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
   const [showDateFilter, setShowDateFilter] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
   const [detail, setDetail] = useState<Reservation | null>(null);
   const [cancelling, setCancelling] = useState<Reservation | null>(null);
   const [rescheduling, setRescheduling] = useState<Reservation | null>(null);
@@ -260,7 +261,7 @@ export default function DealsPage() {
     fetchData();
     const interval = setInterval(fetchData, 30000);
     return () => clearInterval(interval);
-  }, [authLoading, isAuthenticated]);
+  }, [authLoading, isAuthenticated, refreshKey]);
 
   if (authLoading || loading) {
     return (
@@ -303,8 +304,8 @@ export default function DealsPage() {
   return (
     <div className="min-h-screen bg-gray-50 pb-24">
       {detail && <DetailModal r={detail} onClose={() => setDetail(null)} onCancel={(r) => { setDetail(null); setTimeout(() => setCancelling(r), 200); }} onReschedule={(r) => { setDetail(null); setTimeout(() => setRescheduling(r), 200); }} />}
-      {cancelling && <CancellationModal reservation={cancelling} onClose={() => setCancelling(null)} onSuccess={() => { setCancelling(null); setDetail(null); }} />}
-      {rescheduling && <RescheduleModal reservation={rescheduling} onClose={() => setRescheduling(null)} onSuccess={() => { setRescheduling(null); setDetail(null); }} />}
+      {cancelling && <CancellationModal reservation={cancelling} onClose={() => setCancelling(null)} onSuccess={() => { setCancelling(null); setDetail(null); setRefreshKey(k => k + 1); }} />}
+      {rescheduling && <RescheduleModal reservation={rescheduling} onClose={() => setRescheduling(null)} onSuccess={() => { setRescheduling(null); setDetail(null); setRefreshKey(k => k + 1); }} />}
 
       <div className="bg-white border-b border-gray-200 sticky top-0 z-30">
         <div className="max-w-4xl mx-auto px-4 py-4">

@@ -20,19 +20,25 @@ export default function WalletPage() {
   const [txs, setTxs] = useState<any[]>([]);
   const [txsLoading, setTxsLoading] = useState(false);
 
+  const fetchTransactions = () => {
+    api.get<{ transactions: any[] }>("/api/wallet/transactions").then(r => {
+      if (r.data?.transactions) {
+        setTxs(r.data.transactions.map((t: any) => ({
+          id: t.id, reference: t.reference, type: t.type, amount: t.amount,
+          method: t.method, status: t.status, createdAt: t.createdAt,
+        })));
+      }
+    }).catch(() => {});
+  };
+
   useEffect(() => {
     if (!currentUser?.id) return;
     setTxsLoading(true);
     api.get<{ transactions: any[] }>("/api/wallet/transactions").then(r => {
       if (r.data?.transactions) {
         setTxs(r.data.transactions.map((t: any) => ({
-          id: t.id,
-          reference: t.reference,
-          type: t.type,
-          amount: t.amount,
-          method: t.method,
-          status: t.status,
-          createdAt: t.createdAt,
+          id: t.id, reference: t.reference, type: t.type, amount: t.amount,
+          method: t.method, status: t.status, createdAt: t.createdAt,
         })));
       }
     }).catch(() => {}).finally(() => setTxsLoading(false));
@@ -56,6 +62,7 @@ export default function WalletPage() {
         accountName: accountName || currentUser.name,
       });
       if (r.error) { setErrorMsg(r.error); return; }
+      fetchTransactions();
       setWithdrawAmount("");
       setBankName("");
       setAccountNumber("");

@@ -14,11 +14,24 @@ interface SavedSearch {
 }
 
 export default function SavedPage() {
- const [tab, setTab] = useState<"searches" | "favorites">("favorites");
- const [searches, setSearches] = useState<SavedSearch[]>([]);
+  const [tab, setTab] = useState<"searches" | "favorites">("favorites");
+  const [searches, setSearches] = useState<SavedSearch[]>([]);
   const [favIds, setFavIds] = useState<string[]>([]);
   const [listings, setListings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  const fetchSearches = () => {
+    api.get<{ searches: SavedSearch[] }>("/api/saved-searches").then(r => {
+      if (r.data?.searches && r.data.searches.length > 0) {
+        setSearches(r.data.searches);
+      } else {
+        setSearches(JSON.parse(localStorage.getItem("savedSearches") || "[]"));
+      }
+    }).catch(() => {
+     setSearches(JSON.parse(localStorage.getItem("savedSearches") || "[]"));
+    });
+  };
 
   useEffect(() => {
     const load = async () => {
@@ -32,19 +45,10 @@ export default function SavedPage() {
     load();
   }, []);
 
- useEffect(() => {
-   // Load saved searches from backend, fallback to localStorage
-   api.get<{ searches: SavedSearch[] }>("/api/saved-searches").then(r => {
-     if (r.data?.searches && r.data.searches.length > 0) {
-       setSearches(r.data.searches);
-     } else {
-       setSearches(JSON.parse(localStorage.getItem("savedSearches") || "[]"));
-     }
-   }).catch(() => {
-    setSearches(JSON.parse(localStorage.getItem("savedSearches") || "[]"));
-   });
-   setFavIds(getFavorites());
- }, []);
+  useEffect(() => {
+    fetchSearches();
+    setFavIds(getFavorites());
+  }, [refreshKey]);
 
  const syncToBackend = (updated: SavedSearch[]) => {
    // Save latest search to backend
@@ -70,12 +74,10 @@ export default function SavedPage() {
  });
  };
 
- const handleDeleteSearch = (id: string) => {
-   const updated = searches.filter((s) => s.id !== id);
-   setSearches(updated);
-   api.delete(`/api/saved-searches/${id}`).catch(() => {});
-   localStorage.setItem("savedSearches", JSON.stringify(updated));
- };
+  const handleDeleteSearch = async (id: string) => {
+    await api.delete(`/api/saved-searches/${id}`);
+    setRefreshKey(k => k + 1);
+  };
 
   return (
   <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 pb-24 lg:pb-10">
