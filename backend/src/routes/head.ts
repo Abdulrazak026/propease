@@ -32,10 +32,11 @@ router.get("/dashboard", authenticate, authorize("head"), requirePermission("can
       };
     });
 
-    const [recentUsers, recentInquiries, pendingWithdrawals, inquiryStats, withdrawalStats, pendingListings, unapprovedUsers] =
+    const [recentUsers, recentInquiries, recentReservations, pendingWithdrawals, inquiryStats, withdrawalStats, pendingListings, unapprovedUsers] =
       await Promise.all([
         prisma.user.findMany({ orderBy: { createdAt: "desc" }, take: 5, select: { id: true, name: true, role: true, createdAt: true } }),
         prisma.inquiry.findMany({ orderBy: { createdAt: "desc" }, take: 5, include: { listing: { select: { title: true } } } }),
+        prisma.reservation.findMany({ orderBy: { createdAt: "desc" }, take: 5, include: { listing: { select: { title: true } } } }),
         prisma.withdrawal.count({ where: { status: "pending" } }),
         prisma.inquiry.groupBy({ by: ["status"], _count: { id: true } }),
         prisma.withdrawal.aggregate({ where: { status: "pending" }, _sum: { amount: true } }),
@@ -49,6 +50,10 @@ router.get("/dashboard", authenticate, authorize("head"), requirePermission("can
     }
     for (const i of recentInquiries) {
       recentActivity.push({ type: "inquiry_received", title: `Inquiry: ${i.listing?.title || "Property"}`, time: i.createdAt, icon: "📩" });
+    }
+    for (const r of recentReservations) {
+      const statusLabel = r.status === "confirmed" ? "Confirmed" : r.status === "pending" ? "Awaiting confirmation" : r.status;
+      recentActivity.push({ type: "reservation", title: `Reservation: ${r.listing?.title || "Property"} (${statusLabel})`, time: r.createdAt, icon: "📋" });
     }
     recentActivity.sort((a, b) => new Date(b.time).getTime() - new Date(a.time).getTime());
 
