@@ -46,12 +46,17 @@ export default function ReservationsPage() {
     if (!confirmModal || !meetingDate || !meetingTime) return;
     setSubmitting(true);
     try {
-      await api.patch(`/api/reservations/${confirmModal.id}/confirm`, { meetingDate, meetingTime });
+      const res = await api.patch(`/api/reservations/${confirmModal.id}/confirm`, { meetingDate, meetingTime });
+      if (res.status !== 200) {
+        alert(res.error || "Failed to confirm reservation");
+        setSubmitting(false);
+        return;
+      }
       setReservations(prev => prev.map(r => r.id === confirmModal.id ? { ...r, status: "confirmed", meetingDate, meetingTime } : r));
       setConfirmModal(null);
       setMeetingDate("");
       setMeetingTime("");
-    } catch { alert("Failed to confirm reservation"); }
+    } catch (e) { alert("Failed to confirm reservation: " + String(e)); }
     setSubmitting(false);
   };
 
@@ -59,11 +64,16 @@ export default function ReservationsPage() {
     if (!rejectModal) return;
     setSubmitting(true);
     try {
-      await api.patch(`/api/reservations/${rejectModal.id}/reject`, { reason: rejectReason });
+      const res = await api.patch(`/api/reservations/${rejectModal.id}/reject`, { reason: rejectReason });
+      if (res.status !== 200) {
+        alert(res.error || "Failed to reject reservation");
+        setSubmitting(false);
+        return;
+      }
       setReservations(prev => prev.map(r => r.id === rejectModal.id ? { ...r, status: "cancelled" } : r));
       setRejectModal(null);
       setRejectReason("");
-    } catch { alert("Failed to reject reservation"); }
+    } catch (e) { alert("Failed to reject reservation: " + String(e)); }
     setSubmitting(false);
   };
 

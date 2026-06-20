@@ -1,6 +1,7 @@
 import { Router, Request, Response } from "express";
 import { exec } from "child_process";
-import { createHmac, timingSafeEqual, existsSync, writeFileSync, unlinkSync } from "crypto";
+import { createHmac, timingSafeEqual } from "crypto";
+import { existsSync, writeFileSync, unlinkSync } from "fs";
 import { logger } from "../lib/logger";
 
 const router = Router();

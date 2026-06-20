@@ -96,7 +96,7 @@ router.post("/webhook", async (req, res: Response) => {
         if (!listing) { res.sendStatus(200); return; }
 
         const days = listing.reservationDays || 2;
-        const user = await prisma.user.findUnique({ where: { id: userId }, select: { name: true } });
+        const user = await prisma.user.findUnique({ where: { id: userId }, select: { name: true, email: true } });
 
         await prisma.$transaction(async (tx: any) => {
           const reservation = await tx.reservation.create({
@@ -139,7 +139,7 @@ router.post("/webhook", async (req, res: Response) => {
         emailService.paymentReceipt(user?.email || "", user?.name || "", amountInNaira, reference, `Reservation: ${listing.title}`).catch(() => {});
       } else if (purpose === "property_full_payment" && userId && metadata?.listingId) {
         const listingId = metadata.listingId as string;
-        const listing = await prisma.listing.findUnique({ where: { id: listingId } });
+        const listing = await prisma.listing.findUnique({ where: { id: listingId }, include: { photos: true } });
         if (!listing) { res.sendStatus(200); return; }
 
         const user = await prisma.user.findUnique({ where: { id: userId }, select: { name: true, email: true } });

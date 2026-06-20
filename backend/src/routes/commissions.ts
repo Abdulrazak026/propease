@@ -138,7 +138,7 @@ export async function calculateAndDistributeCommission(
   const agentCut = Math.round(totalAmount * (rate.agentRate / 100));
   const companyCut = totalAmount - ambassadorCut - agentCut;
 
-  const txns = [
+  const txns: any[] = [
     prisma.commission.create({
       data: {
         dealId,

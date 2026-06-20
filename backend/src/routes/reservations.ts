@@ -112,8 +112,10 @@ router.patch("/:id/confirm", authenticate, async (req: AuthRequest, res: Respons
       return res.status(400).json({ error: "Meeting date and time are required" });
     }
 
-    const reservation = await prisma.reservation.findUnique({
-      where: { id: req.params.id },
+    const id = req.params.id as string;
+
+    const reservation: any = await prisma.reservation.findUnique({
+      where: { id },
       include: {
         listing: { select: { id: true, title: true } },
         user: { select: { id: true, name: true, email: true } },
@@ -122,8 +124,12 @@ router.patch("/:id/confirm", authenticate, async (req: AuthRequest, res: Respons
 
     if (!reservation) return res.status(404).json({ error: "Reservation not found" });
 
+    const userEmail = reservation.user?.email as string | undefined;
+    const userName = reservation.user?.name || "Customer";
+    const listingTitle = reservation.listing?.title || "Property";
+
     const updated = await prisma.reservation.update({
-      where: { id: req.params.id },
+      where: { id },
       data: {
         status: "confirmed",
         meetingDate: new Date(meetingDate),
@@ -132,12 +138,12 @@ router.patch("/:id/confirm", authenticate, async (req: AuthRequest, res: Respons
       },
     });
 
-    if (reservation.user?.email) {
+    if (userEmail) {
       const meetingDateStr = new Date(meetingDate).toLocaleDateString("en-NG", { weekday: "long", year: "numeric", month: "long", day: "numeric" });
       emailService.reservationConfirmed(
-        reservation.user.email,
-        reservation.user.name || "Customer",
-        reservation.listing.title,
+        userEmail,
+        userName,
+        listingTitle,
         meetingDateStr,
         meetingTime,
       ).catch(() => {});
@@ -157,9 +163,10 @@ router.patch("/:id/reject", authenticate, async (req: AuthRequest, res: Response
     }
 
     const { reason } = req.body;
+    const id = req.params.id as string;
 
-    const reservation = await prisma.reservation.findUnique({
-      where: { id: req.params.id },
+    const reservation: any = await prisma.reservation.findUnique({
+      where: { id },
       include: {
         listing: { select: { id: true, title: true } },
         user: { select: { id: true, name: true, email: true } },
@@ -168,8 +175,12 @@ router.patch("/:id/reject", authenticate, async (req: AuthRequest, res: Response
 
     if (!reservation) return res.status(404).json({ error: "Reservation not found" });
 
+    const userEmail = reservation.user?.email as string | undefined;
+    const userName = reservation.user?.name || "Customer";
+    const listingTitle = reservation.listing?.title || "Property";
+
     const updated = await prisma.reservation.update({
-      where: { id: req.params.id },
+      where: { id },
       data: { status: "cancelled" },
     });
 
@@ -178,11 +189,11 @@ router.patch("/:id/reject", authenticate, async (req: AuthRequest, res: Response
       data: { status: "available" },
     }).catch(() => {});
 
-    if (reservation.user?.email) {
+    if (userEmail) {
       emailService.reservationRejected(
-        reservation.user.email,
-        reservation.user.name || "Customer",
-        reservation.listing.title,
+        userEmail,
+        userName,
+        listingTitle,
         reason || "",
       ).catch(() => {});
     }
