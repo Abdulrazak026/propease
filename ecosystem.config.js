@@ -3,7 +3,7 @@ module.exports = {
     {
       name: "mbpp-api",
       script: "dist/index.js",
-      cwd: "/var/www/mbpp/api",
+      cwd: "/var/www/mbpp/backend",
       instances: 1,
       exec_mode: "fork",
       env: {
@@ -20,9 +20,9 @@ module.exports = {
     },
     {
       name: "mbpp-frontend",
-      script: "node_modules/.bin/next",
+      script: "node_modules/next/dist/bin/next",
       args: "start -p 3000 -H 127.0.0.1",
-      cwd: "/var/www/mbpp/frontend",
+      cwd: "/var/www/mbpp",
       instances: 1,
       exec_mode: "fork",
       env: {
