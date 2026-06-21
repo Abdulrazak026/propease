@@ -64,9 +64,7 @@ export default function AmbassadorTasksPage() {
   };
 
   const reassign = async (taskId: string, agentId: string) => {
-    setReassigning(taskId);
     const res = await api.patch(`/api/tasks/${taskId}`, { assignedToId: agentId || null });
-    setReassigning(null);
     if (res.error || (res.status >= 400)) {
       alert(res.data && (res.data as any).error ? (res.data as any).error : "Failed to reassign task");
       return;
