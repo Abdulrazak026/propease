@@ -36,7 +36,7 @@ router.post("/:listingId", authenticate, async (req: AuthRequest, res: Response)
         userId: req.user!.id,
         clientName: user?.name || "Unknown",
         holdingDeposit: depositAmount,
-        status: paymentRef ? "confirmed" : "pending_payment",
+        status: "pending_payment",
         paymentRef: paymentRef || null,
         expiresAt: new Date(Date.now() + days * 24 * 60 * 60 * 1000),
       },

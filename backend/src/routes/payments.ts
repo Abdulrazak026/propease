@@ -105,7 +105,7 @@ router.post("/webhook", async (req, res: Response) => {
               userId,
               clientName: user?.name || "Client",
               holdingDeposit: amountInNaira,
-              status: "confirmed",
+              status: "pending_payment",
               paymentRef: reference,
               expiresAt: new Date(Date.now() + days * 24 * 60 * 60 * 1000),
             },
