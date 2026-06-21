@@ -48,7 +48,7 @@ export const createTaskSchema = z.object({
   title: z.string().min(5).max(200),
   description: z.string().min(10).max(2000),
   propertyType: z.enum(["house", "land", "flat", "commercial", "other", "office", "shop"]),
-  area: z.string().min(2),
+  area: z.string().optional(),
   budget: z.number().int().min(0).default(0),
   deadline: z.string().refine((d) => !isNaN(Date.parse(d)), "Invalid date").optional(),
   notes: z.string().max(2000).optional(),

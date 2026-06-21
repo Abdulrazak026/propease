@@ -25,7 +25,7 @@ export default function AmbassadorTasksPage() {
   const [saving, setSaving] = useState(false);
   const [reassigning, setReassigning] = useState<string | null>(null);
   const [form, setForm] = useState({
-    title: "", description: "", propertyType: "flat", budget: "", deadline: "", assignedToId: "",
+    title: "", description: "", area: "", propertyType: "flat", budget: "", deadline: "", assignedToId: "",
   });
 
   const load = () => {
@@ -50,7 +50,7 @@ export default function AmbassadorTasksPage() {
     const res = await api.post<{ task: Task }>("/api/tasks", {
       title: form.title,
       description: form.description,
-      area: currentUser?.city || "",
+      area: form.area || currentUser?.city || "",
       propertyType: form.propertyType,
       budget: form.budget ? Number(form.budget) : 0,
       deadline: form.deadline || undefined,
@@ -62,7 +62,7 @@ export default function AmbassadorTasksPage() {
       return;
     }
     setShowCreate(false);
-    setForm({ title: "", description: "", propertyType: "flat", budget: "", deadline: "", assignedToId: "" });
+    setForm({ title: "", description: "", area: "", propertyType: "flat", budget: "", deadline: "", assignedToId: "" });
     load();
   };
 
@@ -86,9 +86,7 @@ export default function AmbassadorTasksPage() {
           </a>
           <div><h1 className="text-xl font-bold text-gray-900">Tasks</h1><p className="text-xs text-gray-500">Manage city assignments</p></div>
         </div>
-        {perms.canCreateTasks && (
-          <button onClick={() => setShowCreate(!showCreate)} className="text-xs font-semibold px-3.5 py-2.5 bg-[var(--color-primary)] text-white rounded-lg hover:bg-[var(--color-primary)]/90">+ Create Task</button>
-        )}
+        <button onClick={() => setShowCreate(!showCreate)} className="text-xs font-semibold px-3.5 py-2.5 bg-[var(--color-primary)] text-white rounded-lg hover:bg-[var(--color-primary)]/90">+ Create Task</button>
       </div>
 
       {showCreate && (
@@ -105,6 +103,10 @@ export default function AmbassadorTasksPage() {
                 <option value="">Open — Any agent can take it</option>
                 {agents.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
               </select>
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-gray-600 mb-1">Area</label>
+              <input value={form.area} onChange={e => setForm({ ...form, area: e.target.value })} className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/30" placeholder={currentUser?.city || "City or area"} />
             </div>
             <div>
               <label className="block text-xs font-medium text-gray-600 mb-1">Property Type</label>

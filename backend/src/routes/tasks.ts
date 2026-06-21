@@ -130,6 +130,10 @@ router.post("/", authenticate, authorize("head", "ambassador"), validate(createT
       }
     }
 
+    if (!req.body.area) {
+      return res.status(400).json({ error: "Area is required" });
+    }
+
     const task = await prisma.task.create({
       data: {
         ...req.body,
