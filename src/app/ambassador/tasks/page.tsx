@@ -1,7 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useRole } from "@/context/RoleContext";
-import { usePermissions } from "@/lib/use-permissions";
 import { api } from "@/lib/api-client";
 import Badge from "@/components/ui/Badge";
 
@@ -16,14 +15,12 @@ interface Agent { id: string; name: string; email?: string; }
 
 export default function AmbassadorTasksPage() {
   const { currentUser } = useRole();
-  const perms = usePermissions();
 
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
   const [showCreate, setShowCreate] = useState(false);
   const [agents, setAgents] = useState<Agent[]>([]);
   const [saving, setSaving] = useState(false);
-  const [reassigning, setReassigning] = useState<string | null>(null);
   const [form, setForm] = useState({
     title: "", description: "", area: "", propertyType: "flat", budget: "", deadline: "", assignedToId: "",
   });
@@ -154,25 +151,18 @@ export default function AmbassadorTasksPage() {
                 <div>
                   <span className="text-gray-400">Assignee</span>
                   <div className="flex items-center gap-1">
-                    {reassigning === t.id ? (
-                      <select
-                        value={t.assignedTo?.id || ""}
-                        onChange={e => reassign(t.id, e.target.value)}
-                        className="text-xs border border-gray-200 rounded px-1 py-0.5 bg-white"
-                        autoFocus
-                        onBlur={() => setReassigning(null)}
-                      >
-                        <option value="">Unassigned</option>
-                        {agents.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
-                      </select>
-                    ) : (
-                      <>
+                      {agents.length > 0 ? (
+                        <select
+                          value={t.assignedTo?.id || ""}
+                          onChange={e => reassign(t.id, e.target.value)}
+                          className="text-xs border border-gray-200 rounded px-1 py-0.5 bg-white max-w-[130px]"
+                        >
+                          <option value="">Unassigned</option>
+                          {agents.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
+                        </select>
+                      ) : (
                         <p className="font-medium">{t.assignedTo?.name || "Unassigned"}</p>
-                        {agents.length > 0 && (
-                          <button onClick={() => setReassigning(t.id)} className="ml-1 text-[10px] text-[var(--color-primary)] hover:underline">Reassign</button>
-                        )}
-                      </>
-                    )}
+                      )}
                   </div>
                 </div>
               </div>
