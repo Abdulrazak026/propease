@@ -23,6 +23,7 @@ export default function AmbassadorTasksPage() {
   const [showCreate, setShowCreate] = useState(false);
   const [agents, setAgents] = useState<Agent[]>([]);
   const [saving, setSaving] = useState(false);
+  const [reassigning, setReassigning] = useState<string | null>(null);
   const [form, setForm] = useState({
     title: "", description: "", propertyType: "flat", budget: "", deadline: "", assignedToId: "",
   });
@@ -63,6 +64,17 @@ export default function AmbassadorTasksPage() {
     }
     setShowCreate(false);
     setForm({ title: "", description: "", propertyType: "flat", budget: "", deadline: "", assignedToId: "" });
+    load();
+  };
+
+  const reassign = async (taskId: string, agentId: string) => {
+    setReassigning(taskId);
+    const res = await api.patch(`/api/tasks/${taskId}`, { assignedToId: agentId || null });
+    setReassigning(null);
+    if (res.error || (res.status >= 400)) {
+      alert(res.data && (res.data as any).error ? (res.data as any).error : "Failed to reassign task");
+      return;
+    }
     load();
   };
 
@@ -138,7 +150,30 @@ export default function AmbassadorTasksPage() {
                 <div><span className="text-gray-400">Area</span><p className="font-medium">{t.area}</p></div>
                 <div><span className="text-gray-400">Budget</span><p className="font-medium">₦{t.budget.toLocaleString()}</p></div>
                 <div><span className="text-gray-400">Deadline</span><p className="font-medium">{t.deadline ? new Date(t.deadline).toLocaleDateString() : "—"}</p></div>
-                <div><span className="text-gray-400">Assignee</span><p className="font-medium">{t.assignedTo?.name || "Unassigned"}</p></div>
+                <div>
+                  <span className="text-gray-400">Assignee</span>
+                  <div className="flex items-center gap-1">
+                    {reassigning === t.id ? (
+                      <select
+                        value={t.assignedTo?.id || ""}
+                        onChange={e => reassign(t.id, e.target.value)}
+                        className="text-xs border border-gray-200 rounded px-1 py-0.5 bg-white"
+                        autoFocus
+                        onBlur={() => setReassigning(null)}
+                      >
+                        <option value="">Unassigned</option>
+                        {agents.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
+                      </select>
+                    ) : (
+                      <>
+                        <p className="font-medium">{t.assignedTo?.name || "Unassigned"}</p>
+                        {perms.canCreateTasks && (
+                          <button onClick={() => setReassigning(t.id)} className="ml-1 text-[10px] text-[var(--color-primary)] hover:underline">Reassign</button>
+                        )}
+                      </>
+                    )}
+                  </div>
+                </div>
               </div>
             </div>
           ))}

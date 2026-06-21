@@ -163,6 +163,44 @@ router.post("/", authenticate, authorize("head", "ambassador"), validate(createT
   }
 });
 
+router.patch("/:id", authenticate, authorize("head", "ambassador"), async (req: AuthRequest, res: Response) => {
+  try {
+    const taskId = req.params.id as string;
+    const task = await prisma.task.findUnique({ where: { id: taskId } });
+    if (!task) return res.status(404).json({ error: "Task not found" });
+
+    if (req.user!.role === "ambassador") {
+      const userCities = await prisma.userCity.findMany({
+        where: { userId: req.user!.id },
+        include: { city: true },
+      });
+      const cityNames = userCities.map((uc) => uc.city.name);
+      if (cityNames.length > 0 && !cityNames.includes(task.area)) {
+        return res.status(403).json({ error: "You can only modify tasks in your assigned cities" });
+      }
+    }
+
+    const updateData: Record<string, unknown> = {};
+    if (req.body.assignedToId !== undefined) updateData.assignedToId = req.body.assignedToId || null;
+    if (req.body.title) updateData.title = req.body.title;
+    if (req.body.description) updateData.description = req.body.description;
+    if (req.body.area) updateData.area = req.body.area;
+
+    const updated = await prisma.task.update({
+      where: { id: taskId },
+      data: updateData,
+      include: {
+        assignedTo: { select: { id: true, name: true } },
+      },
+    });
+
+    res.json({ task: updated });
+  } catch (error) {
+    logger.error({ err: error }, "Update task error:");
+    res.status(500).json({ error: "Failed to update task" });
+  }
+});
+
 router.patch("/:id/status", authenticate, async (req: AuthRequest, res: Response) => {
   try {
     const { status } = req.body;
