@@ -47,6 +47,20 @@ router.post("/:listingId", authenticate, async (req: AuthRequest, res: Response)
       data: { status: "reserved" },
     });
 
+    // Create transaction record if payment reference is available
+    if (paymentRef) {
+      await prisma.transaction.create({
+        data: {
+          userId: req.user!.id,
+          type: "reservation_deposit",
+          amount: depositAmount,
+          reference: paymentRef,
+          method: "card",
+          status: "completed",
+        },
+      }).catch(() => {});
+    }
+
     // Notify admin
     const admins = await prisma.user.findMany({ where: { role: "head" }, select: { id: true } });
     for (const admin of admins) {

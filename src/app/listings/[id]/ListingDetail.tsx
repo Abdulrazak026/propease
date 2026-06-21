@@ -388,10 +388,10 @@ export default function ListingDetail() {
                     amount={reserveDeposit}
                     label="Pay with Paystack"
                     metadata={{ listingId: listing.id, userId: currentUser?.id, purpose: "reservation_deposit", reservationDays: reserveDays }}
-                    onSuccess={async () => {
+                    onSuccess={async (ref) => {
                       try {
-                        await api.post(`/api/reservations/${listing.id}`, {});
-                      } catch { /* reservation was created via webhook */ }
+                        await api.post(`/api/reservations/${listing.id}`, { paymentRef: ref });
+                      } catch { /* reservation may have been created via webhook */ }
                       setReserveStep("done");
                     }}
                     className="w-full min-h-[44px]"
