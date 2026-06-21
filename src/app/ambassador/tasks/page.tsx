@@ -47,7 +47,7 @@ export default function AmbassadorTasksPage() {
   const createTask = async () => {
     if (!form.title) return;
     setSaving(true);
-    await api.post("/api/tasks", {
+    const res = await api.post<{ task: Task }>("/api/tasks", {
       title: form.title,
       description: form.description,
       area: currentUser?.city || "",
@@ -57,6 +57,10 @@ export default function AmbassadorTasksPage() {
       assignedToId: form.assignedToId || undefined,
     });
     setSaving(false);
+    if (res.error || (res.status >= 400)) {
+      alert(res.data && (res.data as any).error ? (res.data as any).error : "Failed to create task");
+      return;
+    }
     setShowCreate(false);
     setForm({ title: "", description: "", propertyType: "flat", budget: "", deadline: "", assignedToId: "" });
     load();

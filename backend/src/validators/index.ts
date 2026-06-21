@@ -47,12 +47,12 @@ export const createListingSchema = z.object({
 export const createTaskSchema = z.object({
   title: z.string().min(5).max(200),
   description: z.string().min(10).max(2000),
-  propertyType: z.enum(["house", "land", "flat", "commercial", "other"]),
+  propertyType: z.enum(["house", "land", "flat", "commercial", "other", "office", "shop"]),
   area: z.string().min(2),
-  budget: z.number().int().positive(),
-  deadline: z.string().refine((d) => !isNaN(Date.parse(d)), "Invalid date"),
+  budget: z.number().int().min(0).default(0),
+  deadline: z.string().refine((d) => !isNaN(Date.parse(d)), "Invalid date").optional(),
   notes: z.string().max(2000).optional(),
-  assignedToId: z.string().uuid(),
+  assignedToId: z.string().uuid().optional().nullable(),
 });
 
 export const createInquirySchema = z.object({
@@ -62,9 +62,9 @@ export const createInquirySchema = z.object({
 });
 
 export const createCustomOrderSchema = z.object({
-  propertyType: z.enum(["house", "land", "flat", "commercial", "other"]),
+  propertyType: z.enum(["house", "land", "flat", "commercial", "other", "office", "shop"]),
   area: z.string().min(2),
-  budget: z.number().int().positive(),
+  budget: z.number().int().min(0).default(0),
   notes: z.string().max(2000).optional(),
   clientName: z.string().min(2).max(100),
   clientContact: z.string().min(5).max(50),

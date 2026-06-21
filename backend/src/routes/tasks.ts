@@ -133,7 +133,7 @@ router.post("/", authenticate, authorize("head", "ambassador"), validate(createT
     const task = await prisma.task.create({
       data: {
         ...req.body,
-        deadline: new Date(req.body.deadline),
+        deadline: req.body.deadline ? new Date(req.body.deadline) : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
         createdById: req.user!.id,
       },
       include: {

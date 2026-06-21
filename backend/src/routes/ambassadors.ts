@@ -95,7 +95,10 @@ router.get("/tasks", authenticate, authorize("ambassador"), async (req: AuthRequ
       where: { userId: req.user!.id },
       include: { city: true },
     });
-    const cityNames = userCities.map((uc) => uc.city.name);
+    let cityNames = userCities.map((uc) => uc.city.name);
+    if (cityNames.length === 0 && req.user!.city) {
+      cityNames = [req.user!.city];
+    }
 
     const tasks = await prisma.task.findMany({
       where: {
@@ -126,10 +129,21 @@ router.get("/city-listings", authenticate, authorize("ambassador"), async (req: 
     });
     const cityNames = userCities.map((uc) => uc.city.name);
 
+    const agentIds = (await prisma.user.findMany({
+      where: { ambassadorId: req.user!.id },
+      select: { id: true },
+    })).map(a => a.id);
+
     const listings = await prisma.listing.findMany({
-      where: { city: { in: cityNames } },
+      where: {
+        OR: [
+          { city: { in: cityNames } },
+          ...(agentIds.length > 0 ? [{ postedById: { in: agentIds } }, { assignedAgentId: { in: agentIds } }] : []),
+        ],
+      },
       include: {
         photos: { take: 1 },
+        postedBy: { select: { id: true, name: true } },
         assignedAgent: { select: { id: true, name: true } },
       },
       orderBy: { createdAt: "desc" },
