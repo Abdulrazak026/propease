@@ -39,11 +39,10 @@ export default function AmbassadorTasksPage() {
   useEffect(load, []);
 
   useEffect(() => {
-    if (!perms.canCreateTasks) return;
     api.get<{ agents: Agent[] }>("/api/ambassador/agents")
       .then(r => setAgents(r.data?.agents || []))
       .catch(() => {});
-  }, [perms.canCreateTasks]);
+  }, []);
 
   const createTask = async () => {
     if (!form.title) return;
@@ -167,7 +166,7 @@ export default function AmbassadorTasksPage() {
                     ) : (
                       <>
                         <p className="font-medium">{t.assignedTo?.name || "Unassigned"}</p>
-                        {perms.canCreateTasks && (
+                        {agents.length > 0 && (
                           <button onClick={() => setReassigning(t.id)} className="ml-1 text-[10px] text-[var(--color-primary)] hover:underline">Reassign</button>
                         )}
                       </>
