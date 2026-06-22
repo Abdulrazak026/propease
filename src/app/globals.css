@@ -9,8 +9,10 @@
   --color-surface: #ffffff;
   --color-border: #e5e7eb;
   --color-muted: #6b7280;
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-brand-blue: #1a365d;
+  --color-brand-gold: #d4a843;
+  --color-brand-dark: #051124;
+  --font-sans: var(--font-sans);
 }
 
 html {
@@ -21,7 +23,7 @@ html {
 body {
   background: var(--color-surface);
   color: #1a202c;
-  font-family: var(--font-sans, Arial, Helvetica, sans-serif);
+  font-family: var(--font-sans, "Inter", Arial, Helvetica, sans-serif);
   -webkit-font-smoothing: antialiased;
   overscroll-behavior: none;
   font-size: 16px;
@@ -68,6 +70,13 @@ body {
   .pb-safe {
     padding-bottom: env(safe-area-inset-bottom, 0px);
   }
+  .bg-brand-blue { background-color: #1a365d; }
+  .bg-brand-gold { background-color: #d4a843; }
+  .bg-brand-dark { background-color: #051124; }
+  .text-brand-blue { color: #1a365d; }
+  .text-brand-gold { color: #d4a843; }
+  .border-brand-gold { border-color: #d4a843; }
+  .ring-brand-gold { --tw-ring-color: #d4a843; }
 }
 
 @keyframes slideUpBottom {

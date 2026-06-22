@@ -1,12 +1,16 @@
 import type { Metadata } from "next";
 import Script from "next/script";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Inter } from "next/font/google";
 import "./globals.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import ClientBody from "@/components/layout/ClientBody";
 
-const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
-const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
+const inter = Inter({
+  variable: "--font-sans",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800", "900"],
+  display: "swap",
+});
 
 const API = "https://mbpproperties.com";
 
@@ -117,7 +121,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   };
 
   return (
-    <html lang={settings.seo_content_language?.split("-")[0] || "en"} className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
+    <html lang={settings.seo_content_language?.split("-")[0] || "en"} className={`${inter.variable} h-full antialiased`}>
       <head>
         {settings.seo_geo_region && <meta name="geo.region" content={settings.seo_geo_region} />}
         {settings.seo_geo_placename && <meta name="geo.placename" content={settings.seo_geo_placename} />}

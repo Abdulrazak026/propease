@@ -69,7 +69,7 @@ export default function AboutPage() {
                 );
               })()}
               <div>
-                <p className="text-xs font-semibold text-emerald-400 uppercase tracking-[0.15em] mb-2">Since 2017 · Kano &amp; Northern States</p>
+                <p className="text-xs font-semibold text-brand-gold uppercase tracking-[0.15em] mb-2">Since 2017 · Kano &amp; Northern States</p>
                 <h1 className="text-4xl sm:text-5xl lg:text-7xl font-bold text-white leading-[1.02] tracking-tight">
                   MBPP
                 </h1>
@@ -141,11 +141,11 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <section className="max-w-[1400px] mx-auto w-full px-5 sm:px-6 lg:px-10 py-20 sm:py-28">
+      <section className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-20 sm:py-28">
         <div className="grid lg:grid-cols-12 gap-10 lg:gap-16 items-start">
           <div className="lg:col-span-4">
-            <p className="text-xs font-semibold text-[var(--color-primary)] uppercase tracking-[0.15em] mb-3">The team</p>
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 tracking-tight leading-[1.15]">Nine people. One office.</h2>
+            <p className="text-xs font-semibold text-brand-gold uppercase tracking-[0.15em] mb-3">The team</p>
+            <h2 className="text-3xl sm:text-4xl font-black text-brand-blue tracking-tight leading-[1.15]">Nine people. One office.</h2>
             <p className="text-sm text-gray-500 mt-4 leading-relaxed">
               Listed below in the order of who runs what. Call the office and the person who picks up can usually help, or pass you to the one who can.
             </p>
@@ -157,11 +157,11 @@ export default function AboutPage() {
                 <div
                   key={m.name}
                   className={`group flex gap-4 p-3 -m-3 rounded-2xl transition-all duration-300 hover:bg-white hover:shadow-lg hover:shadow-gray-900/5 hover:-translate-y-0.5 cursor-default ${
-                    isLead ? "sm:col-span-2 sm:items-center bg-gradient-to-br from-emerald-50/60 to-white border border-emerald-100/60" : ""
+                    isLead ? "sm:col-span-2 sm:items-center bg-gradient-to-br from-brand-blue/5 to-white border border-brand-blue/10" : ""
                   }`}
                   style={{ animation: `fadeUp 0.5s ease-out ${i * 60}ms both` }}
                 >
-                  <div className={`shrink-0 rounded-2xl bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center font-bold text-gray-500 overflow-hidden ring-2 ring-white shadow-md shadow-gray-900/5 transition-transform duration-500 group-hover:scale-105 group-hover:shadow-xl group-hover:shadow-[var(--color-primary)]/20 ${
+                  <div className={`shrink-0 rounded-full bg-gradient-to-br from-brand-blue to-brand-blue-light flex items-center justify-center font-bold text-white overflow-hidden ring-2 ring-white shadow-md shadow-gray-900/5 transition-transform duration-500 group-hover:scale-105 group-hover:shadow-xl group-hover:shadow-brand-blue/20 ${
                     isLead ? "w-24 h-24 sm:w-32 sm:h-32 text-lg" : "w-24 h-24 sm:w-28 sm:h-28 text-base"
                   }`}>
                     {m.photo ? (
@@ -172,15 +172,15 @@ export default function AboutPage() {
                   </div>
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <p className={`font-semibold text-gray-900 leading-tight transition-colors duration-300 group-hover:text-[var(--color-primary)] ${isLead ? "text-lg sm:text-xl" : "text-base"}`}>{m.name}</p>
+                      <p className={`font-bold text-brand-blue leading-tight transition-colors duration-300 group-hover:text-brand-gold ${isLead ? "text-lg sm:text-xl" : "text-base"}`}>{m.name}</p>
                       {isLead && (
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[var(--color-primary)]/10 text-[var(--color-primary)] text-[10px] font-semibold uppercase tracking-wider">
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-brand-gold/10 text-brand-gold text-[10px] font-semibold uppercase tracking-wider">
                           <svg className="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.957a1 1 0 00.95.69h4.162c.969 0 1.371 1.24.588 1.81l-3.37 2.448a1 1 0 00-.364 1.118l1.287 3.957c.3.922-.755 1.688-1.539 1.118L10 14.347l-3.37 2.448c-.783.57-1.838-.196-1.539-1.118l1.287-3.957a1 1 0 00-.364-1.118L2.644 8.384c-.783-.57-.38-1.81.588-1.81h4.162a1 1 0 00.95-.69l1.286-3.957z" /></svg>
                           Founder
                         </span>
                       )}
                     </div>
-                    <p className={`text-[var(--color-primary)] font-medium mb-2 mt-0.5 ${isLead ? "text-sm" : "text-xs"}`}>{m.role}</p>
+                    <p className={`text-brand-gold font-medium mb-2 mt-0.5 ${isLead ? "text-sm" : "text-xs"}`}>{m.role}</p>
                     <p className={`text-gray-500 leading-relaxed ${isLead ? "text-base" : "text-sm"}`}>{m.bio}</p>
                   </div>
                 </div>
@@ -190,21 +190,22 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <section className="max-w-[1400px] mx-auto w-full px-5 sm:px-6 lg:px-10 pb-20 sm:pb-28">
-        <div className="relative bg-gradient-to-br from-emerald-50 via-white to-emerald-50/50 rounded-3xl border border-emerald-100 p-10 sm:p-14 lg:p-16 text-center overflow-hidden">
-          <div className="absolute top-0 left-0 w-72 h-72 bg-emerald-200/30 rounded-full blur-3xl -translate-y-1/2 -translate-x-1/3" />
+      <section className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 pb-20 sm:pb-28">
+        <div className="relative bg-brand-dark rounded-3xl p-10 sm:p-14 lg:p-16 text-center overflow-hidden">
+          <div className="absolute top-0 left-0 w-72 h-72 bg-brand-gold/10 rounded-full blur-3xl -translate-y-1/2 -translate-x-1/3" />
+          <div className="absolute bottom-0 right-0 w-48 h-48 bg-brand-blue/20 rounded-full blur-3xl translate-y-1/2 translate-x-1/3" />
           <div className="relative max-w-2xl mx-auto">
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 tracking-tight leading-[1.15]">
+            <h2 className="text-3xl sm:text-4xl font-black text-white tracking-tight leading-[1.15]">
               Call us, or stop by the office.
             </h2>
-            <p className="text-base text-gray-600 mt-5 leading-relaxed">
+            <p className="text-base text-gray-300 mt-5 leading-relaxed">
               We pick up the phone, and the door is open.
             </p>
             <div className="mt-8 flex flex-wrap justify-center gap-3">
-              <Link href="/contact" className="inline-flex items-center justify-center min-h-[52px] px-7 py-3.5 bg-gray-950 text-white text-sm font-semibold rounded-full hover:bg-gray-800 active:scale-[0.97] transition-all">
+              <Link href="/contact" className="inline-flex items-center justify-center min-h-[52px] px-7 py-3.5 bg-brand-gold text-brand-dark text-sm font-bold rounded-full hover:bg-brand-gold-light active:scale-[0.97] transition-all">
                 Get in touch
               </Link>
-              <Link href="/help" className="inline-flex items-center justify-center min-h-[52px] px-7 py-3.5 text-sm font-semibold rounded-full border border-gray-200 text-gray-700 hover:bg-white transition-all">
+              <Link href="/help" className="inline-flex items-center justify-center min-h-[52px] px-7 py-3.5 text-sm font-semibold rounded-full border border-white/20 text-white hover:bg-white/10 transition-all">
                 Visit help center
               </Link>
             </div>

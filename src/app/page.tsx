@@ -254,21 +254,23 @@ export default function HomePage() {
       </section>
 
       <div className="bg-white border-b border-gray-100">
-        <div className="max-w-[1400px] mx-auto px-5 sm:px-6 lg:px-10 py-3">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between rounded-xl bg-gray-50/50 px-4 py-3">
             {[
-              { v: "30+", l: "Properties", icon: "bi-shield-check", c: "text-[var(--color-primary)]" },
-              { v: "14", l: "Areas", icon: "bi-buildings", c: "text-blue-500" },
-              { v: "4", l: "Cities", icon: "bi-geo-alt", c: "text-purple-500" },
-              { v: "100+", l: "Clients", icon: "bi-people", c: "text-orange-500" },
+              { v: "30+", l: "Properties", icon: "bi-shield-check" },
+              { v: "14", l: "Areas", icon: "bi-buildings" },
+              { v: "4", l: "Cities", icon: "bi-geo-alt" },
+              { v: "100+", l: "Clients", icon: "bi-people" },
             ].map((s, i) => (
               <div key={s.l} className="flex items-center gap-2 sm:gap-3">
-                <i className={`bi ${s.icon} ${s.c} text-lg sm:text-xl`}></i>
+                <div className="w-9 h-9 sm:w-10 sm:h-10 bg-brand-blue text-brand-gold rounded-xl flex items-center justify-center shrink-0">
+                  <i className={`bi ${s.icon} text-sm sm:text-base`}></i>
+                </div>
                 <div className="text-center">
-                  <p className="text-base sm:text-lg font-extrabold text-[var(--color-primary)]">{s.v}</p>
+                  <p className="text-base sm:text-lg font-extrabold text-brand-blue">{s.v}</p>
                   <p className="text-[10px] text-gray-400 font-medium uppercase tracking-wider">{s.l}</p>
                 </div>
-                {i < 3 && <div className="h-8 w-px bg-gray-200 ml-1 sm:ml-2" />}
+                {i < 3 && <div className="h-8 w-px bg-gray-200 ml-1 sm:ml-2 hidden sm:block" />}
               </div>
             ))}
           </div>
@@ -364,23 +366,23 @@ export default function HomePage() {
 
       {/* VERIFIED PROPERTIES + OUR PROMISE TO YOU */}
       <section className="bg-white py-8 sm:py-12">
-        <div className="max-w-[1400px] mx-auto px-5 sm:px-6 lg:px-10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
             <div className="flex items-start gap-3 sm:gap-4 p-4 sm:p-5 rounded-xl bg-gray-50 border border-gray-100">
-              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-[var(--color-primary)]/10 flex items-center justify-center shrink-0">
-                <i className="bi bi-shield-fill-check text-[var(--color-primary)] text-lg sm:text-xl"></i>
+              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-brand-blue text-brand-gold rounded-xl flex items-center justify-center shrink-0">
+                <i className="bi bi-shield-fill-check text-lg sm:text-xl"></i>
               </div>
               <div>
-                <h3 className="text-sm sm:text-base font-bold text-gray-900">VERIFIED PROPERTIES</h3>
+                <h3 className="text-sm sm:text-base font-bold text-brand-blue">VERIFIED PROPERTIES</h3>
                 <p className="text-xs sm:text-sm text-gray-600 mt-0.5">Every property we sell is 100% verified through due diligence and transparency.</p>
               </div>
             </div>
             <div className="flex items-start gap-3 sm:gap-4 p-4 sm:p-5 rounded-xl bg-gray-50 border border-gray-100">
-              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-amber-50 flex items-center justify-center shrink-0">
-                <i className="bi bi-shield-check text-amber-600 text-lg sm:text-xl"></i>
+              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-brand-blue text-brand-gold rounded-xl flex items-center justify-center shrink-0">
+                <i className="bi bi-shield-check text-lg sm:text-xl"></i>
               </div>
               <div>
-                <h3 className="text-sm sm:text-base font-bold text-gray-900">OUR PROMISE TO YOU</h3>
+                <h3 className="text-sm sm:text-base font-bold text-brand-blue">OUR PROMISE TO YOU</h3>
                 <p className="text-xs sm:text-sm text-gray-600 mt-0.5">For any issue related to purchased properties, MBPP takes 100% responsibility. Your peace of mind is our commitment.</p>
               </div>
             </div>
@@ -390,20 +392,20 @@ export default function HomePage() {
 
       {/* WHAT WE OFFER */}
       <section className="bg-gray-50 py-8 sm:py-12">
-        <div className="max-w-[1400px] mx-auto px-5 sm:px-6 lg:px-10">
-          <h2 className="text-lg sm:text-xl font-bold text-gray-900 text-center mb-4 sm:mb-5">WHAT WE OFFER</h2>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-lg sm:text-xl font-bold text-brand-blue text-center mb-4 sm:mb-5">WHAT WE OFFER</h2>
           <div className="max-w-2xl mx-auto bg-white rounded-xl border border-gray-100 p-4 sm:p-5 divide-y divide-gray-100">
             {[
-              { icon: "bi-map-fill", color: "text-[var(--color-primary)]", bg: "bg-[var(--color-primary)]/10", title: "WE SELL LANDS", desc: "Genuine plots in prime locations with secure titles" },
-              { icon: "bi-house-fill", color: "text-blue-600", bg: "bg-blue-50", title: "WE BUILD HOUSES", desc: "From foundation to finishing, we build quality homes tailored to your needs" },
-              { icon: "bi-buildings-fill", color: "text-purple-600", bg: "bg-purple-50", title: "WE SELL COMPLETED HOUSES", desc: "Move-in ready homes with modern finishing and quality construction" },
+              { icon: "bi-map-fill", title: "WE SELL LANDS", desc: "Genuine plots in prime locations with secure titles" },
+              { icon: "bi-house-fill", title: "WE BUILD HOUSES", desc: "From foundation to finishing, we build quality homes tailored to your needs" },
+              { icon: "bi-buildings-fill", title: "WE SELL COMPLETED HOUSES", desc: "Move-in ready homes with modern finishing and quality construction" },
             ].map((item, i) => (
               <div key={i} className="flex items-start gap-3 py-3 sm:py-3.5 first:pt-0 last:pb-0">
-                <div className={`w-9 h-9 ${item.bg} rounded-lg flex items-center justify-center shrink-0`}>
-                  <i className={`bi ${item.icon} ${item.color} text-sm`}></i>
+                <div className="w-9 h-9 bg-brand-blue text-brand-gold rounded-lg flex items-center justify-center shrink-0">
+                  <i className={`bi ${item.icon} text-sm`}></i>
                 </div>
                 <div>
-                  <p className="text-sm font-semibold text-gray-900">{item.title}</p>
+                  <p className="text-sm font-semibold text-brand-blue">{item.title}</p>
                   <p className="text-xs text-gray-600 mt-0.5">{item.desc}</p>
                 </div>
               </div>
@@ -430,29 +432,131 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* WHY BUY FROM MBPP */}
-      <section className="bg-white py-8 sm:py-12">
-        <div className="max-w-[1400px] mx-auto px-5 sm:px-6 lg:px-10">
-          <h2 className="text-lg sm:text-xl font-bold text-gray-900 text-center mb-4 sm:mb-5">WHY BUY FROM MBPP?</h2>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-3">
-            {[
-              { title: "Verified & Genuine", icon: "bi-shield-fill-check", color: "text-[var(--color-primary)]", bg: "bg-[var(--color-primary)]/10" },
-              { title: "Prime Locations", icon: "bi-geo-alt-fill", color: "text-blue-500", bg: "bg-blue-50" },
-              { title: "Northern Nigeria Focus", icon: "bi-buildings", color: "text-purple-500", bg: "bg-purple-50" },
-              { title: "Quality Finishing", icon: "bi-star-fill", color: "text-amber-500", bg: "bg-amber-50" },
-              { title: "Flexible Payment", icon: "bi-credit-card", color: "text-rose-500", bg: "bg-rose-50" },
-              { title: "Expert Team", icon: "bi-people-fill", color: "text-cyan-500", bg: "bg-cyan-50" },
-            ].map((item) => (
-              <div key={item.title} className="flex flex-col items-center text-center gap-2 p-3 rounded-lg border border-gray-100 hover:border-gray-200 transition-all">
-                <div className={`w-8 h-8 ${item.bg} rounded-lg flex items-center justify-center shrink-0`}>
-                  <i className={`bi ${item.icon} ${item.color} text-sm`}></i>
+      {/* WHY BUY FROM MBPP? + MEET OUR TEAM — Combined Split Section */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
+
+          {/* Left Side: Why Buy from MBPP? */}
+          <div className="lg:col-span-5 flex flex-col justify-between">
+            <div>
+              <h3 className="text-2xl font-black text-brand-blue mb-2 tracking-tight">WHY BUY FROM MBPP?</h3>
+              <p className="text-sm text-slate-500 mb-8">We offer the most comprehensive real estate solution structures in Northern Nigeria.</p>
+            </div>
+            <div className="space-y-6">
+              {[
+                { icon: "bi-shield-fill-check", title: "Verified & Genuine Properties", desc: "Absolute assurance with fully documented ownership papers and title deeds." },
+                { icon: "bi-geo-alt-fill", title: "Prime Locations in Kano", desc: "Strategically situated within high capital appreciation corridors." },
+                { icon: "bi-tools", title: "Quality Construction & Finishing", desc: "Unmatched, durability-focused construction quality controlled by experts." },
+                { icon: "bi-receipt", title: "Flexible Payment Options", desc: "Accessible, custom payment plans optimized around client cashflows." },
+                { icon: "bi-person-badge-fill", title: "Professional & Experienced Team", desc: "Guidance from real estate agents who understand local market conditions." },
+              ].map((item) => (
+                <div key={item.title} className="flex gap-4 items-start">
+                  <div className="w-10 h-10 bg-brand-blue text-brand-gold rounded-xl flex items-center justify-center flex-shrink-0">
+                    <i className={`bi ${item.icon}`}></i>
+                  </div>
+                  <div>
+                    <h5 className="font-bold text-brand-blue text-sm">{item.title}</h5>
+                    <p className="text-slate-500 text-xs mt-0.5">{item.desc}</p>
+                  </div>
                 </div>
-                <p className="text-[11px] font-semibold text-gray-900 leading-tight">{item.title}</p>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
+
+          {/* Right Side: Meet our Team — Dark Card */}
+          <div className="lg:col-span-7 bg-brand-dark text-white rounded-2xl p-8 flex flex-col justify-between shadow-2xl relative overflow-hidden">
+            <div className="absolute right-0 top-0 w-32 h-32 bg-brand-gold/10 rounded-full blur-2xl"></div>
+
+            <div>
+              <span className="text-brand-gold font-bold text-xs uppercase tracking-widest block mb-1">Our Leadership</span>
+              <h3 className="text-2xl font-black mb-8">MEET OUR TOP TEAM</h3>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {staffItems.slice(0, 3).map((m, i) => {
+                const name = m.title;
+                const role = m.subtitle;
+                const photo = teamMembers[i]?.photo;
+                return (
+                  <div key={name} className="bg-white/5 border border-white/10 rounded-xl p-4 text-center hover:bg-white/10 transition group">
+                    <div className="w-24 h-24 mx-auto rounded-full overflow-hidden border-2 border-brand-gold/50 group-hover:border-brand-gold transition duration-300 mb-4">
+                      {photo ? (
+                        <img src={resolveImageUrl(photo) || ""} alt={name} className="w-full h-full object-cover object-top" loading="lazy" />
+                      ) : (
+                        <div className="w-full h-full bg-gradient-to-br from-brand-blue to-brand-blue-light flex items-center justify-center text-white font-bold text-lg">
+                          {name.split(" ").map(n => n[0]).join("").slice(0, 2)}
+                        </div>
+                      )}
+                    </div>
+                    <h4 className="font-bold text-sm text-white leading-tight">{name}</h4>
+                    <p className="text-xs text-brand-gold mt-1">{role}</p>
+                  </div>
+                );
+              })}
+            </div>
+
+            {staffItems.length > 3 && (
+              <div className="mt-8 border-t border-white/10 pt-4 flex justify-between items-center">
+                <span className="text-xs text-slate-400">Mutual Benefit Premier Properties Ltd.</span>
+                <button
+                  onClick={() => setShowAllTeam(!showAllTeam)}
+                  className="inline-flex items-center gap-2 px-4 py-2 text-xs font-medium text-brand-gold border border-brand-gold/30 rounded-full hover:bg-brand-gold/10 transition-all"
+                >
+                  {showAllTeam ? "Show less" : "View all members"}
+                  <svg className={`w-3 h-3 transition-transform ${showAllTeam ? "rotate-180" : ""}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                  </svg>
+                </button>
+              </div>
+            )}
+            {staffItems.length <= 3 && (
+              <div className="mt-8 border-t border-white/10 pt-4 flex justify-between items-center text-xs text-slate-400">
+                <span>Mutual Benefit Premier Properties Ltd.</span>
+                <span className="flex gap-1.5">
+                  {staffItems.map((_, i) => (
+                    <span key={i} className={`w-1.5 h-1.5 rounded-full ${i === 0 ? "bg-brand-gold" : "bg-slate-500"}`}></span>
+                  ))}
+                </span>
+              </div>
+            )}
+          </div>
+
         </div>
       </section>
+
+      {/* EXPANDED TEAM (when View all is clicked) */}
+      {showAllTeam && staffItems.length > 3 && (
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {staffItems.slice(3).map((m, i) => {
+              const name = m.title;
+              const role = m.subtitle;
+              const photo = teamMembers[i + 3]?.photo;
+              const bio = teamMembers[i + 3]?.bio;
+              return (
+                <div key={name} className="bg-white border border-gray-200 rounded-xl p-5 hover:shadow-lg transition-all duration-300">
+                  <div className="flex items-start gap-4">
+                    <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-brand-gold/30 shrink-0">
+                      {photo ? (
+                        <img src={resolveImageUrl(photo) || ""} alt={name} className="w-full h-full object-cover object-top" loading="lazy" />
+                      ) : (
+                        <div className="w-full h-full bg-gradient-to-br from-brand-blue to-brand-blue-light flex items-center justify-center text-white font-bold text-sm">
+                          {name.split(" ").map(n => n[0]).join("").slice(0, 2)}
+                        </div>
+                      )}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <h4 className="font-bold text-gray-900 text-sm">{name}</h4>
+                      <p className="text-xs text-brand-gold font-medium mt-0.5">{role}</p>
+                      {bio && <p className="text-xs text-gray-500 mt-2 leading-relaxed">{bio}</p>}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+      )}
 
       {/* FLYER */}
       {getSetting("flyer_image") && (
@@ -476,73 +580,10 @@ export default function HomePage() {
         </section>
       )}
 
-      {/* MEET OUR TEAM */}
-      <section className="bg-gray-50 py-10 sm:py-16">
-        <div className="max-w-[1400px] mx-auto px-5 sm:px-6 lg:px-10">
-          <p className="text-xs font-semibold text-[var(--color-primary)] uppercase tracking-[0.15em] mb-3 text-center">The team</p>
-          <h2 className="text-xl sm:text-3xl font-bold text-gray-900 text-center mb-3 sm:mb-4 tracking-tight leading-[1.15]">Meet Our Team</h2>
-          <p className="text-xs sm:text-base text-gray-500 text-center mb-8 sm:mb-12 max-w-xl mx-auto">Get to know the dedicated professionals behind MBPP</p>
-          <div className="grid sm:grid-cols-2 gap-x-6 gap-y-10 max-w-3xl mx-auto">
-            {staffItems.slice(0, showAllTeam ? staffItems.length : 3).map((m, i) => {
-              const isLead = i === 0;
-              const name = m.title;
-              const role = m.subtitle;
-              const photo = teamMembers[i]?.photo;
-              const bio = teamMembers[i]?.bio;
-              return (
-                <div
-                  key={name}
-                  className={`group flex gap-4 p-3 -m-3 rounded-2xl transition-all duration-300 hover:bg-white hover:shadow-lg hover:shadow-gray-900/5 hover:-translate-y-0.5 cursor-default ${
-                    isLead ? "sm:col-span-2 sm:items-center bg-gradient-to-br from-blue-50/60 to-white border border-blue-100/60" : ""
-                  }`}
-                  style={{ animation: `fadeUp 0.5s ease-out ${i * 60}ms both` }}
-                >
-                  <div className={`shrink-0 rounded-2xl bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center font-bold text-gray-500 overflow-hidden ring-2 ring-white shadow-md shadow-gray-900/5 transition-transform duration-500 group-hover:scale-105 group-hover:shadow-xl group-hover:shadow-[var(--color-primary)]/20 ${
-                    isLead ? "w-24 h-24 sm:w-32 sm:h-32 text-lg" : "w-24 h-24 sm:w-28 sm:h-28 text-base"
-                  }`}>
-                    {photo ? (
-                      <img src={resolveImageUrl(photo) || ""} alt={name} className="w-full h-full object-cover object-top" loading="lazy" />
-                    ) : (
-                      name.split(" ").map(n => n[0]).join("").slice(0, 2)
-                    )}
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <p className={`font-semibold text-gray-900 leading-tight transition-colors duration-300 group-hover:text-[var(--color-primary)] ${isLead ? "text-lg sm:text-xl" : "text-base"}`}>{name}</p>
-                      {isLead && (
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[var(--color-primary)]/10 text-[var(--color-primary)] text-[10px] font-semibold uppercase tracking-wider">
-                          <svg className="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.957a1 1 0 00.95.69h4.162c.969 0 1.371 1.24.588 1.81l-3.37 2.448a1 1 0 00-.364 1.118l1.287 3.957c.3.922-.755 1.688-1.539 1.118L10 14.347l-3.37 2.448c-.783.57-1.838-.196-1.539-1.118l1.287-3.957a1 1 0 00-.364-1.118L2.644 8.384c-.783-.57-.38-1.81.588-1.81h4.162a1 1 0 00.95-.69l1.286-3.957z" /></svg>
-                          Lead
-                        </span>
-                      )}
-                    </div>
-                    <p className={`text-[var(--color-primary)] font-medium mb-1 mt-0.5 ${isLead ? "text-sm" : "text-xs"}`}>{role}</p>
-                    {bio && <p className={`text-gray-500 leading-relaxed ${isLead ? "text-base" : "text-sm"}`}>{bio}</p>}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-          {staffItems.length > 3 && (
-            <div className="flex justify-center mt-8">
-              <button
-                onClick={() => setShowAllTeam(!showAllTeam)}
-                className="inline-flex items-center gap-2 px-6 py-2.5 text-sm font-medium text-[var(--color-primary)] border border-[var(--color-primary)]/20 rounded-full hover:bg-[var(--color-primary)]/5 transition-all"
-              >
-                {showAllTeam ? "Show less" : "View all members"}
-                <svg className={`w-4 h-4 transition-transform ${showAllTeam ? "rotate-180" : ""}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
-                </svg>
-              </button>
-            </div>
-          )}
-        </div>
-      </section>
-
       {/* SOCIAL MEDIA */}
       <section className="bg-gray-50 py-14">
-        <div className="max-w-[1400px] mx-auto px-5 sm:px-6 lg:px-10 text-center">
-          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">Connect With Us</h2>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="text-xl sm:text-2xl font-black text-brand-blue mb-2">Connect With Us</h2>
           <p className="text-gray-500 text-sm mb-8">Follow us on social media for updates and new listings</p>
           <div className="flex items-center justify-center gap-6 flex-wrap">
             {[
@@ -558,7 +599,7 @@ export default function HomePage() {
                 rel={s.url ? "noopener noreferrer" : undefined}
                 className={`w-16 h-16 rounded-full bg-white border border-gray-200 flex items-center justify-center transition-all duration-200 ${
                   s.url
-                    ? "text-gray-600 hover:bg-gray-900 hover:text-white hover:border-gray-900 cursor-pointer"
+                    ? "text-brand-blue hover:bg-brand-blue hover:text-brand-gold hover:border-brand-blue cursor-pointer"
                     : "text-gray-300 cursor-default"
                 }`}
                 aria-label={s.label}
