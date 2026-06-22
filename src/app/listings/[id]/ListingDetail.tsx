@@ -307,12 +307,6 @@ export default function ListingDetail() {
                     >
                       Reserve
                     </Button>
-
-                    {listing.reservationCount > 0 && (
-                      <p className="text-xs text-gray-500 text-center">
-                        {listing.reservationCount} {listing.reservationCount === 1 ? "person" : "people"} reserved this
-                      </p>
-                    )}
                   </>
                 )}
 
@@ -320,6 +314,12 @@ export default function ListingDetail() {
                   <Button className="w-full" disabled>
                     Reserved
                   </Button>
+                )}
+
+                {listing.reservationCount > 0 && (
+                  <p className="text-xs text-gray-500 text-center">
+                    {listing.reservationCount} {listing.reservationCount === 1 ? "other also reserved" : "others also reserved"}
+                  </p>
                 )}
 
                 {listing.status !== "available" && (

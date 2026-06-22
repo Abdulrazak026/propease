@@ -11,8 +11,6 @@ import SoldPropertiesGallery from "@/components/listings/SoldPropertiesGallery";
 import AutoCarousel, { CarouselItem } from "@/components/homepage/AutoCarousel";
 import { resolveImageUrl } from "@/lib/utils";
 
-interface City { id: string; name: string; }
-interface BlogPost { id: string; slug: string; title: string; excerpt?: string | null; content?: string | null; coverImage: string | null; publishedAt: string | null; author?: { name: string } | null; }
 interface ResearchReport { title: string; date: string; summary: string; metrics: string[]; }
 interface TeamMember { name: string; role: string; bio?: string; photo?: string; }
 
@@ -84,9 +82,6 @@ export default function HomePage() {
   const [heroMoreOpen, setHeroMoreOpen] = useState(false);
   const [flyerOpen, setFlyerOpen] = useState(false);
   const [showCount, setShowCount] = useState(INITIAL_SHOW);
-  const [cities, setCities] = useState<City[]>([]);
-  const [posts, setPosts] = useState<BlogPost[]>([]);
-  const [postsLoading, setPostsLoading] = useState(true);
   const [activeCategory, setActiveCategory] = useState("");
   const [showAllTeam, setShowAllTeam] = useState(false);
 
@@ -119,25 +114,7 @@ export default function HomePage() {
     return () => document.removeEventListener("mousedown", click);
   }, []);
 
-  useEffect(() => {
-    fetch("https://mbpproperties.com/api/blog").then(r => r.json()).then(d => {
-      const fetched = (d.posts || []).filter((p: BlogPost) => p.publishedAt);
-      if (fetched.length > 0) setPosts(fetched);
-      setPostsLoading(false);
-    }).catch(() => setPostsLoading(false));
-  }, []);
-
   const { listings, loading, filters, setFilters } = useListings();
-
-  useEffect(() => {
-    if (listings.length > 0) {
-      const unique = new Map<string, City>();
-      listings.forEach(l => {
-        if (l.city) unique.set(l.city, { id: l.city, name: l.city });
-      });
-      setCities(Array.from(unique.values()));
-    }
-  }, [listings]);
 
   const handleFilterChange = (next: any) => {
     setFilters({
@@ -431,6 +408,28 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* FLYER */}
+      {getSetting("flyer_image") && (
+        <section className="bg-white py-10 sm:py-16">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 className="text-2xl sm:text-3xl font-black text-brand-blue text-center mb-6 sm:mb-8 tracking-tight">PROMOTIONAL FLYER</h2>
+            <div className="max-w-3xl mx-auto cursor-pointer" onClick={() => setFlyerOpen(true)}>
+              <img src={getSetting("flyer_image")} alt="Promotional Flyer" className="w-full h-auto rounded-2xl shadow-lg hover:shadow-xl transition-shadow" />
+            </div>
+          </div>
+          {flyerOpen && (
+            <div className="fixed inset-0 z-[100] bg-black/80 flex items-center justify-center p-4" onClick={() => setFlyerOpen(false)}>
+              <div className="relative max-w-4xl w-full max-h-[90vh] flex items-center justify-center" onClick={(e) => e.stopPropagation()}>
+                <button onClick={() => setFlyerOpen(false)} className="absolute -top-10 right-0 text-white/80 hover:text-white text-sm font-medium">
+                  Close ✕
+                </button>
+                <img src={getSetting("flyer_image")} alt="Promotional Flyer" className="w-full h-auto max-h-[85vh] object-contain rounded-xl scale-100 animate-in" />
+              </div>
+            </div>
+          )}
+        </section>
+      )}
+
       {/* WHY BUY FROM MBPP? + MEET OUR TEAM — Combined Split Section */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
@@ -522,28 +521,6 @@ export default function HomePage() {
 
         </div>
       </section>
-
-      {/* FLYER */}
-      {getSetting("flyer_image") && (
-        <section className="bg-white py-10 sm:py-16">
-          <div className="max-w-[1400px] mx-auto px-5 sm:px-6 lg:px-10">
-            <h2 className="text-xl sm:text-3xl font-bold text-gray-900 text-center mb-6 sm:mb-8">PROMOTIONAL FLYER</h2>
-            <div className="max-w-3xl mx-auto cursor-pointer" onClick={() => setFlyerOpen(true)}>
-              <img src={getSetting("flyer_image")} alt="Promotional Flyer" className="w-full h-auto rounded-2xl shadow-lg hover:shadow-xl transition-shadow" />
-            </div>
-          </div>
-          {flyerOpen && (
-            <div className="fixed inset-0 z-[100] bg-black/80 flex items-center justify-center p-4" onClick={() => setFlyerOpen(false)}>
-              <div className="relative max-w-4xl w-full max-h-[90vh] flex items-center justify-center" onClick={(e) => e.stopPropagation()}>
-                <button onClick={() => setFlyerOpen(false)} className="absolute -top-10 right-0 text-white/80 hover:text-white text-sm font-medium">
-                  Close ✕
-                </button>
-                <img src={getSetting("flyer_image")} alt="Promotional Flyer" className="w-full h-auto max-h-[85vh] object-contain rounded-xl scale-100 animate-in" />
-              </div>
-            </div>
-          )}
-        </section>
-      )}
 
       {/* SOCIAL MEDIA */}
       <section className="bg-gray-50 py-14">

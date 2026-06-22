@@ -69,10 +69,11 @@ export default function PropertyCard({ listing }: PropertyCardProps) {
           <div className="flex items-center gap-3 text-sm sm:text-base">
             {listing.bedrooms && <span className="font-bold text-gray-800">{listing.bedrooms} <span className="font-normal text-gray-500">bed</span></span>}
             {listing.bathrooms && <span className="font-bold text-gray-800">{listing.bathrooms} <span className="font-normal text-gray-500">bath</span></span>}
-            {listing.size && <span className="font-bold text-gray-800">{listing.size} <span className="font-normal text-gray-500"></span></span>}
+            {listing.size && <span className="font-bold text-gray-800">{listing.size}</span>}
           </div>
           <button
             onClick={handleFav}
+            aria-label="Save to favorites"
             className="w-8 h-8 rounded-full flex items-center justify-center active:scale-90 transition-all"
           >
             <svg className={`w-5 h-5 ${fav ? "text-red-500 fill-red-500" : "text-gray-300 hover:text-red-400"}`} viewBox="0 0 24 24" fill={fav ? "currentColor" : "none"} stroke="currentColor" strokeWidth={2}>

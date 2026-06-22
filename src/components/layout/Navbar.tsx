@@ -100,7 +100,7 @@ export default function Navbar() {
 
   return (
     <>
-    <header className="lg:hidden h-16 flex items-center pl-4 pr-5 sm:pl-5 sm:pr-6 w-full bg-white border-b border-gray-200">
+    <header className="lg:hidden sticky top-0 z-50 h-16 flex items-center pl-4 pr-5 sm:pl-5 sm:pr-6 w-full bg-white/80 backdrop-blur-md border-b border-gray-200/50 rounded-b-2xl">
       <Link href="/" className="flex items-center gap-2 shrink-0">
         <img src={siteLogo || `https://mbpproperties.com/api/upload/file/7ea15ec8-11b2-4c34-a855-1469d56656a5.png`} alt={siteName} className="h-10 w-auto rounded object-contain" />
       </Link>
@@ -252,8 +252,8 @@ export default function Navbar() {
         </div>
       )}
     </header>
-    <header className="hidden lg:flex h-14 items-center bg-white border-b border-gray-200">
-      <div className="w-full max-w-[1400px] mx-auto px-6 xl:px-10 flex items-center gap-8">
+    <header className="hidden lg:flex sticky top-0 z-50 h-14 items-center bg-white/80 backdrop-blur-md border-b border-gray-200/50 rounded-b-2xl">
+      <div className="w-full max-w-7xl mx-auto px-6 xl:px-10 flex items-center gap-8">
         <Link href="/" className="flex items-center gap-2.5 shrink-0">
           <img src={siteLogo || `https://mbpproperties.com/api/upload/file/7ea15ec8-11b2-4c34-a855-1469d56656a5.png`} alt={siteName} className="h-10 w-auto rounded-lg object-contain" />
         </Link>
