@@ -76,15 +76,9 @@ export default function Navbar() {
     <>
     {/* Mobile header */}
     <header className="lg:hidden sticky top-0 z-50 w-full bg-white border-b border-gray-200">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-2 shrink-0">
-          <div className="bg-brand-blue p-1.5 rounded-lg text-white flex items-center justify-center shadow-sm">
-            <img src={siteLogo || `https://mbpproperties.com/api/upload/file/7ea15ec8-11b2-4c34-a855-1469d56656a5.png`} alt={siteName} className="h-6 w-6 rounded object-contain" />
-          </div>
-          <div>
-            <h1 className="text-sm font-extrabold text-brand-blue tracking-tight leading-none">{siteName.toUpperCase()}</h1>
-            <span className="text-[8px] text-slate-400 block font-medium mt-0.5 leading-none">{siteTagline}</span>
-          </div>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-2 flex items-center justify-between">
+        <Link href="/" className="shrink-0" style={{ width: "35%", maxWidth: "35%" }}>
+          <img src={siteLogo || `https://mbpproperties.com/api/upload/file/7ea15ec8-11b2-4c34-a855-1469d56656a5.png`} alt={siteName} className="w-full h-auto max-h-12 object-contain" />
         </Link>
         <div className="flex items-center gap-2">
           {isAuthenticated && currentUser && (
@@ -203,15 +197,8 @@ export default function Navbar() {
     {/* Desktop header */}
     <header className="hidden lg:flex sticky top-0 z-50 w-full bg-white border-b border-gray-200">
       <div className="max-w-7xl mx-auto px-6 xl:px-10 py-3 flex items-center justify-between w-full">
-        <Link href="/" className="flex items-center gap-3 shrink-0">
-          <div className="bg-brand-blue p-2 rounded-xl text-white flex items-center justify-center shadow-md">
-            <img src={siteLogo || `https://mbpproperties.com/api/upload/file/7ea15ec8-11b2-4c34-a855-1469d56656a5.png`} alt={siteName} className="h-6 w-6 rounded object-contain" />
-          </div>
-          <div>
-            <h1 className="text-lg md:text-xl font-extrabold text-brand-blue tracking-tight leading-none">{siteName.toUpperCase()}</h1>
-            <p className="text-[10px] md:text-xs font-bold text-brand-gold tracking-widest leading-none mt-1">PREMIER PROPERTIES LTD.</p>
-            <span className="text-[8px] text-slate-400 block font-medium mt-0.5">{siteTagline}</span>
-          </div>
+        <Link href="/" className="shrink-0" style={{ width: "20%", maxWidth: "20%" }}>
+          <img src={siteLogo || `https://mbpproperties.com/api/upload/file/7ea15ec8-11b2-4c34-a855-1469d56656a5.png`} alt={siteName} className="w-full h-auto max-h-14 object-contain" />
         </Link>
 
         <div className="flex items-center gap-3">
