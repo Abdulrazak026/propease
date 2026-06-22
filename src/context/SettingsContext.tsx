@@ -50,12 +50,26 @@ const SettingsContext = createContext<SettingsContextType>({
 });
 
 export function SettingsProvider({ children, initialSettings }: { children: ReactNode; initialSettings?: SettingsMap }) {
-  const [settings, setSettings] = useState<SettingsMap>({ ...defaults, ...initialSettings });
+  const mergedInit = { ...defaults, ...initialSettings };
+  // For available_cities, prefer the longer (more comprehensive) value
+  if (defaults.available_cities && initialSettings?.available_cities && defaults.available_cities.length > initialSettings.available_cities.length) {
+    mergedInit.available_cities = defaults.available_cities;
+  }
+  const [settings, setSettings] = useState<SettingsMap>(mergedInit);
   const [loading, setLoading] = useState(!initialSettings);
 
   useEffect(() => {
     api.get<{ settings: SettingsMap }>("/api/settings").then((r) => {
-      if (r.data?.settings) setSettings((p) => ({ ...p, ...r.data!.settings }));
+      if (r.data?.settings) {
+        setSettings((p) => {
+          const merged = { ...p, ...r.data!.settings };
+          // For available_cities, prefer the longer (more comprehensive) value
+          if (p.available_cities && r.data!.settings.available_cities && p.available_cities.length > r.data!.settings.available_cities.length) {
+            merged.available_cities = p.available_cities;
+          }
+          return merged;
+        });
+      }
     }).catch(() => {}).finally(() => setLoading(false));
   }, []);
 
