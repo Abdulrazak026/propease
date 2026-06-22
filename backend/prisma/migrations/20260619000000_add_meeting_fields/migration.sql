@@ -1,4 +1,4 @@
 -- AlterTable
-ALTER TABLE "Reservation" ADD COLUMN "meetingDate" TIMESTAMP(3),
-ADD COLUMN "meetingTime" TEXT,
-ADD COLUMN "confirmedById" TEXT;
+ALTER TABLE "Reservation" ADD COLUMN IF NOT EXISTS "meetingDate" TIMESTAMP(3),
+ADD COLUMN IF NOT EXISTS "meetingTime" TEXT,
+ADD COLUMN IF NOT EXISTS "confirmedById" TEXT;
