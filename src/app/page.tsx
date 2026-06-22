@@ -254,19 +254,19 @@ export default function HomePage() {
       </section>
 
       <div className="bg-white border-b border-gray-100">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center justify-center gap-6 sm:gap-10 lg:gap-16 rounded-xl bg-gray-50/50 px-4 py-3">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 rounded-xl bg-gray-50/50 px-4 py-3">
             {[
               { v: "30+", l: "Properties", icon: "bi-shield-check" },
               { v: "14", l: "Areas", icon: "bi-buildings" },
               { v: "4", l: "Cities", icon: "bi-geo-alt" },
               { v: "100+", l: "Clients", icon: "bi-people" },
             ].map((s) => (
-              <div key={s.l} className="flex items-center gap-2 sm:gap-3">
+              <div key={s.l} className="flex items-center justify-center gap-2 sm:gap-3">
                 <div className="w-9 h-9 sm:w-10 sm:h-10 bg-brand-blue text-brand-gold rounded-xl flex items-center justify-center shrink-0">
                   <i className={`bi ${s.icon} text-sm sm:text-base`}></i>
                 </div>
-                <div className="text-center">
+                <div>
                   <p className="text-base sm:text-lg font-extrabold text-brand-blue">{s.v}</p>
                   <p className="text-[10px] text-gray-400 font-medium uppercase tracking-wider">{s.l}</p>
                 </div>
