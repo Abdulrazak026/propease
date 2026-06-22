@@ -65,6 +65,7 @@ export default function HomePage() {
   const [showCount, setShowCount] = useState(INITIAL_SHOW);
   const [activeCategory, setActiveCategory] = useState("");
   const [showAllTeam, setShowAllTeam] = useState(false);
+  const [currentSlide, setCurrentSlide] = useState(0);
 
   let researchReports: ResearchReport[] = [];
   try { const raw = getSetting("research_reports"); if (raw) researchReports = JSON.parse(raw); } catch {}
@@ -85,6 +86,16 @@ export default function HomePage() {
     window.addEventListener("scroll", handler, { passive: true });
     return () => window.removeEventListener("scroll", handler);
   }, []);
+
+  // Auto-advance carousel for Why Buy + Flyer
+  useEffect(() => {
+    const hasFlyer = !!getSetting("flyer_image");
+    if (!hasFlyer) return;
+    const interval = setInterval(() => {
+      setCurrentSlide(prev => (prev + 1) % 2);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [getSetting]);
 
   const { listings, loading, filters, setFilters } = useListings();
 
@@ -140,11 +151,11 @@ export default function HomePage() {
 
         <div className="relative w-full max-w-7xl mx-auto px-5 sm:px-6 lg:px-10 pt-24 sm:pt-28 lg:pt-32 pb-16 sm:pb-20 lg:pb-24" style={{ opacity: heroOpacity }}>
           <div className="flex flex-col justify-center items-center text-center min-h-[25vh] sm:min-h-[30vh] mt-6 sm:mt-4">
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-white leading-tight tracking-tight max-w-3xl drop-shadow-[0_2px_12px_rgba(0,0,0,0.6)]">
-              Find Your Properties in Kano & Other Northern States
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white leading-[1.1] tracking-tight max-w-3xl drop-shadow-[0_2px_12px_rgba(0,0,0,0.6)]">
+              Rentals. Homes. Land.
             </h2>
-            <p className="text-sm sm:text-base text-white/80 mt-3 sm:mt-4 max-w-2xl leading-relaxed drop-shadow-[0_1px_8px_rgba(0,0,0,0.5)]">
-              Whether you are looking to buy, rent, or sell, we have verified properties across Northern Nigeria. Gidan siyarwa, gidan haya, flats, land, and commercial spaces.
+            <p className="text-base sm:text-lg text-white/70 mt-3 sm:mt-4 max-w-2xl leading-relaxed drop-shadow-[0_1px_8px_rgba(0,0,0,0.5)]">
+              Verified properties across Kano & Northern States. Buy, rent, or sell with confidence.
             </p>
           </div>
         </div>
@@ -339,12 +350,12 @@ export default function HomePage() {
               <p className="text-sm text-slate-500">We offer the most comprehensive real estate solution structures in Northern Nigeria.</p>
             </div>
 
-            {/* Swipeable carousel: features + flyer */}
+            {/* Auto-advancing carousel: features + flyer */}
             <div className="relative flex-1">
-              <div className="flex overflow-x-auto snap-x snap-mandatory scrollbar-hide gap-4 rounded-2xl" style={{ scrollBehavior: "smooth" }}>
+              <div className="relative overflow-hidden rounded-2xl border border-gray-200 bg-white">
                 {/* Slide 1: Features */}
-                <div className="min-w-full snap-start bg-white border border-gray-200 rounded-2xl p-6">
-                  <div className="space-y-5">
+                <div className={`transition-opacity duration-500 ${currentSlide === 0 ? "opacity-100" : "opacity-0 absolute inset-0 pointer-events-none"}`}>
+                  <div className="p-6 space-y-5">
                     {[
                       { icon: "bi-shield-fill-check", title: "Verified & Genuine Properties", desc: "Absolute assurance with fully documented ownership papers and title deeds." },
                       { icon: "bi-geo-alt-fill", title: "Prime Locations in Kano", desc: "Strategically situated within high capital appreciation corridors." },
@@ -353,7 +364,7 @@ export default function HomePage() {
                       { icon: "bi-person-badge-fill", title: "Professional & Experienced Team", desc: "Guidance from real estate agents who understand local market conditions." },
                     ].map((item) => (
                       <div key={item.title} className="flex gap-3 items-start">
-                        <div className="w-9 h-9 bg-brand-blue text-brand-gold rounded-lg flex items-center justify-center flex-shrink-0">
+                        <div className="w-9 h-9 bg-brand-blue text-brand-gold rounded-lg flex items-center justify-center shrink-0">
                           <i className={`bi ${item.icon} text-sm`}></i>
                         </div>
                         <div>
@@ -367,12 +378,14 @@ export default function HomePage() {
 
                 {/* Slide 2: Flyer */}
                 {getSetting("flyer_image") && (
-                  <div className="min-w-full snap-start bg-white border border-gray-200 rounded-2xl p-4 flex flex-col items-center justify-center">
-                    <p className="text-xs font-semibold text-brand-gold uppercase tracking-widest mb-3">Promotional Flyer</p>
-                    <div className="cursor-pointer w-full" onClick={() => setFlyerOpen(true)}>
-                      <img src={getSetting("flyer_image")} alt="Promotional Flyer" className="w-full h-auto rounded-xl shadow-md hover:shadow-lg transition-shadow" />
+                  <div className={`transition-opacity duration-500 ${currentSlide === 1 ? "opacity-100" : "opacity-0 absolute inset-0 pointer-events-none"}`}>
+                    <div className="p-4 flex flex-col items-center justify-center min-h-[400px]">
+                      <p className="text-xs font-semibold text-brand-gold uppercase tracking-widest mb-3">Promotional Flyer</p>
+                      <div className="cursor-pointer w-full" onClick={() => setFlyerOpen(true)}>
+                        <img src={getSetting("flyer_image")} alt="Promotional Flyer" className="w-full h-auto rounded-xl shadow-md hover:shadow-lg transition-shadow" />
+                      </div>
+                      <p className="text-xs text-gray-400 mt-3">Tap to enlarge</p>
                     </div>
-                    <p className="text-xs text-gray-400 mt-3">Tap to enlarge</p>
                   </div>
                 )}
               </div>
@@ -380,8 +393,8 @@ export default function HomePage() {
               {/* Dots indicator */}
               {getSetting("flyer_image") && (
                 <div className="flex justify-center gap-2 mt-4">
-                  <div className="w-2 h-2 rounded-full bg-brand-blue"></div>
-                  <div className="w-2 h-2 rounded-full bg-gray-300"></div>
+                  <button onClick={() => setCurrentSlide(0)} className={`w-2.5 h-2.5 rounded-full transition-all ${currentSlide === 0 ? "bg-brand-blue w-6" : "bg-gray-300"}`}></button>
+                  <button onClick={() => setCurrentSlide(1)} className={`w-2.5 h-2.5 rounded-full transition-all ${currentSlide === 1 ? "bg-brand-blue w-6" : "bg-gray-300"}`}></button>
                 </div>
               )}
             </div>

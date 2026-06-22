@@ -66,8 +66,7 @@ export default function Navbar() {
       if (notifRef.current && !notifRef.current.contains(target)) setNotifOpen(false);
     };
     document.addEventListener("mousedown", handler);
-    document.addEventListener("touchstart", handler);
-    return () => { document.removeEventListener("mousedown", handler); document.removeEventListener("touchstart", handler); };
+    return () => { document.removeEventListener("mousedown", handler); };
   }, []);
 
   const isAdmin = currentUser?.role === "head" || currentUser?.role === "admin";
@@ -76,9 +75,9 @@ export default function Navbar() {
     <>
     {/* Mobile header */}
     <header className="lg:hidden sticky top-0 z-50 w-full bg-white border-b border-gray-200">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-2 flex items-center justify-between">
-        <Link href="/" className="shrink-0" style={{ width: "50%", maxWidth: "50%" }}>
-          <img src={siteLogo || `https://mbpproperties.com/api/upload/file/7ea15ec8-11b2-4c34-a855-1469d56656a5.png`} alt={siteName} className="w-full h-auto max-h-12 object-contain" />
+      <div className="max-w-7xl mx-auto flex items-center justify-between h-14">
+        <Link href="/" className="shrink-0 h-full flex items-center pl-2" style={{ width: "50%", maxWidth: "50%" }}>
+          <img src={siteLogo || `https://mbpproperties.com/api/upload/file/7ea15ec8-11b2-4c34-a855-1469d56656a5.png`} alt={siteName} className="h-full w-auto object-contain object-left" />
         </Link>
         <div className="flex items-center gap-2">
           {isAuthenticated && currentUser && (
@@ -144,16 +143,16 @@ export default function Navbar() {
               <span>Menu</span>
             </button>
             {menuOpen && (
-              <div className="absolute top-full right-0 mt-2 w-64 bg-gray-900 rounded-xl border border-white/10 shadow-xl shadow-black/20 p-2 z-50">
-                <p className="text-[11px] font-semibold text-brand-gold uppercase tracking-wider px-1 pb-2">Navigation</p>
+              <div className="absolute top-full right-0 mt-2 w-64 bg-gray-50 rounded-xl border border-gray-200 shadow-xl p-2 z-50">
+                <p className="text-[11px] font-semibold text-brand-blue uppercase tracking-wider px-1 pb-2">Navigation</p>
                 <div>
                   {MENU_LINKS.map((item, i) => {
                     const isBuy = item.href === "/list-property" && !item.href.includes("type=rent");
                     return (
                       <div key={item.href}>
-                        {i > 0 && <div className="border-t border-white/10 mx-2" />}
-                        <Link href={item.href} onClick={() => setMenuOpen(false)} className="flex items-center gap-3 p-3 rounded-lg hover:bg-white/10 transition-colors text-sm text-white/80 hover:text-white">
-                          <span className="text-brand-gold font-bold text-xs w-4">{item.label[0]}</span>
+                        {i > 0 && <div className="border-t border-gray-100 mx-2" />}
+                        <Link href={item.href} onClick={() => setMenuOpen(false)} className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 transition-colors text-sm text-gray-700 hover:text-gray-900">
+                          <span className="text-brand-blue font-bold text-xs w-4">{item.label[0]}</span>
                           <span>{item.label}</span>
                         </Link>
                       </div>
@@ -161,27 +160,27 @@ export default function Navbar() {
                   })}
                   {isAuthenticated && (
                     <>
-                      <div className="border-t border-white/10 mx-2" />
-                      <Link href={isAdmin ? "/admin" : `/${currentUser?.role}`} onClick={() => setMenuOpen(false)} className="flex items-center gap-3 p-3 rounded-lg hover:bg-white/10 transition-colors text-sm text-white/80 hover:text-white">
-                        <span className="text-brand-gold font-bold text-xs w-4">D</span>
+                      <div className="border-t border-gray-100 mx-2" />
+                      <Link href={isAdmin ? "/admin" : `/${currentUser?.role}`} onClick={() => setMenuOpen(false)} className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 transition-colors text-sm text-gray-700 hover:text-gray-900">
+                        <span className="text-brand-blue font-bold text-xs w-4">D</span>
                         <span>Dashboard</span>
                       </Link>
                     </>
                   )}
                   {!isAuthenticated && (
                     <>
-                      <div className="border-t border-white/10 mx-2" />
-                      <Link href="/login" onClick={() => setMenuOpen(false)} className="flex items-center gap-3 p-3 rounded-lg hover:bg-white/10 transition-colors text-sm text-white/80 hover:text-white">
-                        <span className="text-brand-gold font-bold text-xs w-4">S</span>
+                      <div className="border-t border-gray-100 mx-2" />
+                      <Link href="/login" onClick={() => setMenuOpen(false)} className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 transition-colors text-sm text-gray-700 hover:text-gray-900">
+                        <span className="text-brand-blue font-bold text-xs w-4">S</span>
                         <span>Sign In</span>
                       </Link>
                     </>
                   )}
                   {isAuthenticated && (
                     <>
-                      <div className="border-t border-white/10 mx-2" />
-                      <button onClick={() => { handleLogout(); setMenuOpen(false); }} className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-white/10 transition-colors text-sm text-red-400">
-                        <span className="text-red-500 font-bold text-xs w-4">L</span>
+                      <div className="border-t border-gray-100 mx-2" />
+                      <button onClick={() => { handleLogout(); setMenuOpen(false); }} className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-red-50 transition-colors text-sm text-red-500">
+                        <span className="text-red-400 font-bold text-xs w-4">L</span>
                         <span>Sign Out</span>
                       </button>
                     </>
@@ -196,9 +195,9 @@ export default function Navbar() {
 
     {/* Desktop header */}
     <header className="hidden lg:flex sticky top-0 z-50 w-full bg-white border-b border-gray-200">
-      <div className="max-w-7xl mx-auto px-6 xl:px-10 py-3 flex items-center justify-between w-full">
-        <Link href="/" className="shrink-0" style={{ width: "25%", maxWidth: "25%" }}>
-          <img src={siteLogo || `https://mbpproperties.com/api/upload/file/7ea15ec8-11b2-4c34-a855-1469d56656a5.png`} alt={siteName} className="w-full h-auto max-h-14 object-contain" />
+      <div className="max-w-7xl mx-auto px-6 xl:px-10 flex items-center justify-between w-full h-14">
+        <Link href="/" className="shrink-0 h-full flex items-center pl-2" style={{ width: "25%", maxWidth: "25%" }}>
+          <img src={siteLogo || `https://mbpproperties.com/api/upload/file/7ea15ec8-11b2-4c34-a855-1469d56656a5.png`} alt={siteName} className="h-full w-auto object-contain object-left" />
         </Link>
 
         <div className="flex items-center gap-3">
@@ -285,41 +284,41 @@ export default function Navbar() {
               <span>Menu</span>
             </button>
             {menuOpen && (
-              <div className="absolute top-full right-0 mt-2 w-72 bg-gray-900 rounded-xl border border-white/10 shadow-xl shadow-black/20 p-2 z-50">
-                <p className="text-[11px] font-semibold text-brand-gold uppercase tracking-wider px-1 pb-2">Navigation</p>
+              <div className="absolute top-full right-0 mt-2 w-72 bg-gray-50 rounded-xl border border-gray-200 shadow-xl p-2 z-50">
+                <p className="text-[11px] font-semibold text-brand-blue uppercase tracking-wider px-1 pb-2">Navigation</p>
                 <div>
                   {MENU_LINKS.map((item, i) => (
                     <div key={item.href}>
-                      {i > 0 && <div className="border-t border-white/10 mx-2" />}
-                      <Link href={item.href} onClick={() => setMenuOpen(false)} className="flex items-center gap-3 p-3 rounded-lg hover:bg-white/10 transition-colors text-sm text-white/80 hover:text-white">
-                        <span className="text-brand-gold font-bold text-xs w-4">{item.label[0]}</span>
+                      {i > 0 && <div className="border-t border-gray-100 mx-2" />}
+                      <Link href={item.href} onClick={() => setMenuOpen(false)} className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 transition-colors text-sm text-gray-700 hover:text-gray-900">
+                        <span className="text-brand-blue font-bold text-xs w-4">{item.label[0]}</span>
                         <span>{item.label}</span>
                       </Link>
                     </div>
                   ))}
                   {isAuthenticated && (
                     <>
-                      <div className="border-t border-white/10 mx-2" />
-                      <Link href={isAdmin ? "/admin" : `/${currentUser?.role}`} onClick={() => setMenuOpen(false)} className="flex items-center gap-3 p-3 rounded-lg hover:bg-white/10 transition-colors text-sm text-white/80 hover:text-white">
-                        <span className="text-brand-gold font-bold text-xs w-4">D</span>
+                      <div className="border-t border-gray-100 mx-2" />
+                      <Link href={isAdmin ? "/admin" : `/${currentUser?.role}`} onClick={() => setMenuOpen(false)} className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 transition-colors text-sm text-gray-700 hover:text-gray-900">
+                        <span className="text-brand-blue font-bold text-xs w-4">D</span>
                         <span>Dashboard</span>
                       </Link>
                     </>
                   )}
                   {!isAuthenticated && (
                     <>
-                      <div className="border-t border-white/10 mx-2" />
-                      <Link href="/login" onClick={() => setMenuOpen(false)} className="flex items-center gap-3 p-3 rounded-lg hover:bg-white/10 transition-colors text-sm text-white/80 hover:text-white">
-                        <span className="text-brand-gold font-bold text-xs w-4">S</span>
+                      <div className="border-t border-gray-100 mx-2" />
+                      <Link href="/login" onClick={() => setMenuOpen(false)} className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 transition-colors text-sm text-gray-700 hover:text-gray-900">
+                        <span className="text-brand-blue font-bold text-xs w-4">S</span>
                         <span>Sign In</span>
                       </Link>
                     </>
                   )}
                   {isAuthenticated && (
                     <>
-                      <div className="border-t border-white/10 mx-2" />
-                      <button onClick={() => { handleLogout(); setMenuOpen(false); }} className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-white/10 transition-colors text-sm text-red-400">
-                        <span className="text-red-500 font-bold text-xs w-4">L</span>
+                      <div className="border-t border-gray-100 mx-2" />
+                      <button onClick={() => { handleLogout(); setMenuOpen(false); }} className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-red-50 transition-colors text-sm text-red-500">
+                        <span className="text-red-400 font-bold text-xs w-4">L</span>
                         <span>Sign Out</span>
                       </button>
                     </>
