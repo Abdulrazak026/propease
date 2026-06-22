@@ -184,16 +184,16 @@ export default function HomePage() {
     <div className="flex flex-col">
       <section ref={heroRef} className="relative bg-brand-dark overflow-hidden">
         <div className="absolute inset-0">
-          {!settingsLoading && <img src={heroImage} alt="MBPP Properties - Find verified houses, land and flats in Kano & Northern States, Nigeria" className="w-full h-full object-cover opacity-65 transition-opacity duration-500" />}
-          <div className="absolute inset-0 bg-gradient-to-b from-brand-dark/20 via-brand-dark/15 to-brand-dark/80" />
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--color-accent)_0%,_transparent_60%)] opacity-20 mix-blend-screen" />
+          {!settingsLoading && <img src={heroImage} alt="MBPP Properties - Find verified houses, land and flats in Kano & Northern States, Nigeria" className="w-full h-full object-cover opacity-80 transition-opacity duration-500" />}
+          <div className="absolute inset-0 bg-gradient-to-b from-brand-dark/10 via-brand-dark/5 to-brand-dark/60" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--color-accent)_0%,_transparent_60%)] opacity-25 mix-blend-screen" />
         </div>
 
         <div className="relative w-full max-w-7xl mx-auto px-5 sm:px-6 lg:px-10 pt-16 sm:pt-20 lg:pt-24 pb-16 sm:pb-20 lg:pb-24" style={{ opacity: heroOpacity }}>
           {/* Top-left links */}
           <div className="absolute top-4 left-5 sm:left-6 lg:left-10 flex items-center gap-2 sm:gap-3 z-10">
             {PRIMARY_LINKS.map((link) => (
-              <Link key={link.label} href={link.href} className="bg-brand-dark/60 backdrop-blur-sm text-white/90 hover:text-white text-sm sm:text-base font-semibold tracking-wide uppercase px-4 py-2 rounded-full transition-colors">
+              <Link key={link.label} href={link.href} className="bg-black/30 backdrop-blur-sm text-white hover:text-white text-sm sm:text-base font-bold tracking-wide uppercase px-4 py-2 rounded-full transition-colors border border-white/20">
                 {link.label}
               </Link>
             ))}
@@ -203,7 +203,7 @@ export default function HomePage() {
           <div className="absolute top-4 right-5 sm:right-6 lg:right-10 z-10" id="hero-more">
             <button
               onClick={() => setHeroMoreOpen(!heroMoreOpen)}
-              className="bg-black/40 backdrop-blur-sm text-white/90 hover:text-white rounded-full transition-colors w-10 h-10 flex items-center justify-center"
+              className="bg-black/30 backdrop-blur-sm text-white hover:text-white rounded-full transition-colors w-10 h-10 flex items-center justify-center border border-white/20"
               aria-label="More"
             >
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
