@@ -158,26 +158,26 @@ export default function HomePage() {
 
   return (
     <div className="flex flex-col">
-      <section ref={heroRef} className="relative bg-gray-950 overflow-hidden min-h-screen flex items-center">
+      <section ref={heroRef} className="relative bg-gray-950 overflow-hidden">
         <div className="absolute inset-0">
           {!settingsLoading && <img src={heroImage} alt="MBPP Properties - Find verified houses, land and flats in Kano & Northern States, Nigeria" className="w-full h-full object-cover opacity-65 transition-opacity duration-500" />}
           <div className="absolute inset-0 bg-gradient-to-b from-gray-950/40 via-gray-950/25 to-gray-950" />
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--color-primary)_0%,_transparent_60%)] opacity-25 mix-blend-screen" />
         </div>
 
-        <div className="relative w-full max-w-[1400px] mx-auto px-5 sm:px-6 lg:px-10 py-24 sm:py-32 lg:py-40" style={{ opacity: heroOpacity }}>
+        <div className="relative w-full max-w-[1400px] mx-auto px-5 sm:px-6 lg:px-10 pt-14 sm:pt-20 lg:pt-24 pb-20 sm:pb-24 lg:pb-32" style={{ opacity: heroOpacity }}>
           <div className="flex flex-col items-center text-center">
             <img
               src={getSetting("site_logo") || `https://mbpproperties.com/api/upload/file/7ea15ec8-11b2-4c34-a855-1469d56656a5.png`}
               alt={siteName}
-              className="h-28 sm:h-36 lg:h-44 w-auto rounded-lg object-contain mb-8 sm:mb-10"
+              className="h-28 sm:h-36 lg:h-44 w-auto rounded-lg object-contain mb-6 sm:mb-8"
+              style={{ mixBlendMode: "multiply", filter: "brightness(10)" }}
             />
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white leading-tight tracking-tight max-w-2xl">
-              Find Your Property in<br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-300 via-teal-200 to-emerald-400">Kano &amp; other northern states</span>
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white leading-tight tracking-tight max-w-3xl">
+              Find Property in Northern Nigeria
             </h2>
-            <p className="text-sm sm:text-base text-white/60 mt-4 sm:mt-5 max-w-xl leading-relaxed">
-              Trusted properties. Verified listings. Happy clients.
+            <p className="text-sm sm:text-base text-white/60 mt-3 sm:mt-4 max-w-2xl leading-relaxed">
+              Whether you are looking to buy, rent, or sell — we have verified properties across Northern Nigeria. Gidan siyarwa, gidan haya, flats, land, and commercial spaces.
             </p>
           </div>
         </div>
@@ -292,62 +292,52 @@ export default function HomePage() {
 
       <SoldPropertiesGallery />
 
-      {/* VERIFIED PROPERTIES */}
-      <section className="bg-white py-10 sm:py-16">
+      {/* VERIFIED PROPERTIES + OUR PROMISE TO YOU */}
+      <section className="bg-white py-8 sm:py-12">
         <div className="max-w-[1400px] mx-auto px-5 sm:px-6 lg:px-10">
-          <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-8">
-            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-emerald-50 flex items-center justify-center shrink-0">
-              <i className="bi bi-shield-fill-check text-emerald-600 text-2xl sm:text-3xl"></i>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+            <div className="flex items-start gap-3 sm:gap-4 p-4 sm:p-5 rounded-xl bg-gray-50 border border-gray-100">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-emerald-50 flex items-center justify-center shrink-0">
+                <i className="bi bi-shield-fill-check text-emerald-600 text-lg sm:text-xl"></i>
+              </div>
+              <div>
+                <h3 className="text-sm sm:text-base font-bold text-gray-900">VERIFIED PROPERTIES</h3>
+                <p className="text-xs sm:text-sm text-gray-600 mt-0.5">Every property we sell is 100% verified through due diligence and transparency.</p>
+              </div>
             </div>
-            <div className="text-center sm:text-left">
-              <h2 className="text-xl sm:text-3xl font-bold text-gray-900">VERIFIED PROPERTIES</h2>
-              <p className="text-sm sm:text-base text-gray-600 mt-1 sm:mt-2 max-w-xl">Every property we sell is 100% verified through due diligence and transparency.</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* OUR PROMISE TO YOU */}
-      <section className="bg-gray-50 py-10 sm:py-16">
-        <div className="max-w-[1400px] mx-auto px-5 sm:px-6 lg:px-10">
-          <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-8">
-            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-amber-50 flex items-center justify-center shrink-0">
-              <i className="bi bi-shield-check text-amber-600 text-2xl sm:text-3xl"></i>
-            </div>
-            <div className="text-center sm:text-left">
-              <h2 className="text-xl sm:text-3xl font-bold text-gray-900">OUR PROMISE TO YOU</h2>
-              <p className="text-sm sm:text-base text-gray-600 mt-1 sm:mt-2 max-w-xl">For any issue related to purchased properties, MBPP takes 100% responsibility. Your peace of mind is our commitment.</p>
+            <div className="flex items-start gap-3 sm:gap-4 p-4 sm:p-5 rounded-xl bg-gray-50 border border-gray-100">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-amber-50 flex items-center justify-center shrink-0">
+                <i className="bi bi-shield-check text-amber-600 text-lg sm:text-xl"></i>
+              </div>
+              <div>
+                <h3 className="text-sm sm:text-base font-bold text-gray-900">OUR PROMISE TO YOU</h3>
+                <p className="text-xs sm:text-sm text-gray-600 mt-0.5">For any issue related to purchased properties, MBPP takes 100% responsibility. Your peace of mind is our commitment.</p>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
       {/* WHAT WE OFFER */}
-      <section className="bg-white py-10 sm:py-16">
+      <section className="bg-gray-50 py-8 sm:py-12">
         <div className="max-w-[1400px] mx-auto px-5 sm:px-6 lg:px-10">
-          <h2 className="text-xl sm:text-3xl font-bold text-gray-900 text-center mb-6 sm:mb-10">WHAT WE OFFER</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
-            <div className="bg-white rounded-2xl border border-gray-100 p-6 sm:p-8 text-center hover:shadow-lg transition-shadow group">
-              <div className="w-12 h-12 sm:w-16 sm:h-16 bg-emerald-50 rounded-2xl flex items-center justify-center mx-auto mb-3 sm:mb-4 group-hover:bg-emerald-100 transition-colors">
-                <i className="bi bi-map-fill text-emerald-600 text-xl sm:text-2xl"></i>
+          <h2 className="text-base sm:text-lg font-bold text-gray-900 text-center mb-4 sm:mb-5">WHAT WE OFFER</h2>
+          <div className="max-w-2xl mx-auto bg-white rounded-xl border border-gray-100 p-4 sm:p-5 divide-y divide-gray-100">
+            {[
+              { icon: "bi-map-fill", color: "text-emerald-600", bg: "bg-emerald-50", title: "WE SELL LANDS", desc: "Genuine plots in prime locations with secure titles" },
+              { icon: "bi-house-fill", color: "text-blue-600", bg: "bg-blue-50", title: "WE BUILD HOUSES", desc: "From foundation to finishing, we build quality homes tailored to your needs" },
+              { icon: "bi-buildings-fill", color: "text-purple-600", bg: "bg-purple-50", title: "WE SELL COMPLETED HOUSES", desc: "Move-in ready homes with modern finishing and quality construction" },
+            ].map((item, i) => (
+              <div key={i} className="flex items-start gap-3 py-3 sm:py-3.5 first:pt-0 last:pb-0">
+                <div className={`w-9 h-9 ${item.bg} rounded-lg flex items-center justify-center shrink-0`}>
+                  <i className={`bi ${item.icon} ${item.color} text-sm`}></i>
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-gray-900">{item.title}</p>
+                  <p className="text-xs text-gray-600 mt-0.5">{item.desc}</p>
+                </div>
               </div>
-              <h3 className="text-base sm:text-lg font-bold text-gray-900">WE SELL LANDS</h3>
-              <p className="text-xs sm:text-sm text-gray-600 mt-1 sm:mt-2">Genuine plots in prime locations with secure titles</p>
-            </div>
-            <div className="bg-white rounded-2xl border border-gray-100 p-6 sm:p-8 text-center hover:shadow-lg transition-shadow group">
-              <div className="w-12 h-12 sm:w-16 sm:h-16 bg-blue-50 rounded-2xl flex items-center justify-center mx-auto mb-3 sm:mb-4 group-hover:bg-blue-100 transition-colors">
-                <i className="bi bi-house-fill text-blue-600 text-xl sm:text-2xl"></i>
-              </div>
-              <h3 className="text-base sm:text-lg font-bold text-gray-900">WE BUILD HOUSES</h3>
-              <p className="text-xs sm:text-sm text-gray-600 mt-1 sm:mt-2">From foundation to finishing, we build quality homes tailored to your needs</p>
-            </div>
-            <div className="bg-white rounded-2xl border border-gray-100 p-6 sm:p-8 text-center hover:shadow-lg transition-shadow group">
-              <div className="w-12 h-12 sm:w-16 sm:h-16 bg-purple-50 rounded-2xl flex items-center justify-center mx-auto mb-3 sm:mb-4 group-hover:bg-purple-100 transition-colors">
-                <i className="bi bi-buildings-fill text-purple-600 text-xl sm:text-2xl"></i>
-              </div>
-              <h3 className="text-base sm:text-lg font-bold text-gray-900">WE SELL COMPLETED HOUSES</h3>
-              <p className="text-xs sm:text-sm text-gray-600 mt-1 sm:mt-2">Move-in ready homes with modern finishing and quality construction</p>
-            </div>
+            ))}
           </div>
         </div>
       </section>
@@ -370,33 +360,24 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* OUR LANDS */}
-      <section className="bg-gray-50 py-10 sm:py-16">
-        <div className="max-w-[1400px] mx-auto px-5 sm:px-6 lg:px-10">
-          <h2 className="text-xl sm:text-3xl font-bold text-gray-900 text-center mb-3 sm:mb-4">OUR LANDS</h2>
-          <p className="text-xs sm:text-base text-gray-500 text-center mb-6 sm:mb-8 max-w-xl mx-auto">Prime land parcels with genuine titles and secure transactions</p>
-          <AutoCarousel items={PLACEHOLDER_LANDS} />
-        </div>
-      </section>
-
       {/* WHY BUY FROM MBPP */}
-      <section className="bg-white py-10 sm:py-16">
+      <section className="bg-white py-8 sm:py-12">
         <div className="max-w-[1400px] mx-auto px-5 sm:px-6 lg:px-10">
-          <h2 className="text-xl sm:text-3xl font-bold text-gray-900 text-center mb-6 sm:mb-10">WHY BUY FROM MBPP?</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <h2 className="text-base sm:text-lg font-bold text-gray-900 text-center mb-4 sm:mb-5">WHY BUY FROM MBPP?</h2>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-3">
             {[
-              { title: "Verified & Genuine Properties", icon: "bi-shield-fill-check", color: "text-emerald-500", bg: "bg-emerald-50" },
+              { title: "Verified & Genuine", icon: "bi-shield-fill-check", color: "text-emerald-500", bg: "bg-emerald-50" },
               { title: "Prime Locations", icon: "bi-geo-alt-fill", color: "text-blue-500", bg: "bg-blue-50" },
-              { title: "In Kano & Northern States", icon: "bi-buildings", color: "text-purple-500", bg: "bg-purple-50" },
-              { title: "Quality Construction & Finishing", icon: "bi-star-fill", color: "text-amber-500", bg: "bg-amber-50" },
-              { title: "Flexible Payment Options", icon: "bi-credit-card", color: "text-rose-500", bg: "bg-rose-50" },
-              { title: "Professional & Experienced Team", icon: "bi-people-fill", color: "text-cyan-500", bg: "bg-cyan-50" },
+              { title: "Northern Nigeria Focus", icon: "bi-buildings", color: "text-purple-500", bg: "bg-purple-50" },
+              { title: "Quality Finishing", icon: "bi-star-fill", color: "text-amber-500", bg: "bg-amber-50" },
+              { title: "Flexible Payment", icon: "bi-credit-card", color: "text-rose-500", bg: "bg-rose-50" },
+              { title: "Expert Team", icon: "bi-people-fill", color: "text-cyan-500", bg: "bg-cyan-50" },
             ].map((item) => (
-              <div key={item.title} className="flex items-center gap-4 p-5 rounded-xl border border-gray-100 hover:border-gray-200 hover:shadow-sm transition-all">
-                <div className={`w-12 h-12 ${item.bg} rounded-xl flex items-center justify-center shrink-0`}>
-                  <i className={`bi ${item.icon} ${item.color} text-xl`}></i>
+              <div key={item.title} className="flex flex-col items-center text-center gap-2 p-3 rounded-lg border border-gray-100 hover:border-gray-200 transition-all">
+                <div className={`w-8 h-8 ${item.bg} rounded-lg flex items-center justify-center shrink-0`}>
+                  <i className={`bi ${item.icon} ${item.color} text-sm`}></i>
                 </div>
-                <p className="text-sm font-semibold text-gray-900">{item.title}</p>
+                <p className="text-[11px] font-semibold text-gray-900 leading-tight">{item.title}</p>
               </div>
             ))}
           </div>
@@ -408,30 +389,7 @@ export default function HomePage() {
         <div className="max-w-[1400px] mx-auto px-5 sm:px-6 lg:px-10">
           <h2 className="text-xl sm:text-3xl font-bold text-gray-900 text-center mb-3 sm:mb-4">MEET OUR TEAM</h2>
           <p className="text-xs sm:text-base text-gray-500 text-center mb-6 sm:mb-8 max-w-xl mx-auto">Get to know the dedicated professionals behind MBPP</p>
-          <AutoCarousel items={staffItems} heightClass="h-80 sm:h-96" />
-        </div>
-      </section>
-
-      {/* WHY CHOOSE US */}
-      <section className="bg-white py-10 sm:py-16">
-        <div className="max-w-[1400px] mx-auto px-5 sm:px-6 lg:px-10">
-          <h2 className="text-xl sm:text-3xl font-bold text-gray-900 text-center mb-6 sm:mb-10">WHY CHOOSE US?</h2>
-          <div className="max-w-2xl mx-auto space-y-4">
-            {[
-              { text: "Professional & experienced team", icon: "bi-award-fill", color: "text-amber-500" },
-              { text: "Proven track record", icon: "bi-trophy-fill", color: "text-emerald-500" },
-              { text: "High-quality materials & workmanship", icon: "bi-tools", color: "text-blue-500" },
-              { text: "Timely project completion", icon: "bi-clock-fill", color: "text-purple-500" },
-              { text: "Customer satisfaction is our priority", icon: "bi-heart-fill", color: "text-rose-500" },
-            ].map((item) => (
-              <div key={item.text} className="flex items-center gap-4 p-4 rounded-xl bg-gray-50 border border-gray-100">
-                <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-sm shrink-0">
-                  <i className={`bi ${item.icon} ${item.color} text-lg`}></i>
-                </div>
-                <p className="text-sm font-medium text-gray-800">{item.text}</p>
-              </div>
-            ))}
-          </div>
+          <AutoCarousel items={staffItems} heightClass="h-56 sm:h-64" imageFit="contain" />
         </div>
       </section>
 
@@ -464,7 +422,7 @@ export default function HomePage() {
           <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-2">Find Property in Northern Nigeria</h2>
           <p className="text-sm text-gray-600 mb-4 max-w-2xl">Whether you are looking to buy, rent, or sell — we have verified properties across Northern Nigeria. Gidan siyarwa, gidan haya, flats, land, and commercial spaces.</p>
           <div className="flex flex-wrap gap-2">
-            {["House for sale", "Gidan siyarwa", "House for rent", "Gidan haya", "Flat", "Land for sale", "Plaza", "Shop", "Commercial property", "Sell house", "Sayar da gida", "Siyan gida"].map(tag => (
+            {["House for sale", "Gidan siyarwa", "House for rent", "Gidan haya", "Flat", "Land for sale", "Plaza", "Shop", "Commercial property", "Sell house", "Sayar da gida"].map(tag => (
               <Link key={tag} href={`/list-property?search=${encodeURIComponent(tag)}`} className="px-3 py-1.5 bg-white border border-gray-200 rounded-full text-xs text-gray-600 hover:border-[var(--color-primary)] hover:text-[var(--color-primary)] transition-colors">
                 {tag}
               </Link>

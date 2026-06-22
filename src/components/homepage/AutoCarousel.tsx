@@ -12,9 +12,10 @@ interface AutoCarouselProps {
   interval?: number;
   className?: string;
   heightClass?: string;
+  imageFit?: "cover" | "contain";
 }
 
-export default function AutoCarousel({ items, interval = 4000, className = "", heightClass = "h-64 sm:h-80 lg:h-96" }: AutoCarouselProps) {
+export default function AutoCarousel({ items, interval = 4000, className = "", heightClass = "h-64 sm:h-80 lg:h-96", imageFit = "cover" }: AutoCarouselProps) {
   const [current, setCurrent] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const timerRef = useRef<ReturnType<typeof setInterval> | undefined>(undefined);
@@ -43,7 +44,7 @@ export default function AutoCarousel({ items, interval = 4000, className = "", h
       >
         {items.map((item, i) => (
           <div key={i} className={`min-w-full relative ${heightClass}`}>
-            <img src={item.image} alt={item.title || ""} className="w-full h-full object-cover" />
+            <img src={item.image} alt={item.title || ""} className="w-full h-full" style={{ objectFit: imageFit }} />
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
             {(item.title || item.subtitle) && (
               <div className="absolute bottom-0 left-0 right-0 p-6 sm:p-8">

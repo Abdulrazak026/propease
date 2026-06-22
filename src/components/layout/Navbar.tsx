@@ -131,22 +131,22 @@ export default function Navbar() {
     <>
     <header
       className={`lg:hidden h-16 flex items-center pl-4 pr-5 sm:pl-5 sm:pr-6 max-w-[100vw] overflow-hidden transition-all duration-300 ${
-        hpTransparent
-          ? "fixed top-0 z-50 bg-transparent border-transparent rounded-none translate-y-0"
+        isHomepage
+          ? hpTransparent
+            ? "fixed top-0 z-50 -translate-y-full"
+            : "fixed top-0 z-50 bg-white/95 backdrop-blur-md border-b translate-y-0"
           : `sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b rounded-b-2xl ${
               scrolled ? "border-gray-200" : "border-transparent"
             } ${hidden ? "-translate-y-full" : "translate-y-0"}`
       }`}
     >
-      {!hpTransparent && (
-        <Link href="/" className="flex items-center gap-2 min-w-0 flex-shrink">
-          <img src={siteLogo || `https://mbpproperties.com/api/upload/file/7ea15ec8-11b2-4c34-a855-1469d56656a5.png`} alt={siteName} className="h-12 max-h-12 w-auto min-w-[35%] rounded object-contain shrink-0" />
-          <div className="hidden xs:block min-w-0">
-            <p className="text-[10px] font-bold text-gray-900 leading-tight truncate">MUTUAL BENEFIT PREMIER</p>
-            <p className="text-[8px] text-gray-400 leading-tight tracking-wider">PROPERTIES LTD</p>
-          </div>
-        </Link>
-      )}
+      <Link href="/" className="flex items-center gap-2 min-w-0 flex-shrink">
+        <img src={siteLogo || `https://mbpproperties.com/api/upload/file/7ea15ec8-11b2-4c34-a855-1469d56656a5.png`} alt={siteName} className="h-12 max-h-12 w-auto min-w-[35%] rounded object-contain shrink-0" />
+        <div className="hidden xs:block min-w-0">
+          <p className="text-[10px] font-bold text-gray-900 leading-tight truncate">MUTUAL BENEFIT PREMIER</p>
+          <p className="text-[8px] text-gray-400 leading-tight tracking-wider">PROPERTIES LTD</p>
+        </div>
+      </Link>
       <div className="flex-1 min-w-0" />
       {loading ? (
         <div className="w-8 h-8 ml-3" />
@@ -154,7 +154,7 @@ export default function Navbar() {
         <>
           <div ref={notifRef} className="relative shrink-0 ml-3">
             <button onClick={() => { setNotifOpen(!notifOpen); fetchNotifs(); }} className="relative p-1.5">
-              <svg className={`w-5 h-5 ${hpTransparent ? "text-white/90" : "text-gray-600"}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+              <svg className="w-5 h-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" />
               </svg>
               {unreadCount > 0 && (
@@ -202,10 +202,10 @@ export default function Navbar() {
       <div ref={mobileMoreRef} className="relative shrink-0 ml-2">
         <button
           onClick={() => setMobileMoreOpen(!mobileMoreOpen)}
-          className={`w-8 h-8 flex items-center justify-center rounded-full transition-colors ${hpTransparent ? "hover:bg-white/10" : "hover:bg-gray-100"}`}
+          className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors"
           aria-label="More"
         >
-          <svg className={`w-5 h-5 ${hpTransparent ? "text-white/90" : "text-gray-600"}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+          <svg className="w-5 h-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
             <circle cx="12" cy="5" r="1.5" fill="currentColor" stroke="none" />
             <circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none" />
             <circle cx="12" cy="19" r="1.5" fill="currentColor" stroke="none" />
@@ -265,21 +265,21 @@ export default function Navbar() {
     </header>
     <header
       className={`hidden lg:flex h-14 items-center rounded-b-2xl transition-all duration-300 ${
-        hpTransparent
-          ? "fixed top-0 z-50 bg-transparent border-transparent rounded-none translate-y-0"
+        isHomepage
+          ? hpTransparent
+            ? "fixed top-0 z-50 -translate-y-full"
+            : "fixed top-0 z-50 bg-white/95 backdrop-blur-md border-b translate-y-0"
           : `sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b ${
               scrolled ? "border-gray-200" : "border-transparent"
             } ${hidden ? "-translate-y-full" : "translate-y-0"}`
       }`}
     >
       <div className="w-full max-w-[1400px] mx-auto px-6 xl:px-10 flex items-center gap-8">
-        {!hpTransparent && (
-          <Link href="/" className="flex items-center gap-2.5 shrink-0">
-            <img src={siteLogo || `https://mbpproperties.com/api/upload/file/7ea15ec8-11b2-4c34-a855-1469d56656a5.png`} alt={siteName} className="h-10 w-auto rounded-lg object-contain" />
-          </Link>
-        )}
+        <Link href="/" className="flex items-center gap-2.5 shrink-0">
+          <img src={siteLogo || `https://mbpproperties.com/api/upload/file/7ea15ec8-11b2-4c34-a855-1469d56656a5.png`} alt={siteName} className="h-10 w-auto rounded-lg object-contain" />
+        </Link>
 
-        {!hpTransparent && <nav className="flex items-center gap-1">
+        <nav className="flex items-center gap-1">
           {PRIMARY_LINKS.map((link) => {
             const active = pathname === link.href || (link.href !== "/" && pathname.startsWith(link.href));
             return (
@@ -296,7 +296,7 @@ export default function Navbar() {
               </Link>
             );
           })}
-        </nav>}
+        </nav>
 
         <div className="flex-1" />
 
@@ -305,9 +305,7 @@ export default function Navbar() {
             <button
               onClick={() => setMoreOpen(!moreOpen)}
               className={`px-3.5 py-2 text-sm font-medium rounded-md transition-all inline-flex items-center gap-1 ${
-                hpTransparent
-                  ? "text-white/90 hover:text-white hover:bg-white/10"
-                  : moreOpen ? "text-gray-900 bg-gray-50" : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                moreOpen ? "text-gray-900 bg-gray-50" : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
               }`}
             >
               More
@@ -346,7 +344,7 @@ export default function Navbar() {
           {isAuthenticated && currentUser && (
             <div ref={notifRef} className="relative">
               <button onClick={() => { setNotifOpen(!notifOpen); fetchNotifs(); }} className="relative p-2 rounded-full hover:bg-gray-100 transition-colors">
-                <svg className={`w-5 h-5 ${hpTransparent ? "text-white/90" : "text-gray-600"}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <svg className="w-5 h-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" />
                 </svg>
                 {unreadCount > 0 && (
@@ -387,13 +385,13 @@ export default function Navbar() {
             <div ref={userRef} className="relative">
               <button
                 onClick={() => setUserOpen(!userOpen)}
-                className={`flex items-center gap-2.5 pl-1 pr-3 py-1 rounded-full transition-colors ${hpTransparent ? "hover:bg-white/10" : "hover:bg-gray-50"}`}
+                className="flex items-center gap-2.5 pl-1 pr-3 py-1 rounded-full hover:bg-gray-50 transition-colors"
               >
                 <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary-light)] flex items-center justify-center text-white text-xs font-bold shadow-sm">
                   {currentUser.name?.split(" ").map(n => n[0]).join("").slice(0, 2) || "?"}
                 </div>
-                <span className={`text-sm font-medium capitalize hidden xl:inline ${hpTransparent ? "text-white/90" : "text-gray-700"}`}>{currentUser.role === "head" ? "admin" : currentUser.role}</span>
-                <svg className={`w-3.5 h-3.5 transition-transform ${userOpen ? "rotate-180" : ""} ${hpTransparent ? "text-white/70" : "text-gray-400"}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <span className="text-sm text-gray-700 font-medium capitalize hidden xl:inline">{currentUser.role === "head" ? "admin" : currentUser.role}</span>
+                <svg className={`w-3.5 h-3.5 text-gray-400 transition-transform ${userOpen ? "rotate-180" : ""}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
                 </svg>
               </button>

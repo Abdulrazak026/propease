@@ -42,9 +42,9 @@ export default function Footer() {
 
   return (
     <footer className="bg-gray-950 text-gray-400 pb-16 lg:pb-0">
-      <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-10 pt-16 pb-8">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-10 lg:gap-8">
-          <div className="lg:col-span-4 space-y-5">
+      <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-10 pt-10 pb-6">
+        <div className="grid grid-cols-2 lg:grid-cols-12 gap-6 lg:gap-8">
+          <div className="col-span-2 lg:col-span-4 space-y-4">
             <Link href="/" className="inline-flex items-center gap-2.5">
               <div className="w-10 h-10 rounded-lg bg-white flex items-center justify-center">
                 <span className="text-gray-950 font-black text-base">M</span>
@@ -136,7 +136,7 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="mt-14 pt-8 border-t border-gray-800/80 flex flex-col md:flex-row items-start md:items-center justify-between gap-5">
+        <div className="mt-8 pt-6 border-t border-gray-800/80 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           <div className="max-w-md">
             <p className="text-sm font-semibold text-white mb-1">Get new properties by email</p>
             <p className="text-xs text-gray-500">We send fresh listings every Friday. No spam.</p>
@@ -167,7 +167,7 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="mt-10 pt-6 border-t border-gray-800/80 flex flex-col sm:flex-row items-center justify-between gap-3">
+        <div className="mt-6 pt-5 border-t border-gray-800/80 flex flex-col sm:flex-row items-center justify-between gap-3">
           <p className="text-xs text-gray-500">
             Copyright &copy; {new Date().getFullYear()} Mutual Benefit Premier Properties Ltd. All rights reserved.
           </p>
