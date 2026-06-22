@@ -283,109 +283,96 @@ export default function HomePage() {
       <SoldPropertiesGallery />
 
       {/* VERIFIED PROPERTIES */}
-      <section className="bg-white py-16 sm:py-20">
+      <section className="bg-white py-10 sm:py-16">
         <div className="max-w-[1400px] mx-auto px-5 sm:px-6 lg:px-10">
-          <div className="flex flex-col sm:flex-row items-center gap-6 sm:gap-8">
-            <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-emerald-50 flex items-center justify-center shrink-0">
-              <svg className="w-14 h-14 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
-              </svg>
+          <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-8">
+            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-emerald-50 flex items-center justify-center shrink-0">
+              <i className="bi bi-shield-fill-check text-emerald-600 text-2xl sm:text-3xl"></i>
             </div>
             <div className="text-center sm:text-left">
-              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">VERIFIED PROPERTIES</h2>
-              <p className="text-gray-600 mt-2 max-w-xl">Every property we sell is 100% verified through due diligence and transparency.</p>
+              <h2 className="text-xl sm:text-3xl font-bold text-gray-900">VERIFIED PROPERTIES</h2>
+              <p className="text-sm sm:text-base text-gray-600 mt-1 sm:mt-2 max-w-xl">Every property we sell is 100% verified through due diligence and transparency.</p>
             </div>
           </div>
         </div>
       </section>
 
       {/* OUR PROMISE TO YOU */}
-      <section className="bg-gray-50 py-16 sm:py-20">
+      <section className="bg-gray-50 py-10 sm:py-16">
         <div className="max-w-[1400px] mx-auto px-5 sm:px-6 lg:px-10">
-          <div className="flex flex-col sm:flex-row items-center gap-6 sm:gap-8">
-            <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-amber-50 flex items-center justify-center shrink-0">
-              <svg className="w-14 h-14 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
-              </svg>
+          <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-8">
+            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-amber-50 flex items-center justify-center shrink-0">
+              <i className="bi bi-shield-check text-amber-600 text-2xl sm:text-3xl"></i>
             </div>
             <div className="text-center sm:text-left">
-              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">OUR PROMISE TO YOU</h2>
-              <p className="text-gray-600 mt-2 max-w-xl">For any issue related to purchased properties, MBPP takes 100% responsibility. Your peace of mind is our commitment.</p>
+              <h2 className="text-xl sm:text-3xl font-bold text-gray-900">OUR PROMISE TO YOU</h2>
+              <p className="text-sm sm:text-base text-gray-600 mt-1 sm:mt-2 max-w-xl">For any issue related to purchased properties, MBPP takes 100% responsibility. Your peace of mind is our commitment.</p>
             </div>
           </div>
         </div>
       </section>
 
       {/* WHAT WE OFFER */}
-      <section className="bg-white py-16 sm:py-20">
+      <section className="bg-white py-10 sm:py-16">
         <div className="max-w-[1400px] mx-auto px-5 sm:px-6 lg:px-10">
-          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 text-center mb-10">WHAT WE OFFER</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="bg-white rounded-2xl border border-gray-100 p-8 text-center hover:shadow-lg transition-shadow group">
-              <div className="w-16 h-16 bg-emerald-50 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:bg-emerald-100 transition-colors">
-                <svg className="w-8 h-8 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 6.75V15m6-6v8.25m.503 3.498l4.875-2.437c.381-.19.622-.58.622-1.006V4.82c0-.836-.88-1.38-1.628-1.006l-3.869 1.934c-.317.159-.69.159-1.006 0L9.503 3.252a1.125 1.125 0 00-1.006 0L3.622 5.689C3.24 5.88 3 6.27 3 6.695V19.18c0 .836.88 1.38 1.628 1.006l3.869-1.934c.317-.159.69-.159 1.006 0l4.994 2.497c.317.158.69.158 1.006 0z" />
-                </svg>
+          <h2 className="text-xl sm:text-3xl font-bold text-gray-900 text-center mb-6 sm:mb-10">WHAT WE OFFER</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
+            <div className="bg-white rounded-2xl border border-gray-100 p-6 sm:p-8 text-center hover:shadow-lg transition-shadow group">
+              <div className="w-12 h-12 sm:w-16 sm:h-16 bg-emerald-50 rounded-2xl flex items-center justify-center mx-auto mb-3 sm:mb-4 group-hover:bg-emerald-100 transition-colors">
+                <i className="bi bi-map-fill text-emerald-600 text-xl sm:text-2xl"></i>
               </div>
-              <h3 className="text-lg font-bold text-gray-900">WE SELL LANDS</h3>
-              <p className="text-sm text-gray-600 mt-2">Genuine plots in prime locations with secure titles</p>
+              <h3 className="text-base sm:text-lg font-bold text-gray-900">WE SELL LANDS</h3>
+              <p className="text-xs sm:text-sm text-gray-600 mt-1 sm:mt-2">Genuine plots in prime locations with secure titles</p>
             </div>
-            <div className="bg-white rounded-2xl border border-gray-100 p-8 text-center hover:shadow-lg transition-shadow group">
-              <div className="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:bg-blue-100 transition-colors">
-                <svg className="w-8 h-8 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3.75h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008z" />
-                </svg>
+            <div className="bg-white rounded-2xl border border-gray-100 p-6 sm:p-8 text-center hover:shadow-lg transition-shadow group">
+              <div className="w-12 h-12 sm:w-16 sm:h-16 bg-blue-50 rounded-2xl flex items-center justify-center mx-auto mb-3 sm:mb-4 group-hover:bg-blue-100 transition-colors">
+                <i className="bi bi-house-fill text-blue-600 text-xl sm:text-2xl"></i>
               </div>
-              <h3 className="text-lg font-bold text-gray-900">WE BUILD HOUSES</h3>
-              <p className="text-sm text-gray-600 mt-2">From foundation to finishing, we build quality homes tailored to your needs</p>
+              <h3 className="text-base sm:text-lg font-bold text-gray-900">WE BUILD HOUSES</h3>
+              <p className="text-xs sm:text-sm text-gray-600 mt-1 sm:mt-2">From foundation to finishing, we build quality homes tailored to your needs</p>
             </div>
-            <div className="bg-white rounded-2xl border border-gray-100 p-8 text-center hover:shadow-lg transition-shadow group">
-              <div className="w-16 h-16 bg-purple-50 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:bg-purple-100 transition-colors">
-                <svg className="w-8 h-8 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3.75h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008z" />
-                </svg>
-                <svg className="w-5 h-5 text-purple-600 -ml-6 mt-4" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
-                </svg>
+            <div className="bg-white rounded-2xl border border-gray-100 p-6 sm:p-8 text-center hover:shadow-lg transition-shadow group">
+              <div className="w-12 h-12 sm:w-16 sm:h-16 bg-purple-50 rounded-2xl flex items-center justify-center mx-auto mb-3 sm:mb-4 group-hover:bg-purple-100 transition-colors">
+                <i className="bi bi-buildings-fill text-purple-600 text-xl sm:text-2xl"></i>
               </div>
-              <h3 className="text-lg font-bold text-gray-900">WE SELL COMPLETED HOUSES</h3>
-              <p className="text-sm text-gray-600 mt-2">Move-in ready homes with modern finishing and quality construction</p>
+              <h3 className="text-base sm:text-lg font-bold text-gray-900">WE SELL COMPLETED HOUSES</h3>
+              <p className="text-xs sm:text-sm text-gray-600 mt-1 sm:mt-2">Move-in ready homes with modern finishing and quality construction</p>
             </div>
           </div>
         </div>
       </section>
 
       {/* OUR COMPLETED PROJECTS */}
-      <section className="bg-gray-50 py-16 sm:py-20">
+      <section className="bg-gray-50 py-10 sm:py-16">
         <div className="max-w-[1400px] mx-auto px-5 sm:px-6 lg:px-10">
-          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 text-center mb-4">OUR COMPLETED PROJECTS</h2>
-          <p className="text-gray-500 text-center mb-8 max-w-xl mx-auto">Take a look at some of our delivered projects across Kano &amp; Northern Nigeria</p>
+          <h2 className="text-xl sm:text-3xl font-bold text-gray-900 text-center mb-3 sm:mb-4">OUR COMPLETED PROJECTS</h2>
+          <p className="text-xs sm:text-base text-gray-500 text-center mb-6 sm:mb-8 max-w-xl mx-auto">Take a look at some of our delivered projects across Kano &amp; Northern Nigeria</p>
           <AutoCarousel items={PLACEHOLDER_PROJECTS} />
         </div>
       </section>
 
       {/* OUR DEVELOPMENTS IN PROGRESS */}
-      <section className="bg-white py-16 sm:py-20">
+      <section className="bg-white py-10 sm:py-16">
         <div className="max-w-[1400px] mx-auto px-5 sm:px-6 lg:px-10">
-          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 text-center mb-4">OUR DEVELOPMENTS IN PROGRESS</h2>
-          <p className="text-gray-500 text-center mb-8 max-w-xl mx-auto">Ongoing projects taking shape across prime locations</p>
+          <h2 className="text-xl sm:text-3xl font-bold text-gray-900 text-center mb-3 sm:mb-4">OUR DEVELOPMENTS IN PROGRESS</h2>
+          <p className="text-xs sm:text-base text-gray-500 text-center mb-6 sm:mb-8 max-w-xl mx-auto">Ongoing projects taking shape across prime locations</p>
           <AutoCarousel items={PLACEHOLDER_DEVELOPMENTS} />
         </div>
       </section>
 
       {/* OUR LANDS */}
-      <section className="bg-gray-50 py-16 sm:py-20">
+      <section className="bg-gray-50 py-10 sm:py-16">
         <div className="max-w-[1400px] mx-auto px-5 sm:px-6 lg:px-10">
-          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 text-center mb-4">OUR LANDS</h2>
-          <p className="text-gray-500 text-center mb-8 max-w-xl mx-auto">Prime land parcels with genuine titles and secure transactions</p>
+          <h2 className="text-xl sm:text-3xl font-bold text-gray-900 text-center mb-3 sm:mb-4">OUR LANDS</h2>
+          <p className="text-xs sm:text-base text-gray-500 text-center mb-6 sm:mb-8 max-w-xl mx-auto">Prime land parcels with genuine titles and secure transactions</p>
           <AutoCarousel items={PLACEHOLDER_LANDS} />
         </div>
       </section>
 
       {/* WHY BUY FROM MBPP */}
-      <section className="bg-white py-16 sm:py-20">
+      <section className="bg-white py-10 sm:py-16">
         <div className="max-w-[1400px] mx-auto px-5 sm:px-6 lg:px-10">
-          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 text-center mb-10">WHY BUY FROM MBPP?</h2>
+          <h2 className="text-xl sm:text-3xl font-bold text-gray-900 text-center mb-6 sm:mb-10">WHY BUY FROM MBPP?</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {[
               { title: "Verified & Genuine Properties", icon: "bi-shield-fill-check", color: "text-emerald-500", bg: "bg-emerald-50" },
@@ -407,18 +394,18 @@ export default function HomePage() {
       </section>
 
       {/* MEET OUR TEAM - Staff Carousel */}
-      <section className="bg-gray-50 py-16 sm:py-20">
+      <section className="bg-gray-50 py-10 sm:py-16">
         <div className="max-w-[1400px] mx-auto px-5 sm:px-6 lg:px-10">
-          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 text-center mb-4">MEET OUR TEAM</h2>
-          <p className="text-gray-500 text-center mb-8 max-w-xl mx-auto">Get to know the dedicated professionals behind MBPP</p>
+          <h2 className="text-xl sm:text-3xl font-bold text-gray-900 text-center mb-3 sm:mb-4">MEET OUR TEAM</h2>
+          <p className="text-xs sm:text-base text-gray-500 text-center mb-6 sm:mb-8 max-w-xl mx-auto">Get to know the dedicated professionals behind MBPP</p>
           <AutoCarousel items={staffItems} heightClass="h-80 sm:h-96" />
         </div>
       </section>
 
       {/* WHY CHOOSE US */}
-      <section className="bg-white py-16 sm:py-20">
+      <section className="bg-white py-10 sm:py-16">
         <div className="max-w-[1400px] mx-auto px-5 sm:px-6 lg:px-10">
-          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 text-center mb-10">WHY CHOOSE US?</h2>
+          <h2 className="text-xl sm:text-3xl font-bold text-gray-900 text-center mb-6 sm:mb-10">WHY CHOOSE US?</h2>
           <div className="max-w-2xl mx-auto space-y-4">
             {[
               { text: "Professional & experienced team", icon: "bi-award-fill", color: "text-amber-500" },
