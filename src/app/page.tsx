@@ -15,6 +15,12 @@ interface ResearchReport { title: string; date: string; summary: string; metrics
 interface TeamMember { name: string; role: string; bio?: string; photo?: string; }
 
 const INITIAL_SHOW = 6;
+
+const PLACEHOLDER_LANDS = [
+  { image: "https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=800&h=500&fit=crop", title: "Prime Plot, Tarauni", subtitle: "500 sqm, title documents ready" },
+  { image: "https://images.unsplash.com/photo-1464146072230-91cabc968266?w=800&h=500&fit=crop", title: "Commercial Land, Kano Municipal", subtitle: "2,000 sqm, high traffic area" },
+  { image: "https://images.unsplash.com/photo-1500076656116-558758c991c1?w=800&h=500&fit=crop", title: "Residential Plot, Nassarawa", subtitle: "300 sqm, quiet neighborhood" },
+];
 const LOAD_MORE = 6;
 
 const CATEGORY_PILLS = [
@@ -165,8 +171,8 @@ export default function HomePage() {
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--color-primary)_0%,_transparent_60%)] opacity-25 mix-blend-screen" />
         </div>
 
-        <div className="relative w-full max-w-[1400px] mx-auto px-5 sm:px-6 lg:px-10 pt-14 sm:pt-20 lg:pt-24 pb-20 sm:pb-24 lg:pb-32" style={{ opacity: heroOpacity }}>
-          <div className="flex flex-col items-center text-center">
+        <div className="relative w-full max-w-[1400px] mx-auto px-5 sm:px-6 lg:px-10 pt-24 sm:pt-28 lg:pt-36 pb-16 sm:pb-20 lg:pb-24" style={{ opacity: heroOpacity }}>
+          <div className="flex flex-col justify-center items-center text-center min-h-[30vh] sm:min-h-[35vh]">
             <img
               src={getSetting("site_logo") || `https://mbpproperties.com/api/upload/file/7ea15ec8-11b2-4c34-a855-1469d56656a5.png`}
               alt={siteName}
@@ -384,12 +390,22 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* MEET OUR TEAM - Staff Carousel */}
+      {/* MEET OUR TEAM */}
       <section className="bg-gray-50 py-10 sm:py-16">
         <div className="max-w-[1400px] mx-auto px-5 sm:px-6 lg:px-10">
           <h2 className="text-xl sm:text-3xl font-bold text-gray-900 text-center mb-3 sm:mb-4">MEET OUR TEAM</h2>
           <p className="text-xs sm:text-base text-gray-500 text-center mb-6 sm:mb-8 max-w-xl mx-auto">Get to know the dedicated professionals behind MBPP</p>
-          <AutoCarousel items={staffItems} heightClass="h-56 sm:h-64" imageFit="contain" />
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 sm:gap-6">
+            {staffItems.map((member) => (
+              <div key={member.title} className="text-center">
+                <div className="aspect-square rounded-xl overflow-hidden bg-gray-200">
+                  <img src={member.image} alt={member.title} className="w-full h-full object-cover" />
+                </div>
+                <p className="text-sm font-semibold text-gray-900 mt-2">{member.title}</p>
+                <p className="text-xs text-gray-500">{member.subtitle}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
@@ -416,20 +432,6 @@ export default function HomePage() {
           </div>
         </section>
       )}
-
-      <section className="bg-gray-50 border-y border-gray-100">
-        <div className="max-w-[1400px] mx-auto px-5 sm:px-6 lg:px-10 py-10 sm:py-14">
-          <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-2">Find Property in Northern Nigeria</h2>
-          <p className="text-sm text-gray-600 mb-4 max-w-2xl">Whether you are looking to buy, rent, or sell — we have verified properties across Northern Nigeria. Gidan siyarwa, gidan haya, flats, land, and commercial spaces.</p>
-          <div className="flex flex-wrap gap-2">
-            {["House for sale", "Gidan siyarwa", "House for rent", "Gidan haya", "Flat", "Land for sale", "Plaza", "Shop", "Commercial property", "Sell house", "Sayar da gida"].map(tag => (
-              <Link key={tag} href={`/list-property?search=${encodeURIComponent(tag)}`} className="px-3 py-1.5 bg-white border border-gray-200 rounded-full text-xs text-gray-600 hover:border-[var(--color-primary)] hover:text-[var(--color-primary)] transition-colors">
-                {tag}
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
 
       <Footer />
     </div>

@@ -130,7 +130,7 @@ export default function Navbar() {
   return (
     <>
     <header
-      className={`lg:hidden h-16 flex items-center pl-4 pr-5 sm:pl-5 sm:pr-6 max-w-[100vw] overflow-hidden transition-all duration-300 ${
+      className={`lg:hidden h-16 flex items-center pl-4 pr-5 sm:pl-5 sm:pr-6 w-full transition-all duration-300 ${
         isHomepage
           ? hpTransparent
             ? "fixed top-0 z-50 -translate-y-full"
@@ -140,13 +140,27 @@ export default function Navbar() {
             } ${hidden ? "-translate-y-full" : "translate-y-0"}`
       }`}
     >
-      <Link href="/" className="flex items-center gap-2 min-w-0 flex-shrink">
-        <img src={siteLogo || `https://mbpproperties.com/api/upload/file/7ea15ec8-11b2-4c34-a855-1469d56656a5.png`} alt={siteName} className="h-12 max-h-12 w-auto min-w-[35%] rounded object-contain shrink-0" />
-        <div className="hidden xs:block min-w-0">
-          <p className="text-[10px] font-bold text-gray-900 leading-tight truncate">MUTUAL BENEFIT PREMIER</p>
-          <p className="text-[8px] text-gray-400 leading-tight tracking-wider">PROPERTIES LTD</p>
-        </div>
+      <Link href="/" className="flex items-center gap-2 shrink-0">
+        <img src={siteLogo || `https://mbpproperties.com/api/upload/file/7ea15ec8-11b2-4c34-a855-1469d56656a5.png`} alt={siteName} className="h-10 w-auto rounded object-contain" />
       </Link>
+      <nav className="flex items-center gap-0.5 ml-2 overflow-x-auto scrollbar-hide">
+        {PRIMARY_LINKS.map((link) => {
+          const active = pathname === link.href || (link.href !== "/" && pathname.startsWith(link.href));
+          return (
+            <Link
+              key={link.label}
+              href={link.href}
+              className={`shrink-0 px-2 py-1 text-[11px] font-medium rounded-md transition-all ${
+                active
+                  ? "text-[var(--color-primary)] bg-[var(--color-primary)]/8"
+                  : "text-gray-600 hover:text-gray-900"
+              }`}
+            >
+              {link.label}
+            </Link>
+          );
+        })}
+      </nav>
       <div className="flex-1 min-w-0" />
       {loading ? (
         <div className="w-8 h-8 ml-3" />
