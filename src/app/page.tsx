@@ -15,12 +15,6 @@ interface ResearchReport { title: string; date: string; summary: string; metrics
 interface TeamMember { name: string; role: string; bio?: string; photo?: string; }
 
 const INITIAL_SHOW = 6;
-
-const PLACEHOLDER_LANDS = [
-  { image: "https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=800&h=500&fit=crop", title: "Prime Plot, Tarauni", subtitle: "500 sqm, title documents ready" },
-  { image: "https://images.unsplash.com/photo-1464146072230-91cabc968266?w=800&h=500&fit=crop", title: "Commercial Land, Kano Municipal", subtitle: "2,000 sqm, high traffic area" },
-  { image: "https://images.unsplash.com/photo-1500076656116-558758c991c1?w=800&h=500&fit=crop", title: "Residential Plot, Nassarawa", subtitle: "300 sqm, quiet neighborhood" },
-];
 const LOAD_MORE = 6;
 
 const CATEGORY_PILLS = [
@@ -42,12 +36,6 @@ const PLACEHOLDER_DEVELOPMENTS = [
   { image: "https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?w=800&h=500&fit=crop", title: "Green Valley Estate", subtitle: "Phase 2 construction ongoing" },
   { image: "https://images.unsplash.com/photo-1590674899484-d5640f854633?w=800&h=500&fit=crop", title: "City Center Towers", subtitle: "12-storey commercial complex" },
   { image: "https://images.unsplash.com/photo-1574362848149-11496d93a7c7?w=800&h=500&fit=crop", title: "Harmony Heights", subtitle: "Luxury hilltop development" },
-];
-
-const PLACEHOLDER_LANDS = [
-  { image: "https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=800&h=500&fit=crop", title: "Prime Plot, Tarauni", subtitle: "500 sqm, title documents ready" },
-  { image: "https://images.unsplash.com/photo-1464146072230-91cabc968266?w=800&h=500&fit=crop", title: "Commercial Land, Kano Municipal", subtitle: "2,000 sqm, high traffic area" },
-  { image: "https://images.unsplash.com/photo-1500076656116-558758c991c1?w=800&h=500&fit=crop", title: "Residential Plot, Nassarawa", subtitle: "300 sqm, quiet neighborhood" },
 ];
 
 const SOCIAL_PLATFORMS = [
