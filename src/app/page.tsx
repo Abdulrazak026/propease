@@ -66,6 +66,7 @@ export default function HomePage() {
   const siteName = getSetting("site_name", "MBPP");
   const siteTagline = getSetting("site_tagline", "Find Your Dream Property in Kano & Northern States");
   const heroRef = useRef<HTMLElement>(null);
+  const [heroOpacity, setHeroOpacity] = useState(1);
   const [showCount, setShowCount] = useState(INITIAL_SHOW);
   const [cities, setCities] = useState<City[]>([]);
   const [posts, setPosts] = useState<BlogPost[]>([]);
@@ -77,6 +78,14 @@ export default function HomePage() {
 
   let teamMembers: TeamMember[] = [];
   try { const raw = getSetting("team_members"); if (raw) teamMembers = JSON.parse(raw); } catch {}
+
+  useEffect(() => {
+    const handler = () => {
+      setHeroOpacity(Math.max(0, Math.min(1, 1 - window.scrollY / (window.innerHeight * 0.6))));
+    };
+    window.addEventListener("scroll", handler, { passive: true });
+    return () => window.removeEventListener("scroll", handler);
+  }, []);
 
   useEffect(() => {
     fetch("https://mbpproperties.com/api/blog").then(r => r.json()).then(d => {
@@ -149,24 +158,25 @@ export default function HomePage() {
 
   return (
     <div className="flex flex-col">
-      <section ref={heroRef} className="relative bg-gray-950 overflow-hidden">
+      <section ref={heroRef} className="relative bg-gray-950 overflow-hidden min-h-screen flex items-center">
         <div className="absolute inset-0">
           {!settingsLoading && <img src={heroImage} alt="MBPP Properties - Find verified houses, land and flats in Kano & Northern States, Nigeria" className="w-full h-full object-cover opacity-65 transition-opacity duration-500" />}
           <div className="absolute inset-0 bg-gradient-to-b from-gray-950/40 via-gray-950/25 to-gray-950" />
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--color-primary)_0%,_transparent_60%)] opacity-25 mix-blend-screen" />
         </div>
 
-        <div className="relative max-w-[1400px] mx-auto px-5 sm:px-6 lg:px-10 pt-14 sm:pt-20 lg:pt-24 pb-20 sm:pb-24 lg:pb-32">
-          <div className="max-w-3xl">
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 backdrop-blur-sm border border-white/10 text-white/70 text-xs font-medium mb-6">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-              Now serving across Northern Nigeria
-            </div>
-            <h1 className="text-4xl sm:text-5xl lg:text-7xl font-bold text-white leading-[1.05] tracking-tight">
-              Find Your Property<br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-300 via-teal-200 to-emerald-400">in Kano &amp; other northern states.</span>
-            </h1>
-            <p className="text-base sm:text-lg text-white/60 mt-5 sm:mt-6 max-w-xl leading-relaxed">
+        <div className="relative w-full max-w-[1400px] mx-auto px-5 sm:px-6 lg:px-10 py-24 sm:py-32 lg:py-40" style={{ opacity: heroOpacity }}>
+          <div className="flex flex-col items-center text-center">
+            <img
+              src={getSetting("site_logo") || `https://mbpproperties.com/api/upload/file/7ea15ec8-11b2-4c34-a855-1469d56656a5.png`}
+              alt={siteName}
+              className="h-28 sm:h-36 lg:h-44 w-auto rounded-lg object-contain mb-8 sm:mb-10"
+            />
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white leading-tight tracking-tight max-w-2xl">
+              Find Your Property in<br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-300 via-teal-200 to-emerald-400">Kano &amp; other northern states</span>
+            </h2>
+            <p className="text-sm sm:text-base text-white/60 mt-4 sm:mt-5 max-w-xl leading-relaxed">
               Trusted properties. Verified listings. Happy clients.
             </p>
           </div>
