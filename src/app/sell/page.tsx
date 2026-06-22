@@ -118,8 +118,6 @@ export default async function SellPage() {
             <li><strong>MBPP Approval:</strong> All listings are subject to MBPP verification and approval before publication.</li>
             <li><strong>Notification Requirement:</strong> Sellers must notify MBPP of any price changes, pending offers, or withdrawal of listing within 24 hours.</li>
             <li><strong>Commission:</strong> MBPP charges a commission on successful transactions. Rates depend on the service tier selected at listing.</li>
-            <li><strong>Rent Only (Option 1):</strong> After handover to the tenant, MBPP is not responsible for any damage to the property or illegal activity carried out by the tenant.</li>
-            <li><strong>Rent &amp; Maintenance (Option 2):</strong> MBPP remains the overseer of the property and is 100% responsible for the property throughout the duration of the tenancy agreement.</li>
           </ul>
         </div>
       </section>

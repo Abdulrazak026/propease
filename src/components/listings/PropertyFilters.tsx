@@ -30,7 +30,7 @@ export default function PropertyFilters({ onFilterChange }: PropertyFiltersProps
   const cities = ["All Cities", ...parsed.map(c => c.city)];
 
   const [selectedState, setSelectedState] = useState("All States");
-  const [filteredCities, setFilteredCities] = useState(cities);
+  const [filteredCities, setFilteredCities] = useState<string[]>([]);
   const [filters, setFilters] = useState<FilterState>({
     search: "", propertyType: "", listingType: "", rentTier: "",
     category: "", city: "", state: "", minPrice: "", maxPrice: "",
@@ -49,7 +49,7 @@ export default function PropertyFilters({ onFilterChange }: PropertyFiltersProps
   const handleStateChange = (state: string) => {
     setSelectedState(state);
     if (state === "All States") {
-      setFilteredCities(["All Cities", ...parsed.map(c => c.city)]);
+      setFilteredCities([]);
       update("state", "");
     } else {
       const cs = parsed.filter(c => c.state === state).map(c => c.city);
@@ -92,9 +92,9 @@ export default function PropertyFilters({ onFilterChange }: PropertyFiltersProps
           className="min-h-[44px] rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)]">
           {uniqueStates.map((s) => <option key={s} value={s}>{s}</option>)}
         </select>
-        <select value={filters.city} onChange={(e) => update("city", e.target.value)}
-          className="min-h-[44px] rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)]">
-          {filteredCities.map((c) => <option key={c} value={c === "All Cities" ? "" : c}>{c}</option>)}
+        <select value={filters.city} onChange={(e) => update("city", e.target.value)} disabled={selectedState === "All States"}
+          className={`min-h-[44px] rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)] ${selectedState === "All States" ? "opacity-50 cursor-not-allowed" : ""}`}>
+          {selectedState === "All States" ? <option value="">Select a state first</option> : filteredCities.map((c) => <option key={c} value={c === "All Cities" ? "" : c}>{c}</option>)}
         </select>
       </div>
 
@@ -165,9 +165,9 @@ export default function PropertyFilters({ onFilterChange }: PropertyFiltersProps
             className="rounded-md border border-gray-300 bg-white px-2 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)]">
             {uniqueStates.map((s) => <option key={s} value={s}>{s}</option>)}
           </select>
-          <select value={filters.city} onChange={(e) => update("city", e.target.value)}
-            className="rounded-md border border-gray-300 bg-white px-2 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)]">
-            {filteredCities.map((c) => <option key={c} value={c === "All Cities" ? "" : c}>{c}</option>)}
+          <select value={filters.city} onChange={(e) => update("city", e.target.value)} disabled={selectedState === "All States"}
+            className={`rounded-md border border-gray-300 bg-white px-2 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)] ${selectedState === "All States" ? "opacity-50 cursor-not-allowed" : ""}`}>
+            {selectedState === "All States" ? <option value="">Select state first</option> : filteredCities.map((c) => <option key={c} value={c === "All Cities" ? "" : c}>{c}</option>)}
           </select>
           <div className="relative">
             <span className="absolute left-2 top-1/2 -translate-y-1/2 text-gray-400 text-xs">&#8358;</span>
