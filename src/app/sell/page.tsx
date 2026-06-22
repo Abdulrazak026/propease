@@ -101,8 +101,8 @@ export default async function SellPage() {
             <p className="text-sm text-gray-600 leading-relaxed mb-4">
               MBPP lists, rents, and maintains your property. We remain the overseer throughout the entire agreement period.
             </p>
-            <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-3">
-              <p className="text-xs text-emerald-800 leading-relaxed">
+            <div className="bg-brand-blue/5 border border-brand-blue/10 rounded-lg p-3">
+              <p className="text-xs text-brand-blue leading-relaxed">
                 <strong>Full responsibility:</strong> MBPP remains overseer and is 100% responsible for the property during the tenancy agreement period.
               </p>
             </div>

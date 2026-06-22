@@ -67,7 +67,7 @@ export default function CareersPage() {
       <section className="relative bg-gray-950 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-[var(--color-primary)]/20 via-transparent to-emerald-900/10" />
         <div className="relative max-w-[1100px] mx-auto px-5 sm:px-6 lg:px-10 pt-20 sm:pt-28 pb-16 sm:pb-24">
-          <p className="text-xs font-semibold text-emerald-400 uppercase tracking-[0.15em] mb-4">Careers</p>
+          <p className="text-xs font-semibold text-brand-gold uppercase tracking-[0.15em] mb-4">Careers</p>
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white leading-[1.1] tracking-tight">
             Work with us
           </h1>

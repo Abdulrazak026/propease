@@ -285,8 +285,8 @@ export default function ReservationsPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={() => setDetailRes(null)}>
           <div className="absolute inset-0 bg-black/40" />
           <div className="relative bg-white rounded-2xl max-w-md w-full shadow-2xl overflow-hidden" onClick={e => e.stopPropagation()}>
-            <div className="bg-gradient-to-r from-emerald-600 to-teal-600 px-5 py-4 flex items-center justify-between">
-              <div><h3 className="text-base font-bold text-white truncate max-w-[260px]">{detailRes.listing?.title || "Property"}</h3><p className="text-xs text-emerald-100">{detailRes.listing?.address || ""}</p></div>
+            <div className="bg-gradient-to-r from-brand-blue to-brand-blue-light px-5 py-4 flex items-center justify-between">
+              <div><h3 className="text-base font-bold text-white truncate max-w-[260px]">{detailRes.listing?.title || "Property"}</h3><p className="text-xs text-brand-blue/60">{detailRes.listing?.address || ""}</p></div>
               <button onClick={() => setDetailRes(null)} className="text-white/80 hover:text-white"><i className="bi bi-x-lg text-sm"></i></button>
             </div>
             <div className="p-5 space-y-4">

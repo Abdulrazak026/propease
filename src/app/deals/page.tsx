@@ -21,7 +21,7 @@ interface Transaction {
 type Tab = "reservations" | "transactions";
 
 function statusBadge(s: string) {
-  if (s === "confirmed") return "bg-emerald-100 text-emerald-700";
+  if (s === "confirmed") return "bg-brand-blue/10 text-brand-blue";
   if (s === "pending" || s === "pending_payment") return "bg-amber-100 text-amber-700";
   if (s === "cancelled") return "bg-red-100 text-red-600";
   return "bg-gray-100 text-gray-500";
@@ -38,10 +38,10 @@ function DetailModal({ r, onClose, onCancel, onReschedule }: { r: Reservation; o
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={onClose}>
       <div className="absolute inset-0 bg-black/40" />
       <div className="relative bg-white rounded-2xl max-w-md w-full shadow-2xl overflow-hidden" onClick={e => e.stopPropagation()}>
-        <div className="bg-gradient-to-r from-emerald-600 to-teal-600 px-5 py-4 flex items-center justify-between">
+        <div className="bg-gradient-to-r from-brand-blue to-brand-blue-light px-5 py-4 flex items-center justify-between">
           <div>
             <h3 className="text-base font-bold text-white truncate max-w-[260px]">{r.listing?.title || "Property"}</h3>
-            <p className="text-xs text-emerald-100">{r.listing?.address || "Kano"}</p>
+            <p className="text-xs text-brand-blue/60">{r.listing?.address || "Kano"}</p>
           </div>
           <button onClick={onClose} className="text-white/80 hover:text-white"><i className="bi bi-x-lg text-sm"></i></button>
         </div>

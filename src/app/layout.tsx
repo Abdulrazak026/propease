@@ -49,7 +49,7 @@ export async function generateMetadata(): Promise<Metadata> {
     twitter: { card: "summary_large_image", title: s.meta_title || "MBPP", description: s.meta_description || "", images: s.og_image ? [s.og_image] : [] },
     alternates: { canonical: s.seo_canonical_url || "https://mbpproperties.com/" },
     other: {
-      "theme-color": s.primary_color || "#0D6B3D",
+      "theme-color": s.primary_color || "#1a365d",
       "mobile-web-app-capable": "yes",
       "apple-mobile-web-app-capable": "yes",
       "apple-mobile-web-app-status-bar-style": "default",

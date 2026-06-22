@@ -187,8 +187,8 @@ export default function Navbar() {
           </svg>
         </button>
         {mobileMoreOpen && (
-          <div className="absolute top-full right-0 mt-2 w-64 bg-white rounded-xl border border-gray-100 shadow-xl shadow-gray-900/5 p-2 z-50">
-            <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider px-1 pb-2">More</p>
+          <div className="absolute top-full right-0 mt-2 w-64 bg-gray-900 rounded-xl border border-white/10 shadow-xl shadow-black/20 p-2 z-50">
+            <p className="text-[11px] font-semibold text-brand-gold uppercase tracking-wider px-1 pb-2">More</p>
             <div>
               {MORE_LINKS.map((item, i) => {
                 const isSignIn = item.href === "/login";
@@ -198,13 +198,13 @@ export default function Navbar() {
                 const actualLabel = isAuthenticated && isSignIn ? "Dashboard" : item.label;
                 return (
                   <div key={item.href}>
-                    {i > 0 && <div className="border-t border-gray-100 mx-2" />}
+                    {i > 0 && <div className="border-t border-white/10 mx-2" />}
                     <Link
                       href={actualHref}
                       onClick={() => setMobileMoreOpen(false)}
-                      className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors group text-sm sm:text-base text-gray-700 hover:text-gray-900"
+                      className="flex items-center gap-3 p-3 rounded-lg hover:bg-white/10 transition-colors group text-sm sm:text-base text-white/80 hover:text-white"
                     >
-                      <span className="text-gray-400 group-hover:text-[var(--color-primary)]">{item.label[0]}</span>
+                      <span className="text-brand-gold">{item.label[0]}</span>
                       <span>{actualLabel}</span>
                     </Link>
                   </div>
@@ -212,12 +212,12 @@ export default function Navbar() {
               })}
               {isAuthenticated && (
                 <>
-                  <div className="border-t border-gray-100 mx-2" />
+                  <div className="border-t border-white/10 mx-2" />
                   <button
                     onClick={() => { handleLogout(); setMobileMoreOpen(false); }}
-                    className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-red-50 transition-colors text-sm text-red-600"
+                    className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-white/10 transition-colors text-sm text-red-400"
                   >
-                    <span className="text-red-400">S</span>
+                    <span className="text-red-500">S</span>
                     <span>Sign Out</span>
                   </button>
                 </>
@@ -293,7 +293,7 @@ export default function Navbar() {
               </svg>
             </button>
             {moreOpen && (
-              <div className="absolute top-full right-0 mt-2 w-72 bg-white rounded-xl border border-gray-100 shadow-xl shadow-gray-900/5 p-2 z-50">
+              <div className="absolute top-full right-0 mt-2 w-72 bg-gray-50 rounded-xl border border-gray-200 shadow-xl shadow-gray-900/5 p-2 z-50">
                 {MORE_LINKS.map((item, i) => {
                   const isSignIn = item.href === "/login";
                   const actualHref = isAuthenticated && isSignIn

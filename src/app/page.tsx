@@ -182,18 +182,18 @@ export default function HomePage() {
 
   return (
     <div className="flex flex-col">
-      <section ref={heroRef} className="relative bg-gray-950 overflow-hidden">
+      <section ref={heroRef} className="relative bg-brand-dark overflow-hidden">
         <div className="absolute inset-0">
           {!settingsLoading && <img src={heroImage} alt="MBPP Properties - Find verified houses, land and flats in Kano & Northern States, Nigeria" className="w-full h-full object-cover opacity-65 transition-opacity duration-500" />}
-          <div className="absolute inset-0 bg-gradient-to-b from-gray-950/20 via-gray-950/15 to-gray-950/80" />
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--color-primary)_0%,_transparent_60%)] opacity-25 mix-blend-screen" />
+          <div className="absolute inset-0 bg-gradient-to-b from-brand-dark/20 via-brand-dark/15 to-brand-dark/80" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--color-accent)_0%,_transparent_60%)] opacity-20 mix-blend-screen" />
         </div>
 
-        <div className="relative w-full max-w-[1400px] mx-auto px-5 sm:px-6 lg:px-10 pt-16 sm:pt-20 lg:pt-24 pb-16 sm:pb-20 lg:pb-24" style={{ opacity: heroOpacity }}>
+        <div className="relative w-full max-w-7xl mx-auto px-5 sm:px-6 lg:px-10 pt-16 sm:pt-20 lg:pt-24 pb-16 sm:pb-20 lg:pb-24" style={{ opacity: heroOpacity }}>
           {/* Top-left links */}
           <div className="absolute top-4 left-5 sm:left-6 lg:left-10 flex items-center gap-2 sm:gap-3 z-10">
             {PRIMARY_LINKS.map((link) => (
-              <Link key={link.label} href={link.href} className="bg-black/40 backdrop-blur-sm text-white/90 hover:text-white text-sm sm:text-base font-semibold tracking-wide uppercase px-4 py-2 rounded-full transition-colors">
+              <Link key={link.label} href={link.href} className="bg-brand-dark/60 backdrop-blur-sm text-white/90 hover:text-white text-sm sm:text-base font-semibold tracking-wide uppercase px-4 py-2 rounded-full transition-colors">
                 {link.label}
               </Link>
             ))}
@@ -243,10 +243,10 @@ export default function HomePage() {
               alt={siteName}
               className="h-32 sm:h-40 lg:h-52 w-auto rounded-lg object-contain mb-3 sm:mb-5"
             />
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white leading-tight tracking-tight max-w-3xl">
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-white leading-tight tracking-tight max-w-3xl">
               Find Your Properties in Kano & Other Northern States
             </h2>
-            <p className="text-sm sm:text-base text-white/60 mt-3 sm:mt-4 max-w-2xl leading-relaxed">
+            <p className="text-sm sm:text-base text-white/70 mt-3 sm:mt-4 max-w-2xl leading-relaxed">
               Whether you are looking to buy, rent, or sell, we have verified properties across Northern Nigeria. Gidan siyarwa, gidan haya, flats, land, and commercial spaces.
             </p>
           </div>
@@ -472,8 +472,8 @@ export default function HomePage() {
               <h3 className="text-2xl font-black mb-8">MEET OUR TOP TEAM</h3>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {staffItems.slice(0, 3).map((m, i) => {
+            <div className={`grid gap-6 ${showAllTeam && staffItems.length > 3 ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3" : "grid-cols-1 md:grid-cols-3"}`}>
+              {(showAllTeam ? staffItems : staffItems.slice(0, 3)).map((m, i) => {
                 const name = m.title;
                 const role = m.subtitle;
                 const photo = teamMembers[i]?.photo;
@@ -523,40 +523,6 @@ export default function HomePage() {
 
         </div>
       </section>
-
-      {/* EXPANDED TEAM (when View all is clicked) */}
-      {showAllTeam && staffItems.length > 3 && (
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {staffItems.slice(3).map((m, i) => {
-              const name = m.title;
-              const role = m.subtitle;
-              const photo = teamMembers[i + 3]?.photo;
-              const bio = teamMembers[i + 3]?.bio;
-              return (
-                <div key={name} className="bg-white border border-gray-200 rounded-xl p-5 hover:shadow-lg transition-all duration-300">
-                  <div className="flex items-start gap-4">
-                    <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-brand-gold/30 shrink-0">
-                      {photo ? (
-                        <img src={resolveImageUrl(photo) || ""} alt={name} className="w-full h-full object-cover object-top" loading="lazy" />
-                      ) : (
-                        <div className="w-full h-full bg-gradient-to-br from-brand-blue to-brand-blue-light flex items-center justify-center text-white font-bold text-sm">
-                          {name.split(" ").map(n => n[0]).join("").slice(0, 2)}
-                        </div>
-                      )}
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <h4 className="font-bold text-gray-900 text-sm">{name}</h4>
-                      <p className="text-xs text-brand-gold font-medium mt-0.5">{role}</p>
-                      {bio && <p className="text-xs text-gray-500 mt-2 leading-relaxed">{bio}</p>}
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </section>
-      )}
 
       {/* FLYER */}
       {getSetting("flyer_image") && (
