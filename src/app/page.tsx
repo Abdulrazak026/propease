@@ -238,19 +238,17 @@ export default function HomePage() {
           </div>
 
           <div className="flex flex-col justify-center items-center text-center min-h-[25vh] sm:min-h-[30vh] mt-6 sm:mt-4">
-            <div className="bg-brand-dark/40 backdrop-blur-sm rounded-2xl px-6 sm:px-10 py-6 sm:py-8 max-w-3xl">
-              <img
-                src={getSetting("site_logo") || `https://mbpproperties.com/api/upload/file/7ea15ec8-11b2-4c34-a855-1469d56656a5.png`}
-                alt={siteName}
-                className="h-32 sm:h-40 lg:h-52 w-auto rounded-lg object-contain mb-3 sm:mb-5 mx-auto"
-              />
-              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-white leading-tight tracking-tight">
-                Find Your Properties in Kano & Other Northern States
-              </h2>
-              <p className="text-sm sm:text-base text-white/80 mt-3 sm:mt-4 leading-relaxed">
-                Whether you are looking to buy, rent, or sell, we have verified properties across Northern Nigeria. Gidan siyarwa, gidan haya, flats, land, and commercial spaces.
-              </p>
-            </div>
+            <img
+              src={getSetting("site_logo") || `https://mbpproperties.com/api/upload/file/7ea15ec8-11b2-4c34-a855-1469d56656a5.png`}
+              alt={siteName}
+              className="h-32 sm:h-40 lg:h-52 w-auto rounded-lg object-contain mb-3 sm:mb-5 drop-shadow-[0_4px_20px_rgba(0,0,0,0.5)]"
+            />
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-white leading-tight tracking-tight max-w-3xl drop-shadow-[0_2px_12px_rgba(0,0,0,0.6)]">
+              Find Your Properties in Kano & Other Northern States
+            </h2>
+            <p className="text-sm sm:text-base text-white/80 mt-3 sm:mt-4 max-w-2xl leading-relaxed drop-shadow-[0_1px_8px_rgba(0,0,0,0.5)]">
+              Whether you are looking to buy, rent, or sell, we have verified properties across Northern Nigeria. Gidan siyarwa, gidan haya, flats, land, and commercial spaces.
+            </p>
           </div>
         </div>
       </section>
