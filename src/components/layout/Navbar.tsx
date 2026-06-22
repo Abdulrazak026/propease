@@ -34,8 +34,6 @@ export default function Navbar() {
   const [moreOpen, setMoreOpen] = useState(false);
   const [mobileMoreOpen, setMobileMoreOpen] = useState(false);
   const [userOpen, setUserOpen] = useState(false);
-  const [hidden, setHidden] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [notifs, setNotifs] = useState<{ id: string; title: string; body: string; link: string | null; read: boolean; createdAt: string; type: string }[]>([]);
@@ -44,12 +42,10 @@ export default function Navbar() {
   const moreRef = useRef<HTMLDivElement>(null);
   const mobileMoreRef = useRef<HTMLDivElement>(null);
   const userRef = useRef<HTMLDivElement>(null);
-  const lastScrollY = useRef(0);
 
   const siteLogo = getSetting("site_logo");
   const siteName = getSetting("site_name", "MBPP");
   const isHomepage = mounted && pathname === "/";
-  const [heroPassed, setHeroPassed] = useState(false);
 
   const isDashboard = mounted && (pathname.startsWith("/admin") || pathname.startsWith("/agent") || pathname.startsWith("/ambassador") || pathname === "/wallet");
 
@@ -107,42 +103,11 @@ export default function Navbar() {
 
   useEffect(() => { setMounted(true); }, []);
 
-  useEffect(() => {
-    const onScroll = () => {
-      const y = window.scrollY;
-      if (isHomepage && y > window.innerHeight * 0.7) {
-        setHeroPassed(true);
-      }
-      const delta = y - lastScrollY.current;
-      if (y < 8) { setHidden(false); setScrolled(false); }
-      else {
-        setScrolled(true);
-        if (delta > 4 && y > 80) setHidden(true);
-        else if (delta < -4) setHidden(false);
-      }
-      lastScrollY.current = y;
-    };
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, [isHomepage]);
-
-  if (isDashboard) return null;
-
-  const hpTransparent = isHomepage && !heroPassed;
+  if (isHomepage || isDashboard) return null;
 
   return (
     <>
-    <header
-      className={`lg:hidden h-16 flex items-center pl-4 pr-5 sm:pl-5 sm:pr-6 w-full transition-all duration-300 ${
-        isHomepage
-          ? hpTransparent
-            ? "fixed top-0 z-50 -translate-y-full"
-            : "fixed top-0 z-50 bg-white/95 backdrop-blur-md border-b translate-y-0"
-          : `sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b rounded-b-2xl ${
-              scrolled ? "border-gray-200" : "border-transparent"
-            } ${hidden ? "-translate-y-full" : "translate-y-0"}`
-      }`}
-    >
+    <header className="lg:hidden h-16 flex items-center pl-4 pr-5 sm:pl-5 sm:pr-6 w-full bg-white border-b border-gray-200">
       <Link href="/" className="flex items-center gap-2 shrink-0">
         <img src={siteLogo || `https://mbpproperties.com/api/upload/file/7ea15ec8-11b2-4c34-a855-1469d56656a5.png`} alt={siteName} className="h-10 w-auto rounded object-contain" />
       </Link>
@@ -280,17 +245,7 @@ export default function Navbar() {
         </div>
       )}
     </header>
-    <header
-      className={`hidden lg:flex h-14 items-center rounded-b-2xl transition-all duration-300 ${
-        isHomepage
-          ? hpTransparent
-            ? "fixed top-0 z-50 -translate-y-full"
-            : "fixed top-0 z-50 bg-white/95 backdrop-blur-md border-b translate-y-0"
-          : `sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b ${
-              scrolled ? "border-gray-200" : "border-transparent"
-            } ${hidden ? "-translate-y-full" : "translate-y-0"}`
-      }`}
-    >
+    <header className="hidden lg:flex h-14 items-center bg-white border-b border-gray-200">
       <div className="w-full max-w-[1400px] mx-auto px-6 xl:px-10 flex items-center gap-8">
         <Link href="/" className="flex items-center gap-2.5 shrink-0">
           <img src={siteLogo || `https://mbpproperties.com/api/upload/file/7ea15ec8-11b2-4c34-a855-1469d56656a5.png`} alt={siteName} className="h-10 w-auto rounded-lg object-contain" />

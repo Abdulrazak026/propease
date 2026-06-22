@@ -54,7 +54,18 @@ function defaults(): SettingsMap {
     agent_dir_visible: "true", default_commission: "5",
     primary_color: "#0d6e4e", secondary_color: "#f97316", accent_color: "#facc15",
     heading_font: "Inter", body_font: "Inter",
-    hero_image: "", about_hero_image: "", custom_css: "", custom_js: "",
+    hero_image: "", about_hero_image: "", flyer_image: "", custom_css: "", custom_js: "",
+    completed_projects: JSON.stringify([
+      { image: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800&h=500&fit=crop", title: "Luxury Villa, Tarauni", subtitle: "4-bedroom duplex with modern finishes" },
+      { image: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&h=500&fit=crop", title: "Modern Estate, Nassarawa", subtitle: "6 units of 3-bedroom apartments" },
+      { image: "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=800&h=500&fit=crop", title: "Smart Homes, Kano Municipal", subtitle: "Eco-friendly smart homes" },
+      { image: "https://images.unsplash.com/photo-1600566753086-00f18f6b7c92?w=800&h=500&fit=crop", title: "Gated Community, Fagge", subtitle: "Secure compound with 8 townhouses" },
+    ]),
+    developments_in_progress: JSON.stringify([
+      { image: "https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?w=800&h=500&fit=crop", title: "Green Valley Estate", subtitle: "Phase 2 construction ongoing" },
+      { image: "https://images.unsplash.com/photo-1590674899484-d5640f854633?w=800&h=500&fit=crop", title: "City Center Towers", subtitle: "12-storey commercial complex" },
+      { image: "https://images.unsplash.com/photo-1574362848149-11496d93a7c7?w=800&h=500&fit=crop", title: "Harmony Heights", subtitle: "Luxury hilltop development" },
+    ]),
     recaptcha_site: "", recaptcha_secret: "",
     maintenance_mode: "false", timezone: "Africa/Lagos", date_format: "DD/MM/YYYY",
     team_members: JSON.stringify([
@@ -162,6 +173,7 @@ function EmailTemplateSection({ label, settingKey, settings, set }: { label: str
 
 interface TeamMember { name: string; role: string; bio: string; photo: string; }
 interface ResearchReport { title: string; date: string; summary: string; metrics: string[]; }
+interface CarouselProject { image: string; title: string; subtitle: string; }
 
 function parseJson<T>(raw: string): T[] {
   try { return JSON.parse(raw); } catch { return []; }
@@ -175,6 +187,8 @@ export default function AdminSettings() {
   const [msg, setMsg] = useState<{ type: "success" | "error"; text: string } | null>(null);
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>(parseJson<TeamMember>((defaults()).team_members));
   const [researchReports, setResearchReports] = useState<ResearchReport[]>(parseJson<ResearchReport>((defaults()).research_reports));
+  const [completedProjects, setCompletedProjects] = useState<CarouselProject[]>(parseJson<CarouselProject>((defaults()).completed_projects));
+  const [developmentsProjects, setDevelopmentsProjects] = useState<CarouselProject[]>(parseJson<CarouselProject>((defaults()).developments_in_progress));
 
   useEffect(() => {
     api.get<{ settings: SettingsMap }>("/api/admin/settings").then((r) => {
@@ -186,6 +200,8 @@ export default function AdminSettings() {
         setSettings((p) => ({ ...p, ...merged }));
         if (merged.team_members) setTeamMembers(parseJson<TeamMember>(merged.team_members));
         if (merged.research_reports) setResearchReports(parseJson<ResearchReport>(merged.research_reports));
+        if (merged.completed_projects) setCompletedProjects(parseJson<CarouselProject>(merged.completed_projects));
+        if (merged.developments_in_progress) setDevelopmentsProjects(parseJson<CarouselProject>(merged.developments_in_progress));
       }
       setLoading(false);
     });
@@ -228,6 +244,36 @@ export default function AdminSettings() {
     const updated = researchReports.filter((_, idx) => idx !== i);
     setResearchReports(updated);
     set("research_reports", JSON.stringify(updated));
+  };
+
+  const updateProject = (list: "completed" | "developments", i: number, field: keyof CarouselProject, value: string) => {
+    const setter = list === "completed" ? setCompletedProjects : setDevelopmentsProjects;
+    const key = list === "completed" ? "completed_projects" : "developments_in_progress";
+    setter((prev: CarouselProject[]) => {
+      const updated = prev.map((p, idx) => idx === i ? { ...p, [field]: value } : p);
+      set(key, JSON.stringify(updated));
+      return updated;
+    });
+  };
+
+  const addProject = (list: "completed" | "developments") => {
+    const setter = list === "completed" ? setCompletedProjects : setDevelopmentsProjects;
+    const key = list === "completed" ? "completed_projects" : "developments_in_progress";
+    setter((prev: CarouselProject[]) => {
+      const updated = [...prev, { image: "", title: "", subtitle: "" }];
+      set(key, JSON.stringify(updated));
+      return updated;
+    });
+  };
+
+  const removeProject = (list: "completed" | "developments", i: number) => {
+    const setter = list === "completed" ? setCompletedProjects : setDevelopmentsProjects;
+    const key = list === "completed" ? "completed_projects" : "developments_in_progress";
+    setter((prev: CarouselProject[]) => {
+      const updated = prev.filter((_, idx) => idx !== i);
+      set(key, JSON.stringify(updated));
+      return updated;
+    });
   };
 
   const save = async () => {
@@ -295,6 +341,7 @@ export default function AdminSettings() {
           <MediaPicker label="About Page Hero Image" current={s("about_hero_image")} onSelect={(url) => set("about_hero_image", url)} />
           <MediaPicker label="Site Logo" current={s("site_logo")} onSelect={(url) => set("site_logo", url)} />
           <MediaPicker label="Favicon" current={s("site_favicon")} onSelect={(url) => set("site_favicon", url)} />
+          <MediaPicker label="Flyer Image (homepage)" current={s("flyer_image")} onSelect={(url) => set("flyer_image", url)} />
           <div className="grid grid-cols-2 gap-3">
             <div><label className="block text-xs font-medium text-gray-700 mb-1">Custom CSS</label><textarea value={s("custom_css")} onChange={(e) => set("custom_css", e.target.value)} rows={3} className="w-full rounded-lg border border-gray-200 px-3 py-2 text-xs font-mono focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20" /></div>
             <div><label className="block text-xs font-medium text-gray-700 mb-1">Custom JS</label><textarea value={s("custom_js")} onChange={(e) => set("custom_js", e.target.value)} rows={3} className="w-full rounded-lg border border-gray-200 px-3 py-2 text-xs font-mono focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20" /></div>
@@ -441,6 +488,50 @@ export default function AdminSettings() {
             ))}
             <button type="button" onClick={addReport} className="w-full py-2 border-2 border-dashed border-gray-200 rounded-lg text-xs text-gray-400 hover:border-gray-300 hover:text-gray-600 transition-colors">+ Add Report</button>
           </div>
+          <hr className="border-gray-100 my-6" />
+
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-sm font-semibold text-gray-900">Completed Projects (Carousel)</h3>
+            <p className="text-xs text-gray-500">{completedProjects.length} items</p>
+          </div>
+          <p className="text-xs text-gray-500 mb-4">These appear in the "OUR COMPLETED PROJECTS" carousel on the homepage.</p>
+          <div className="space-y-4">
+            {completedProjects.map((p, i) => (
+              <div key={i} className="border border-gray-200 rounded-lg p-4 space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-semibold text-gray-700">Project {i + 1}</span>
+                  <button type="button" onClick={() => removeProject("completed", i)} className="text-[10px] text-red-500 hover:text-red-700">Remove</button>
+                </div>
+                <F label="Title" v={p.title || ""} onChange={(v) => updateProject("completed", i, "title", v)} />
+                <F label="Subtitle" v={p.subtitle || ""} onChange={(v) => updateProject("completed", i, "subtitle", v)} />
+                <MediaPicker label="Image" current={p.image || ""} onSelect={(url) => updateProject("completed", i, "image", url)} />
+              </div>
+            ))}
+            <button type="button" onClick={() => addProject("completed")} className="w-full py-2 border-2 border-dashed border-gray-200 rounded-lg text-xs text-gray-400 hover:border-gray-300 hover:text-gray-600 transition-colors">+ Add Project</button>
+          </div>
+
+          <hr className="border-gray-100 my-6" />
+
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-sm font-semibold text-gray-900">Developments In Progress (Carousel)</h3>
+            <p className="text-xs text-gray-500">{developmentsProjects.length} items</p>
+          </div>
+          <p className="text-xs text-gray-500 mb-4">These appear in the "OUR DEVELOPMENTS IN PROGRESS" carousel on the homepage.</p>
+          <div className="space-y-4">
+            {developmentsProjects.map((p, i) => (
+              <div key={i} className="border border-gray-200 rounded-lg p-4 space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-semibold text-gray-700">Development {i + 1}</span>
+                  <button type="button" onClick={() => removeProject("developments", i)} className="text-[10px] text-red-500 hover:text-red-700">Remove</button>
+                </div>
+                <F label="Title" v={p.title || ""} onChange={(v) => updateProject("developments", i, "title", v)} />
+                <F label="Subtitle" v={p.subtitle || ""} onChange={(v) => updateProject("developments", i, "subtitle", v)} />
+                <MediaPicker label="Image" current={p.image || ""} onSelect={(url) => updateProject("developments", i, "image", url)} />
+              </div>
+            ))}
+            <button type="button" onClick={() => addProject("developments")} className="w-full py-2 border-2 border-dashed border-gray-200 rounded-lg text-xs text-gray-400 hover:border-gray-300 hover:text-gray-600 transition-colors">+ Add Development</button>
+          </div>
+
           <hr className="border-gray-100 my-6" />
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
             <h4 className="text-xs font-semibold text-blue-900 mb-1">Blog Posts</h4>

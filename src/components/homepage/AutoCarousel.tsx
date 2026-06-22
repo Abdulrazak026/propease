@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect, useRef, useCallback } from "react";
 
-interface CarouselItem {
+export interface CarouselItem {
   image: string;
   title?: string;
   subtitle?: string;
@@ -13,9 +13,10 @@ interface AutoCarouselProps {
   className?: string;
   heightClass?: string;
   imageFit?: "cover" | "contain";
+  showOverlay?: boolean;
 }
 
-export default function AutoCarousel({ items, interval = 4000, className = "", heightClass = "h-64 sm:h-80 lg:h-96", imageFit = "cover" }: AutoCarouselProps) {
+export default function AutoCarousel({ items, interval = 4000, className = "", heightClass = "h-72 sm:h-96 lg:h-[28rem]", imageFit = "cover", showOverlay = true }: AutoCarouselProps) {
   const [current, setCurrent] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const timerRef = useRef<ReturnType<typeof setInterval> | undefined>(undefined);
@@ -45,8 +46,8 @@ export default function AutoCarousel({ items, interval = 4000, className = "", h
         {items.map((item, i) => (
           <div key={i} className={`min-w-full relative ${heightClass}`}>
             <img src={item.image} alt={item.title || ""} className="w-full h-full" style={{ objectFit: imageFit }} />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
-            {(item.title || item.subtitle) && (
+            {showOverlay && <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />}
+            {(item.title || item.subtitle) && showOverlay && (
               <div className="absolute bottom-0 left-0 right-0 p-6 sm:p-8">
                 {item.title && <h3 className="text-white text-xl sm:text-2xl font-bold">{item.title}</h3>}
                 {item.subtitle && <p className="text-white/80 text-sm sm:text-base mt-1">{item.subtitle}</p>}

@@ -63,7 +63,7 @@ export default function SoldPropertiesGallery() {
   const carouselItems = items.slice(0, 6).map((p, i) => ({
     image: p.coverPhoto || FALLBACK_PHOTOS[i % FALLBACK_PHOTOS.length],
     title: p.title,
-    subtitle: `${p.city} \u2022 ${formatNaira(p.salePrice)} \u2022 ${timeAgo(p.soldAt)}`,
+    subtitle: `${p.city} \u2022 ${timeAgo(p.soldAt)}`,
   }));
 
   return (
@@ -76,7 +76,7 @@ export default function SoldPropertiesGallery() {
             <p className="text-sm text-gray-500 mt-1.5 max-w-md">Real properties that transacted through MBPP. We post a new one every week.</p>
           </div>
         </div>
-        <AutoCarousel items={carouselItems} heightClass="h-64 sm:h-80 lg:h-96" />
+        <AutoCarousel items={carouselItems} heightClass="h-72 sm:h-96 lg:h-[28rem]" />
       </div>
     </section>
   );

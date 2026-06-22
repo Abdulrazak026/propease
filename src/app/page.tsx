@@ -7,7 +7,7 @@ import { useListings } from "@/hooks/useListings";
 import Footer from "@/components/layout/Footer";
 import { useSettings } from "@/context/SettingsContext";
 import SoldPropertiesGallery from "@/components/listings/SoldPropertiesGallery";
-import AutoCarousel from "@/components/homepage/AutoCarousel";
+import AutoCarousel, { CarouselItem } from "@/components/homepage/AutoCarousel";
 
 interface City { id: string; name: string; }
 interface BlogPost { id: string; slug: string; title: string; excerpt?: string | null; content?: string | null; coverImage: string | null; publishedAt: string | null; author?: { name: string } | null; }
@@ -77,6 +77,7 @@ export default function HomePage() {
   const heroRef = useRef<HTMLElement>(null);
   const [heroOpacity, setHeroOpacity] = useState(1);
   const [heroMoreOpen, setHeroMoreOpen] = useState(false);
+  const [flyerOpen, setFlyerOpen] = useState(false);
   const [showCount, setShowCount] = useState(INITIAL_SHOW);
   const [cities, setCities] = useState<City[]>([]);
   const [posts, setPosts] = useState<BlogPost[]>([]);
@@ -88,6 +89,12 @@ export default function HomePage() {
 
   let teamMembers: TeamMember[] = [];
   try { const raw = getSetting("team_members"); if (raw) teamMembers = JSON.parse(raw); } catch {}
+
+  let completedProjects: CarouselItem[] = [];
+  try { const raw = getSetting("completed_projects"); if (raw) completedProjects = JSON.parse(raw); } catch {}
+
+  let developmentsProjects: CarouselItem[] = [];
+  try { const raw = getSetting("developments_in_progress"); if (raw) developmentsProjects = JSON.parse(raw); } catch {}
 
   useEffect(() => {
     const handler = () => {
@@ -186,16 +193,11 @@ export default function HomePage() {
 
         <div className="relative w-full max-w-[1400px] mx-auto px-5 sm:px-6 lg:px-10 pt-16 sm:pt-20 lg:pt-24 pb-16 sm:pb-20 lg:pb-24" style={{ opacity: heroOpacity }}>
           {/* Top-right menu */}
-          <div className="absolute top-4 right-5 sm:right-6 lg:right-10 flex items-center gap-3 sm:gap-5 z-10">
-            {PRIMARY_LINKS.map((link) => (
-              <Link key={link.label} href={link.href} className="text-white/85 hover:text-white text-[11px] sm:text-sm font-semibold tracking-wide transition-colors uppercase">
-                {link.label}
-              </Link>
-            ))}
+          <div className="absolute top-4 right-5 sm:right-6 lg:right-10 flex items-center gap-2 sm:gap-3 z-10">
             <div className="relative" id="hero-more">
               <button
                 onClick={() => setHeroMoreOpen(!heroMoreOpen)}
-                className="text-white/85 hover:text-white text-[11px] sm:text-sm font-semibold tracking-wide transition-colors uppercase cursor-pointer"
+                className="bg-black/20 backdrop-blur-sm text-white/90 hover:text-white text-[11px] sm:text-sm font-semibold tracking-wide uppercase px-3 py-1.5 rounded-full transition-colors"
               >
                 More
               </button>
@@ -214,6 +216,11 @@ export default function HomePage() {
                 </div>
               )}
             </div>
+            {PRIMARY_LINKS.map((link) => (
+              <Link key={link.label} href={link.href} className="bg-black/20 backdrop-blur-sm text-white/90 hover:text-white text-[11px] sm:text-sm font-semibold tracking-wide uppercase px-3 py-1.5 rounded-full transition-colors">
+                {link.label}
+              </Link>
+            ))}
           </div>
 
           <div className="flex flex-col justify-center items-center text-center min-h-[25vh] sm:min-h-[30vh] mt-10 sm:mt-6">
@@ -396,7 +403,7 @@ export default function HomePage() {
         <div className="max-w-[1400px] mx-auto px-5 sm:px-6 lg:px-10">
           <h2 className="text-xl sm:text-3xl font-bold text-gray-900 text-center mb-3 sm:mb-4">OUR COMPLETED PROJECTS</h2>
           <p className="text-xs sm:text-base text-gray-500 text-center mb-6 sm:mb-8 max-w-xl mx-auto">Take a look at some of our delivered projects across Kano &amp; Northern Nigeria</p>
-          <AutoCarousel items={PLACEHOLDER_PROJECTS} />
+          <AutoCarousel items={completedProjects.length > 0 ? completedProjects : PLACEHOLDER_PROJECTS} heightClass="h-72 sm:h-96 lg:h-[28rem]" />
         </div>
       </section>
 
@@ -405,7 +412,7 @@ export default function HomePage() {
         <div className="max-w-[1400px] mx-auto px-5 sm:px-6 lg:px-10">
           <h2 className="text-xl sm:text-3xl font-bold text-gray-900 text-center mb-3 sm:mb-4">OUR DEVELOPMENTS IN PROGRESS</h2>
           <p className="text-xs sm:text-base text-gray-500 text-center mb-6 sm:mb-8 max-w-xl mx-auto">Ongoing projects taking shape across prime locations</p>
-          <AutoCarousel items={PLACEHOLDER_DEVELOPMENTS} />
+          <AutoCarousel items={developmentsProjects.length > 0 ? developmentsProjects : PLACEHOLDER_DEVELOPMENTS} heightClass="h-72 sm:h-96 lg:h-[28rem]" />
         </div>
       </section>
 
@@ -433,12 +440,34 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* FLYER */}
+      {getSetting("flyer_image") && (
+        <section className="bg-white py-10 sm:py-16">
+          <div className="max-w-[1400px] mx-auto px-5 sm:px-6 lg:px-10">
+            <h2 className="text-xl sm:text-3xl font-bold text-gray-900 text-center mb-6 sm:mb-8">PROMOTIONAL FLYER</h2>
+            <div className="max-w-3xl mx-auto cursor-pointer" onClick={() => setFlyerOpen(true)}>
+              <img src={getSetting("flyer_image")} alt="Promotional Flyer" className="w-full h-auto rounded-2xl shadow-lg hover:shadow-xl transition-shadow" />
+            </div>
+          </div>
+          {flyerOpen && (
+            <div className="fixed inset-0 z-[100] bg-black/80 flex items-center justify-center p-4" onClick={() => setFlyerOpen(false)}>
+              <div className="relative max-w-4xl w-full max-h-[90vh] flex items-center justify-center" onClick={(e) => e.stopPropagation()}>
+                <button onClick={() => setFlyerOpen(false)} className="absolute -top-10 right-0 text-white/80 hover:text-white text-sm font-medium">
+                  Close ✕
+                </button>
+                <img src={getSetting("flyer_image")} alt="Promotional Flyer" className="w-full h-auto max-h-[85vh] object-contain rounded-xl scale-100 animate-in" />
+              </div>
+            </div>
+          )}
+        </section>
+      )}
+
       {/* MEET OUR TEAM */}
       <section className="bg-gray-50 py-10 sm:py-16">
         <div className="max-w-[1400px] mx-auto px-5 sm:px-6 lg:px-10">
           <h2 className="text-xl sm:text-3xl font-bold text-gray-900 text-center mb-3 sm:mb-4">MEET OUR TEAM</h2>
           <p className="text-xs sm:text-base text-gray-500 text-center mb-6 sm:mb-8 max-w-xl mx-auto">Get to know the dedicated professionals behind MBPP</p>
-          <AutoCarousel items={staffItems} heightClass="h-80 sm:h-96" imageFit="contain" />
+          <AutoCarousel items={staffItems} heightClass="h-72 sm:h-96 lg:h-[28rem]" imageFit="contain" showOverlay={false} />
         </div>
       </section>
 
