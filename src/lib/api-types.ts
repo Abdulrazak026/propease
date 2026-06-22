@@ -44,12 +44,17 @@ export interface ApiListing {
   category: string;
   address: string;
   city: string;
+  state?: string;
   bedrooms?: number;
   bathrooms?: number;
   size?: string;
   features?: string[];
   lat: number;
   lng: number;
+  instalmentAvailable?: boolean;
+  instalmentMonths?: number;
+  instalmentCommission?: number;
+  reservationCount?: number;
   photos: { id: string; url: string; alt: string }[];
   postedBy: { id: string; name: string };
   assignedAgent?: { id: string; name: string };

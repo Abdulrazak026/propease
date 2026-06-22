@@ -45,9 +45,8 @@ export default function Navbar() {
 
   const siteLogo = getSetting("site_logo");
   const siteName = getSetting("site_name", "MBPP");
-  const isHomepage = mounted && pathname === "/";
 
-  const isDashboard = mounted && (pathname.startsWith("/admin") || pathname.startsWith("/agent") || pathname.startsWith("/ambassador") || pathname === "/wallet");
+  if (!mounted || pathname === "/" || pathname.startsWith("/admin") || pathname.startsWith("/agent") || pathname.startsWith("/ambassador") || pathname === "/wallet") return null;
 
   const handleLogout = () => { setCurrentUser(null); router.push("/"); };
 
@@ -102,8 +101,6 @@ export default function Navbar() {
   }, []);
 
   useEffect(() => { setMounted(true); }, []);
-
-  if (isHomepage || isDashboard) return null;
 
   return (
     <>

@@ -59,6 +59,7 @@ export interface Listing {
   lng: number;
   address: string;
   city: string;
+  state?: string;
   postedBy: User;
   assignedAgent?: User;
   createdAt: string;
@@ -66,6 +67,10 @@ export interface Listing {
   bathrooms?: number;
   size?: string;
   features?: string[];
+  instalmentAvailable?: boolean;
+  instalmentMonths?: number;
+  instalmentCommission?: number;
+  reservationCount?: number;
 }
 
 export type TaskStatus = "open" | "in_progress" | "fulfilled" | "closed";
@@ -141,9 +146,13 @@ export interface Reservation {
   listingTitle: string;
   clientName: string;
   holdingDeposit: number;
-  status: "pending" | "confirmed" | "expired";
+  status: "pending" | "pending_payment" | "confirmed" | "expired" | "cancelled" | "refunded";
   expiresAt: string;
   createdAt: string;
+  cancellationReason?: string;
+  cancelledAt?: string;
+  meetingDate?: string;
+  meetingTime?: string;
 }
 
 export interface CustomOrder {

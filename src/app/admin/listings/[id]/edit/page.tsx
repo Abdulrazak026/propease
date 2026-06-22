@@ -32,7 +32,7 @@ export default function AdminEditListingPage() {
         const l = (r.data as any).listing || r.data;
         setForm({
           title: l.title || "", description: l.description || "", propertyType: l.propertyType || "house",
-          listingType: l.listingType || "sale", city: l.city || "Kano Municipal", address: l.address || "",
+          listingType: l.listingType || "sale", city: l.city || "Kano Municipal", state: l.state || "Kano", address: l.address || "",
           price: String(l.price || 0), salePrice: String(l.salePrice || ""), annualRent: String(l.annualRent || ""),
           damageDeposit: String(l.damageDeposit || ""), maintenanceCharge: String(l.maintenanceCharge || ""),
           rentTier: l.rentTier || "normal", bedrooms: String(l.bedrooms || ""), bathrooms: String(l.bathrooms || ""),
@@ -40,6 +40,7 @@ export default function AdminEditListingPage() {
           partnerCompany: l.partnerCompany || "", negotiable: l.negotiable || false,
           depositAmount: String(l.depositAmount || ""), reservationDays: String(l.reservationDays || "2"),
           downPaymentPercent: String(l.downPaymentPercent || "10"),
+          instalmentAvailable: l.instalmentAvailable || false, instalmentMonths: String(l.instalmentMonths || ""), instalmentCommission: String(l.instalmentCommission || ""),
         });
         if (l.photos) setUploadedUrls(l.photos.map((p: any) => p.url));
       }
@@ -88,6 +89,10 @@ export default function AdminEditListingPage() {
         depositAmount: form.depositAmount ? parseInt(form.depositAmount) : undefined,
         reservationDays: form.reservationDays ? parseInt(form.reservationDays) : undefined,
         downPaymentPercent: form.downPaymentPercent ? parseInt(form.downPaymentPercent) : undefined,
+        state: form.state,
+        instalmentAvailable: form.instalmentAvailable,
+        instalmentMonths: form.instalmentAvailable && form.instalmentMonths ? parseInt(form.instalmentMonths) : undefined,
+        instalmentCommission: form.instalmentAvailable && form.instalmentCommission ? parseFloat(form.instalmentCommission) : undefined,
       };
 
       if (form.listingType === "rent") {
@@ -142,6 +147,7 @@ export default function AdminEditListingPage() {
           <div><label className="block text-xs font-medium text-gray-700 mb-1">Sale/Rent</label><select value={form.listingType} onChange={tf("listingType")} className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm"><option value="sale">For Sale</option><option value="rent">For Rent</option></select></div>
           <div><label className="block text-xs font-medium text-gray-700 mb-1">City *</label><select required value={form.city} onChange={tf("city")} className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm">{CITIES.map(c => <option key={c}>{c}</option>)}</select></div>
         </div>
+        <div><label className="block text-xs font-medium text-gray-700 mb-1">State</label><select value={form.state} onChange={tf("state")} className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm">{["Abia","Adamawa","Akwa Ibom","Anambra","Bauchi","Bayelsa","Benue","Borno","Cross River","Delta","Ebonyi","Edo","Ekiti","Enugu","FCT","Gombe","Imo","Jigawa","Kaduna","Kano","Katsina","Kebbi","Kogi","Kwara","Lagos","Nasarawa","Niger","Ogun","Ondo","Osun","Oyo","Plateau","Rivers","Sokoto","Taraba","Yobe","Zamfara"].map(s => <option key={s} value={s}>{s}</option>)}</select></div>
         <div><label className="block text-xs font-medium text-gray-700 mb-1">Address</label><input value={form.address} onChange={tf("address")} className="w-full rounded-lg border border-gray-200 px-4 py-2.5 text-sm" /></div>
 
         <h3 className="text-sm font-semibold text-gray-900 pt-2">Pricing</h3>
@@ -173,6 +179,15 @@ export default function AdminEditListingPage() {
         </div>
         {form.listingType === "sale" && (
           <div><label className="block text-xs font-medium text-gray-700 mb-1">Down Payment (%)</label><input type="number" min="1" max="100" value={form.downPaymentPercent} onChange={tf("downPaymentPercent")} className="w-full rounded-lg border border-gray-200 px-4 py-2.5 text-sm" /></div>
+        )}
+
+        <h3 className="text-sm font-semibold text-gray-900 pt-2">Instalment Plan</h3>
+        <div className="flex items-center gap-2"><input type="checkbox" id="instalmentAvailable" checked={form.instalmentAvailable} onChange={tf("instalmentAvailable")} className="rounded border-gray-300 text-[var(--color-primary)] focus:ring-[var(--color-primary)]" /><label htmlFor="instalmentAvailable" className="text-sm text-gray-700">Instalment payment available</label></div>
+        {form.instalmentAvailable && (
+          <div className="grid grid-cols-2 gap-3">
+            <div><label className="block text-xs font-medium text-gray-700 mb-1">Instalment Months</label><input type="number" min="0" max="24" value={form.instalmentMonths} onChange={tf("instalmentMonths")} placeholder="e.g. 6" className="w-full rounded-lg border border-gray-200 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20" /></div>
+            <div><label className="block text-xs font-medium text-gray-700 mb-1">Instalment Commission (%)</label><input type="number" min="0" max="100" step="0.1" value={form.instalmentCommission} onChange={tf("instalmentCommission")} placeholder="e.g. 5" className="w-full rounded-lg border border-gray-200 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20" /></div>
+          </div>
         )}
 
         <h3 className="text-sm font-semibold text-gray-900 pt-2">Details</h3>

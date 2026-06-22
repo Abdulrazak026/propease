@@ -58,6 +58,25 @@ export default function SellPage() {
         </div>
       </section>
 
+      {/* TERMS & DISCLAIMER */}
+      <section className="max-w-[900px] mx-auto w-full px-5 sm:px-6 lg:px-10 pb-10 sm:pb-14">
+        <div className="bg-amber-50 border border-amber-200 rounded-2xl p-6 sm:p-8">
+          <h3 className="text-lg font-bold text-amber-900 mb-3">Important Information</h3>
+          <ul className="space-y-2 text-sm text-amber-800 leading-relaxed">
+            <li><strong>MBPP Approval:</strong> All listings are subject to MBPP verification and approval before publication.</li>
+            <li><strong>Notification Requirement:</strong> Sellers must notify MBPP of any price changes, pending offers, or withdrawal of listing within 24 hours.</li>
+            <li><strong>Rental Options:</strong>
+              <ul className="ml-4 mt-1 space-y-1">
+                <li>• <strong>Standard (5% commission):</strong> MBPP charges a 5% commission on the total rental value upon successful tenant placement.</li>
+                <li>• <strong>Premium (10% commission):</strong> Includes professional photography, virtual tour, and priority placement. 10% commission applies.</li>
+              </ul>
+            </li>
+            <li className="mt-2"><strong>Reservation:</strong> Properties can be reserved for free. Reservations expire after 24 hours if not confirmed. Multiple people may reserve the same property.</li>
+            <li className="mt-2"><strong>Instalment Plans:</strong> For qualifying properties, buyers may purchase via an instalment plan. Terms (duration 0–24 months, commission %) are set by the lister. Monthly payment = (price + price × commission%) / months.</li>
+          </ul>
+        </div>
+      </section>
+
       <section className="max-w-[900px] mx-auto w-full px-5 sm:px-6 lg:px-10 pb-16 sm:pb-20">
         <div className="relative bg-[var(--color-primary)] rounded-3xl overflow-hidden p-8 sm:p-12 text-center">
           <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight leading-[1.1]">Sell with us</h2>

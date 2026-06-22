@@ -45,6 +45,7 @@ export default function PropertyCard({ listing }: PropertyCardProps) {
           </span>
           {listing.category === "partnership" && <Badge variant="info">Partner</Badge>}
           {listing.postedBy?.isVerified && <VerifiedBadge />}
+          {listing.instalmentAvailable && <Badge variant="success">Instalment</Badge>}
         </div>
 
         <div className="absolute bottom-2 left-2 sm:left-3 backdrop-blur-sm bg-black/55 rounded-md px-2 py-1 max-w-[calc(100%-1rem)]">

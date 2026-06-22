@@ -38,6 +38,10 @@ export const createListingSchema = z.object({
   status: z.nativeEnum(ListingStatus).optional(),
   features: z.array(z.string()).optional(),
   price: z.number().int().min(0).optional(),
+  state: z.string().optional(),
+  instalmentAvailable: z.boolean().optional(),
+  instalmentMonths: z.number().int().min(0).max(24).optional(),
+  instalmentCommission: z.number().min(0).max(100).optional(),
 }).refine((data) => {
   if (data.listingType === "rent" && !data.annualRent) return false;
   if (data.listingType === "sale" && !data.salePrice && !data.price) return false;

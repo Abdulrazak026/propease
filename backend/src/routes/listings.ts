@@ -12,10 +12,11 @@ const router = Router();
 
 router.get("/", async (req, res: Response) => {
   try {
-    const { city, listingType, propertyType, status, minPrice, maxPrice, search, limit, offset } = req.query;
+    const { state, city, listingType, propertyType, status, minPrice, maxPrice, search, limit, offset } = req.query;
 
     const where: any = {};
 
+    if (state) where.state = state;
     if (city) where.city = city;
     if (listingType) where.listingType = listingType;
     if (propertyType) where.propertyType = propertyType;

@@ -11,7 +11,7 @@ interface PropertyFiltersProps {
 
 export interface FilterState {
   search: string; propertyType: PropertyType | ""; listingType: ListingType | "";
-  rentTier: RentTier | ""; category: ListingCategory | ""; city: string;
+  rentTier: RentTier | ""; category: ListingCategory | ""; city: string; state: string;
   minPrice: string; maxPrice: string; minBeds: string; maxBeds: string;
   minBaths: string; maxBaths: string; size: string;
   paymentOption: string;
@@ -33,7 +33,7 @@ export default function PropertyFilters({ onFilterChange }: PropertyFiltersProps
   const [filteredCities, setFilteredCities] = useState(cities);
   const [filters, setFilters] = useState<FilterState>({
     search: "", propertyType: "", listingType: "", rentTier: "",
-    category: "", city: "", minPrice: "", maxPrice: "",
+    category: "", city: "", state: "", minPrice: "", maxPrice: "",
     minBeds: "", maxBeds: "", minBaths: "", maxBaths: "",
     size: "", paymentOption: "",
   });
@@ -50,9 +50,11 @@ export default function PropertyFilters({ onFilterChange }: PropertyFiltersProps
     setSelectedState(state);
     if (state === "All States") {
       setFilteredCities(["All Cities", ...parsed.map(c => c.city)]);
+      update("state", "");
     } else {
       const cs = parsed.filter(c => c.state === state).map(c => c.city);
       setFilteredCities(["All Cities", ...cs]);
+      update("state", state);
     }
     update("city", "");
   };
@@ -60,7 +62,7 @@ export default function PropertyFilters({ onFilterChange }: PropertyFiltersProps
   const reset = () => {
     const empty: FilterState = {
       search: "", propertyType: "", listingType: "", rentTier: "",
-      category: "", city: "", minPrice: "", maxPrice: "",
+      category: "", city: "", state: "", minPrice: "", maxPrice: "",
       minBeds: "", maxBeds: "", minBaths: "", maxBaths: "",
       size: "", paymentOption: "",
     };

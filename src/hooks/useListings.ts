@@ -5,7 +5,7 @@ import type { ApiListing } from "@/lib/api-types";
 
 interface ListingFilters {
   search: string; propertyType: string; listingType: string;
-  rentTier: string; category: string; city: string;
+  rentTier: string; category: string; city: string; state: string;
   minPrice: string; maxPrice: string; minBeds: string; maxBeds: string;
   minBaths: string; maxBaths: string; minSqft: string; maxSqft: string;
   paymentOption: string;
@@ -13,7 +13,7 @@ interface ListingFilters {
 
 const defaultFilters: ListingFilters = {
   search: "", propertyType: "", listingType: "", rentTier: "",
-  category: "", city: "", minPrice: "", maxPrice: "",
+  category: "", city: "", state: "", minPrice: "", maxPrice: "",
   minBeds: "", maxBeds: "", minBaths: "", maxBaths: "",
   minSqft: "", maxSqft: "", paymentOption: "",
 };
@@ -52,6 +52,7 @@ export function useListings() {
       }
       if (filters.propertyType && l.propertyType !== filters.propertyType) return false;
       if (filters.listingType && l.listingType !== filters.listingType) return false;
+      if (filters.state && l.state !== filters.state) return false;
       if (filters.city && l.city !== filters.city) return false;
       if (filters.minPrice && l.price < parseInt(filters.minPrice)) return false;
       if (filters.maxPrice && l.price > parseInt(filters.maxPrice)) return false;

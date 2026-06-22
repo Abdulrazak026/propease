@@ -3,27 +3,19 @@ import prisma from "../lib/prisma";
 import { authenticate, AuthRequest } from "../middleware/auth";
 import { logger } from "../lib/logger";
 import { emailService } from "../services/email";
-import { processRefund, calculateRefundAmount } from "../services/refund";
 const router = Router();
 
 router.post("/:listingId", authenticate, async (req: AuthRequest, res: Response) => {
   try {
     const listingId = req.params.listingId as string;
-    const { paymentRef } = req.body;
 
     const listing = await prisma.listing.findUnique({
       where: { id: listingId },
-      select: { id: true, status: true, title: true, depositAmount: true, reservationDays: true, listingType: true, price: true, damageDeposit: true, salePrice: true },
+      select: { id: true, status: true, title: true },
     });
 
     if (!listing) return res.status(404).json({ error: "Listing not found" });
     if (listing.status !== "available") return res.status(400).json({ error: "Listing is not available" });
-
-    // Calculate deposit: use listing's depositAmount, or fallback to listing-type logic
-    const depositAmount = listing.depositAmount
-      || (listing.listingType === "rent" ? (listing.damageDeposit || Math.round(listing.price * 0.1)) : Math.round((listing.salePrice || listing.price) * 0.05));
-
-    const days = listing.reservationDays || 2;
 
     const user = await prisma.user.findUnique({
       where: { id: req.user!.id },
@@ -35,31 +27,17 @@ router.post("/:listingId", authenticate, async (req: AuthRequest, res: Response)
         listingId,
         userId: req.user!.id,
         clientName: user?.name || "Unknown",
-        holdingDeposit: depositAmount,
-        status: "pending_payment",
-        paymentRef: paymentRef || null,
-        expiresAt: new Date(Date.now() + days * 24 * 60 * 60 * 1000),
+        holdingDeposit: 0,
+        status: "pending",
+        expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
       },
     });
 
+    // Increment reservation count (listing stays available for others)
     await prisma.listing.update({
       where: { id: listingId },
-      data: { status: "reserved" },
+      data: { reservationCount: { increment: 1 } },
     });
-
-    // Create transaction record if payment reference is available
-    if (paymentRef) {
-      await prisma.transaction.create({
-        data: {
-          userId: req.user!.id,
-          type: "reservation_deposit",
-          amount: depositAmount,
-          reference: paymentRef,
-          method: "card",
-          status: "completed",
-        },
-      }).catch(() => {});
-    }
 
     // Notify admin
     const admins = await prisma.user.findMany({ where: { role: "head" }, select: { id: true } });
@@ -69,13 +47,13 @@ router.post("/:listingId", authenticate, async (req: AuthRequest, res: Response)
           userId: admin.id,
           type: "application_status",
           title: "New Reservation",
-          body: `${user?.name || "A user"} reserved "${listing.title}" with ${depositAmount.toLocaleString()} deposit.`,
+          body: `${user?.name || "A user"} reserved "${listing.title}"`,
           link: "/admin/reservations",
         },
       }).catch(() => {});
     }
 
-    res.status(201).json({ reservation, depositAmount, reservationDays: days });
+    res.status(201).json({ reservation });
   } catch (error) {
     logger.error({ err: error }, "Create reservation error:");
     res.status(500).json({ error: "Failed to create reservation" });
@@ -226,8 +204,7 @@ router.post("/:id/cancel", authenticate, async (req: AuthRequest, res: Response)
     const reservation: any = await prisma.reservation.findUnique({
       where: { id },
       include: {
-        listing: { select: { id: true, title: true, cancellationPolicy: true, status: true } },
-        user: { select: { id: true, email: true, name: true } },
+        listing: { select: { id: true, title: true } },
       },
     });
 
@@ -238,69 +215,28 @@ router.post("/:id/cancel", authenticate, async (req: AuthRequest, res: Response)
     }
 
     const now = new Date();
-    const hoursSinceBooking = (now.getTime() - new Date(reservation.createdAt).getTime()) / (1000 * 60 * 60);
-    const hoursUntilMeeting = reservation.meetingDate
-      ? (new Date(reservation.meetingDate).getTime() - now.getTime()) / (1000 * 60 * 60)
-      : null;
-
-    const policy = reservation.listing?.cancellationPolicy || "flexible";
-    const { refundAmount, fee } = calculateRefundAmount(
-      reservation.holdingDeposit,
-      policy,
-      hoursSinceBooking,
-      hoursUntilMeeting,
-    );
-
-    const listingTitle = reservation.listing?.title || "Property";
-
-    await prisma.$transaction(async (tx) => {
-      await tx.reservation.update({
-        where: { id },
-        data: {
-          status: "cancelled",
-          cancelledAt: now,
-          cancelledByUserId: req.user!.id,
-          cancellationReason: "Cancelled by client",
-          refundAmount: refundAmount || null,
-        },
-      });
-
-      await tx.listing.update({
-        where: { id: reservation.listingId },
-        data: { status: "available" },
-      });
-
-      await tx.reservationLog.create({
-        data: {
-          action: "cancelled",
-          oldStatus: reservation.status,
-          newStatus: "cancelled",
-          reason: "Client requested cancellation",
-          reservationId: id,
-          userId: req.user!.id,
-        },
-      });
+    await prisma.reservation.update({
+      where: { id },
+      data: {
+        status: "cancelled",
+        cancelledAt: now,
+        cancelledByUserId: req.user!.id,
+        cancellationReason: "Cancelled by client",
+      },
     });
 
-    if (refundAmount > 0 && reservation.paymentRef) {
-      const refundResult = await processRefund(id, refundAmount * 100, reservation.paymentRef, "Client requested cancellation");
-      if (!refundResult.success) {
-        logger.warn({ reservationId: id, error: refundResult.error }, "Refund failed during cancellation — manual refund needed");
-      }
-    }
+    await prisma.reservationLog.create({
+      data: {
+        action: "cancelled",
+        oldStatus: reservation.status,
+        newStatus: "cancelled",
+        reason: "Client requested cancellation",
+        reservationId: id,
+        userId: req.user!.id,
+      },
+    });
 
-    const userEmail = reservation.user?.email;
-    if (userEmail) {
-      emailService.reservationCancelled(
-        userEmail,
-        reservation.user?.name || "Customer",
-        listingTitle,
-        refundAmount,
-        reservation.holdingDeposit,
-      ).catch(() => {});
-    }
-
-    res.json({ success: true, refundAmount, fee, message: `Reservation cancelled. Refund: ₦${refundAmount.toLocaleString()}` });
+    res.json({ success: true, message: "Reservation cancelled" });
   } catch (error) {
     logger.error({ err: error }, "Cancel reservation error:");
     res.status(500).json({ error: "Failed to cancel reservation" });
@@ -314,12 +250,16 @@ router.post("/:id/admin-cancel", authenticate, async (req: AuthRequest, res: Res
     }
 
     const id = req.params.id as string;
-    const { reason, processRefund: shouldRefund } = req.body;
+    const { reason } = req.body;
+
+    if (!reason || !reason.trim()) {
+      return res.status(400).json({ error: "Cancellation reason is required" });
+    }
 
     const reservation: any = await prisma.reservation.findUnique({
       where: { id },
       include: {
-        listing: { select: { id: true, title: true, status: true } },
+        listing: { select: { id: true, title: true } },
         user: { select: { id: true, email: true, name: true } },
       },
     });
@@ -330,7 +270,6 @@ router.post("/:id/admin-cancel", authenticate, async (req: AuthRequest, res: Res
     }
 
     const now = new Date();
-    const refundAmount = shouldRefund ? reservation.holdingDeposit : 0;
 
     await prisma.$transaction(async (tx) => {
       await tx.reservation.update({
@@ -339,14 +278,8 @@ router.post("/:id/admin-cancel", authenticate, async (req: AuthRequest, res: Res
           status: "cancelled",
           cancelledAt: now,
           cancelledByUserId: req.user!.id,
-          cancellationReason: reason || "Cancelled by admin",
-          refundAmount: refundAmount || null,
+          cancellationReason: reason,
         },
-      });
-
-      await tx.listing.update({
-        where: { id: reservation.listingId },
-        data: { status: "available" },
       });
 
       await tx.reservationLog.create({
@@ -354,19 +287,12 @@ router.post("/:id/admin-cancel", authenticate, async (req: AuthRequest, res: Res
           action: "cancelled",
           oldStatus: reservation.status,
           newStatus: "cancelled",
-          reason: reason || "Admin cancelled reservation",
+          reason,
           reservationId: id,
           userId: req.user!.id,
         },
       });
     });
-
-    if (refundAmount > 0 && reservation.paymentRef) {
-      const refundResult = await processRefund(id, refundAmount * 100, reservation.paymentRef, reason || "Admin-initiated cancellation");
-      if (!refundResult.success) {
-        logger.warn({ reservationId: id, error: refundResult.error }, "Admin refund failed — manual refund needed");
-      }
-    }
 
     const listingTitle = reservation.listing?.title || "Property";
     const userEmail = reservation.user?.email;
@@ -375,12 +301,12 @@ router.post("/:id/admin-cancel", authenticate, async (req: AuthRequest, res: Res
         userEmail,
         reservation.user?.name || "Customer",
         listingTitle,
-        reason || "",
-        refundAmount,
+        reason,
+        0,
       ).catch(() => {});
     }
 
-    res.json({ success: true, refundAmount, message: `Reservation cancelled by admin. Refund: ₦${refundAmount.toLocaleString()}` });
+    res.json({ success: true, message: `Reservation cancelled. Reason: ${reason}` });
   } catch (error) {
     logger.error({ err: error }, "Admin cancel reservation error:");
     res.status(500).json({ error: "Failed to cancel reservation" });

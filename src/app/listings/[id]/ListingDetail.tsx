@@ -32,6 +32,9 @@ export default function ListingDetail() {
   const [showBuyModal, setShowBuyModal] = useState(false);
   const [buyStep, setBuyStep] = useState<"choose" | "pay" | "done">("choose");
   const [buyType, setBuyType] = useState<"full" | "down_payment">("full");
+  const [userReserved, setUserReserved] = useState(false);
+  const [showFreeReserveSuccess, setShowFreeReserveSuccess] = useState(false);
+  const [freeReserveLoading, setFreeReserveLoading] = useState(false);
 
   const reserveDeposit = listing?.depositAmount
     || (listing?.listingType === "rent"
@@ -59,6 +62,16 @@ export default function ListingDetail() {
       if ((r.data as any)?.history) setPriceHistory((r.data as any).history);
     }).catch(() => {});
   }, [id]);
+
+  useEffect(() => {
+    if (!currentUser || !id) return;
+    api.get<{ reservations: any[] }>("/api/reservations/my").then(r => {
+      if (r.data?.reservations) {
+        const found = r.data.reservations.some((res: any) => res.listing?.id === id);
+        setUserReserved(found);
+      }
+    }).catch(() => {});
+  }, [currentUser, id]);
 
   const handleToggleFav = () => {
     const now = toggleFavorite(listing!.id);
@@ -213,6 +226,15 @@ export default function ListingDetail() {
                 </div>
                 {listing.listingType === "rent" && <p className="text-xs text-gray-400 mt-1">Due upfront on signing</p>}
                 {listing.listingType !== "rent" && <p className="text-xs text-gray-400 mt-1">Full price or pay {listing.downPaymentPercent || 10}% down payment</p>}
+                {listing.instalmentAvailable && (
+                  <div className="mt-3 pt-3 border-t border-gray-100">
+                    <Badge variant="success">Instalment Available</Badge>
+                    <p className="text-sm text-gray-700 mt-2 font-medium">
+                      from {formatNaira(Math.round((listing.price + listing.price * (listing.instalmentCommission || 0) / 100) / (listing.instalmentMonths || 1)))}/month
+                      for {listing.instalmentMonths} months
+                    </p>
+                  </div>
+                )}
               </div>
 
               {listing.listingType === "rent" && listing.assignedAgent && (
@@ -250,6 +272,39 @@ export default function ListingDetail() {
                   <Button className="w-full" disabled>
                     {listing.status === "reserved" ? "Reserved" : listing.status === "sold" ? "Sold" : "Rented"}
                   </Button>
+                )}
+
+                {listing.status === "available" && !userReserved && (
+                  <Button
+                    className="w-full"
+                    variant="outline"
+                    onClick={() => {
+                      if (!currentUser) {
+                        router.push(`/login?redirect=${encodeURIComponent(window.location.pathname)}`);
+                        return;
+                      }
+                      setFreeReserveLoading(true);
+                      api.post(`/api/reservations/${listing.id}`).then(() => {
+                        setShowFreeReserveSuccess(true);
+                        setUserReserved(true);
+                      }).catch(() => {}).finally(() => setFreeReserveLoading(false));
+                    }}
+                    disabled={freeReserveLoading}
+                  >
+                    {freeReserveLoading ? "Reserving..." : "Reserve (Free)"}
+                  </Button>
+                )}
+
+                {listing.status === "available" && currentUser && userReserved && (
+                  <Button className="w-full" variant="outline" disabled>
+                    Reserved
+                  </Button>
+                )}
+
+                {listing.reservationCount > 0 && (
+                  <p className="text-xs text-gray-500 text-center">
+                    {listing.reservationCount} {listing.reservationCount === 1 ? "person" : "people"} reserved this
+                  </p>
                 )}
 
                 <Link
@@ -297,6 +352,13 @@ export default function ListingDetail() {
                 <div className="bg-green-50 border border-green-200 rounded-lg p-4 mt-4 text-center">
                   <p className="text-sm font-medium text-green-800">Reservation Confirmed!</p>
                   <p className="text-xs text-green-600 mt-1">Holding deposit received. Expires in {reserveDays} days.</p>
+                </div>
+              )}
+
+              {showFreeReserveSuccess && (
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mt-4 text-center">
+                  <p className="text-sm font-medium text-blue-800">Reserved Successfully!</p>
+                  <p className="text-xs text-blue-600 mt-1">Expires in 24 hours. No payment required.</p>
                 </div>
               )}
 

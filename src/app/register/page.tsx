@@ -10,7 +10,7 @@ export default function RegisterPage() {
   const router = useRouter();
   const { login } = useRole();
   const { get: getSetting } = useSettings();
-  const [form, setForm] = useState({ name: "", email: "", password: "", role: "client" });
+  const [form, setForm] = useState({ name: "", email: "", password: "" });
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
@@ -21,7 +21,7 @@ export default function RegisterPage() {
     setError(null);
     setSubmitting(true);
     const { status, data } = await api.post<{ accessToken: string; user: { role: string } }>("/api/auth/register", {
-      name: form.name, email: form.email, password: form.password, role: form.role,
+      name: form.name, email: form.email, password: form.password, role: "client",
     });
     setSubmitting(false);
     if (status === 201 && data) {
@@ -30,8 +30,7 @@ export default function RegisterPage() {
       setAccessToken(data.accessToken);
       await login(form.email, form.password);
       setTimeout(() => {
-        if (form.role === "agent") router.push("/agent");
-        else router.push("/");
+        router.push("/");
       }, 1500);
     } else if (status === 409) {
       setError("This email is already registered");
@@ -107,27 +106,6 @@ export default function RegisterPage() {
               <input type="password" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} placeholder="Min. 8 characters" required
                 className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20 focus:border-[var(--color-primary)] focus:bg-white transition-all" />
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">I want to</label>
-              <div className="grid grid-cols-2 gap-2.5">
-                {[
-                  { v: "client", t: "Find a property", d: "Browse & contact agents" },
-                  { v: "agent", t: "List my property", d: "Sell or rent out a place" },
-                ].map((r) => (
-                  <label key={r.v} className={`relative flex flex-col p-3 rounded-xl border-2 cursor-pointer transition-all ${form.role === r.v ? "border-[var(--color-primary)] bg-[var(--color-primary)]/5" : "border-gray-200 hover:border-gray-300"}`}>
-                    <input type="radio" name="role" value={r.v} checked={form.role === r.v} onChange={() => setForm({ ...form, role: r.v })} className="sr-only" />
-                    <span className="text-sm font-semibold text-gray-900">{r.t}</span>
-                    <span className="text-[11px] text-gray-500 mt-0.5">{r.d}</span>
-                    {form.role === r.v && (
-                      <span className="absolute top-2.5 right-2.5 w-4 h-4 rounded-full bg-[var(--color-primary)] flex items-center justify-center">
-                        <svg className="w-2.5 h-2.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
-                      </span>
-                    )}
-                  </label>
-                ))}
-              </div>
-            </div>
-
             {error && (
               <div className="flex items-center gap-2 text-sm text-red-600 bg-red-50 rounded-xl px-4 py-3 border border-red-100">
                 <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>

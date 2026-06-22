@@ -140,6 +140,7 @@ export default function HomePage() {
       listingType: next.listingType,
       rentTier: next.rentTier || "",
       city: next.city,
+      state: next.state || "",
       category: next.category || "",
       minPrice: next.minPrice?.toString() || "",
       maxPrice: next.maxPrice?.toString() || "",
@@ -194,12 +195,20 @@ export default function HomePage() {
         <div className="relative w-full max-w-[1400px] mx-auto px-5 sm:px-6 lg:px-10 pt-16 sm:pt-20 lg:pt-24 pb-16 sm:pb-20 lg:pb-24" style={{ opacity: heroOpacity }}>
           {/* Top-right menu */}
           <div className="absolute top-4 right-5 sm:right-6 lg:right-10 flex items-center gap-2 sm:gap-3 z-10">
+            {PRIMARY_LINKS.map((link) => (
+              <Link key={link.label} href={link.href} className="bg-black/40 backdrop-blur-sm text-white/90 hover:text-white text-[11px] sm:text-sm font-semibold tracking-wide uppercase px-3 py-1.5 rounded-full transition-colors">
+                {link.label}
+              </Link>
+            ))}
             <div className="relative" id="hero-more">
               <button
                 onClick={() => setHeroMoreOpen(!heroMoreOpen)}
-                className="bg-black/20 backdrop-blur-sm text-white/90 hover:text-white text-[11px] sm:text-sm font-semibold tracking-wide uppercase px-3 py-1.5 rounded-full transition-colors"
+                className="bg-black/40 backdrop-blur-sm text-white/90 hover:text-white rounded-full transition-colors w-8 h-8 flex items-center justify-center"
+                aria-label="More"
               >
-                More
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
               </button>
               {heroMoreOpen && (
                 <div className="absolute top-full right-0 mt-2 w-44 bg-white rounded-xl border border-gray-100 shadow-xl shadow-gray-900/5 p-2 z-50">
@@ -216,11 +225,6 @@ export default function HomePage() {
                 </div>
               )}
             </div>
-            {PRIMARY_LINKS.map((link) => (
-              <Link key={link.label} href={link.href} className="bg-black/20 backdrop-blur-sm text-white/90 hover:text-white text-[11px] sm:text-sm font-semibold tracking-wide uppercase px-3 py-1.5 rounded-full transition-colors">
-                {link.label}
-              </Link>
-            ))}
           </div>
 
           <div className="flex flex-col justify-center items-center text-center min-h-[25vh] sm:min-h-[30vh] mt-10 sm:mt-6">
@@ -230,7 +234,7 @@ export default function HomePage() {
               className="h-36 sm:h-44 lg:h-56 w-auto rounded-lg object-contain mb-4 sm:mb-6"
             />
             <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white leading-tight tracking-tight max-w-3xl">
-              Find Property in Northern Nigeria
+              Find Your Properties in Kano & Other Northern States
             </h2>
             <p className="text-sm sm:text-base text-white/60 mt-3 sm:mt-4 max-w-2xl leading-relaxed">
               Whether you are looking to buy, rent, or sell — we have verified properties across Northern Nigeria. Gidan siyarwa, gidan haya, flats, land, and commercial spaces.
@@ -473,10 +477,10 @@ export default function HomePage() {
 
       {/* SOCIAL MEDIA */}
       {socialLinks.length > 0 && (
-        <section className="bg-gray-950 py-14">
+        <section className="bg-gray-50 py-14">
           <div className="max-w-[1400px] mx-auto px-5 sm:px-6 lg:px-10 text-center">
-            <h2 className="text-xl sm:text-2xl font-bold text-white mb-2">Connect With Us</h2>
-            <p className="text-gray-400 text-sm mb-8">Follow us on social media for updates and new listings</p>
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">Connect With Us</h2>
+            <p className="text-gray-500 text-sm mb-8">Follow us on social media for updates and new listings</p>
             <div className="flex items-center justify-center gap-6">
               {socialLinks.map((s) => (
                 <a
@@ -484,7 +488,7 @@ export default function HomePage() {
                   href={s.url || "#"}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-16 h-16 rounded-full bg-gray-800 border border-gray-700 flex items-center justify-center text-gray-300 hover:bg-white hover:text-gray-950 hover:border-white transition-all duration-200"
+                  className="w-16 h-16 rounded-full bg-white border border-gray-200 flex items-center justify-center text-gray-600 hover:bg-gray-900 hover:text-white hover:border-gray-900 transition-all duration-200"
                   aria-label={s.label}
                 >
                   {SOCIAL_ICONS[s.icon] || s.label[0]}

@@ -16,12 +16,13 @@ export default function AdminNewListingPage() {
   const router = useRouter();
   const [form, setForm] = useState({
     title: "", description: "", propertyType: "house", listingType: "sale",
-    city: "Kano Municipal", address: "", price: "", salePrice: "",
+    city: "Kano Municipal", state: "Kano", address: "", price: "", salePrice: "",
     annualRent: "", damageDeposit: "", maintenanceCharge: "",
     rentTier: "normal", bedrooms: "", bathrooms: "", size: "",
     features: [] as string[], category: "company" as "company" | "partnership",
     partnerCompany: "", negotiable: false,
     depositAmount: "", reservationDays: "2", downPaymentPercent: "10",
+    instalmentAvailable: false, instalmentMonths: "", instalmentCommission: "",
   });
   const [uploadedUrls, setUploadedUrls] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
@@ -85,6 +86,10 @@ export default function AdminNewListingPage() {
         depositAmount: form.depositAmount ? parseInt(form.depositAmount) : undefined,
         reservationDays: form.reservationDays ? parseInt(form.reservationDays) : undefined,
         downPaymentPercent: form.downPaymentPercent ? parseInt(form.downPaymentPercent) : undefined,
+        state: form.state,
+        instalmentAvailable: form.instalmentAvailable,
+        instalmentMonths: form.instalmentAvailable && form.instalmentMonths ? parseInt(form.instalmentMonths) : undefined,
+        instalmentCommission: form.instalmentAvailable && form.instalmentCommission ? parseFloat(form.instalmentCommission) : undefined,
       };
 
       if (form.listingType === "rent") {
@@ -166,6 +171,12 @@ export default function AdminNewListingPage() {
           </div>
         </div>
         <div>
+          <label className="block text-xs font-medium text-gray-700 mb-1">State</label>
+          <select value={form.state} onChange={tf("state")} className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20">
+            {["Abia","Adamawa","Akwa Ibom","Anambra","Bauchi","Bayelsa","Benue","Borno","Cross River","Delta","Ebonyi","Edo","Ekiti","Enugu","FCT","Gombe","Imo","Jigawa","Kaduna","Kano","Katsina","Kebbi","Kogi","Kwara","Lagos","Nasarawa","Niger","Ogun","Ondo","Osun","Oyo","Plateau","Rivers","Sokoto","Taraba","Yobe","Zamfara"].map(s => <option key={s} value={s}>{s}</option>)}
+          </select>
+        </div>
+        <div>
           <label className="block text-xs font-medium text-gray-700 mb-1">Address</label>
           <input value={form.address} onChange={tf("address")} placeholder="e.g. No. 15 Zaria Road" className="w-full rounded-lg border border-gray-200 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20" />
         </div>
@@ -238,6 +249,25 @@ export default function AdminNewListingPage() {
             <label className="block text-xs font-medium text-gray-700 mb-1">Down Payment (%)</label>
             <input type="number" min="1" max="100" value={form.downPaymentPercent} onChange={tf("downPaymentPercent")} placeholder="10" className="w-full rounded-lg border border-gray-200 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20" />
             <p className="text-xs text-gray-400 mt-1">Percentage paid upfront when using "Buy Now - Down Payment"</p>
+          </div>
+        )}
+
+        {/* Instalment Plan */}
+        <h3 className="text-sm font-semibold text-gray-900 pt-2">Instalment Plan</h3>
+        <div className="flex items-center gap-2">
+          <input type="checkbox" id="instalmentAvailable" checked={form.instalmentAvailable} onChange={tf("instalmentAvailable")} className="rounded border-gray-300 text-[var(--color-primary)] focus:ring-[var(--color-primary)]" />
+          <label htmlFor="instalmentAvailable" className="text-sm text-gray-700">Instalment payment available</label>
+        </div>
+        {form.instalmentAvailable && (
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-xs font-medium text-gray-700 mb-1">Instalment Months</label>
+              <input type="number" min="0" max="24" value={form.instalmentMonths} onChange={tf("instalmentMonths")} placeholder="e.g. 6" className="w-full rounded-lg border border-gray-200 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20" />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-gray-700 mb-1">Instalment Commission (%)</label>
+              <input type="number" min="0" max="100" step="0.1" value={form.instalmentCommission} onChange={tf("instalmentCommission")} placeholder="e.g. 5" className="w-full rounded-lg border border-gray-200 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20" />
+            </div>
           </div>
         )}
 

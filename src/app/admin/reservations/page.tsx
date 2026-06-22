@@ -193,6 +193,7 @@ export default function ReservationsPage() {
                         <div className="flex items-center gap-1.5">
                           <button onClick={() => setConfirmModal(r)} className="px-3 py-1.5 text-xs font-medium bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition-colors">Confirm</button>
                           <button onClick={() => setRejectModal(r)} className="px-3 py-1.5 text-xs font-medium bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors">Reject</button>
+                          <button onClick={() => { setAdminCancelModal(r); setAdminCancelRefund(false); }} className="px-3 py-1.5 text-xs font-medium bg-orange-50 text-orange-600 rounded-lg hover:bg-orange-100 transition-colors">Cancel</button>
                         </div>
                       )}
                       {r.status === "confirmed" && (
@@ -304,6 +305,7 @@ export default function ReservationsPage() {
                 {detailRes.paymentRef && <div className="flex justify-between text-sm"><span className="text-gray-500">Payment Ref</span><span className="text-xs font-mono text-gray-600">{detailRes.paymentRef}</span></div>}
                 {detailRes.refundAmount ? <div className="flex justify-between text-sm"><span className="text-gray-500">Refund</span><span className="font-bold text-emerald-600">{formatNaira(detailRes.refundAmount)}</span></div> : null}
                 {detailRes.cancelledAt && <div className="flex justify-between text-sm"><span className="text-gray-500">Cancelled</span><span className="font-medium text-gray-900">{new Date(detailRes.cancelledAt).toLocaleDateString()}</span></div>}
+                {detailRes.cancellationReason && <div className="flex justify-between text-sm"><span className="text-gray-500">Reason</span><span className="font-medium text-gray-900 text-right max-w-[200px]">{detailRes.cancellationReason}</span></div>}
               </div>
               {detailRes.status === "confirmed" && detailRes.meetingDate && (
                 <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-3 flex items-center gap-2">

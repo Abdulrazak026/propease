@@ -34,6 +34,7 @@ export default function ListPropertyPage() {
       listingType: next.listingType,
       rentTier: next.rentTier || "",
       city: next.city,
+      state: next.state || "",
       category: next.category || "",
       minPrice: next.minPrice?.toString() || "",
       maxPrice: next.maxPrice?.toString() || "",
