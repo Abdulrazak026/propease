@@ -25,32 +25,11 @@ export default function SellPage() {
       <section className="max-w-[900px] mx-auto w-full px-5 sm:px-6 lg:px-10 py-10 sm:py-14">
         <div className="grid sm:grid-cols-3 gap-4">
           {[
-            {
-              t: "Free visit",
-              d: "We come to your place. No charge, no obligation.",
-              icon: (
-                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" /></svg>
-              ),
-            },
-            {
-              t: "Fair price",
-              d: "We look at recent sales in your area and suggest a realistic price.",
-              icon: (
-                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-              ),
-            },
-            {
-              t: "We find the buyer",
-              d: "We list, show, and negotiate. You sign when the deal is right.",
-              icon: (
-                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" /></svg>
-              ),
-            },
+            { t: "Free visit", d: "We come to your place. No charge, no obligation." },
+            { t: "Fair price", d: "We look at recent sales in your area and suggest a realistic price." },
+            { t: "We find the buyer", d: "We list, show, and negotiate. You sign when the deal is right." },
           ].map((s) => (
             <div key={s.t} className="bg-white border border-gray-200 rounded-2xl p-6 text-center sm:text-left">
-              <div className="w-12 h-12 rounded-xl bg-[var(--color-primary)]/10 text-[var(--color-primary)] flex items-center justify-center mx-auto sm:mx-0 mb-4">
-                {s.icon}
-              </div>
               <h3 className="text-lg font-semibold text-gray-900 mb-1.5">{s.t}</h3>
               <p className="text-sm text-gray-600 leading-relaxed">{s.d}</p>
             </div>
@@ -58,21 +37,14 @@ export default function SellPage() {
         </div>
       </section>
 
-      {/* TERMS & DISCLAIMER */}
+      {/* DISCLAIMER */}
       <section className="max-w-[900px] mx-auto w-full px-5 sm:px-6 lg:px-10 pb-10 sm:pb-14">
-        <div className="bg-amber-50 border border-amber-200 rounded-2xl p-6 sm:p-8">
-          <h3 className="text-lg font-bold text-amber-900 mb-3">Important Information</h3>
-          <ul className="space-y-2 text-sm text-amber-800 leading-relaxed">
+        <div className="bg-white border border-gray-200 rounded-2xl p-6 sm:p-8">
+          <h3 className="text-base font-semibold text-gray-900 mb-3">Terms & Conditions</h3>
+          <ul className="space-y-2 text-sm text-gray-600 leading-relaxed">
             <li><strong>MBPP Approval:</strong> All listings are subject to MBPP verification and approval before publication.</li>
             <li><strong>Notification Requirement:</strong> Sellers must notify MBPP of any price changes, pending offers, or withdrawal of listing within 24 hours.</li>
-            <li><strong>Rental Options:</strong>
-              <ul className="ml-4 mt-1 space-y-1">
-                <li>• <strong>Standard (5% commission):</strong> MBPP charges a 5% commission on the total rental value upon successful tenant placement.</li>
-                <li>• <strong>Premium (10% commission):</strong> Includes professional photography, virtual tour, and priority placement. 10% commission applies.</li>
-              </ul>
-            </li>
-            <li className="mt-2"><strong>Reservation:</strong> Properties can be reserved for free. Reservations expire after 24 hours if not confirmed. Multiple people may reserve the same property.</li>
-            <li className="mt-2"><strong>Instalment Plans:</strong> For qualifying properties, buyers may purchase via an instalment plan. Terms (duration 0–24 months, commission %) are set by the lister. Monthly payment = (price + price × commission%) / months.</li>
+            <li><strong>Commission:</strong> MBPP charges a commission on successful transactions. Rates depend on the service tier selected at listing.</li>
           </ul>
         </div>
       </section>

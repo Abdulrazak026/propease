@@ -44,10 +44,10 @@ export default function AutoCarousel({ items, interval = 4000, className = "", h
         style={{ transform: `translateX(-${current * 100}%)` }}
       >
         {items.map((item, i) => (
-          <div key={i} className={`min-w-full relative ${heightClass}`}>
-            <img src={item.image} alt={item.title || ""} className="w-full h-full" style={{ objectFit: imageFit }} />
+          <div key={i} className={`min-w-full relative ${heightClass} bg-gray-200`}>
+            <img src={item.image} alt={item.title || ""} className="w-full h-full" style={{ objectFit: imageFit }} loading="lazy" />
             {showOverlay && <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />}
-            {!showOverlay && (item.title || item.subtitle) && <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-black/40 to-transparent" />}
+            {!showOverlay && (item.title || item.subtitle) && <div className="absolute bottom-0 left-0 right-0 h-36 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />}
             {(item.title || item.subtitle) && (
               <div className="absolute bottom-0 left-0 right-0 p-6 sm:p-8">
                 {item.title && <h3 className={showOverlay ? "text-white text-xl sm:text-2xl font-bold" : "text-white text-xl sm:text-2xl font-bold drop-shadow-lg"}>{item.title}</h3>}
