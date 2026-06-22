@@ -20,10 +20,12 @@ html {
 
 body {
   background: var(--color-surface);
-  color: #111827;
+  color: #1a202c;
   font-family: var(--font-sans, Arial, Helvetica, sans-serif);
   -webkit-font-smoothing: antialiased;
   overscroll-behavior: none;
+  font-size: 16px;
+  line-height: 1.6;
 }
 
 ::selection {

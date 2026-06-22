@@ -400,7 +400,7 @@ export default function HomePage() {
       {/* WHAT WE OFFER */}
       <section className="bg-gray-50 py-8 sm:py-12">
         <div className="max-w-[1400px] mx-auto px-5 sm:px-6 lg:px-10">
-          <h2 className="text-base sm:text-lg font-bold text-gray-900 text-center mb-4 sm:mb-5">WHAT WE OFFER</h2>
+          <h2 className="text-lg sm:text-xl font-bold text-gray-900 text-center mb-4 sm:mb-5">WHAT WE OFFER</h2>
           <div className="max-w-2xl mx-auto bg-white rounded-xl border border-gray-100 p-4 sm:p-5 divide-y divide-gray-100">
             {[
               { icon: "bi-map-fill", color: "text-[var(--color-primary)]", bg: "bg-[var(--color-primary)]/10", title: "WE SELL LANDS", desc: "Genuine plots in prime locations with secure titles" },
@@ -442,7 +442,7 @@ export default function HomePage() {
       {/* WHY BUY FROM MBPP */}
       <section className="bg-white py-8 sm:py-12">
         <div className="max-w-[1400px] mx-auto px-5 sm:px-6 lg:px-10">
-          <h2 className="text-base sm:text-lg font-bold text-gray-900 text-center mb-4 sm:mb-5">WHY BUY FROM MBPP?</h2>
+          <h2 className="text-lg sm:text-xl font-bold text-gray-900 text-center mb-4 sm:mb-5">WHY BUY FROM MBPP?</h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-3">
             {[
               { title: "Verified & Genuine", icon: "bi-shield-fill-check", color: "text-[var(--color-primary)]", bg: "bg-[var(--color-primary)]/10" },
