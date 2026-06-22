@@ -59,22 +59,23 @@ const SOCIAL_ICONS: Record<string, React.ReactNode> = {
 
 const PRIMARY_LINKS = [
   { label: "Buy", href: "/list-property" },
-  { label: "Sell", href: "/sell" },
   { label: "Rental", href: "/list-property?type=rent" },
+  { label: "Sell", href: "/sell" },
 ];
 
-const HERO_MORE_ITEMS = (isAuth: boolean) => [
+const HERO_MORE_ITEMS = (isAuth: boolean, isAdmin: boolean) => [
   { label: "About", href: "/about" },
   { label: "Contact", href: "/contact" },
   { label: "News", href: "/news" },
   { label: "Careers", href: "/careers" },
-  ...(isAuth ? [{ label: "Dashboard", href: "/admin" }] : [{ label: "Sign In", href: "/login" }]),
+  ...(isAuth && isAdmin ? [{ label: "Dashboard", href: "/admin" }] : []),
+  ...(!isAuth ? [{ label: "Sign In", href: "/login" }] : []),
   ...(isAuth ? [{ label: "Sign Out", href: "/", action: "logout" as const }] : []),
 ];
 
 export default function HomePage() {
   const { get: getSetting, loading: settingsLoading } = useSettings();
-  const { currentUser, isAuthenticated, logout } = useRole();
+  const { currentUser, isAuthenticated, logout, role } = useRole();
   const heroImage = getSetting("hero_image") || "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=1600&h=900&fit=crop";
   const siteName = getSetting("site_name", "MBPP");
   const siteTagline = getSetting("site_tagline", "Find Your Dream Property in Kano & Northern States");
@@ -202,7 +203,7 @@ export default function HomePage() {
           {/* Top-left links */}
           <div className="absolute top-4 left-5 sm:left-6 lg:left-10 flex items-center gap-2 sm:gap-3 z-10">
             {PRIMARY_LINKS.map((link) => (
-              <Link key={link.label} href={link.href} className="bg-black/40 backdrop-blur-sm text-white/90 hover:text-white text-[11px] sm:text-sm font-semibold tracking-wide uppercase px-3 py-1.5 rounded-full transition-colors">
+              <Link key={link.label} href={link.href} className="bg-black/40 backdrop-blur-sm text-white/90 hover:text-white text-sm sm:text-base font-semibold tracking-wide uppercase px-4 py-2 rounded-full transition-colors">
                 {link.label}
               </Link>
             ))}
@@ -212,21 +213,21 @@ export default function HomePage() {
           <div className="absolute top-4 right-5 sm:right-6 lg:right-10 z-10" id="hero-more">
             <button
               onClick={() => setHeroMoreOpen(!heroMoreOpen)}
-              className="bg-black/40 backdrop-blur-sm text-white/90 hover:text-white rounded-full transition-colors w-8 h-8 flex items-center justify-center"
+              className="bg-black/40 backdrop-blur-sm text-white/90 hover:text-white rounded-full transition-colors w-10 h-10 flex items-center justify-center"
               aria-label="More"
             >
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
               </svg>
             </button>
             {heroMoreOpen && (
-              <div className="absolute top-full right-0 mt-2 w-56 bg-white rounded-xl border border-gray-100 shadow-xl shadow-gray-900/5 p-3 z-50">
-                {HERO_MORE_ITEMS(!!isAuthenticated).map((item) => (
+              <div className="absolute top-full right-0 mt-2 w-64 bg-white rounded-xl border border-gray-100 shadow-xl shadow-gray-900/5 p-3 z-50">
+                {HERO_MORE_ITEMS(!!isAuthenticated, role === "head" || role === "admin" || role === "ambassador" || role === "agent").map((item) => (
                   item.action === "logout" ? (
                     <button
                       key="logout"
                       onClick={() => { setHeroMoreOpen(false); logout(); }}
-                      className="w-full text-left block px-4 py-2.5 text-sm font-medium text-red-600 hover:bg-red-50 rounded-lg"
+                      className="w-full text-left block px-5 py-3 text-base font-medium text-red-600 hover:bg-red-50 rounded-lg"
                     >
                       {item.label}
                     </button>
@@ -235,7 +236,7 @@ export default function HomePage() {
                       key={item.href}
                       href={item.href}
                       onClick={() => setHeroMoreOpen(false)}
-                      className="block px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-lg"
+                      className="block px-5 py-3 text-base font-medium text-gray-700 hover:bg-gray-50 rounded-lg"
                     >
                       {item.label}
                     </Link>
@@ -265,7 +266,7 @@ export default function HomePage() {
         <div className="max-w-[1400px] mx-auto px-5 sm:px-6 lg:px-10 py-3">
           <div className="flex items-center justify-between rounded-xl bg-gray-50/50 px-4 py-3">
             {[
-              { v: "30+", l: "Properties", icon: "bi-shield-check", c: "text-emerald-500" },
+              { v: "30+", l: "Properties", icon: "bi-shield-check", c: "text-[var(--color-primary)]" },
               { v: "14", l: "Areas", icon: "bi-buildings", c: "text-blue-500" },
               { v: "4", l: "Cities", icon: "bi-geo-alt", c: "text-purple-500" },
               { v: "100+", l: "Clients", icon: "bi-people", c: "text-orange-500" },
@@ -375,8 +376,8 @@ export default function HomePage() {
         <div className="max-w-[1400px] mx-auto px-5 sm:px-6 lg:px-10">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
             <div className="flex items-start gap-3 sm:gap-4 p-4 sm:p-5 rounded-xl bg-gray-50 border border-gray-100">
-              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-emerald-50 flex items-center justify-center shrink-0">
-                <i className="bi bi-shield-fill-check text-emerald-600 text-lg sm:text-xl"></i>
+              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-[var(--color-primary)]/10 flex items-center justify-center shrink-0">
+                <i className="bi bi-shield-fill-check text-[var(--color-primary)] text-lg sm:text-xl"></i>
               </div>
               <div>
                 <h3 className="text-sm sm:text-base font-bold text-gray-900">VERIFIED PROPERTIES</h3>
@@ -402,7 +403,7 @@ export default function HomePage() {
           <h2 className="text-base sm:text-lg font-bold text-gray-900 text-center mb-4 sm:mb-5">WHAT WE OFFER</h2>
           <div className="max-w-2xl mx-auto bg-white rounded-xl border border-gray-100 p-4 sm:p-5 divide-y divide-gray-100">
             {[
-              { icon: "bi-map-fill", color: "text-emerald-600", bg: "bg-emerald-50", title: "WE SELL LANDS", desc: "Genuine plots in prime locations with secure titles" },
+              { icon: "bi-map-fill", color: "text-[var(--color-primary)]", bg: "bg-[var(--color-primary)]/10", title: "WE SELL LANDS", desc: "Genuine plots in prime locations with secure titles" },
               { icon: "bi-house-fill", color: "text-blue-600", bg: "bg-blue-50", title: "WE BUILD HOUSES", desc: "From foundation to finishing, we build quality homes tailored to your needs" },
               { icon: "bi-buildings-fill", color: "text-purple-600", bg: "bg-purple-50", title: "WE SELL COMPLETED HOUSES", desc: "Move-in ready homes with modern finishing and quality construction" },
             ].map((item, i) => (
@@ -444,7 +445,7 @@ export default function HomePage() {
           <h2 className="text-base sm:text-lg font-bold text-gray-900 text-center mb-4 sm:mb-5">WHY BUY FROM MBPP?</h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-3">
             {[
-              { title: "Verified & Genuine", icon: "bi-shield-fill-check", color: "text-emerald-500", bg: "bg-emerald-50" },
+              { title: "Verified & Genuine", icon: "bi-shield-fill-check", color: "text-[var(--color-primary)]", bg: "bg-[var(--color-primary)]/10" },
               { title: "Prime Locations", icon: "bi-geo-alt-fill", color: "text-blue-500", bg: "bg-blue-50" },
               { title: "Northern Nigeria Focus", icon: "bi-buildings", color: "text-purple-500", bg: "bg-purple-50" },
               { title: "Quality Finishing", icon: "bi-star-fill", color: "text-amber-500", bg: "bg-amber-50" },
@@ -501,7 +502,7 @@ export default function HomePage() {
                 <div
                   key={name}
                   className={`group flex gap-4 p-3 -m-3 rounded-2xl transition-all duration-300 hover:bg-white hover:shadow-lg hover:shadow-gray-900/5 hover:-translate-y-0.5 cursor-default ${
-                    isLead ? "sm:col-span-2 sm:items-center bg-gradient-to-br from-emerald-50/60 to-white border border-emerald-100/60" : ""
+                    isLead ? "sm:col-span-2 sm:items-center bg-gradient-to-br from-blue-50/60 to-white border border-blue-100/60" : ""
                   }`}
                   style={{ animation: `fadeUp 0.5s ease-out ${i * 60}ms both` }}
                 >

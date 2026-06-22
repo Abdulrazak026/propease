@@ -8,7 +8,7 @@ interface MapViewProps {
 }
 
 function priceBucket(p: number): { fill: string } {
-  if (p < 5_000_000) return { fill: "#0d6b3d" };
+  if (p < 5_000_000) return { fill: "#1a365d" };
   if (p < 15_000_000) return { fill: "#2563eb" };
   if (p < 30_000_000) return { fill: "#f59e0b" };
   return { fill: "#dc2626" };
@@ -71,7 +71,7 @@ export default function MapView({ listings, height = "calc(100vh - 12rem)" }: Ma
       const photo = (l.photos && l.photos[0] && l.photos[0].url) || "";
       const popup = `<div style="min-width:200px;font-family:system-ui">
         ${photo ? `<img src="${photo}" alt="${l.title || 'Property'}" style="width:100%;height:100px;object-fit:cover;border-radius:8px;margin-bottom:6px;" />` : ""}
-        <a href="/listings/${l.id}" style="font-weight:600;font-size:13px;color:#0d6b3d;text-decoration:none;display:block;margin-bottom:2px;">${l.title}</a>
+        <a href="/listings/${l.id}" style="font-weight:600;font-size:13px;color:#1a365d;text-decoration:none;display:block;margin-bottom:2px;">${l.title}</a>
         <p style="font-size:11px;color:#6b7280;margin:0 0 4px;">${l.city}</p>
         <p style="font-size:13px;font-weight:700;color:#111;margin:0;">₦${l.price.toLocaleString()}</p>
       </div>`;

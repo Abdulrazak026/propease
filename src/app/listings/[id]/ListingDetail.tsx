@@ -6,10 +6,9 @@ import { useRole } from "@/context/RoleContext";
 import { api } from "@/lib/api-client";
 import Badge from "@/components/ui/Badge";
 import Button from "@/components/ui/Button";
-import BottomSheet from "@/components/ui/BottomSheet";
 import VerifiedBadge from "@/components/ui/VerifiedBadge";
 import RentTierBreakdown from "@/components/listings/RentTierBreakdown";
-import ReviewSection from "@/components/listings/ReviewSection";
+import PaystackButton from "@/components/payments/PaystackButton";
 import PriceHistory from "@/components/listings/PriceHistory";
 import ValuationEstimate from "@/components/listings/ValuationEstimate";
 import MapPlaceholder from "@/components/ui/MapPlaceholder";
@@ -32,6 +31,7 @@ export default function ListingDetail() {
   const [fav, setFav] = useState(false);
   const [priceHistory, setPriceHistory] = useState<any[]>([]);
   const [agreedToTerms, setAgreedToTerms] = useState(false);
+  const [showBuySuccess, setShowBuySuccess] = useState(false);
 
   useEffect(() => {
     api.get<any>(`/api/listings/${id}`).then(r => {
@@ -107,7 +107,7 @@ export default function ListingDetail() {
           },
         }) }}
       />
-      <div className="px-4 sm:px-6 lg:px-8 py-6">
+      <div className="px-4 sm:px-6 lg:px-8 py-6 pb-12">
         <Link href="/" className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-[var(--color-primary)] transition-colors mb-4">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M19 12H5M12 19l-7-7 7-7" /></svg>
           Back to listings
@@ -300,6 +300,23 @@ export default function ListingDetail() {
                   );
                 })()}
 
+                {listing.listingType === "sale" && listing.status === "available" && !userReserved && (
+                  <PaystackButton
+                    email={currentUser?.email || ""}
+                    amount={listing.price}
+                    label={listing.instalmentAvailable ? `Buy Now — Full or ${listing.downPaymentPercent || 10}% Down` : "Buy Now — Pay Full Price"}
+                    metadata={{ listingId: listing.id, userId: currentUser?.id, purpose: "property_purchase" }}
+                    onSuccess={async (ref) => {
+                      try {
+                        await api.post(`/api/reservations/${listing.id}`, { paymentRef: ref, purpose: "purchase" });
+                      } catch {}
+                      setShowBuySuccess(true);
+                    }}
+                    disabled={!currentUser}
+                    className="w-full bg-[var(--color-accent)] hover:bg-[var(--color-accent-light)] text-gray-900 font-semibold"
+                  />
+                )}
+
                 {listing.listingType === "rent" && (
                   <Link
                     href={`/apply?listing=${listing.id}`}
@@ -308,7 +325,7 @@ export default function ListingDetail() {
                     <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                     </svg>
-                    Apply Now
+                    Rent Now
                   </Link>
                 )}
               </div>
@@ -317,6 +334,13 @@ export default function ListingDetail() {
                 <div className="bg-green-50 border border-green-200 rounded-lg p-4 mt-4 text-center">
                   <p className="text-sm font-medium text-green-800">Reserved Successfully!</p>
                   <p className="text-xs text-green-600 mt-1">Expires in 24 hours. No payment required.</p>
+                </div>
+              )}
+
+              {showBuySuccess && (
+                <div className="bg-green-50 border border-green-200 rounded-lg p-4 mt-4 text-center">
+                  <p className="text-sm font-medium text-green-800">Payment Received!</p>
+                  <p className="text-xs text-green-600 mt-1">An MBPP agent will contact you shortly to complete the process.</p>
                 </div>
               )}
 
@@ -401,15 +425,6 @@ export default function ListingDetail() {
               priceLabel={listing.priceLabel}
             />
           </div>
-        </div>
-
-        <div className="max-w-3xl mt-8">
-          <ReviewSection
-            agentId={listing.assignedAgent?.id}
-            agentName={listing.assignedAgent?.name}
-            listingId={listing.id}
-            currentUserId={currentUser?.id}
-          />
         </div>
       </div>
 
