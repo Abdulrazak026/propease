@@ -37,38 +37,54 @@ export default function ListingDetail() {
 
   const openPaystack = (amount: number, purpose: string) => {
     setBuyLoading(true);
-    const loadScript = (): Promise<boolean> => {
-      return new Promise((resolve) => {
-        if (typeof window !== "undefined" && (window as any).PaystackPop) return resolve(true);
-        const script = document.createElement("script");
-        script.src = "https://js.paystack.co/v1/inline.js";
-        script.onload = () => resolve(true);
-        script.onerror = () => resolve(false);
-        document.head.appendChild(script);
-      });
+    const paystackKey = process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY;
+    if (!paystackKey) {
+      console.error("NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY is not set");
+      setBuyLoading(false);
+      alert("Payment is not configured. Please contact support.");
+      return;
+    }
+
+    const doPay = () => {
+      try {
+        const ref = "MBPP-" + Date.now() + "-" + Math.random().toString(36).substring(2, 7);
+        const handler = (window as any).PaystackPop.setup({
+          key: paystackKey,
+          email: currentUser?.email || "",
+          amount: Math.round(amount * 100),
+          currency: "NGN",
+          ref,
+          metadata: { listingId: listing.id, userId: currentUser?.id, purpose },
+          callback: async (response: { reference: string }) => {
+            setBuyLoading(false);
+            try {
+              await api.post(`/api/reservations/${listing.id}`, { paymentRef: response.reference, purpose: "purchase" });
+            } catch {}
+            setShowBuySuccess(true);
+            setShowBuyOptions(false);
+          },
+          onClose: () => { setBuyLoading(false); },
+        });
+        handler.openIframe();
+      } catch (err) {
+        console.error("Paystack error:", err);
+        setBuyLoading(false);
+        alert("Payment failed to load. Please try again.");
+      }
     };
-    loadScript().then((loaded) => {
-      if (!loaded) { setBuyLoading(false); return; }
-      const ref = "MBPP-" + Date.now() + "-" + Math.random().toString(36).substring(2, 7);
-      const handler = (window as any).PaystackPop.setup({
-        key: process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY || "pk_test_xxxxxxxxxxxxx",
-        email: currentUser?.email || "",
-        amount: Math.round(amount * 100),
-        currency: "NGN",
-        ref,
-        metadata: { listingId: listing.id, userId: currentUser?.id, purpose, buyType: purpose.includes("down") ? "instalment" : "full" },
-        callback: async (response: { reference: string }) => {
-          setBuyLoading(false);
-          try {
-            await api.post(`/api/reservations/${listing.id}`, { paymentRef: response.reference, purpose: "purchase" });
-          } catch {}
-          setShowBuySuccess(true);
-          setShowBuyOptions(false);
-        },
-        onClose: () => { setBuyLoading(false); },
-      });
-      handler.openIframe();
-    });
+
+    if (typeof window !== "undefined" && (window as any).PaystackPop) {
+      doPay();
+    } else {
+      const script = document.createElement("script");
+      script.src = "https://js.paystack.co/v1/inline.js";
+      script.onload = () => doPay();
+      script.onerror = () => {
+        setBuyLoading(false);
+        alert("Payment system failed to load. Check your internet connection.");
+      };
+      document.head.appendChild(script);
+    }
   };
 
   useEffect(() => {
