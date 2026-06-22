@@ -408,56 +408,62 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* FLYER */}
-      {getSetting("flyer_image") && (
-        <section className="bg-white py-10 sm:py-16">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 className="text-2xl sm:text-3xl font-black text-brand-blue text-center mb-6 sm:mb-8 tracking-tight">PROMOTIONAL FLYER</h2>
-            <div className="max-w-3xl mx-auto cursor-pointer" onClick={() => setFlyerOpen(true)}>
-              <img src={getSetting("flyer_image")} alt="Promotional Flyer" className="w-full h-auto rounded-2xl shadow-lg hover:shadow-xl transition-shadow" />
-            </div>
-          </div>
-          {flyerOpen && (
-            <div className="fixed inset-0 z-[100] bg-black/80 flex items-center justify-center p-4" onClick={() => setFlyerOpen(false)}>
-              <div className="relative max-w-4xl w-full max-h-[90vh] flex items-center justify-center" onClick={(e) => e.stopPropagation()}>
-                <button onClick={() => setFlyerOpen(false)} className="absolute -top-10 right-0 text-white/80 hover:text-white text-sm font-medium">
-                  Close ✕
-                </button>
-                <img src={getSetting("flyer_image")} alt="Promotional Flyer" className="w-full h-auto max-h-[85vh] object-contain rounded-xl scale-100 animate-in" />
-              </div>
-            </div>
-          )}
-        </section>
-      )}
-
-      {/* WHY BUY FROM MBPP? + MEET OUR TEAM — Combined Split Section */}
+      {/* WHY BUY FROM MBPP? + FLYER — Swipeable */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
 
-          {/* Left Side: Why Buy from MBPP? */}
-          <div className="lg:col-span-5 flex flex-col justify-between">
-            <div>
+          {/* Left Side: Why Buy from MBPP? + Flyer Carousel */}
+          <div className="lg:col-span-5 flex flex-col">
+            <div className="mb-4">
               <h3 className="text-2xl font-black text-brand-blue mb-2 tracking-tight">WHY BUY FROM MBPP?</h3>
-              <p className="text-sm text-slate-500 mb-8">We offer the most comprehensive real estate solution structures in Northern Nigeria.</p>
+              <p className="text-sm text-slate-500">We offer the most comprehensive real estate solution structures in Northern Nigeria.</p>
             </div>
-            <div className="space-y-6">
-              {[
-                { icon: "bi-shield-fill-check", title: "Verified & Genuine Properties", desc: "Absolute assurance with fully documented ownership papers and title deeds." },
-                { icon: "bi-geo-alt-fill", title: "Prime Locations in Kano", desc: "Strategically situated within high capital appreciation corridors." },
-                { icon: "bi-tools", title: "Quality Construction & Finishing", desc: "Unmatched, durability-focused construction quality controlled by experts." },
-                { icon: "bi-receipt", title: "Flexible Payment Options", desc: "Accessible, custom payment plans optimized around client cashflows." },
-                { icon: "bi-person-badge-fill", title: "Professional & Experienced Team", desc: "Guidance from real estate agents who understand local market conditions." },
-              ].map((item) => (
-                <div key={item.title} className="flex gap-4 items-start">
-                  <div className="w-10 h-10 bg-brand-blue text-brand-gold rounded-xl flex items-center justify-center flex-shrink-0">
-                    <i className={`bi ${item.icon}`}></i>
-                  </div>
-                  <div>
-                    <h5 className="font-bold text-brand-blue text-sm">{item.title}</h5>
-                    <p className="text-slate-500 text-xs mt-0.5">{item.desc}</p>
+
+            {/* Swipeable carousel: features + flyer */}
+            <div className="relative flex-1">
+              <div className="flex overflow-x-auto snap-x snap-mandatory scrollbar-hide gap-4 rounded-2xl" style={{ scrollBehavior: "smooth" }}>
+                {/* Slide 1: Features */}
+                <div className="min-w-full snap-start bg-white border border-gray-200 rounded-2xl p-6">
+                  <div className="space-y-5">
+                    {[
+                      { icon: "bi-shield-fill-check", title: "Verified & Genuine Properties", desc: "Absolute assurance with fully documented ownership papers and title deeds." },
+                      { icon: "bi-geo-alt-fill", title: "Prime Locations in Kano", desc: "Strategically situated within high capital appreciation corridors." },
+                      { icon: "bi-tools", title: "Quality Construction & Finishing", desc: "Unmatched, durability-focused construction quality controlled by experts." },
+                      { icon: "bi-receipt", title: "Flexible Payment Options", desc: "Accessible, custom payment plans optimized around client cashflows." },
+                      { icon: "bi-person-badge-fill", title: "Professional & Experienced Team", desc: "Guidance from real estate agents who understand local market conditions." },
+                    ].map((item) => (
+                      <div key={item.title} className="flex gap-3 items-start">
+                        <div className="w-9 h-9 bg-brand-blue text-brand-gold rounded-lg flex items-center justify-center flex-shrink-0">
+                          <i className={`bi ${item.icon} text-sm`}></i>
+                        </div>
+                        <div>
+                          <h5 className="font-bold text-brand-blue text-sm">{item.title}</h5>
+                          <p className="text-slate-500 text-xs mt-0.5">{item.desc}</p>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </div>
-              ))}
+
+                {/* Slide 2: Flyer */}
+                {getSetting("flyer_image") && (
+                  <div className="min-w-full snap-start bg-white border border-gray-200 rounded-2xl p-4 flex flex-col items-center justify-center">
+                    <p className="text-xs font-semibold text-brand-gold uppercase tracking-widest mb-3">Promotional Flyer</p>
+                    <div className="cursor-pointer w-full" onClick={() => setFlyerOpen(true)}>
+                      <img src={getSetting("flyer_image")} alt="Promotional Flyer" className="w-full h-auto rounded-xl shadow-md hover:shadow-lg transition-shadow" />
+                    </div>
+                    <p className="text-xs text-gray-400 mt-3">Tap to enlarge</p>
+                  </div>
+                )}
+              </div>
+
+              {/* Dots indicator */}
+              {getSetting("flyer_image") && (
+                <div className="flex justify-center gap-2 mt-4">
+                  <div className="w-2 h-2 rounded-full bg-brand-blue"></div>
+                  <div className="w-2 h-2 rounded-full bg-gray-300"></div>
+                </div>
+              )}
             </div>
           </div>
 
@@ -553,6 +559,18 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* Flyer Lightbox Modal */}
+      {flyerOpen && getSetting("flyer_image") && (
+        <div className="fixed inset-0 z-[100] bg-black/80 flex items-center justify-center p-4" onClick={() => setFlyerOpen(false)}>
+          <div className="relative max-w-4xl w-full max-h-[90vh] flex items-center justify-center" onClick={(e) => e.stopPropagation()}>
+            <button onClick={() => setFlyerOpen(false)} className="absolute -top-10 right-0 text-white/80 hover:text-white text-sm font-medium">
+              Close ✕
+            </button>
+            <img src={getSetting("flyer_image")} alt="Promotional Flyer" className="w-full h-auto max-h-[85vh] object-contain rounded-xl" />
+          </div>
+        </div>
+      )}
 
       <Footer />
     </div>
