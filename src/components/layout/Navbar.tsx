@@ -37,6 +37,7 @@ export default function Navbar() {
   const [hidden, setHidden] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const [notifs, setNotifs] = useState<{ id: string; title: string; body: string; link: string | null; read: boolean; createdAt: string; type: string }[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const notifRef = useRef<HTMLDivElement>(null);
@@ -47,10 +48,10 @@ export default function Navbar() {
 
   const siteLogo = getSetting("site_logo");
   const siteName = getSetting("site_name", "MBPP");
-  const isHomepage = pathname === "/";
+  const isHomepage = mounted && pathname === "/";
   const [heroPassed, setHeroPassed] = useState(false);
 
-  const isDashboard = pathname.startsWith("/admin") || pathname.startsWith("/agent") || pathname.startsWith("/ambassador") || pathname === "/wallet";
+  const isDashboard = mounted && (pathname.startsWith("/admin") || pathname.startsWith("/agent") || pathname.startsWith("/ambassador") || pathname === "/wallet");
 
   const handleLogout = () => { setCurrentUser(null); router.push("/"); };
 
@@ -103,6 +104,8 @@ export default function Navbar() {
       document.removeEventListener("touchstart", handleClick);
     };
   }, []);
+
+  useEffect(() => { setMounted(true); }, []);
 
   useEffect(() => {
     const onScroll = () => {

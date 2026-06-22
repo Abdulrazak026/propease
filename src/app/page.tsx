@@ -54,6 +54,13 @@ const SOCIAL_ICONS: Record<string, React.ReactNode> = {
   tiktok: <svg className="w-7 h-7" fill="currentColor" viewBox="0 0 24 24"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1v-3.5a6.37 6.37 0 00-.79-.05A6.34 6.34 0 003.15 15.2a6.34 6.34 0 0010.86 4.43V13a8.28 8.28 0 005.58 2.16V11.7a4.83 4.83 0 01-3.58-1.42V6.69h3.58z"/></svg>,
 };
 
+const PRIMARY_LINKS = [
+  { label: "Properties", href: "/list-property" },
+  { label: "Rent", href: "/list-property?type=rent" },
+  { label: "Sell", href: "/sell" },
+  { label: "Research", href: "/research" },
+];
+
 export default function HomePage() {
   const { get: getSetting, loading: settingsLoading } = useSettings();
   const heroImage = getSetting("hero_image") || "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=1600&h=900&fit=crop";
@@ -161,11 +168,20 @@ export default function HomePage() {
 
         <div className="relative w-full max-w-[1400px] mx-auto px-5 sm:px-6 lg:px-10 pt-24 sm:pt-28 lg:pt-36 pb-16 sm:pb-20 lg:pb-24" style={{ opacity: heroOpacity }}>
           <div className="flex flex-col justify-center items-center text-center min-h-[30vh] sm:min-h-[35vh]">
+            <div className="flex items-center justify-center gap-4 sm:gap-6 mb-6 sm:mb-8 flex-wrap">
+              {PRIMARY_LINKS.map((link) => (
+                <Link key={link.label} href={link.href} className="text-white/85 hover:text-white text-[13px] sm:text-sm font-semibold tracking-wide transition-colors uppercase">
+                  {link.label}
+                </Link>
+              ))}
+              <span className="text-white/60 text-[13px] sm:text-sm font-semibold tracking-wide uppercase cursor-default">
+                More
+              </span>
+            </div>
             <img
               src={getSetting("site_logo") || `https://mbpproperties.com/api/upload/file/7ea15ec8-11b2-4c34-a855-1469d56656a5.png`}
               alt={siteName}
               className="h-28 sm:h-36 lg:h-44 w-auto rounded-lg object-contain mb-6 sm:mb-8"
-              style={{ mixBlendMode: "multiply", filter: "brightness(10)" }}
             />
             <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white leading-tight tracking-tight max-w-3xl">
               Find Property in Northern Nigeria
