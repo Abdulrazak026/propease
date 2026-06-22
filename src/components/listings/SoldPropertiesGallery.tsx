@@ -1,8 +1,9 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { api } from "@/lib/api-client";
 import { ApiSoldProperty } from "@/lib/api-types";
+import AutoCarousel from "@/components/homepage/AutoCarousel";
 
 const FALLBACK_SOLD: ApiSoldProperty[] = [
   { id: "fs1", title: "3-bed bungalow in Tarauni", city: "Tarauni", salePrice: 28000000, soldAt: new Date(Date.now() - 7 * 86400000).toISOString() },
@@ -59,6 +60,12 @@ export default function SoldPropertiesGallery() {
     return null;
   }
 
+  const carouselItems = items.slice(0, 6).map((p, i) => ({
+    image: p.coverPhoto || FALLBACK_PHOTOS[i % FALLBACK_PHOTOS.length],
+    title: p.title,
+    subtitle: `${p.city} \u2022 ${formatNaira(p.salePrice)} \u2022 ${timeAgo(p.soldAt)}`,
+  }));
+
   return (
     <section className="bg-gradient-to-b from-white to-emerald-50/40 border-y border-gray-100">
       <div className="max-w-[1400px] mx-auto px-5 sm:px-6 lg:px-10 py-14 sm:py-20">
@@ -69,30 +76,7 @@ export default function SoldPropertiesGallery() {
             <p className="text-sm text-gray-500 mt-1.5 max-w-md">Real properties that transacted through MBPP. We post a new one every week.</p>
           </div>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          {items.slice(0, 3).map((p, i) => (
-            <div key={p.id} className="bg-white rounded-2xl border border-gray-100 overflow-hidden hover:shadow-lg transition-shadow group relative">
-              <div className="relative h-44 bg-gray-100 overflow-hidden">
-                <img src={p.coverPhoto || FALLBACK_PHOTOS[i % FALLBACK_PHOTOS.length]} alt={p.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 grayscale-[30%]" loading="lazy" />
-                <div className="absolute inset-0 bg-gradient-to-t from-red-900/40 via-transparent to-transparent" />
-                <span className="absolute top-3 left-3 inline-flex items-center gap-1.5 bg-red-600 text-white text-[10px] font-bold px-2.5 py-1 rounded-full shadow-lg">
-                  <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
-                  SOLD
-                </span>
-                <span className="absolute top-3 right-3 bg-white/95 text-gray-900 text-[10px] font-medium px-2 py-1 rounded-full">
-                  {timeAgo(p.soldAt)}
-                </span>
-              </div>
-              <div className="p-4">
-                <h3 className="text-sm font-semibold text-gray-900 line-clamp-1">{p.title}</h3>
-                <p className="text-xs text-gray-500 flex items-center gap-1 mt-2">
-                  <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" /></svg>
-                  {p.city}
-                </p>
-              </div>
-            </div>
-          ))}
-        </div>
+        <AutoCarousel items={carouselItems} heightClass="h-64 sm:h-80 lg:h-96" />
       </div>
     </section>
   );
