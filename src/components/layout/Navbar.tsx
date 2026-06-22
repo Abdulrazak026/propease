@@ -26,7 +26,6 @@ export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [userOpen, setUserOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
-  const [mounted, setMounted] = useState(false);
   const [notifs, setNotifs] = useState<{ id: string; title: string; body: string; link: string | null; read: boolean; createdAt: string; type: string }[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const notifRef = useRef<HTMLDivElement>(null);
@@ -37,7 +36,7 @@ export default function Navbar() {
   const siteName = getSetting("site_name", "MBPP");
   const siteTagline = getSetting("site_tagline", "Building Trust. Delivering Value.");
 
-  if (!mounted || pathname.startsWith("/admin") || pathname.startsWith("/agent") || pathname.startsWith("/ambassador") || pathname === "/wallet") return null;
+  if (pathname.startsWith("/admin") || pathname.startsWith("/agent") || pathname.startsWith("/ambassador") || pathname === "/wallet") return null;
 
   const handleLogout = () => { setCurrentUser(null); router.push("/"); };
 
@@ -70,8 +69,6 @@ export default function Navbar() {
     document.addEventListener("touchstart", handler);
     return () => { document.removeEventListener("mousedown", handler); document.removeEventListener("touchstart", handler); };
   }, []);
-
-  useEffect(() => { setMounted(true); }, []);
 
   const isAdmin = currentUser?.role === "head" || currentUser?.role === "admin";
 
