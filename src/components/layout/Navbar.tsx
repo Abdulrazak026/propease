@@ -32,6 +32,7 @@ export default function Navbar() {
   const { currentUser, setCurrentUser, isAuthenticated, loading } = useRole();
   const { get: getSetting } = useSettings();
   const [moreOpen, setMoreOpen] = useState(false);
+  const [mobileMoreOpen, setMobileMoreOpen] = useState(false);
   const [userOpen, setUserOpen] = useState(false);
   const [hidden, setHidden] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -40,6 +41,7 @@ export default function Navbar() {
   const [unreadCount, setUnreadCount] = useState(0);
   const notifRef = useRef<HTMLDivElement>(null);
   const moreRef = useRef<HTMLDivElement>(null);
+  const mobileMoreRef = useRef<HTMLDivElement>(null);
   const userRef = useRef<HTMLDivElement>(null);
   const lastScrollY = useRef(0);
 
@@ -89,6 +91,7 @@ export default function Navbar() {
     const handleClick = (e: Event) => {
       const target = e.target as Node;
       if (moreRef.current && !moreRef.current.contains(target)) setMoreOpen(false);
+      if (mobileMoreRef.current && !mobileMoreRef.current.contains(target)) setMobileMoreOpen(false);
       if (userRef.current && !userRef.current.contains(target)) setUserOpen(false);
     };
     document.addEventListener("mousedown", handleClick);
@@ -182,14 +185,45 @@ export default function Navbar() {
           )}
         </div>
         </>
-      ) : (
-        <Link
-          href="/sell"
-          className="ml-3 px-3.5 py-1.5 text-xs font-semibold text-white bg-[var(--color-primary)] hover:opacity-90 rounded-full transition-opacity shrink-0"
+      ) : null}
+      <div ref={mobileMoreRef} className="relative shrink-0 ml-2">
+        <button
+          onClick={() => setMobileMoreOpen(!mobileMoreOpen)}
+          className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors"
+          aria-label="More"
         >
-          List Property
-        </Link>
-      )}
+          <svg className="w-5 h-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+            <circle cx="12" cy="5" r="1.5" fill="currentColor" stroke="none" />
+            <circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none" />
+            <circle cx="12" cy="19" r="1.5" fill="currentColor" stroke="none" />
+          </svg>
+        </button>
+        {mobileMoreOpen && (
+          <div className="absolute top-full right-0 mt-2 w-56 bg-white rounded-xl border border-gray-100 shadow-xl shadow-gray-900/5 p-2 z-50">
+            <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider px-1 pb-2">More</p>
+            <div className="space-y-0.5">
+              {MORE_LINKS.map((item) => {
+                const isSignIn = item.href === "/login";
+                const actualHref = isAuthenticated && isSignIn
+                  ? (currentUser!.role === "head" ? "/admin" : `/${currentUser!.role}`)
+                  : item.href;
+                const actualLabel = isAuthenticated && isSignIn ? "Dashboard" : item.label;
+                return (
+                  <Link
+                    key={item.href}
+                    href={actualHref}
+                    onClick={() => setMobileMoreOpen(false)}
+                    className="flex items-center gap-3 p-2.5 rounded-lg hover:bg-gray-50 transition-colors group text-sm text-gray-700 hover:text-gray-900"
+                  >
+                    <span className="text-gray-400 group-hover:text-[var(--color-primary)]">{item.label[0]}</span>
+                    <span>{actualLabel}</span>
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+        )}
+      </div>
       {notifOpen && isAuthenticated && (
         <div className="absolute top-full left-0 right-0 z-50 mx-4 bg-white rounded-xl shadow-xl border border-gray-200 overflow-hidden">
           <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
