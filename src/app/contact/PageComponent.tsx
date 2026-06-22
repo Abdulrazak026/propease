@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import Link from "next/link";
 import Button from "@/components/ui/Button";
 import { useSettings } from "@/context/SettingsContext";
 import { api } from "@/lib/api-client";
@@ -40,6 +41,12 @@ export default function ContactPage() {
 
   return (
     <div className="flex-1">
+      <div className="max-w-4xl mx-auto px-4 pt-4">
+        <Link href="/" className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-900 transition-colors">
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" /></svg>
+          Home
+        </Link>
+      </div>
       <section className="bg-gray-50 py-16 px-4 border-b border-gray-200">
         <div className="max-w-4xl mx-auto text-center">
           <span className="text-xs font-medium text-[var(--color-primary)] uppercase tracking-wider">Contact</span>

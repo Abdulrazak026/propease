@@ -58,6 +58,12 @@ export default function CareersPage() {
 
   return (
     <div className="flex flex-col">
+      <div className="max-w-[1400px] w-full mx-auto px-5 sm:px-6 lg:px-10 pt-4">
+        <Link href="/" className="inline-flex items-center gap-1.5 text-sm text-white/70 hover:text-white transition-colors">
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" /></svg>
+          Home
+        </Link>
+      </div>
       <section className="relative bg-gray-950 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-[var(--color-primary)]/20 via-transparent to-emerald-900/10" />
         <div className="relative max-w-[1100px] mx-auto px-5 sm:px-6 lg:px-10 pt-20 sm:pt-28 pb-16 sm:pb-24">

@@ -8,7 +8,7 @@ import { api } from "@/lib/api-client";
 
 const PRIMARY_LINKS = [
   { label: "Buy", href: "/list-property" },
-  { label: "Rental", href: "/list-property?type=rent" },
+  { label: "Rent", href: "/list-property?type=rent" },
   { label: "Sell", href: "/sell" },
 ];
 
@@ -189,33 +189,38 @@ export default function Navbar() {
         {mobileMoreOpen && (
           <div className="absolute top-full right-0 mt-2 w-64 bg-white rounded-xl border border-gray-100 shadow-xl shadow-gray-900/5 p-2 z-50">
             <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider px-1 pb-2">More</p>
-            <div className="space-y-0.5">
-              {MORE_LINKS.map((item) => {
+            <div>
+              {MORE_LINKS.map((item, i) => {
                 const isSignIn = item.href === "/login";
                 const actualHref = isAuthenticated && isSignIn
                   ? (currentUser!.role === "head" ? "/admin" : `/${currentUser!.role}`)
                   : item.href;
                 const actualLabel = isAuthenticated && isSignIn ? "Dashboard" : item.label;
                 return (
-                  <Link
-                    key={item.href}
-                    href={actualHref}
-                    onClick={() => setMobileMoreOpen(false)}
-                    className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors group text-sm sm:text-base text-gray-700 hover:text-gray-900"
-                  >
-                    <span className="text-gray-400 group-hover:text-[var(--color-primary)]">{item.label[0]}</span>
-                    <span>{actualLabel}</span>
-                  </Link>
+                  <div key={item.href}>
+                    {i > 0 && <div className="border-t border-gray-100 mx-2" />}
+                    <Link
+                      href={actualHref}
+                      onClick={() => setMobileMoreOpen(false)}
+                      className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors group text-sm sm:text-base text-gray-700 hover:text-gray-900"
+                    >
+                      <span className="text-gray-400 group-hover:text-[var(--color-primary)]">{item.label[0]}</span>
+                      <span>{actualLabel}</span>
+                    </Link>
+                  </div>
                 );
               })}
               {isAuthenticated && (
-                <button
-                  onClick={() => { handleLogout(); setMobileMoreOpen(false); }}
-                  className="w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-red-50 transition-colors text-sm text-red-600"
-                >
-                  <span className="text-red-400">S</span>
-                  <span>Sign Out</span>
-                </button>
+                <>
+                  <div className="border-t border-gray-100 mx-2" />
+                  <button
+                    onClick={() => { handleLogout(); setMobileMoreOpen(false); }}
+                    className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-red-50 transition-colors text-sm text-red-600"
+                  >
+                    <span className="text-red-400">S</span>
+                    <span>Sign Out</span>
+                  </button>
+                </>
               )}
             </div>
           </div>
@@ -289,42 +294,47 @@ export default function Navbar() {
             </button>
             {moreOpen && (
               <div className="absolute top-full right-0 mt-2 w-72 bg-white rounded-xl border border-gray-100 shadow-xl shadow-gray-900/5 p-2 z-50">
-                {MORE_LINKS.map((item) => {
+                {MORE_LINKS.map((item, i) => {
                   const isSignIn = item.href === "/login";
                   const actualHref = isAuthenticated && isSignIn
                     ? (currentUser!.role === "head" ? "/admin" : `/${currentUser!.role}`)
                     : item.href;
                   const actualLabel = isAuthenticated && isSignIn ? "Dashboard" : item.label;
                   return (
-                    <Link
-                      key={item.href}
-                      href={actualHref}
-                      onClick={() => setMoreOpen(false)}
-                      className="flex items-start gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors group"
-                    >
-                      <div className="w-8 h-8 rounded-md bg-gray-100 group-hover:bg-[var(--color-primary)]/10 flex items-center justify-center shrink-0 transition-colors">
-                        <span className="w-1.5 h-1.5 rounded-full bg-gray-400 group-hover:bg-[var(--color-primary)]" />
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium text-gray-900">{actualLabel}</p>
-                        <p className="text-xs text-gray-500 mt-0.5">{item.desc}</p>
-                      </div>
-                    </Link>
+                    <div key={item.href}>
+                      {i > 0 && <div className="border-t border-gray-100 mx-2" />}
+                      <Link
+                        href={actualHref}
+                        onClick={() => setMoreOpen(false)}
+                        className="flex items-start gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors group"
+                      >
+                        <div className="w-8 h-8 rounded-md bg-gray-100 group-hover:bg-[var(--color-primary)]/10 flex items-center justify-center shrink-0 transition-colors">
+                          <span className="w-1.5 h-1.5 rounded-full bg-gray-400 group-hover:bg-[var(--color-primary)]" />
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium text-gray-900">{actualLabel}</p>
+                          <p className="text-xs text-gray-500 mt-0.5">{item.desc}</p>
+                        </div>
+                      </Link>
+                    </div>
                   );
                 })}
                 {isAuthenticated && (
-                  <button
-                    onClick={() => { handleLogout(); setMoreOpen(false); }}
-                    className="w-full flex items-start gap-3 p-3 rounded-lg hover:bg-red-50 transition-colors group"
-                  >
-                    <div className="w-8 h-8 rounded-md bg-red-50 group-hover:bg-red-100 flex items-center justify-center shrink-0 transition-colors">
-                      <span className="w-1.5 h-1.5 rounded-full bg-red-400" />
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium text-red-600">Sign Out</p>
-                      <p className="text-xs text-gray-500 mt-0.5">Log out of your account</p>
-                    </div>
-                  </button>
+                  <>
+                    <div className="border-t border-gray-100 mx-2" />
+                    <button
+                      onClick={() => { handleLogout(); setMoreOpen(false); }}
+                      className="w-full flex items-start gap-3 p-3 rounded-lg hover:bg-red-50 transition-colors group"
+                    >
+                      <div className="w-8 h-8 rounded-md bg-red-50 group-hover:bg-red-100 flex items-center justify-center shrink-0 transition-colors">
+                        <span className="w-1.5 h-1.5 rounded-full bg-red-400" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-red-600">Sign Out</p>
+                        <p className="text-xs text-gray-500 mt-0.5">Log out of your account</p>
+                      </div>
+                    </button>
+                  </>
                 )}
               </div>
             )}

@@ -8,7 +8,6 @@ import Badge from "@/components/ui/Badge";
 import Button from "@/components/ui/Button";
 import VerifiedBadge from "@/components/ui/VerifiedBadge";
 import RentTierBreakdown from "@/components/listings/RentTierBreakdown";
-import PaystackButton from "@/components/payments/PaystackButton";
 import PriceHistory from "@/components/listings/PriceHistory";
 import ValuationEstimate from "@/components/listings/ValuationEstimate";
 import MapPlaceholder from "@/components/ui/MapPlaceholder";
@@ -34,6 +33,43 @@ export default function ListingDetail() {
   const [showBuySuccess, setShowBuySuccess] = useState(false);
   const [showBuyOptions, setShowBuyOptions] = useState(false);
   const [buyType, setBuyType] = useState<"full" | "instalment" | null>(null);
+  const [buyLoading, setBuyLoading] = useState(false);
+
+  const openPaystack = (amount: number, purpose: string) => {
+    setBuyLoading(true);
+    const loadScript = (): Promise<boolean> => {
+      return new Promise((resolve) => {
+        if (typeof window !== "undefined" && (window as any).PaystackPop) return resolve(true);
+        const script = document.createElement("script");
+        script.src = "https://js.paystack.co/v1/inline.js";
+        script.onload = () => resolve(true);
+        script.onerror = () => resolve(false);
+        document.head.appendChild(script);
+      });
+    };
+    loadScript().then((loaded) => {
+      if (!loaded) { setBuyLoading(false); return; }
+      const ref = "MBPP-" + Date.now() + "-" + Math.random().toString(36).substring(2, 7);
+      const handler = (window as any).PaystackPop.setup({
+        key: process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY || "pk_test_xxxxxxxxxxxxx",
+        email: currentUser?.email || "",
+        amount: Math.round(amount * 100),
+        currency: "NGN",
+        ref,
+        metadata: { listingId: listing.id, userId: currentUser?.id, purpose, buyType: purpose.includes("down") ? "instalment" : "full" },
+        callback: async (response: { reference: string }) => {
+          setBuyLoading(false);
+          try {
+            await api.post(`/api/reservations/${listing.id}`, { paymentRef: response.reference, purpose: "purchase" });
+          } catch {}
+          setShowBuySuccess(true);
+          setShowBuyOptions(false);
+        },
+        onClose: () => { setBuyLoading(false); },
+      });
+      handler.openIframe();
+    });
+  };
 
   useEffect(() => {
     api.get<any>(`/api/listings/${id}`).then(r => {
@@ -303,41 +339,23 @@ export default function ListingDetail() {
                 })()}
 
                 {listing.listingType === "sale" && listing.status === "available" && !userReserved && (
-                  <>
-                    {!buyType ? (
-                      <Button
-                        className="w-full bg-[var(--color-accent)] hover:bg-[var(--color-accent-light)] text-gray-900 font-semibold"
-                        onClick={() => {
-                          if (!currentUser) {
-                            router.push(`/login?redirect=${encodeURIComponent(window.location.pathname)}`);
-                            return;
-                          }
-                          setShowBuyOptions(true);
-                        }}
-                      >
-                        Buy Now
-                      </Button>
-                    ) : (
-                      <PaystackButton
-                        email={currentUser?.email || ""}
-                        amount={buyType === "full" ? listing.price : Math.round(listing.price * (listing.downPaymentPercent || 10) / 100)}
-                        label={buyType === "full" ? `Pay ${formatNaira(listing.price)}` : `Pay ${formatNaira(Math.round(listing.price * (listing.downPaymentPercent || 10) / 100))} Down Payment`}
-                        metadata={{ listingId: listing.id, userId: currentUser?.id, purpose: buyType === "full" ? "property_full_payment" : "property_down_payment", buyType }}
-                        onSuccess={async (ref) => {
-                          try {
-                            await api.post(`/api/reservations/${listing.id}`, { paymentRef: ref, purpose: "purchase" });
-                          } catch {}
-                          setShowBuySuccess(true);
-                        }}
-                        className="w-full bg-[var(--color-accent)] hover:bg-[var(--color-accent-light)] text-gray-900 font-semibold"
-                      />
-                    )}
-                    {buyType && (
-                      <button onClick={() => setBuyType(null)} className="w-full text-xs text-gray-500 hover:text-gray-700 text-center">
-                        Change payment option
-                      </button>
-                    )}
-                  </>
+                  <Button
+                    className="w-full bg-[var(--color-accent)] hover:bg-[var(--color-accent-light)] text-gray-900 font-semibold"
+                    disabled={buyLoading}
+                    onClick={() => {
+                      if (!currentUser) {
+                        router.push(`/login?redirect=${encodeURIComponent(window.location.pathname)}`);
+                        return;
+                      }
+                      if (listing.instalmentAvailable) {
+                        setShowBuyOptions(true);
+                      } else {
+                        openPaystack(listing.price, "property_full_payment");
+                      }
+                    }}
+                  >
+                    {buyLoading ? "Processing..." : "Buy Now"}
+                  </Button>
                 )}
 
                 {listing.listingType === "rent" && (
@@ -449,15 +467,17 @@ export default function ListingDetail() {
                     {listing.instalmentAvailable ? (
                       <>
                         <button
-                          onClick={() => { setBuyType("full"); setShowBuyOptions(false); }}
-                          className="w-full text-left p-4 rounded-xl border-2 border-gray-200 hover:border-[var(--color-primary)] hover:bg-[var(--color-primary)]/5 transition-all"
+                          onClick={() => { setBuyType("full"); setShowBuyOptions(false); openPaystack(listing.price, "property_full_payment"); }}
+                          disabled={buyLoading}
+                          className="w-full text-left p-4 rounded-xl border-2 border-gray-200 hover:border-[var(--color-primary)] hover:bg-[var(--color-primary)]/5 transition-all disabled:opacity-50"
                         >
                           <p className="font-semibold text-gray-900">Pay Full Price</p>
                           <p className="text-sm text-gray-500 mt-1">{formatNaira(listing.price)}</p>
                         </button>
                         <button
-                          onClick={() => { setBuyType("instalment"); setShowBuyOptions(false); }}
-                          className="w-full text-left p-4 rounded-xl border-2 border-gray-200 hover:border-[var(--color-primary)] hover:bg-[var(--color-primary)]/5 transition-all"
+                          onClick={() => { setBuyType("instalment"); setShowBuyOptions(false); openPaystack(Math.round(listing.price * (listing.downPaymentPercent || 10) / 100), "property_down_payment"); }}
+                          disabled={buyLoading}
+                          className="w-full text-left p-4 rounded-xl border-2 border-gray-200 hover:border-[var(--color-primary)] hover:bg-[var(--color-primary)]/5 transition-all disabled:opacity-50"
                         >
                           <p className="font-semibold text-gray-900">Instalment Plan</p>
                           <p className="text-sm text-gray-500 mt-1">
@@ -470,8 +490,9 @@ export default function ListingDetail() {
                       </>
                     ) : (
                       <button
-                        onClick={() => { setBuyType("full"); setShowBuyOptions(false); }}
-                        className="w-full text-left p-4 rounded-xl border-2 border-[var(--color-primary)] bg-[var(--color-primary)]/5"
+                        onClick={() => { setBuyType("full"); setShowBuyOptions(false); openPaystack(listing.price, "property_full_payment"); }}
+                        disabled={buyLoading}
+                        className="w-full text-left p-4 rounded-xl border-2 border-[var(--color-primary)] bg-[var(--color-primary)]/5 disabled:opacity-50"
                       >
                         <p className="font-semibold text-gray-900">Pay Full Price</p>
                         <p className="text-sm text-gray-500 mt-1">{formatNaira(listing.price)}</p>
