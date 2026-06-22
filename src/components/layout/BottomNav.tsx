@@ -36,7 +36,21 @@ const TABS = [
 ];
 
 const MORE_TABS = [
-  { label: "Advertise", href: "/sell", desc: "List your property",
+  { label: "Sign In", href: "/login", desc: "Access your account",
+    icon: () => (
+      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75" />
+      </svg>
+    ),
+  },
+  { label: "Properties", href: "/list-property", desc: "Browse all properties",
+    icon: () => (
+      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z" />
+      </svg>
+    ),
+  },
+  { label: "Sell / Rent", href: "/sell", desc: "List your property",
     icon: () => (
       <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M10.34 15.84c-.688-.06-1.386-.09-2.09-.09H7.5a4.5 4.5 0 110-9h.75c.704 0 1.402-.03 2.09-.09m0 9.18c.253.962.584 1.892.985 2.783.247.55.06 1.21-.463 1.511l-.657.38a.851.851 0 01-1.08-.246 7.5 7.5 0 00-3.505-2.49m3.72-4.134a4.5 4.5 0 010-5.652m0 5.652c.533.64 1.377 1.028 2.28 1.028h.75a4.5 4.5 0 010 9h-.75c-.702 0-1.402-.03-2.09-.09m3.72-9.882a7.467 7.467 0 00-1.23-3.29c-.355-.582-.188-1.33.399-1.653l.657-.38a.851.851 0 011.08.246 7.5 7.5 0 003.505 2.49m-3.72 4.134a4.5 4.5 0 000 5.652m0-5.652c.533-.64 1.377-1.028 2.28-1.028h.75a4.5 4.5 0 000-9h-.75c-.702 0-1.402.03-2.09.09" />
@@ -163,9 +177,11 @@ export default function BottomNav() {
               <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider px-1 pb-3">More</p>
               <div className="space-y-0.5">
                 {MORE_TABS.map((tab) => {
-                  const actualHref = isAuthenticated && tab.href === "/login"
+                  const isLogin = tab.href === "/login";
+                  const actualHref = isAuthenticated && isLogin
                     ? (currentUser!.role === "head" ? "/admin" : `/${currentUser!.role}`)
                     : tab.href;
+                  const actualLabel = isAuthenticated && isLogin ? "Dashboard" : tab.label;
                   return (
                     <Link
                       key={tab.label}
@@ -177,7 +193,7 @@ export default function BottomNav() {
                         {tab.icon()}
                       </span>
                       <div className="min-w-0">
-                        <p className="text-sm font-medium text-gray-800 group-hover:text-[var(--color-primary)] transition-colors">{tab.label}</p>
+                        <p className="text-sm font-medium text-gray-800 group-hover:text-[var(--color-primary)] transition-colors">{actualLabel}</p>
                         <p className="text-[11px] text-gray-400">{tab.desc}</p>
                       </div>
                     </Link>

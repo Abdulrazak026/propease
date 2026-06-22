@@ -54,7 +54,7 @@ const MORE_ITEMS = [
       </svg>
     ),
   },
-  { label: "Advertise", href: "/sell", desc: "List and promote your property",
+  { label: "Sell", href: "/sell", desc: "List and promote your property",
     icon: (a: boolean) => (
       <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M10.34 15.84c-.688-.06-1.386-.09-2.09-.09H7.5a4.5 4.5 0 110-9h.75c.704 0 1.402-.03 2.09-.09m0 9.18c.253.962.584 1.892.985 2.783.247.55.06 1.21-.463 1.511l-.657.38a.851.851 0 01-1.08-.246 7.5 7.5 0 00-3.505-2.49m3.72-4.134a4.5 4.5 0 010-5.652m0 5.652c.533.64 1.377 1.028 2.28 1.028h.75a4.5 4.5 0 010 9h-.75c-.702 0-1.402-.03-2.09-.09m3.72-9.882a7.467 7.467 0 00-1.23-3.29c-.355-.582-.188-1.33.399-1.653l.657-.38a.851.851 0 011.08.246 7.5 7.5 0 003.505 2.49m-3.72 4.134a4.5 4.5 0 000 5.652m0-5.652c.533-.64 1.377-1.028 2.28-1.028h.75a4.5 4.5 0 000-9h-.75c-.702 0-1.402.03-2.09.09" />

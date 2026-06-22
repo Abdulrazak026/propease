@@ -14,6 +14,10 @@ const PRIMARY_LINKS = [
 ];
 
 const MORE_LINKS = [
+  { label: "Sign In", href: "/login", desc: "Access your account" },
+  { label: "Properties", href: "/list-property", desc: "Browse all properties" },
+  { label: "Sell", href: "/sell", desc: "List your property" },
+  { label: "Rent", href: "/list-property?type=rent", desc: "Find rental properties" },
   { label: "About", href: "/about", desc: "Our story and team" },
   { label: "Contact", href: "/contact", desc: "Talk to us" },
   { label: "Get Help", href: "/help", desc: "FAQ and support" },
@@ -180,10 +184,10 @@ export default function Navbar() {
         </>
       ) : (
         <Link
-          href="/login"
+          href="/sell"
           className="ml-3 px-3.5 py-1.5 text-xs font-semibold text-white bg-[var(--color-primary)] hover:opacity-90 rounded-full transition-opacity shrink-0"
         >
-          Sign In
+          List Property
         </Link>
       )}
       {notifOpen && isAuthenticated && (
@@ -239,6 +243,11 @@ export default function Navbar() {
               </Link>
             );
           })}
+        </nav>
+
+        <div className="flex-1" />
+
+        <div className="flex items-center gap-2">
           <div ref={moreRef} className="relative">
             <button
               onClick={() => setMoreOpen(!moreOpen)}
@@ -252,31 +261,33 @@ export default function Navbar() {
               </svg>
             </button>
             {moreOpen && (
-              <div className="absolute top-full left-0 mt-2 w-64 bg-white rounded-xl border border-gray-100 shadow-xl shadow-gray-900/5 p-2 z-50">
-                {MORE_LINKS.map((item) => (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    onClick={() => setMoreOpen(false)}
-                    className="flex items-start gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors group"
-                  >
-                    <div className="w-8 h-8 rounded-md bg-gray-100 group-hover:bg-[var(--color-primary)]/10 flex items-center justify-center shrink-0 transition-colors">
-                      <span className="w-1.5 h-1.5 rounded-full bg-gray-400 group-hover:bg-[var(--color-primary)]" />
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium text-gray-900">{item.label}</p>
-                      <p className="text-xs text-gray-500 mt-0.5">{item.desc}</p>
-                    </div>
-                  </Link>
-                ))}
+              <div className="absolute top-full right-0 mt-2 w-64 bg-white rounded-xl border border-gray-100 shadow-xl shadow-gray-900/5 p-2 z-50">
+                {MORE_LINKS.map((item) => {
+                  const isSignIn = item.href === "/login";
+                  const actualHref = isAuthenticated && isSignIn
+                    ? (currentUser!.role === "head" ? "/admin" : `/${currentUser!.role}`)
+                    : item.href;
+                  const actualLabel = isAuthenticated && isSignIn ? "Dashboard" : item.label;
+                  return (
+                    <Link
+                      key={item.href}
+                      href={actualHref}
+                      onClick={() => setMoreOpen(false)}
+                      className="flex items-start gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors group"
+                    >
+                      <div className="w-8 h-8 rounded-md bg-gray-100 group-hover:bg-[var(--color-primary)]/10 flex items-center justify-center shrink-0 transition-colors">
+                        <span className="w-1.5 h-1.5 rounded-full bg-gray-400 group-hover:bg-[var(--color-primary)]" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-gray-900">{actualLabel}</p>
+                        <p className="text-xs text-gray-500 mt-0.5">{item.desc}</p>
+                      </div>
+                    </Link>
+                  );
+                })}
               </div>
             )}
           </div>
-        </nav>
-
-        <div className="flex-1" />
-
-        <div className="flex items-center gap-2">
           {isAuthenticated && currentUser && (
             <div ref={notifRef} className="relative">
               <button onClick={() => { setNotifOpen(!notifOpen); fetchNotifs(); }} className="relative p-2 rounded-full hover:bg-gray-100 transition-colors">
@@ -375,21 +386,13 @@ export default function Navbar() {
               )}
             </div>
           ) : (
-            <>
-              <Link
-                href="/login"
-                className="px-4 py-2 text-sm font-semibold text-gray-700 border border-gray-200 hover:border-gray-300 hover:bg-gray-50 rounded-lg transition-colors"
-              >
-                Sign In
-              </Link>
-          <Link
-            href="/sell"
-            className="px-4 py-2 text-sm font-semibold text-white bg-[var(--color-primary)] hover:bg-[var(--color-primary)]/90 rounded-lg transition-colors"
-          >
-            List Property
-          </Link>
-        </>
-      )}
+            <Link
+              href="/sell"
+              className="px-4 py-2 text-sm font-semibold text-white bg-[var(--color-primary)] hover:bg-[var(--color-primary)]/90 rounded-lg transition-colors"
+            >
+              List Property
+            </Link>
+          )}
     </div>
       </div>
     </header>

@@ -22,8 +22,15 @@ const propertyTypes = ["", "house", "flat", "land", "commercial"] as const;
 export default function PropertyFilters({ onFilterChange }: PropertyFiltersProps) {
   const { get } = useSettings();
   const rawCities = get("available_cities") || "Kano Municipal, Kano State; Fagge, Kano State; Tarauni, Kano State; Nassarawa, Kano State";
-  const cities = ["All Cities", ...rawCities.split(";").map(c => c.trim().split(",")[0].trim()).filter(Boolean)];
+  const parsed = rawCities.split(";").map(c => {
+    const parts = c.trim().split(",");
+    return { city: parts[0]?.trim(), state: parts[1]?.trim() };
+  }).filter(c => c.city && c.state);
+  const uniqueStates = ["All States", ...new Set(parsed.map(c => c.state))];
+  const cities = ["All Cities", ...parsed.map(c => c.city)];
 
+  const [selectedState, setSelectedState] = useState("All States");
+  const [filteredCities, setFilteredCities] = useState(cities);
   const [filters, setFilters] = useState<FilterState>({
     search: "", propertyType: "", listingType: "", rentTier: "",
     category: "", city: "", minPrice: "", maxPrice: "",
@@ -37,6 +44,17 @@ export default function PropertyFilters({ onFilterChange }: PropertyFiltersProps
     const next = { ...filters, [key]: value };
     setFilters(next);
     onFilterChange(next);
+  };
+
+  const handleStateChange = (state: string) => {
+    setSelectedState(state);
+    if (state === "All States") {
+      setFilteredCities(["All Cities", ...parsed.map(c => c.city)]);
+    } else {
+      const cs = parsed.filter(c => c.state === state).map(c => c.city);
+      setFilteredCities(["All Cities", ...cs]);
+    }
+    update("city", "");
   };
 
   const reset = () => {
@@ -68,9 +86,13 @@ export default function PropertyFilters({ onFilterChange }: PropertyFiltersProps
           className={`min-h-[44px] px-5 py-2.5 rounded-lg text-sm font-medium transition-all active:scale-95 ${filters.listingType === "sale" ? "bg-[var(--color-accent)] text-gray-900 shadow-sm" : "bg-white border border-gray-300 text-gray-600 hover:border-gray-400"}`}>Sale</button>
         <button onClick={() => update("listingType", filters.listingType === "rent" ? "" : "rent")}
           className={`min-h-[44px] px-5 py-2.5 rounded-lg text-sm font-medium transition-all active:scale-95 ${filters.listingType === "rent" ? "bg-[var(--color-accent)] text-gray-900 shadow-sm" : "bg-white border border-gray-300 text-gray-600 hover:border-gray-400"}`}>Rent</button>
+        <select value={selectedState} onChange={(e) => handleStateChange(e.target.value)}
+          className="min-h-[44px] rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)]">
+          {uniqueStates.map((s) => <option key={s} value={s}>{s}</option>)}
+        </select>
         <select value={filters.city} onChange={(e) => update("city", e.target.value)}
           className="min-h-[44px] rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)]">
-          {cities.map((c) => <option key={c} value={c === "All Cities" ? "" : c}>{c}</option>)}
+          {filteredCities.map((c) => <option key={c} value={c === "All Cities" ? "" : c}>{c}</option>)}
         </select>
       </div>
 
@@ -137,9 +159,13 @@ export default function PropertyFilters({ onFilterChange }: PropertyFiltersProps
             className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${filters.listingType === "sale" ? "bg-[var(--color-accent)] text-gray-900" : "bg-white border border-gray-300 text-gray-600 hover:border-gray-400"}`}>Sale</button>
           <button onClick={() => update("listingType", filters.listingType === "rent" ? "" : "rent")}
             className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${filters.listingType === "rent" ? "bg-[var(--color-accent)] text-gray-900" : "bg-white border border-gray-300 text-gray-600 hover:border-gray-400"}`}>Rent</button>
+          <select value={selectedState} onChange={(e) => handleStateChange(e.target.value)}
+            className="rounded-md border border-gray-300 bg-white px-2 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)]">
+            {uniqueStates.map((s) => <option key={s} value={s}>{s}</option>)}
+          </select>
           <select value={filters.city} onChange={(e) => update("city", e.target.value)}
             className="rounded-md border border-gray-300 bg-white px-2 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)]">
-            {cities.map((c) => <option key={c} value={c === "All Cities" ? "" : c}>{c}</option>)}
+            {filteredCities.map((c) => <option key={c} value={c === "All Cities" ? "" : c}>{c}</option>)}
           </select>
           <div className="relative">
             <span className="absolute left-2 top-1/2 -translate-y-1/2 text-gray-400 text-xs">&#8358;</span>

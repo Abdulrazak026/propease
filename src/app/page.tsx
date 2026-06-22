@@ -7,10 +7,12 @@ import { useListings } from "@/hooks/useListings";
 import Footer from "@/components/layout/Footer";
 import { useSettings } from "@/context/SettingsContext";
 import SoldPropertiesGallery from "@/components/listings/SoldPropertiesGallery";
+import AutoCarousel from "@/components/homepage/AutoCarousel";
 
 interface City { id: string; name: string; }
 interface BlogPost { id: string; slug: string; title: string; excerpt?: string | null; content?: string | null; coverImage: string | null; publishedAt: string | null; author?: { name: string } | null; }
 interface ResearchReport { title: string; date: string; summary: string; metrics: string[]; }
+interface TeamMember { name: string; role: string; bio?: string; photo?: string; }
 
 const INITIAL_SHOW = 6;
 const LOAD_MORE = 6;
@@ -23,27 +25,58 @@ const CATEGORY_PILLS = [
   { label: "Commercial", value: "commercial" },
 ];
 
-const FALLBACK_POSTS = [
-  { id: "f1", slug: "first-time-buyers-guide", title: "First-time Buyer's Guide to Kano Real Estate", excerpt: "Everything you need to know before buying your first home in Kano, from choosing a neighborhood to closing the deal.", coverImage: "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=800&h=500&fit=crop", publishedAt: "2026-05-22T00:00:00Z", author: { name: "Aisha Bello" } },
-  { id: "f2", slug: "renting-vs-buying-2026", title: "Renting vs Buying in 2026: What Makes More Sense?", excerpt: "A breakdown of the real costs, market trends, and lifestyle trade-offs of renting versus buying in Northern Nigeria.", coverImage: "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&h=500&fit=crop", publishedAt: "2026-05-10T00:00:00Z", author: { name: "Ahmad Abubakar" } },
-  { id: "f3", slug: "kano-neighborhood-spotlight", title: "Neighborhood Spotlight: Tarauni & Nassarawa", excerpt: "Two of the most in-demand areas for renters in Kano Municipal. What makes them tick, and what you'll pay.", coverImage: "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&h=500&fit=crop", publishedAt: "2026-04-28T00:00:00Z", author: { name: "Zahradden Aliyu" } },
-  { id: "f4", slug: "tenant-rights-nigeria", title: "Understanding Your Rights as a Tenant in Nigeria", excerpt: "From rent advance limits to eviction notice periods, here's what every tenant should know before signing.", coverImage: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&h=500&fit=crop", publishedAt: "2026-04-15T00:00:00Z", author: { name: "Barr. Sulaiman Usman" } },
+const PLACEHOLDER_PROJECTS = [
+  { image: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800&h=500&fit=crop", title: "Luxury Villa, Tarauni", subtitle: "4-bedroom duplex with modern finishes" },
+  { image: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&h=500&fit=crop", title: "Modern Estate, Nassarawa", subtitle: "6 units of 3-bedroom apartments" },
+  { image: "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=800&h=500&fit=crop", title: "Smart Homes, Kano Municipal", subtitle: "Eco-friendly smart homes" },
+  { image: "https://images.unsplash.com/photo-1600566753086-00f18f6b7c92?w=800&h=500&fit=crop", title: "Gated Community, Fagge", subtitle: "Secure compound with 8 townhouses" },
 ];
+
+const PLACEHOLDER_DEVELOPMENTS = [
+  { image: "https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?w=800&h=500&fit=crop", title: "Green Valley Estate", subtitle: "Phase 2 construction ongoing" },
+  { image: "https://images.unsplash.com/photo-1590674899484-d5640f854633?w=800&h=500&fit=crop", title: "City Center Towers", subtitle: "12-storey commercial complex" },
+  { image: "https://images.unsplash.com/photo-1574362848149-11496d93a7c7?w=800&h=500&fit=crop", title: "Harmony Heights", subtitle: "Luxury hilltop development" },
+];
+
+const PLACEHOLDER_LANDS = [
+  { image: "https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=800&h=500&fit=crop", title: "Prime Plot, Tarauni", subtitle: "500 sqm, title documents ready" },
+  { image: "https://images.unsplash.com/photo-1464146072230-91cabc968266?w=800&h=500&fit=crop", title: "Commercial Land, Kano Municipal", subtitle: "2,000 sqm, high traffic area" },
+  { image: "https://images.unsplash.com/photo-1500076656116-558758c991c1?w=800&h=500&fit=crop", title: "Residential Plot, Nassarawa", subtitle: "300 sqm, quiet neighborhood" },
+];
+
+const SOCIAL_PLATFORMS = [
+  { key: "facebook_url", label: "Facebook", icon: "facebook" },
+  { key: "instagram_url", label: "Instagram", icon: "instagram" },
+  { key: "tiktok_url", label: "TikTok", icon: "tiktok" },
+  { key: "linkedin_url", label: "LinkedIn", icon: "linkedin" },
+  { key: "twitter_url", label: "Twitter", icon: "twitter" },
+];
+
+const SOCIAL_ICONS: Record<string, React.ReactNode> = {
+  facebook: <svg className="w-7 h-7" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.879V14.89h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.989C18.343 21.129 22 16.99 22 12c0-5.523-4.477-10-10-10z"/></svg>,
+  instagram: <svg className="w-7 h-7" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>,
+  linkedin: <svg className="w-7 h-7" fill="currentColor" viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>,
+  twitter: <svg className="w-7 h-7" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>,
+  tiktok: <svg className="w-7 h-7" fill="currentColor" viewBox="0 0 24 24"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1v-3.5a6.37 6.37 0 00-.79-.05A6.34 6.34 0 003.15 15.2a6.34 6.34 0 0010.86 4.43V13a8.28 8.28 0 005.58 2.16V11.7a4.83 4.83 0 01-3.58-1.42V6.69h3.58z"/></svg>,
+};
 
 export default function HomePage() {
   const { get: getSetting, loading: settingsLoading } = useSettings();
   const heroImage = getSetting("hero_image") || "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=1600&h=900&fit=crop";
   const siteName = getSetting("site_name", "MBPP");
-  const siteTagline = getSetting("site_tagline", "Find Your Dream Property in Kano");
+  const siteTagline = getSetting("site_tagline", "Find Your Dream Property in Kano & Northern States");
   const heroRef = useRef<HTMLElement>(null);
   const [showCount, setShowCount] = useState(INITIAL_SHOW);
   const [cities, setCities] = useState<City[]>([]);
-  const [posts, setPosts] = useState<BlogPost[]>(FALLBACK_POSTS);
+  const [posts, setPosts] = useState<BlogPost[]>([]);
   const [postsLoading, setPostsLoading] = useState(true);
   const [activeCategory, setActiveCategory] = useState("");
 
   let researchReports: ResearchReport[] = [];
   try { const raw = getSetting("research_reports"); if (raw) researchReports = JSON.parse(raw); } catch {}
+
+  let teamMembers: TeamMember[] = [];
+  try { const raw = getSetting("team_members"); if (raw) teamMembers = JSON.parse(raw); } catch {}
 
   useEffect(() => {
     fetch("https://mbpproperties.com/api/blog").then(r => r.json()).then(d => {
@@ -90,6 +123,30 @@ export default function HomePage() {
 
   const isSearching = !!(filters.search || filters.propertyType || filters.listingType || filters.city || filters.minPrice || filters.maxPrice || filters.minBeds || filters.maxBeds || filters.minBaths || filters.maxBaths || filters.category);
 
+  const facebookUrl = getSetting("facebook_url");
+  const instagramUrl = getSetting("instagram_url");
+  const tiktokUrl = getSetting("tiktok_url");
+  const linkedinUrl = getSetting("linkedin_url");
+  const twitterUrl = getSetting("twitter_url");
+
+  const socialLinks = [
+    { url: facebookUrl, label: "Facebook", icon: "facebook" },
+    { url: instagramUrl, label: "Instagram", icon: "instagram" },
+    { url: tiktokUrl, label: "TikTok", icon: "tiktok" },
+    { url: linkedinUrl, label: "LinkedIn", icon: "linkedin" },
+    { url: twitterUrl, label: "Twitter", icon: "twitter" },
+  ].filter(s => s.url);
+
+  const staffItems = (teamMembers.length > 0 ? teamMembers : [
+    { name: "Aisha Bello", role: "CEO / Lead Consultant", photo: "" },
+    { name: "Ahmad Abubakar", role: "Head of Operations", photo: "" },
+    { name: "Zahradden Aliyu", role: "Senior Property Manager", photo: "" },
+  ]).map(m => ({
+    image: m.photo || `https://ui-avatars.com/api/?name=${encodeURIComponent(m.name)}&background=6366f1&color=fff&size=400`,
+    title: m.name,
+    subtitle: m.role,
+  }));
+
   return (
     <div className="flex flex-col">
       <section ref={heroRef} className="relative bg-gray-950 overflow-hidden">
@@ -106,8 +163,8 @@ export default function HomePage() {
               Now serving across Northern Nigeria
             </div>
             <h1 className="text-4xl sm:text-5xl lg:text-7xl font-bold text-white leading-[1.05] tracking-tight">
-              Find Your Dream Home<br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-300 via-teal-200 to-emerald-400">in Kano &amp; Northern States.</span>
+              Find Your Property<br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-300 via-teal-200 to-emerald-400">in Kano &amp; other northern states.</span>
             </h1>
             <p className="text-base sm:text-lg text-white/60 mt-5 sm:mt-6 max-w-xl leading-relaxed">
               Trusted properties. Verified listings. Happy clients.
@@ -150,7 +207,7 @@ export default function HomePage() {
             <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight">
               {isSearching ? "Search results" : "Properties for you"}
             </h2>
-            <p className="text-sm text-gray-500 mt-1">{loading ? "Loading…" : listings.length > 0 ? `${listings.length} ${listings.length === 1 ? "property" : "properties"}` : ""}</p>
+            <p className="text-sm text-gray-500 mt-1">{loading ? "Loading\u2026" : listings.length > 0 ? `${listings.length} ${listings.length === 1 ? "property" : "properties"}` : ""}</p>
           </div>
           <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide -mx-1 px-1 pb-1">
             {CATEGORY_PILLS.map((p) => {
@@ -225,75 +282,184 @@ export default function HomePage() {
 
       <SoldPropertiesGallery />
 
-      {!postsLoading && posts.length > 0 && (
-        <div className="bg-gray-50 border-y border-gray-100">
-          <div className="max-w-[1400px] mx-auto px-5 sm:px-6 lg:px-10 py-14 sm:py-20">
-            <div className="flex items-end justify-between mb-8">
-              <div>
-                <p className="text-xs font-semibold text-[var(--color-primary)] uppercase tracking-[0.15em] mb-2">From the blog</p>
-                <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight">News & insights</h2>
-                <p className="text-sm text-gray-500 mt-1.5">Practical reads for buyers, renters, and agents.</p>
-              </div>
-              <Link href="/news" className="hidden sm:inline-flex items-center gap-1 text-sm font-medium text-gray-700 hover:text-gray-900">
-                All articles
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" /></svg>
-              </Link>
+      {/* VERIFIED PROPERTIES */}
+      <section className="bg-white py-16 sm:py-20">
+        <div className="max-w-[1400px] mx-auto px-5 sm:px-6 lg:px-10">
+          <div className="flex flex-col sm:flex-row items-center gap-6 sm:gap-8">
+            <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-emerald-50 flex items-center justify-center shrink-0">
+              <svg className="w-14 h-14 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
+              </svg>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
-              {posts.slice(0, 4).map((p) => (
-                <Link key={p.id} href={`/news/${p.slug}`} className="group bg-white rounded-2xl overflow-hidden border border-gray-100 hover:border-gray-200 hover:shadow-lg active:scale-[0.99] transition-all duration-200 flex flex-col">
-                  {p.coverImage && (
-                    <div className="relative h-44 overflow-hidden bg-gray-100">
-                      <img src={p.coverImage} alt={p.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" />
-                    </div>
-                  )}
-                  <div className="p-5 flex-1 flex flex-col">
-                    <p className="text-[10px] font-semibold text-[var(--color-primary)] uppercase tracking-[0.12em]">
-                      {p.publishedAt ? new Date(p.publishedAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "News"}
-                    </p>
-                    <h3 className="text-sm font-semibold text-gray-900 mt-2 group-hover:text-[var(--color-primary)] transition-colors line-clamp-2 leading-snug">{p.title}</h3>
-                    <p className="text-xs text-gray-500 mt-2 line-clamp-2 leading-relaxed flex-1">{p.excerpt || p.content?.slice(0, 100)}</p>
-                    {p.author?.name && (
-                      <p className="text-[11px] text-gray-400 mt-3 pt-3 border-t border-gray-100">by {p.author.name}</p>
-                    )}
-                  </div>
-                </Link>
-              ))}
+            <div className="text-center sm:text-left">
+              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">VERIFIED PROPERTIES</h2>
+              <p className="text-gray-600 mt-2 max-w-xl">Every property we sell is 100% verified through due diligence and transparency.</p>
             </div>
           </div>
         </div>
-      )}
+      </section>
 
-      {researchReports.length > 0 && (
-        <div className="max-w-[1400px] mx-auto px-5 sm:px-6 lg:px-10 py-14 sm:py-20">
-          <div className="flex items-end justify-between mb-8">
-            <div>
-              <p className="text-xs font-semibold text-[var(--color-primary)] uppercase tracking-[0.15em] mb-2">Market research</p>
-              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight">Market Trends</h2>
-              <p className="text-sm text-gray-500 mt-1.5">Data-driven reports on the local property market.</p>
+      {/* OUR PROMISE TO YOU */}
+      <section className="bg-gray-50 py-16 sm:py-20">
+        <div className="max-w-[1400px] mx-auto px-5 sm:px-6 lg:px-10">
+          <div className="flex flex-col sm:flex-row items-center gap-6 sm:gap-8">
+            <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-amber-50 flex items-center justify-center shrink-0">
+              <svg className="w-14 h-14 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
+              </svg>
             </div>
-            <Link href="/research" className="hidden sm:inline-flex items-center gap-1 text-sm font-medium text-gray-700 hover:text-gray-900">
-              All reports
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" /></svg>
-            </Link>
+            <div className="text-center sm:text-left">
+              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">OUR PROMISE TO YOU</h2>
+              <p className="text-gray-600 mt-2 max-w-xl">For any issue related to purchased properties, MBPP takes 100% responsibility. Your peace of mind is our commitment.</p>
+            </div>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            {researchReports.slice(0, 4).map((r, i) => (
-              <div key={i} className="group bg-white rounded-2xl border border-gray-100 p-6 hover:border-gray-200 hover:shadow-md active:scale-[0.99] transition-all duration-200">
-                <div className="flex items-start justify-between mb-3">
-                  <h3 className="text-base font-semibold text-gray-900 pr-4 leading-snug">{r.title}</h3>
-                  <span className="text-xs text-gray-400 shrink-0">{r.date}</span>
+        </div>
+      </section>
+
+      {/* WHAT WE OFFER */}
+      <section className="bg-white py-16 sm:py-20">
+        <div className="max-w-[1400px] mx-auto px-5 sm:px-6 lg:px-10">
+          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 text-center mb-10">WHAT WE OFFER</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="bg-white rounded-2xl border border-gray-100 p-8 text-center hover:shadow-lg transition-shadow group">
+              <div className="w-16 h-16 bg-emerald-50 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:bg-emerald-100 transition-colors">
+                <svg className="w-8 h-8 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 6.75V15m6-6v8.25m.503 3.498l4.875-2.437c.381-.19.622-.58.622-1.006V4.82c0-.836-.88-1.38-1.628-1.006l-3.869 1.934c-.317.159-.69.159-1.006 0L9.503 3.252a1.125 1.125 0 00-1.006 0L3.622 5.689C3.24 5.88 3 6.27 3 6.695V19.18c0 .836.88 1.38 1.628 1.006l3.869-1.934c.317-.159.69-.159 1.006 0l4.994 2.497c.317.158.69.158 1.006 0z" />
+                </svg>
+              </div>
+              <h3 className="text-lg font-bold text-gray-900">WE SELL LANDS</h3>
+              <p className="text-sm text-gray-600 mt-2">Genuine plots in prime locations with secure titles</p>
+            </div>
+            <div className="bg-white rounded-2xl border border-gray-100 p-8 text-center hover:shadow-lg transition-shadow group">
+              <div className="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:bg-blue-100 transition-colors">
+                <svg className="w-8 h-8 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3.75h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008z" />
+                </svg>
+              </div>
+              <h3 className="text-lg font-bold text-gray-900">WE BUILD HOUSES</h3>
+              <p className="text-sm text-gray-600 mt-2">From foundation to finishing, we build quality homes tailored to your needs</p>
+            </div>
+            <div className="bg-white rounded-2xl border border-gray-100 p-8 text-center hover:shadow-lg transition-shadow group">
+              <div className="w-16 h-16 bg-purple-50 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:bg-purple-100 transition-colors">
+                <svg className="w-8 h-8 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3.75h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008z" />
+                </svg>
+                <svg className="w-5 h-5 text-purple-600 -ml-6 mt-4" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                </svg>
+              </div>
+              <h3 className="text-lg font-bold text-gray-900">WE SELL COMPLETED HOUSES</h3>
+              <p className="text-sm text-gray-600 mt-2">Move-in ready homes with modern finishing and quality construction</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* OUR COMPLETED PROJECTS */}
+      <section className="bg-gray-50 py-16 sm:py-20">
+        <div className="max-w-[1400px] mx-auto px-5 sm:px-6 lg:px-10">
+          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 text-center mb-4">OUR COMPLETED PROJECTS</h2>
+          <p className="text-gray-500 text-center mb-8 max-w-xl mx-auto">Take a look at some of our delivered projects across Kano &amp; Northern Nigeria</p>
+          <AutoCarousel items={PLACEHOLDER_PROJECTS} />
+        </div>
+      </section>
+
+      {/* OUR DEVELOPMENTS IN PROGRESS */}
+      <section className="bg-white py-16 sm:py-20">
+        <div className="max-w-[1400px] mx-auto px-5 sm:px-6 lg:px-10">
+          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 text-center mb-4">OUR DEVELOPMENTS IN PROGRESS</h2>
+          <p className="text-gray-500 text-center mb-8 max-w-xl mx-auto">Ongoing projects taking shape across prime locations</p>
+          <AutoCarousel items={PLACEHOLDER_DEVELOPMENTS} />
+        </div>
+      </section>
+
+      {/* OUR LANDS */}
+      <section className="bg-gray-50 py-16 sm:py-20">
+        <div className="max-w-[1400px] mx-auto px-5 sm:px-6 lg:px-10">
+          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 text-center mb-4">OUR LANDS</h2>
+          <p className="text-gray-500 text-center mb-8 max-w-xl mx-auto">Prime land parcels with genuine titles and secure transactions</p>
+          <AutoCarousel items={PLACEHOLDER_LANDS} />
+        </div>
+      </section>
+
+      {/* WHY BUY FROM MBPP */}
+      <section className="bg-white py-16 sm:py-20">
+        <div className="max-w-[1400px] mx-auto px-5 sm:px-6 lg:px-10">
+          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 text-center mb-10">WHY BUY FROM MBPP?</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[
+              { title: "Verified & Genuine Properties", icon: "bi-shield-fill-check", color: "text-emerald-500", bg: "bg-emerald-50" },
+              { title: "Prime Locations", icon: "bi-geo-alt-fill", color: "text-blue-500", bg: "bg-blue-50" },
+              { title: "In Kano & Northern States", icon: "bi-buildings", color: "text-purple-500", bg: "bg-purple-50" },
+              { title: "Quality Construction & Finishing", icon: "bi-star-fill", color: "text-amber-500", bg: "bg-amber-50" },
+              { title: "Flexible Payment Options", icon: "bi-credit-card", color: "text-rose-500", bg: "bg-rose-50" },
+              { title: "Professional & Experienced Team", icon: "bi-people-fill", color: "text-cyan-500", bg: "bg-cyan-50" },
+            ].map((item) => (
+              <div key={item.title} className="flex items-center gap-4 p-5 rounded-xl border border-gray-100 hover:border-gray-200 hover:shadow-sm transition-all">
+                <div className={`w-12 h-12 ${item.bg} rounded-xl flex items-center justify-center shrink-0`}>
+                  <i className={`bi ${item.icon} ${item.color} text-xl`}></i>
                 </div>
-                <p className="text-sm text-gray-600 leading-relaxed mb-4">{r.summary}</p>
-                <div className="flex flex-wrap gap-1.5">
-                  {(r.metrics || []).map((m) => (
-                    <span key={m} className="px-2.5 py-1 bg-gray-50 text-gray-600 text-xs font-medium rounded-full">{m}</span>
-                  ))}
-                </div>
+                <p className="text-sm font-semibold text-gray-900">{item.title}</p>
               </div>
             ))}
           </div>
         </div>
+      </section>
+
+      {/* MEET OUR TEAM - Staff Carousel */}
+      <section className="bg-gray-50 py-16 sm:py-20">
+        <div className="max-w-[1400px] mx-auto px-5 sm:px-6 lg:px-10">
+          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 text-center mb-4">MEET OUR TEAM</h2>
+          <p className="text-gray-500 text-center mb-8 max-w-xl mx-auto">Get to know the dedicated professionals behind MBPP</p>
+          <AutoCarousel items={staffItems} heightClass="h-80 sm:h-96" />
+        </div>
+      </section>
+
+      {/* WHY CHOOSE US */}
+      <section className="bg-white py-16 sm:py-20">
+        <div className="max-w-[1400px] mx-auto px-5 sm:px-6 lg:px-10">
+          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 text-center mb-10">WHY CHOOSE US?</h2>
+          <div className="max-w-2xl mx-auto space-y-4">
+            {[
+              { text: "Professional & experienced team", icon: "bi-award-fill", color: "text-amber-500" },
+              { text: "Proven track record", icon: "bi-trophy-fill", color: "text-emerald-500" },
+              { text: "High-quality materials & workmanship", icon: "bi-tools", color: "text-blue-500" },
+              { text: "Timely project completion", icon: "bi-clock-fill", color: "text-purple-500" },
+              { text: "Customer satisfaction is our priority", icon: "bi-heart-fill", color: "text-rose-500" },
+            ].map((item) => (
+              <div key={item.text} className="flex items-center gap-4 p-4 rounded-xl bg-gray-50 border border-gray-100">
+                <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-sm shrink-0">
+                  <i className={`bi ${item.icon} ${item.color} text-lg`}></i>
+                </div>
+                <p className="text-sm font-medium text-gray-800">{item.text}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* SOCIAL MEDIA */}
+      {socialLinks.length > 0 && (
+        <section className="bg-gray-950 py-14">
+          <div className="max-w-[1400px] mx-auto px-5 sm:px-6 lg:px-10 text-center">
+            <h2 className="text-xl sm:text-2xl font-bold text-white mb-2">Connect With Us</h2>
+            <p className="text-gray-400 text-sm mb-8">Follow us on social media for updates and new listings</p>
+            <div className="flex items-center justify-center gap-6">
+              {socialLinks.map((s) => (
+                <a
+                  key={s.label}
+                  href={s.url || "#"}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-16 h-16 rounded-full bg-gray-800 border border-gray-700 flex items-center justify-center text-gray-300 hover:bg-white hover:text-gray-950 hover:border-white transition-all duration-200"
+                  aria-label={s.label}
+                >
+                  {SOCIAL_ICONS[s.icon] || s.label[0]}
+                </a>
+              ))}
+            </div>
+          </div>
+        </section>
       )}
 
       <section className="bg-gray-50 border-y border-gray-100">
