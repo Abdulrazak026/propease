@@ -105,7 +105,19 @@ router.post("/withdrawals/:id/reject", authenticate, authorize("head"), async (r
     const wid = req.params.id as string;
     const withdrawal = await prisma.withdrawal.findUnique({ where: { id: wid }, include: { user: { select: { email: true, name: true } } } });
     if (!withdrawal) return res.status(404).json({ error: "Withdrawal not found" });
-    await prisma.withdrawal.update({ where: { id: wid }, data: { status: "rejected" } });
+    await prisma.$transaction(async (tx) => {
+      await tx.withdrawal.update({ where: { id: wid }, data: { status: "rejected" } });
+      await tx.transaction.create({
+        data: {
+          type: "withdrawal",
+          amount: withdrawal.amount,
+          reference: `WD-${withdrawal.id.slice(0,8)}`,
+          method: "transfer",
+          status: "failed",
+          userId: withdrawal.userId,
+        },
+      });
+    });
     emailService.withdrawalRejected(withdrawal.user.email, withdrawal.user.name, withdrawal.amount, (req.body as any).reason).catch(() => {});
     res.json({ success: true, message: "Withdrawal rejected" });
   } catch (error) {

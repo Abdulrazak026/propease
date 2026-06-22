@@ -195,6 +195,28 @@ router.post("/webhook", async (req, res: Response) => {
 
         emailService.paymentReceipt(user?.email || "", user?.name || "", amountInNaira, reference, `Down Payment: ${listing.title}`).catch(() => {});
       }
+    } else if (event.event === "charge.failed") {
+      const { metadata, reference, amount, gateway_response } = event.data;
+      const userId = metadata?.userId;
+      const amountInNaira = amount / 100;
+      const purpose = metadata?.purpose || "payment";
+
+      if (userId) {
+        const existingTx = await prisma.transaction.findFirst({ where: { reference } });
+        if (!existingTx) {
+          await prisma.transaction.create({
+            data: {
+              userId,
+              type: purpose,
+              amount: amountInNaira,
+              reference,
+              method: "card",
+              status: "failed",
+            },
+          });
+          logger.info({ reference, userId, purpose }, "Declined transaction recorded");
+        }
+      }
     }
 
     res.sendStatus(200);
