@@ -88,6 +88,7 @@ export default function HomePage() {
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [postsLoading, setPostsLoading] = useState(true);
   const [activeCategory, setActiveCategory] = useState("");
+  const [showAllTeam, setShowAllTeam] = useState(false);
 
   let researchReports: ResearchReport[] = [];
   try { const raw = getSetting("research_reports"); if (raw) researchReports = JSON.parse(raw); } catch {}
@@ -492,7 +493,7 @@ export default function HomePage() {
           <h2 className="text-xl sm:text-3xl font-bold text-gray-900 text-center mb-3 sm:mb-4 tracking-tight leading-[1.15]">Meet Our Team</h2>
           <p className="text-xs sm:text-base text-gray-500 text-center mb-8 sm:mb-12 max-w-xl mx-auto">Get to know the dedicated professionals behind MBPP</p>
           <div className="grid sm:grid-cols-2 gap-x-6 gap-y-10 max-w-3xl mx-auto">
-            {staffItems.map((m, i) => {
+            {staffItems.slice(0, showAllTeam ? staffItems.length : 3).map((m, i) => {
               const isLead = i === 0;
               const name = m.title;
               const role = m.subtitle;
@@ -532,32 +533,55 @@ export default function HomePage() {
               );
             })}
           </div>
+          {staffItems.length > 3 && (
+            <div className="flex justify-center mt-8">
+              <button
+                onClick={() => setShowAllTeam(!showAllTeam)}
+                className="inline-flex items-center gap-2 px-6 py-2.5 text-sm font-medium text-[var(--color-primary)] border border-[var(--color-primary)]/20 rounded-full hover:bg-[var(--color-primary)]/5 transition-all"
+              >
+                {showAllTeam ? "Show less" : `View all ${staffItems.length} members`}
+                <svg className={`w-4 h-4 transition-transform ${showAllTeam ? "rotate-180" : ""}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                </svg>
+              </button>
+            </div>
+          )}
         </div>
       </section>
 
       {/* SOCIAL MEDIA */}
-      {socialLinks.length > 0 && (
-        <section className="bg-gray-50 py-14">
-          <div className="max-w-[1400px] mx-auto px-5 sm:px-6 lg:px-10 text-center">
-            <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">Connect With Us</h2>
-            <p className="text-gray-500 text-sm mb-8">Follow us on social media for updates and new listings</p>
-            <div className="flex items-center justify-center gap-6">
-              {socialLinks.map((s) => (
-                <a
-                  key={s.label}
-                  href={s.url || "#"}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-16 h-16 rounded-full bg-white border border-gray-200 flex items-center justify-center text-gray-600 hover:bg-gray-900 hover:text-white hover:border-gray-900 transition-all duration-200"
-                  aria-label={s.label}
-                >
-                  {SOCIAL_ICONS[s.icon] || s.label[0]}
-                </a>
-              ))}
-            </div>
+      <section className="bg-gray-50 py-14">
+        <div className="max-w-[1400px] mx-auto px-5 sm:px-6 lg:px-10 text-center">
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">Connect With Us</h2>
+          <p className="text-gray-500 text-sm mb-8">Follow us on social media for updates and new listings</p>
+          <div className="flex items-center justify-center gap-6 flex-wrap">
+            {[
+              { label: "Facebook", icon: "facebook", url: facebookUrl },
+              { label: "Instagram", icon: "instagram", url: instagramUrl },
+              { label: "TikTok", icon: "tiktok", url: tiktokUrl },
+              { label: "WhatsApp", icon: "whatsapp", url: whatsappUrl },
+              { label: "LinkedIn", icon: "linkedin", url: linkedinUrl },
+              { label: "Twitter", icon: "twitter", url: twitterUrl },
+            ].map((s) => (
+              <a
+                key={s.label}
+                href={s.url || "#"}
+                target={s.url ? "_blank" : undefined}
+                rel={s.url ? "noopener noreferrer" : undefined}
+                className={`w-16 h-16 rounded-full bg-white border border-gray-200 flex items-center justify-center transition-all duration-200 ${
+                  s.url
+                    ? "text-gray-600 hover:bg-gray-900 hover:text-white hover:border-gray-900 cursor-pointer"
+                    : "text-gray-300 cursor-default"
+                }`}
+                aria-label={s.label}
+                onClick={s.url ? undefined : (e) => e.preventDefault()}
+              >
+                {SOCIAL_ICONS[s.icon] || s.label[0]}
+              </a>
+            ))}
           </div>
-        </section>
-      )}
+        </div>
+      </section>
 
       <Footer />
     </div>

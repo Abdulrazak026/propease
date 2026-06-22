@@ -80,7 +80,7 @@ export default function AboutPage() {
       <section className="max-w-[1400px] mx-auto w-full px-5 sm:px-6 lg:px-10 -mt-10 sm:-mt-14 relative z-10">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-px bg-gray-200 rounded-2xl overflow-hidden shadow-xl shadow-gray-900/5">
           {[
-            { v: "2017", l: "Founded — Kano Based" },
+            { v: "2017", l: "Founded in Kano" },
             { v: "120+", l: "Verified agents & staff" },
             { v: "₦38M", l: "Tracked monthly" },
             { v: "4 cities", l: "Across Northern Nigeria" },

@@ -299,7 +299,7 @@ export default function SubmissionsPage() {
               <div className="space-y-2 pt-2">
                 <label className="text-xs font-semibold text-gray-700">Assign to Ambassador (optional)</label>
                 <select value={selectedAmbassadorId} onChange={e => setSelectedAmbassadorId(e.target.value)} className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm">
-                  <option value="">Partner — No ambassador</option>
+                  <option value="">Partner - No ambassador</option>
                   {ambassadors.map(a => <option key={a.id} value={a.id}>{a.name} ({a.city || "No city"})</option>)}
                 </select>
                 <div className="flex gap-2">

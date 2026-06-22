@@ -185,7 +185,7 @@ function RolesModal({ userId, users, onClose, onUpdate }: { userId: string; user
             <div>
               <label className="text-xs font-semibold text-gray-700">Reports To (Ambassador)</label>
               <select defaultValue={u.ambassadorId || ""} className="w-full mt-1 rounded-lg border border-gray-200 px-3 py-2 text-sm" onChange={async e => { await update({ ambassadorId: e.target.value || null }); }}>
-                <option value="">— Not assigned —</option>
+                <option value="">- Not assigned -</option>
                 {ambassadors.map(a => <option key={a.id} value={a.id}>{a.name} ({a.city || "No city"})</option>)}
               </select>
             </div>
@@ -284,7 +284,7 @@ function AddStaffModal({ onClose }: { onClose: () => void }) {
           </select>
           {form.role === "agent" && (
             <select value={form.ambassadorId} onChange={e => setForm({ ...form, ambassadorId: e.target.value })} className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm">
-              <option value="">— No ambassador —</option>
+              <option value="">- No ambassador -</option>
               {ambassadors.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
             </select>
           )}

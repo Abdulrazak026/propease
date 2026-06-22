@@ -48,7 +48,7 @@ export default function ModerationPage() {
     if (r.status === 200 && r.data?.listing) {
       load();
     } else {
-      setToast(r.error || "Approve failed — listing must be in 'review' status first");
+      setToast(r.error || "Approve failed - listing must be in 'review' status first");
     }
     setBusy(null);
   };
