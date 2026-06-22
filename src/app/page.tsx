@@ -9,6 +9,7 @@ import { useSettings } from "@/context/SettingsContext";
 import { useRole } from "@/context/RoleContext";
 import SoldPropertiesGallery from "@/components/listings/SoldPropertiesGallery";
 import AutoCarousel, { CarouselItem } from "@/components/homepage/AutoCarousel";
+import { resolveImageUrl } from "@/lib/utils";
 
 interface City { id: string; name: string; }
 interface BlogPost { id: string; slug: string; title: string; excerpt?: string | null; content?: string | null; coverImage: string | null; publishedAt: string | null; author?: { name: string } | null; }
@@ -68,11 +69,12 @@ const HERO_MORE_ITEMS = (isAuth: boolean) => [
   { label: "News", href: "/news" },
   { label: "Careers", href: "/careers" },
   ...(isAuth ? [{ label: "Dashboard", href: "/admin" }] : [{ label: "Sign In", href: "/login" }]),
+  ...(isAuth ? [{ label: "Sign Out", href: "/", action: "logout" as const }] : []),
 ];
 
 export default function HomePage() {
   const { get: getSetting, loading: settingsLoading } = useSettings();
-  const { currentUser, isAuthenticated } = useRole();
+  const { currentUser, isAuthenticated, logout } = useRole();
   const heroImage = getSetting("hero_image") || "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=1600&h=900&fit=crop";
   const siteName = getSetting("site_name", "MBPP");
   const siteTagline = getSetting("site_tagline", "Find Your Dream Property in Kano & Northern States");
@@ -197,26 +199,38 @@ export default function HomePage() {
         </div>
 
         <div className="relative w-full max-w-[1400px] mx-auto px-5 sm:px-6 lg:px-10 pt-16 sm:pt-20 lg:pt-24 pb-16 sm:pb-20 lg:pb-24" style={{ opacity: heroOpacity }}>
-          {/* Top-right menu */}
-          <div className="absolute top-4 right-5 sm:right-6 lg:right-10 flex items-center gap-2 sm:gap-3 z-10">
+          {/* Top-left links */}
+          <div className="absolute top-4 left-5 sm:left-6 lg:left-10 flex items-center gap-2 sm:gap-3 z-10">
             {PRIMARY_LINKS.map((link) => (
               <Link key={link.label} href={link.href} className="bg-black/40 backdrop-blur-sm text-white/90 hover:text-white text-[11px] sm:text-sm font-semibold tracking-wide uppercase px-3 py-1.5 rounded-full transition-colors">
                 {link.label}
               </Link>
             ))}
-            <div className="relative" id="hero-more">
-              <button
-                onClick={() => setHeroMoreOpen(!heroMoreOpen)}
-                className="bg-black/40 backdrop-blur-sm text-white/90 hover:text-white rounded-full transition-colors w-8 h-8 flex items-center justify-center"
-                aria-label="More"
-              >
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
-                </svg>
-              </button>
-              {heroMoreOpen && (
-                <div className="absolute top-full right-0 mt-2 w-56 bg-white rounded-xl border border-gray-100 shadow-xl shadow-gray-900/5 p-3 z-50">
-                  {HERO_MORE_ITEMS(!!isAuthenticated).map((item) => (
+          </div>
+
+          {/* Top-right hamburger */}
+          <div className="absolute top-4 right-5 sm:right-6 lg:right-10 z-10" id="hero-more">
+            <button
+              onClick={() => setHeroMoreOpen(!heroMoreOpen)}
+              className="bg-black/40 backdrop-blur-sm text-white/90 hover:text-white rounded-full transition-colors w-8 h-8 flex items-center justify-center"
+              aria-label="More"
+            >
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            </button>
+            {heroMoreOpen && (
+              <div className="absolute top-full right-0 mt-2 w-56 bg-white rounded-xl border border-gray-100 shadow-xl shadow-gray-900/5 p-3 z-50">
+                {HERO_MORE_ITEMS(!!isAuthenticated).map((item) => (
+                  item.action === "logout" ? (
+                    <button
+                      key="logout"
+                      onClick={() => { setHeroMoreOpen(false); logout(); }}
+                      className="w-full text-left block px-4 py-2.5 text-sm font-medium text-red-600 hover:bg-red-50 rounded-lg"
+                    >
+                      {item.label}
+                    </button>
+                  ) : (
                     <Link
                       key={item.href}
                       href={item.href}
@@ -225,10 +239,10 @@ export default function HomePage() {
                     >
                       {item.label}
                     </Link>
-                  ))}
-                </div>
-              )}
-            </div>
+                  )
+                ))}
+              </div>
+            )}
           </div>
 
           <div className="flex flex-col justify-center items-center text-center min-h-[25vh] sm:min-h-[30vh] mt-10 sm:mt-6">
@@ -473,9 +487,50 @@ export default function HomePage() {
       {/* MEET OUR TEAM */}
       <section className="bg-gray-50 py-10 sm:py-16">
         <div className="max-w-[1400px] mx-auto px-5 sm:px-6 lg:px-10">
-          <h2 className="text-xl sm:text-3xl font-bold text-gray-900 text-center mb-3 sm:mb-4">MEET OUR TEAM</h2>
-          <p className="text-xs sm:text-base text-gray-500 text-center mb-6 sm:mb-8 max-w-xl mx-auto">Get to know the dedicated professionals behind MBPP</p>
-          <AutoCarousel items={staffItems} heightClass="h-72 sm:h-96 lg:h-[28rem]" imageFit="contain" showOverlay={false} />
+          <p className="text-xs font-semibold text-[var(--color-primary)] uppercase tracking-[0.15em] mb-3 text-center">The team</p>
+          <h2 className="text-xl sm:text-3xl font-bold text-gray-900 text-center mb-3 sm:mb-4 tracking-tight leading-[1.15]">Meet Our Team</h2>
+          <p className="text-xs sm:text-base text-gray-500 text-center mb-8 sm:mb-12 max-w-xl mx-auto">Get to know the dedicated professionals behind MBPP</p>
+          <div className="grid sm:grid-cols-2 gap-x-6 gap-y-10 max-w-3xl mx-auto">
+            {staffItems.map((m, i) => {
+              const isLead = i === 0;
+              const name = m.title;
+              const role = m.subtitle;
+              const photo = teamMembers[i]?.photo;
+              const bio = teamMembers[i]?.bio;
+              return (
+                <div
+                  key={name}
+                  className={`group flex gap-4 p-3 -m-3 rounded-2xl transition-all duration-300 hover:bg-white hover:shadow-lg hover:shadow-gray-900/5 hover:-translate-y-0.5 cursor-default ${
+                    isLead ? "sm:col-span-2 sm:items-center bg-gradient-to-br from-emerald-50/60 to-white border border-emerald-100/60" : ""
+                  }`}
+                  style={{ animation: `fadeUp 0.5s ease-out ${i * 60}ms both` }}
+                >
+                  <div className={`shrink-0 rounded-2xl bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center font-bold text-gray-500 overflow-hidden ring-2 ring-white shadow-md shadow-gray-900/5 transition-transform duration-500 group-hover:scale-105 group-hover:shadow-xl group-hover:shadow-[var(--color-primary)]/20 ${
+                    isLead ? "w-24 h-24 sm:w-32 sm:h-32 text-lg" : "w-24 h-24 sm:w-28 sm:h-28 text-base"
+                  }`}>
+                    {photo ? (
+                      <img src={resolveImageUrl(photo) || ""} alt={name} className="w-full h-full object-cover object-top" loading="lazy" />
+                    ) : (
+                      name.split(" ").map(n => n[0]).join("").slice(0, 2)
+                    )}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <p className={`font-semibold text-gray-900 leading-tight transition-colors duration-300 group-hover:text-[var(--color-primary)] ${isLead ? "text-lg sm:text-xl" : "text-base"}`}>{name}</p>
+                      {isLead && (
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[var(--color-primary)]/10 text-[var(--color-primary)] text-[10px] font-semibold uppercase tracking-wider">
+                          <svg className="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.957a1 1 0 00.95.69h4.162c.969 0 1.371 1.24.588 1.81l-3.37 2.448a1 1 0 00-.364 1.118l1.287 3.957c.3.922-.755 1.688-1.539 1.118L10 14.347l-3.37 2.448c-.783.57-1.838-.196-1.539-1.118l1.287-3.957a1 1 0 00-.364-1.118L2.644 8.384c-.783-.57-.38-1.81.588-1.81h4.162a1 1 0 00.95-.69l1.286-3.957z" /></svg>
+                          Lead
+                        </span>
+                      )}
+                    </div>
+                    <p className={`text-[var(--color-primary)] font-medium mb-1 mt-0.5 ${isLead ? "text-sm" : "text-xs"}`}>{role}</p>
+                    {bio && <p className={`text-gray-500 leading-relaxed ${isLead ? "text-base" : "text-sm"}`}>{bio}</p>}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </div>
       </section>
 

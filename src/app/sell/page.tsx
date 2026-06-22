@@ -11,8 +11,17 @@ export const metadata: Metadata = {
 export default function SellPage() {
   return (
     <div className="flex flex-col">
-      <section className="bg-white border-b border-gray-100">
-        <div className="max-w-[900px] mx-auto px-5 sm:px-6 lg:px-10 pt-12 sm:pt-16 pb-10 sm:pb-14">
+      {/* BACK LINK */}
+      <div className="max-w-[900px] mx-auto w-full px-5 sm:px-6 lg:px-10 pt-6">
+        <Link href="/" className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-900 transition-colors">
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" /></svg>
+          Home
+        </Link>
+      </div>
+
+      {/* HERO */}
+      <section className="bg-white">
+        <div className="max-w-[900px] mx-auto px-5 sm:px-6 lg:px-10 pt-8 sm:pt-10 pb-10 sm:pb-14">
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 leading-[1.1] tracking-tight">
             Want to sell your house?
           </h1>
@@ -22,8 +31,9 @@ export default function SellPage() {
         </div>
       </section>
 
-      <section className="max-w-[900px] mx-auto w-full px-5 sm:px-6 lg:px-10 py-10 sm:py-14">
-        <div className="grid sm:grid-cols-3 gap-4">
+      {/* VALUE PROPOSITIONS + TERMS */}
+      <section className="max-w-[900px] mx-auto w-full px-5 sm:px-6 lg:px-10 pb-10 sm:pb-14">
+        <div className="grid sm:grid-cols-3 gap-4 mb-6">
           {[
             { t: "Free visit", d: "We come to your place. No charge, no obligation." },
             { t: "Fair price", d: "We look at recent sales in your area and suggest a realistic price." },
@@ -35,10 +45,8 @@ export default function SellPage() {
             </div>
           ))}
         </div>
-      </section>
 
-      {/* DISCLAIMER */}
-      <section className="max-w-[900px] mx-auto w-full px-5 sm:px-6 lg:px-10 pb-10 sm:pb-14">
+        {/* TERMS */}
         <div className="bg-white border border-gray-200 rounded-2xl p-6 sm:p-8">
           <h3 className="text-base font-semibold text-gray-900 mb-3">Terms & Conditions</h3>
           <ul className="space-y-2 text-sm text-gray-600 leading-relaxed">
@@ -49,6 +57,7 @@ export default function SellPage() {
         </div>
       </section>
 
+      {/* CTA */}
       <section className="max-w-[900px] mx-auto w-full px-5 sm:px-6 lg:px-10 pb-16 sm:pb-20">
         <div className="relative bg-[var(--color-primary)] rounded-3xl overflow-hidden p-8 sm:p-12 text-center">
           <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight leading-[1.1]">Sell with us</h2>

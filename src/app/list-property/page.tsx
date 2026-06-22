@@ -6,6 +6,7 @@ import { Listing } from "@/lib/types";
 import PropertyCard from "@/components/listings/PropertyCard";
 import PropertyFilters from "@/components/listings/PropertyFilters";
 import { useListings } from "@/hooks/useListings";
+import Link from "next/link";
 import Footer from "@/components/layout/Footer";
 
 const MapView = dynamic(() => import("@/components/listings/MapView"), { ssr: false, loading: () => <div className="h-[60vh] bg-gray-100 rounded-2xl flex items-center justify-center text-sm text-gray-400">Loading map…</div> });
@@ -50,6 +51,12 @@ export default function ListPropertyPage() {
 
   return (
     <div className="flex flex-col">
+      <div className="max-w-[1400px] w-full mx-auto px-5 sm:px-6 lg:px-10 pt-4">
+        <Link href="/" className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-900 transition-colors">
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" /></svg>
+          Home
+        </Link>
+      </div>
       <div className="bg-white border-b border-gray-200">
         <PropertyFilters onFilterChange={handleFilterChange} />
       </div>

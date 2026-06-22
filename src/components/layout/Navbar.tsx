@@ -7,17 +7,13 @@ import { useSettings } from "@/context/SettingsContext";
 import { api } from "@/lib/api-client";
 
 const PRIMARY_LINKS = [
-  { label: "Properties", href: "/list-property" },
-  { label: "Rent", href: "/list-property?type=rent" },
+  { label: "Buy", href: "/list-property" },
   { label: "Sell", href: "/sell" },
-  { label: "Research", href: "/research" },
+  { label: "Rental", href: "/list-property?type=rent" },
 ];
 
 const MORE_LINKS = [
   { label: "Sign In", href: "/login", desc: "Access your account" },
-  { label: "Properties", href: "/list-property", desc: "Browse all properties" },
-  { label: "Sell", href: "/sell", desc: "List your property" },
-  { label: "Rent", href: "/list-property?type=rent", desc: "Find rental properties" },
   { label: "About", href: "/about", desc: "Our story and team" },
   { label: "Contact", href: "/contact", desc: "Talk to us" },
   { label: "Get Help", href: "/help", desc: "FAQ and support" },
@@ -212,6 +208,15 @@ export default function Navbar() {
                   </Link>
                 );
               })}
+              {isAuthenticated && (
+                <button
+                  onClick={() => { handleLogout(); setMobileMoreOpen(false); }}
+                  className="w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-red-50 transition-colors text-sm text-red-600"
+                >
+                  <span className="text-red-400">S</span>
+                  <span>Sign Out</span>
+                </button>
+              )}
             </div>
           </div>
         )}
@@ -307,6 +312,20 @@ export default function Navbar() {
                     </Link>
                   );
                 })}
+                {isAuthenticated && (
+                  <button
+                    onClick={() => { handleLogout(); setMoreOpen(false); }}
+                    className="w-full flex items-start gap-3 p-3 rounded-lg hover:bg-red-50 transition-colors group"
+                  >
+                    <div className="w-8 h-8 rounded-md bg-red-50 group-hover:bg-red-100 flex items-center justify-center shrink-0 transition-colors">
+                      <span className="w-1.5 h-1.5 rounded-full bg-red-400" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-red-600">Sign Out</p>
+                      <p className="text-xs text-gray-500 mt-0.5">Log out of your account</p>
+                    </div>
+                  </button>
+                )}
               </div>
             )}
           </div>
