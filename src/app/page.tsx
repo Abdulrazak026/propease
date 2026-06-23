@@ -150,15 +150,13 @@ export default function HomePage() {
         </div>
 
         <div className="relative w-full max-w-7xl mx-auto px-5 sm:px-6 lg:px-10 pt-24 sm:pt-28 lg:pt-32 pb-16 sm:pb-20 lg:pb-24" style={{ opacity: heroOpacity }}>
-          <div className="flex flex-col justify-center items-center text-center min-h-[25vh] sm:min-h-[30vh] mt-6 sm:mt-4">
-            <div className="bg-black/25 backdrop-blur-sm rounded-2xl px-6 sm:px-10 py-5 sm:py-7 max-w-3xl">
-              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white leading-[1.1] tracking-tight">
-                Find Your Properties in Kano &amp; Other Northern States
-              </h2>
-              <p className="text-base sm:text-lg text-white/90 mt-3 sm:mt-4 leading-relaxed">
-                Buy, rent, or sell verified properties across Northern Nigeria with confidence.
-              </p>
-            </div>
+          <div className="flex flex-col justify-center items-center text-center min-h-[25vh] sm:min-h-[30vh] mt-6 sm:mt-4 px-4">
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white leading-[1.1] tracking-tight max-w-3xl" style={{ textShadow: '0 2px 12px rgba(0,0,0,0.7)' }}>
+              Find Your Properties in Kano &amp; Other Northern States
+            </h2>
+            <p className="text-base sm:text-lg text-white/90 mt-3 sm:mt-4 max-w-2xl leading-relaxed" style={{ textShadow: '0 1px 8px rgba(0,0,0,0.6)' }}>
+              Buy, rent, or sell verified properties across Northern Nigeria with confidence.
+            </p>
           </div>
         </div>
       </section>
