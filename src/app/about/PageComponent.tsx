@@ -23,42 +23,30 @@ export default function AboutPage() {
     const raw = get("team_members");
     const parsed = raw ? JSON.parse(raw) : null;
     if (Array.isArray(parsed) && parsed.length > 0) {
-      const photosByCore: Record<string, string> = {};
-      const firstNameCount: Record<string, number> = {};
+      const normalizeName = (name: string) => name
+        .replace(/^(Engr\.|Dr\.|Barr\.|Prof\.|Alh\.|Mallam)\s*/i, "")
+        .replace(/\s*\(.*?\)\s*/g, "")
+        .replace(/\s*(PhD|Ph\.D|LLB|B\.L|LLM|MSc|BSc|MBA)\s*/gi, "")
+        .replace(/,\s*/g, "")
+        .trim()
+        .toLowerCase();
+      const nameMapping: Record<string, string> = {
+        "salisu muhammad": "engr. salisu mohd nuhu",
+      };
+      const photosByName: Record<string, string> = {};
       for (const m of parsed) {
-        if (!m.photo) continue;
-        const core = m.name
-          .replace(/^(Engr\.|Dr\.|Barr\.|Prof\.|Alh\.|Mallam)\s*/i, "")
-          .replace(/\s*\(.*?\)\s*/g, "")
-          .replace(/\s*(PhD|Ph\.D|LLB|B\.L|LLM|MSc|BSc|MBA)\s*/gi, "")
-          .replace(/,\s*/g, "")
-          .trim();
-        const parts = core.split(/\s+/);
-        photosByCore[core.toLowerCase()] = m.photo;
-        if (parts.length >= 2) {
-          photosByCore[`${parts[0]} ${parts[parts.length - 1]}`.toLowerCase()] = m.photo;
-          photosByCore[`${parts[0]} ${parts[1]}`.toLowerCase()] = m.photo;
+        if (m.photo) {
+          const normalized = normalizeName(m.name);
+          photosByName[normalized] = m.photo;
+          if (nameMapping[normalized]) {
+            photosByName[nameMapping[normalized]] = m.photo;
+          }
         }
-        firstNameCount[parts[0].toLowerCase()] = (firstNameCount[parts[0].toLowerCase()] || 0) + 1;
       }
-      team = defaultTeam.map(m => {
-        if (m.photo) return m;
-        const core = m.name
-          .replace(/^(Engr\.|Dr\.|Barr\.|Prof\.|Alh\.|Mallam)\s*/i, "")
-          .replace(/\s*\(.*?\)\s*/g, "")
-          .replace(/\s*(PhD|Ph\.D|LLB|B\.L|LLM|MSc|BSc|MBA)\s*/gi, "")
-          .replace(/,\s*/g, "")
-          .trim();
-        const parts = core.split(/\s+/);
-        let photo = photosByCore[core.toLowerCase()]
-          || (parts.length >= 2 ? photosByCore[`${parts[0]} ${parts[parts.length - 1]}`.toLowerCase()] : "")
-          || (parts.length >= 2 ? photosByCore[`${parts[0]} ${parts[1]}`.toLowerCase()] : "")
-          || "";
-        if (!photo && parts.length > 0 && firstNameCount[parts[0].toLowerCase()] === 1) {
-          photo = photosByCore[parts[0].toLowerCase()] || "";
-        }
-        return { ...m, photo };
-      });
+      team = defaultTeam.map(m => ({
+        ...m,
+        photo: m.photo || photosByName[normalizeName(m.name)] || "",
+      }));
     } else {
       team = defaultTeam;
     }

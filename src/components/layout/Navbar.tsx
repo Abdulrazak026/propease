@@ -90,7 +90,7 @@ export default function Navbar() {
                 )}
               </button>
               {notifOpen && (
-                <div className="absolute top-full right-0 mt-2 w-72 bg-white rounded-xl shadow-xl border border-gray-200 z-50 overflow-hidden">
+                <div className="absolute top-full right-0 mt-2 w-72 bg-white rounded-xl shadow-xl border border-gray-200 z-[60] overflow-hidden">
                   <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
                     <span className="text-sm font-semibold text-gray-900">Notifications</span>
                     {unreadCount > 0 && <button onClick={markAllNotifRead} className="text-xs text-[var(--color-primary)] hover:underline font-medium">Mark all read</button>}
@@ -143,8 +143,8 @@ export default function Navbar() {
             </button>
             {menuOpen && (
               <>
-                <div className="fixed inset-0 z-40" onClick={() => setMenuOpen(false)} />
-                <div className="absolute top-full right-0 mt-2 w-64 bg-gray-50 rounded-xl border border-gray-200 shadow-xl p-2 z-50">
+                <div className="fixed inset-0 z-[55]" onClick={() => setMenuOpen(false)} />
+                <div className="absolute top-full right-0 mt-2 w-64 bg-gray-50 rounded-xl border border-gray-200 shadow-xl p-2 z-[60]">
                   <p className="text-[11px] font-semibold text-brand-blue uppercase tracking-wider px-1 pb-2">Navigation</p>
                   <div>
                     {MENU_LINKS.map((item, i) => {
