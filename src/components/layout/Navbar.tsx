@@ -72,7 +72,7 @@ export default function Navbar() {
   return (
     <>
     {/* Mobile header */}
-    <header className="lg:hidden sticky top-0 z-50 w-full bg-white border-b border-gray-200">
+    <header className="lg:hidden w-full bg-white border-b border-gray-200">
       <div className="max-w-7xl mx-auto flex items-center justify-between h-14">
         <Link href="/" className="shrink-0 h-full flex items-center pl-2" style={{ width: "50%", maxWidth: "50%" }}>
           <img src={siteLogo || `https://mbpproperties.com/api/upload/file/7ea15ec8-11b2-4c34-a855-1469d56656a5.png`} alt={siteName} className="h-full w-auto object-contain object-left" />
@@ -192,7 +192,7 @@ export default function Navbar() {
     </header>
 
     {/* Desktop header */}
-    <header className="hidden lg:flex sticky top-0 z-50 w-full bg-white border-b border-gray-200">
+    <header className="hidden lg:flex w-full bg-white border-b border-gray-200">
       <div className="max-w-7xl mx-auto px-6 xl:px-10 flex items-center justify-between w-full h-14">
         <Link href="/" className="shrink-0 h-full flex items-center pl-2" style={{ width: "25%", maxWidth: "25%" }}>
           <img src={siteLogo || `https://mbpproperties.com/api/upload/file/7ea15ec8-11b2-4c34-a855-1469d56656a5.png`} alt={siteName} className="h-full w-auto object-contain object-left" />
