@@ -455,7 +455,7 @@ export default function HomePage() {
 
             <div>
               <span className="text-brand-gold font-bold text-xs uppercase tracking-widest block mb-1">Our Leadership</span>
-              <h3 className="text-2xl font-black mb-8">MEET OUR TOP TEAM</h3>
+              <h3 className="text-2xl font-black mb-8">MEET OUR TEAM</h3>
             </div>
 
             <div className={`grid gap-6 ${showAllTeam && staffItems.length > 3 ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3" : "grid-cols-1 md:grid-cols-3"}`}>
