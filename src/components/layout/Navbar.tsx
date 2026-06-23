@@ -60,7 +60,6 @@ export default function Navbar() {
   useEffect(() => {
     const handler = (e: Event) => {
       const target = e.target as Node;
-      if (menuRef.current && !menuRef.current.contains(target)) setMenuOpen(false);
       if (userRef.current && !userRef.current.contains(target)) setUserOpen(false);
       if (notifRef.current && !notifRef.current.contains(target)) setNotifOpen(false);
     };
@@ -150,31 +149,31 @@ export default function Navbar() {
                     {MENU_LINKS.map((item, i) => (
                       <div key={item.href}>
                         {i > 0 && <div className="border-t border-gray-100 mx-2" />}
-                        <button onClick={() => { setMenuOpen(false); router.push(item.href); }} className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 transition-colors text-sm text-gray-700 hover:text-gray-900 text-left">
+                        <a href={item.href} onClick={() => setMenuOpen(false)} className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 transition-colors text-sm text-gray-700 hover:text-gray-900">
                           <span className="text-brand-blue font-bold text-xs w-4">{item.label[0]}</span>
                           <span>{item.label}</span>
-                        </button>
+                        </a>
                       </div>
                     ))}
-                    {isAuthenticated && (
+                    {mounted && isAuthenticated && currentUser && (
                       <>
                         <div className="border-t border-gray-100 mx-2" />
-                        <button onClick={() => { setMenuOpen(false); router.push(isAdmin ? "/admin" : `/${currentUser?.role}`); }} className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 transition-colors text-sm text-gray-700 hover:text-gray-900 text-left">
+                        <a href={isAdmin ? "/admin" : `/${currentUser?.role}`} onClick={() => setMenuOpen(false)} className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 transition-colors text-sm text-gray-700 hover:text-gray-900">
                           <span className="text-brand-blue font-bold text-xs w-4">D</span>
                           <span>Dashboard</span>
-                        </button>
+                        </a>
                       </>
                     )}
-                    {!isAuthenticated && (
+                    {!mounted || !isAuthenticated ? (
                       <>
                         <div className="border-t border-gray-100 mx-2" />
-                        <button onClick={() => { setMenuOpen(false); router.push("/login"); }} className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 transition-colors text-sm text-gray-700 hover:text-gray-900 text-left">
+                        <a href="/login" onClick={() => setMenuOpen(false)} className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 transition-colors text-sm text-gray-700 hover:text-gray-900">
                           <span className="text-brand-blue font-bold text-xs w-4">S</span>
                           <span>Sign In</span>
-                        </button>
+                        </a>
                       </>
-                    )}
-                    {isAuthenticated && (
+                    ) : null}
+                    {mounted && isAuthenticated && (
                       <>
                         <div className="border-t border-gray-100 mx-2" />
                         <button onClick={() => { handleLogout(); setMenuOpen(false); }} className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-red-50 transition-colors text-sm text-red-500 text-left">
@@ -291,31 +290,31 @@ export default function Navbar() {
                     {MENU_LINKS.map((item, i) => (
                       <div key={item.href}>
                         {i > 0 && <div className="border-t border-gray-100 mx-2" />}
-                        <button onClick={() => { setMenuOpen(false); router.push(item.href); }} className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 transition-colors text-sm text-gray-700 hover:text-gray-900 text-left">
+                        <a href={item.href} onClick={() => setMenuOpen(false)} className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 transition-colors text-sm text-gray-700 hover:text-gray-900">
                           <span className="text-brand-blue font-bold text-xs w-4">{item.label[0]}</span>
                           <span>{item.label}</span>
-                        </button>
+                        </a>
                       </div>
                     ))}
-                    {isAuthenticated && (
+                    {mounted && isAuthenticated && currentUser && (
                       <>
                         <div className="border-t border-gray-100 mx-2" />
-                        <button onClick={() => { setMenuOpen(false); router.push(isAdmin ? "/admin" : `/${currentUser?.role}`); }} className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 transition-colors text-sm text-gray-700 hover:text-gray-900 text-left">
+                        <a href={isAdmin ? "/admin" : `/${currentUser?.role}`} onClick={() => setMenuOpen(false)} className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 transition-colors text-sm text-gray-700 hover:text-gray-900">
                           <span className="text-brand-blue font-bold text-xs w-4">D</span>
                           <span>Dashboard</span>
-                        </button>
+                        </a>
                       </>
                     )}
-                    {!isAuthenticated && (
+                    {!mounted || !isAuthenticated ? (
                       <>
                         <div className="border-t border-gray-100 mx-2" />
-                        <button onClick={() => { setMenuOpen(false); router.push("/login"); }} className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 transition-colors text-sm text-gray-700 hover:text-gray-900 text-left">
+                        <a href="/login" onClick={() => setMenuOpen(false)} className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 transition-colors text-sm text-gray-700 hover:text-gray-900">
                           <span className="text-brand-blue font-bold text-xs w-4">S</span>
                           <span>Sign In</span>
-                        </button>
+                        </a>
                       </>
-                    )}
-                    {isAuthenticated && (
+                    ) : null}
+                    {mounted && isAuthenticated && (
                       <>
                         <div className="border-t border-gray-100 mx-2" />
                         <button onClick={() => { handleLogout(); setMenuOpen(false); }} className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-red-50 transition-colors text-sm text-red-500 text-left">
