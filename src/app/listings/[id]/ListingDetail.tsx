@@ -219,13 +219,28 @@ export default function ListingDetail() {
               </div>
 
               <div className="flex flex-wrap gap-2 mt-5">
-                <span className="text-xs bg-gray-100 px-3 py-1.5 rounded-md text-gray-700">{propertyTypeLabels[listing.propertyType]}</span>
+                <span className="inline-flex items-center gap-1.5 text-xs bg-gray-100 px-3 py-1.5 rounded-md text-gray-700">{propertyTypeLabels[listing.propertyType]}</span>
                 {listing.listingType === "rent" && listing.rentTier && (
-                  <span className="text-xs bg-gray-100 px-3 py-1.5 rounded-md text-gray-700">{rentTierLabels[listing.rentTier]}</span>
+                  <span className="inline-flex items-center gap-1.5 text-xs bg-gray-100 px-3 py-1.5 rounded-md text-gray-700">{rentTierLabels[listing.rentTier]}</span>
                 )}
-                {listing.bedrooms && <span className="text-xs bg-gray-100 px-3 py-1.5 rounded-md text-gray-700">{listing.bedrooms} Bedrooms</span>}
-                {listing.bathrooms && <span className="text-xs bg-gray-100 px-3 py-1.5 rounded-md text-gray-700">{listing.bathrooms} Bathrooms</span>}
-                {listing.size && <span className="text-xs bg-gray-100 px-3 py-1.5 rounded-md text-gray-700">{listing.size}</span>}
+                {listing.bedrooms && (
+                  <span className="inline-flex items-center gap-1.5 text-xs bg-gray-100 px-3 py-1.5 rounded-md text-gray-700">
+                    <i className="bi bi-bed text-brand-blue"></i>
+                    {listing.bedrooms} Bedrooms
+                  </span>
+                )}
+                {listing.bathrooms && (
+                  <span className="inline-flex items-center gap-1.5 text-xs bg-gray-100 px-3 py-1.5 rounded-md text-gray-700">
+                    <i className="bi bi-bathtub text-brand-blue"></i>
+                    {listing.bathrooms} Bathrooms
+                  </span>
+                )}
+                {listing.size && (
+                  <span className="inline-flex items-center gap-1.5 text-xs bg-gray-100 px-3 py-1.5 rounded-md text-gray-700">
+                    <i className="bi bi-arrows-angle-expand text-brand-blue"></i>
+                    {listing.size}
+                  </span>
+                )}
               </div>
 
               <p className="text-sm text-gray-600 mt-5 leading-relaxed">{listing.description}</p>

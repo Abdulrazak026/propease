@@ -66,10 +66,27 @@ export default function PropertyCard({ listing }: PropertyCardProps) {
           {listing.address || listing.city}
         </p>
         <div className="flex items-center justify-between mt-3.5 pt-3 border-t border-gray-100">
-          <div className="flex items-center gap-3 text-sm sm:text-base">
-            {listing.bedrooms && <span className="font-bold text-gray-800">{listing.bedrooms} <span className="font-normal text-gray-500">bed</span></span>}
-            {listing.bathrooms && <span className="font-bold text-gray-800">{listing.bathrooms} <span className="font-normal text-gray-500">bath</span></span>}
-            {listing.size && <span className="font-bold text-gray-800">{listing.size}</span>}
+          <div className="flex items-center gap-2 sm:gap-2.5 text-sm sm:text-base">
+            {listing.bedrooms && (
+              <span className="flex items-center gap-1">
+                <i className="bi bi-bed text-brand-blue text-sm"></i>
+                <span className="font-bold text-gray-800">{listing.bedrooms}</span>
+              </span>
+            )}
+            {listing.bedrooms && listing.bathrooms && <span className="text-gray-300">•</span>}
+            {listing.bathrooms && (
+              <span className="flex items-center gap-1">
+                <i className="bi bi-bathtub text-brand-blue text-sm"></i>
+                <span className="font-bold text-gray-800">{listing.bathrooms}</span>
+              </span>
+            )}
+            {listing.bathrooms && listing.size && <span className="text-gray-300">•</span>}
+            {listing.size && (
+              <span className="flex items-center gap-1">
+                <i className="bi bi-arrows-angle-expand text-brand-blue text-sm"></i>
+                <span className="font-bold text-gray-800">{listing.size}</span>
+              </span>
+            )}
           </div>
           <button
             onClick={handleFav}
