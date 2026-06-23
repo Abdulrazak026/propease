@@ -79,7 +79,7 @@ export default function Navbar() {
         <Link href="/" className="shrink-0 h-full flex items-center pl-2" style={{ width: "50%", maxWidth: "50%" }}>
           <img src={siteLogo || `https://mbpproperties.com/api/upload/file/7ea15ec8-11b2-4c34-a855-1469d56656a5.png`} alt={siteName} className="h-full w-auto object-contain object-left" />
         </Link>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 pr-2">
           {isAuthenticated && currentUser && (
             <div ref={notifRef} className="relative">
               <button onClick={() => { setNotifOpen(!notifOpen); fetchNotifs(); }} className="relative p-2 rounded-full hover:bg-gray-100 transition-colors">
@@ -138,8 +138,13 @@ export default function Navbar() {
             </div>
           )}
           <div ref={menuRef} className="relative">
-            <button onClick={() => setMenuOpen(!menuOpen)} className="flex items-center gap-2 px-3 py-1.5 border-2 border-gray-200 hover:border-brand-blue rounded-full transition font-semibold text-xs text-slate-700">
-              <svg className="w-4 h-4 text-brand-blue" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" /></svg>
+            {!isAuthenticated && (
+              <Link href="/login" className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-white bg-brand-blue rounded-full mr-1.5">
+                Sign In
+              </Link>
+            )}
+            <button onClick={() => setMenuOpen(!menuOpen)} className="inline-flex items-center gap-2 px-4 py-2.5 border-2 border-gray-200 hover:border-brand-blue rounded-full transition font-semibold text-sm text-slate-700 min-h-[44px]">
+              <svg className="w-5 h-5 text-brand-blue" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" /></svg>
               <span>Menu</span>
             </button>
             {menuOpen && (
