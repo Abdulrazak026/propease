@@ -25,7 +25,8 @@ export default async function SellPage() {
   const s = await getSettings();
   const whatsappRaw = s.support_whatsapp || "";
   const whatsappClean = whatsappRaw.replace(/[^0-9]/g, "");
-  const whatsappLink = whatsappClean ? `https://wa.me/${whatsappClean}` : "https://wa.me/2348000000000";
+  const whatsappMsg = encodeURIComponent("Hi! I'm interested in listing my property with MBPP. I'd like to know more about your selling and rental services.");
+  const whatsappLink = whatsappClean ? `https://wa.me/${whatsappClean}?text=${whatsappMsg}` : `https://wa.me/2347074222284?text=${whatsappMsg}`;
 
   return (
     <div className="flex flex-col">

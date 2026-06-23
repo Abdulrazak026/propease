@@ -26,7 +26,8 @@ export default async function PartnerPage() {
   const pdfUrl = s.partner_proposal_pdf || "";
   const whatsappRaw = s.support_whatsapp || "";
   const whatsappClean = whatsappRaw.replace(/[^0-9]/g, "");
-  const whatsappLink = whatsappClean ? `https://wa.me/${whatsappClean}` : "https://wa.me/2347074222284";
+  const whatsappMsg = encodeURIComponent("Hi! I'm interested in the Mudarabah investment opportunity with MBPP. I'd like to learn more about partnering with your team.");
+  const whatsappLink = whatsappClean ? `https://wa.me/${whatsappClean}?text=${whatsappMsg}` : `https://wa.me/2347074222284?text=${whatsappMsg}`;
 
   const defaultTeam = [
     { name: "Engr. Ahmad Abubakar, PhD", role: "CEO & Managing Director", bio: "Strategic leadership & final authority. Investment management & capital control. Enterprise growth & market expansion.", photo: "" },

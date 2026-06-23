@@ -3,7 +3,7 @@ import { useSettings } from "@/context/SettingsContext";
 
 export default function WhatsAppButton() {
   const { get } = useSettings();
-  const number = get("support_whatsapp");
+  const number = get("support_whatsapp") || "2347074222284";
   if (!number) return null;
 
   const clean = number.replace(/[^0-9]/g, "");
