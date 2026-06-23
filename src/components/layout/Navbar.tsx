@@ -73,8 +73,8 @@ export default function Navbar() {
     <>
     {/* Mobile header */}
     <header className="lg:hidden w-full bg-white border-b border-gray-200">
-      <div className="max-w-7xl mx-auto flex items-center justify-between h-14">
-        <Link href="/" className="shrink-0 h-full flex items-center pl-2" style={{ width: "50%", maxWidth: "50%" }}>
+      <div className="max-w-7xl mx-auto flex items-center justify-between h-16">
+        <Link href="/" className="shrink-0 h-full flex items-center pl-2" style={{ width: "55%", maxWidth: "55%" }}>
           <img src={siteLogo || `https://mbpproperties.com/api/upload/file/7ea15ec8-11b2-4c34-a855-1469d56656a5.png`} alt={siteName} className="h-full w-auto object-contain object-left" />
         </Link>
         <div className="flex items-center gap-2 pr-2">
@@ -149,36 +149,36 @@ export default function Navbar() {
                     {MENU_LINKS.map((item, i) => (
                       <div key={item.href}>
                         {i > 0 && <div className="border-t border-gray-100 mx-2" />}
-                        <a href={item.href} onClick={() => setMenuOpen(false)} className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 transition-colors text-sm text-gray-700 hover:text-gray-900">
-                          <span className="text-brand-blue font-bold text-xs w-4">{item.label[0]}</span>
-                          <span>{item.label}</span>
+                        <a href={item.href} onClick={() => setMenuOpen(false)} className="flex items-center gap-3 p-3.5 rounded-lg hover:bg-gray-100 transition-colors text-base text-gray-700 hover:text-gray-900">
+                          <span className="text-brand-blue font-bold text-sm w-5">{item.label[0]}</span>
+                          <span className="font-medium">{item.label}</span>
                         </a>
                       </div>
                     ))}
                     {mounted && isAuthenticated && currentUser && (
                       <>
                         <div className="border-t border-gray-100 mx-2" />
-                        <a href={isAdmin ? "/admin" : `/${currentUser?.role}`} onClick={() => setMenuOpen(false)} className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 transition-colors text-sm text-gray-700 hover:text-gray-900">
-                          <span className="text-brand-blue font-bold text-xs w-4">D</span>
-                          <span>Dashboard</span>
+                        <a href={isAdmin ? "/admin" : `/${currentUser?.role}`} onClick={() => setMenuOpen(false)} className="flex items-center gap-3 p-3.5 rounded-lg hover:bg-gray-100 transition-colors text-base text-gray-700 hover:text-gray-900">
+                          <span className="text-brand-blue font-bold text-sm w-5">D</span>
+                          <span className="font-medium">Dashboard</span>
                         </a>
                       </>
                     )}
                     {!mounted || !isAuthenticated ? (
                       <>
                         <div className="border-t border-gray-100 mx-2" />
-                        <a href="/login" onClick={() => setMenuOpen(false)} className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 transition-colors text-sm text-gray-700 hover:text-gray-900">
-                          <span className="text-brand-blue font-bold text-xs w-4">S</span>
-                          <span>Sign In</span>
+                        <a href="/login" onClick={() => setMenuOpen(false)} className="flex items-center gap-3 p-3.5 rounded-lg hover:bg-gray-100 transition-colors text-base text-gray-700 hover:text-gray-900">
+                          <span className="text-brand-blue font-bold text-sm w-5">S</span>
+                          <span className="font-medium">Sign In</span>
                         </a>
                       </>
                     ) : null}
                     {mounted && isAuthenticated && (
                       <>
                         <div className="border-t border-gray-100 mx-2" />
-                        <button onClick={() => { handleLogout(); setMenuOpen(false); }} className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-red-50 transition-colors text-sm text-red-500 text-left">
-                          <span className="text-red-400 font-bold text-xs w-4">L</span>
-                          <span>Sign Out</span>
+                        <button onClick={() => { handleLogout(); setMenuOpen(false); }} className="w-full flex items-center gap-3 p-3.5 rounded-lg hover:bg-red-50 transition-colors text-base text-red-500 text-left">
+                          <span className="text-red-400 font-bold text-sm w-5">L</span>
+                          <span className="font-medium">Sign Out</span>
                         </button>
                       </>
                     )}
@@ -193,8 +193,8 @@ export default function Navbar() {
 
     {/* Desktop header */}
     <header className="hidden lg:flex w-full bg-white border-b border-gray-200">
-      <div className="max-w-7xl mx-auto px-6 xl:px-10 flex items-center justify-between w-full h-14">
-        <Link href="/" className="shrink-0 h-full flex items-center pl-2" style={{ width: "25%", maxWidth: "25%" }}>
+      <div className="max-w-7xl mx-auto px-6 xl:px-10 flex items-center justify-between w-full h-16">
+        <Link href="/" className="shrink-0 h-full flex items-center pl-2" style={{ width: "28%", maxWidth: "28%" }}>
           <img src={siteLogo || `https://mbpproperties.com/api/upload/file/7ea15ec8-11b2-4c34-a855-1469d56656a5.png`} alt={siteName} className="h-full w-auto object-contain object-left" />
         </Link>
 
@@ -290,36 +290,36 @@ export default function Navbar() {
                     {MENU_LINKS.map((item, i) => (
                       <div key={item.href}>
                         {i > 0 && <div className="border-t border-gray-100 mx-2" />}
-                        <a href={item.href} onClick={() => setMenuOpen(false)} className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 transition-colors text-sm text-gray-700 hover:text-gray-900">
-                          <span className="text-brand-blue font-bold text-xs w-4">{item.label[0]}</span>
-                          <span>{item.label}</span>
+                        <a href={item.href} onClick={() => setMenuOpen(false)} className="flex items-center gap-3 p-3.5 rounded-lg hover:bg-gray-100 transition-colors text-base text-gray-700 hover:text-gray-900">
+                          <span className="text-brand-blue font-bold text-sm w-5">{item.label[0]}</span>
+                          <span className="font-medium">{item.label}</span>
                         </a>
                       </div>
                     ))}
                     {mounted && isAuthenticated && currentUser && (
                       <>
                         <div className="border-t border-gray-100 mx-2" />
-                        <a href={isAdmin ? "/admin" : `/${currentUser?.role}`} onClick={() => setMenuOpen(false)} className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 transition-colors text-sm text-gray-700 hover:text-gray-900">
-                          <span className="text-brand-blue font-bold text-xs w-4">D</span>
-                          <span>Dashboard</span>
+                        <a href={isAdmin ? "/admin" : `/${currentUser?.role}`} onClick={() => setMenuOpen(false)} className="flex items-center gap-3 p-3.5 rounded-lg hover:bg-gray-100 transition-colors text-base text-gray-700 hover:text-gray-900">
+                          <span className="text-brand-blue font-bold text-sm w-5">D</span>
+                          <span className="font-medium">Dashboard</span>
                         </a>
                       </>
                     )}
                     {!mounted || !isAuthenticated ? (
                       <>
                         <div className="border-t border-gray-100 mx-2" />
-                        <a href="/login" onClick={() => setMenuOpen(false)} className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 transition-colors text-sm text-gray-700 hover:text-gray-900">
-                          <span className="text-brand-blue font-bold text-xs w-4">S</span>
-                          <span>Sign In</span>
+                        <a href="/login" onClick={() => setMenuOpen(false)} className="flex items-center gap-3 p-3.5 rounded-lg hover:bg-gray-100 transition-colors text-base text-gray-700 hover:text-gray-900">
+                          <span className="text-brand-blue font-bold text-sm w-5">S</span>
+                          <span className="font-medium">Sign In</span>
                         </a>
                       </>
                     ) : null}
                     {mounted && isAuthenticated && (
                       <>
                         <div className="border-t border-gray-100 mx-2" />
-                        <button onClick={() => { handleLogout(); setMenuOpen(false); }} className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-red-50 transition-colors text-sm text-red-500 text-left">
-                          <span className="text-red-400 font-bold text-xs w-4">L</span>
-                          <span>Sign Out</span>
+                        <button onClick={() => { handleLogout(); setMenuOpen(false); }} className="w-full flex items-center gap-3 p-3.5 rounded-lg hover:bg-red-50 transition-colors text-base text-red-500 text-left">
+                          <span className="text-red-400 font-bold text-sm w-5">L</span>
+                          <span className="font-medium">Sign Out</span>
                         </button>
                       </>
                     )}
