@@ -20,6 +20,7 @@ export default function Navbar() {
   const pathname = usePathname();
   const { currentUser, setCurrentUser, isAuthenticated, loading } = useRole();
   const { get: getSetting } = useSettings();
+  const [mounted, setMounted] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [userOpen, setUserOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
@@ -31,7 +32,8 @@ export default function Navbar() {
 
   const siteLogo = getSetting("site_logo");
   const siteName = getSetting("site_name", "MBPP");
-  const siteTagline = getSetting("site_tagline", "Building Trust. Delivering Value.");
+
+  useEffect(() => { setMounted(true); }, []);
 
   if (pathname.startsWith("/admin") || pathname.startsWith("/agent") || pathname.startsWith("/ambassador") || pathname === "/wallet") return null;
 
@@ -77,7 +79,7 @@ export default function Navbar() {
           <img src={siteLogo || `https://mbpproperties.com/api/upload/file/7ea15ec8-11b2-4c34-a855-1469d56656a5.png`} alt={siteName} className="h-full w-auto object-contain object-left" />
         </Link>
         <div className="flex items-center gap-2 pr-2">
-          {isAuthenticated && currentUser && (
+          {mounted && isAuthenticated && currentUser && (
             <div ref={notifRef} className="relative">
               <button onClick={() => { setNotifOpen(!notifOpen); fetchNotifs(); }} className="relative p-2 rounded-full hover:bg-gray-100 transition-colors">
                 <svg className="w-5 h-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -110,7 +112,7 @@ export default function Navbar() {
               )}
             </div>
           )}
-          {isAuthenticated && currentUser && (
+          {mounted && isAuthenticated && currentUser && (
             <div ref={userRef} className="relative">
               <button onClick={() => setUserOpen(!userOpen)} className="w-8 h-8 rounded-full bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary-light)] flex items-center justify-center text-white text-[10px] font-bold shadow-sm">
                 {currentUser.name?.split(" ").map(n => n[0]).join("").slice(0, 2) || "?"}
@@ -198,7 +200,7 @@ export default function Navbar() {
         </Link>
 
         <div className="flex items-center gap-3">
-          {isAuthenticated && currentUser && (
+          {mounted && isAuthenticated && currentUser && (
             <div ref={notifRef} className="relative">
               <button onClick={() => { setNotifOpen(!notifOpen); fetchNotifs(); }} className="relative p-2 rounded-full hover:bg-gray-100 transition-colors">
                 <svg className="w-5 h-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -232,7 +234,7 @@ export default function Navbar() {
               )}
             </div>
           )}
-          {isAuthenticated && currentUser && (
+          {mounted && isAuthenticated && currentUser && (
             <div ref={userRef} className="relative">
               <button onClick={() => setUserOpen(!userOpen)} className="flex items-center gap-2.5 pl-1 pr-3 py-1 rounded-full hover:bg-gray-50 transition-colors">
                 <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary-light)] flex items-center justify-center text-white text-xs font-bold shadow-sm">
