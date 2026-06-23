@@ -147,18 +147,21 @@ export default function Navbar() {
                 <div className="absolute top-full right-0 mt-2 w-64 bg-gray-50 rounded-xl border border-gray-200 shadow-xl p-2 z-50">
                   <p className="text-[11px] font-semibold text-brand-blue uppercase tracking-wider px-1 pb-2">Navigation</p>
                   <div>
-                    {MENU_LINKS.map((item, i) => (
-                      <div key={item.href} className="px-1 py-0.5">
-                        <a href={item.href} onClick={() => setMenuOpen(false)} className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-colors text-base font-medium ${
-                          item.label === "Buy" ? "bg-brand-blue text-white hover:bg-brand-blue-light" :
-                          item.label === "Partner With Us" ? "bg-brand-gold/10 text-brand-gold border border-brand-gold/30 hover:bg-brand-gold/20" :
-                          "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                        }`}>
-                          <span className="font-bold text-sm w-5">{item.label[0]}</span>
-                          <span>{item.label}</span>
-                        </a>
-                      </div>
-                    ))}
+                    {MENU_LINKS.map((item, i) => {
+                      const isActive = pathname === item.href || (item.href.includes("?") && pathname === item.href.split("?")[0]);
+                      return (
+                        <div key={item.href} className="px-1 py-0.5">
+                          <a href={item.href} onClick={() => setMenuOpen(false)} className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-colors text-base font-medium ${
+                            isActive ? "bg-brand-blue text-white" :
+                            item.label === "Buy" ? "bg-gray-200 text-gray-900 hover:bg-gray-300" :
+                            "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                          }`}>
+                            <span className="font-bold text-sm w-5">{item.label[0]}</span>
+                            <span>{item.label}</span>
+                          </a>
+                        </div>
+                      );
+                    })}
                     {mounted && isAuthenticated && currentUser && (
                       <>
                         <div className="border-t border-gray-100 mx-2" />
@@ -203,10 +206,10 @@ export default function Navbar() {
         </Link>
 
         <nav className="flex items-center gap-1.5">
-          <a href="/list-property" className="px-4 py-2 text-sm font-semibold text-white bg-brand-blue rounded-full hover:bg-brand-blue-light transition-colors">Buy</a>
-          <a href="/list-property?type=rent" className="px-4 py-2 text-sm font-semibold text-brand-blue border-2 border-brand-blue rounded-full hover:bg-brand-blue hover:text-white transition-colors">Rent</a>
-          <a href="/sell" className="px-4 py-2 text-sm font-semibold text-brand-blue border-2 border-brand-blue rounded-full hover:bg-brand-blue hover:text-white transition-colors">Sell</a>
-          <a href="/partner" className="px-4 py-2 text-sm font-semibold text-brand-gold border-2 border-brand-gold rounded-full hover:bg-brand-gold hover:text-white transition-colors">Partner</a>
+          <a href="/list-property" className={`px-4 py-2 text-sm font-semibold rounded-full transition-colors ${pathname === "/list-property" ? "bg-brand-blue text-white" : "text-brand-blue border-2 border-brand-blue hover:bg-brand-blue hover:text-white"}`}>Buy</a>
+          <a href="/list-property?type=rent" className={`px-4 py-2 text-sm font-semibold rounded-full transition-colors ${pathname === "/list-property" && typeof window !== "undefined" && window.location.search.includes("type=rent") ? "bg-brand-blue text-white" : "text-brand-blue border-2 border-brand-blue hover:bg-brand-blue hover:text-white"}`}>Rent</a>
+          <a href="/sell" className={`px-4 py-2 text-sm font-semibold rounded-full transition-colors ${pathname === "/sell" ? "bg-brand-blue text-white" : "text-brand-blue border-2 border-brand-blue hover:bg-brand-blue hover:text-white"}`}>Sell</a>
+          <a href="/partner" className={`px-4 py-2 text-sm font-semibold rounded-full transition-colors ${pathname === "/partner" ? "bg-brand-gold text-white" : "text-brand-gold border-2 border-brand-gold hover:bg-brand-gold hover:text-white"}`}>Partner</a>
         </nav>
 
         <div className="flex items-center gap-3">
@@ -298,18 +301,21 @@ export default function Navbar() {
                 <div className="absolute top-full right-0 mt-2 w-72 bg-gray-50 rounded-xl border border-gray-200 shadow-xl p-2 z-50">
                   <p className="text-[11px] font-semibold text-brand-blue uppercase tracking-wider px-1 pb-2">Navigation</p>
                   <div>
-                    {MENU_LINKS.map((item, i) => (
-                      <div key={item.href} className="px-1 py-0.5">
-                        <a href={item.href} onClick={() => setMenuOpen(false)} className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-colors text-base font-medium ${
-                          item.label === "Buy" ? "bg-brand-blue text-white hover:bg-brand-blue-light" :
-                          item.label === "Partner With Us" ? "bg-brand-gold/10 text-brand-gold border border-brand-gold/30 hover:bg-brand-gold/20" :
-                          "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                        }`}>
-                          <span className="font-bold text-sm w-5">{item.label[0]}</span>
-                          <span>{item.label}</span>
-                        </a>
-                      </div>
-                    ))}
+                    {MENU_LINKS.map((item, i) => {
+                      const isActive = pathname === item.href || (item.href.includes("?") && pathname === item.href.split("?")[0]);
+                      return (
+                        <div key={item.href} className="px-1 py-0.5">
+                          <a href={item.href} onClick={() => setMenuOpen(false)} className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-colors text-base font-medium ${
+                            isActive ? "bg-brand-blue text-white" :
+                            item.label === "Buy" ? "bg-gray-200 text-gray-900 hover:bg-gray-300" :
+                            "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                          }`}>
+                            <span className="font-bold text-sm w-5">{item.label[0]}</span>
+                            <span>{item.label}</span>
+                          </a>
+                        </div>
+                      );
+                    })}
                     {mounted && isAuthenticated && currentUser && (
                       <>
                         <div className="border-t border-gray-100 mx-2" />

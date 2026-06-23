@@ -70,8 +70,64 @@ export default function HomePage() {
   let researchReports: ResearchReport[] = [];
   try { const raw = getSetting("research_reports"); if (raw) researchReports = JSON.parse(raw); } catch {}
 
-  let teamMembers: TeamMember[] = [];
-  try { const raw = getSetting("team_members"); if (raw) teamMembers = JSON.parse(raw); } catch {}
+  const defaultTeamMembers: TeamMember[] = [
+    { name: "Engr. Ahmad Abubakar, PhD", role: "CEO & Managing Director", bio: "Strategic leadership & final authority. Investment management & capital control. Enterprise growth & market expansion.", photo: "" },
+    { name: "Sulaiman Usman (LLB, B.L, LLM)", role: "Legal Adviser", bio: "Contract management & compliance. Oversees all legal documentation, property contracts, and regulatory compliance.", photo: "" },
+    { name: "Umar Nuhu Umar", role: "Admin Officer", bio: "Executive support & corporate services. Manages day-to-day administrative operations and corporate coordination.", photo: "" },
+    { name: "Engr. Tasiu Sani", role: "Sales Manager", bio: "Property marketing & client relations. Leads property marketing strategies and maintains client relationships.", photo: "" },
+    { name: "Engr. Salisu Mohd Nuhu", role: "Operations Manager", bio: "Property development & asset management. Oversees property development projects and asset portfolio management.", photo: "" },
+    { name: "Abdulmalik Abubakar", role: "Finance Manager", bio: "Accounting & budget management. Handles financial records, budgeting, and fiscal planning.", photo: "" },
+    { name: "Zahradden Aliyu", role: "Project Manager", bio: "Project planning, execution & delivery. Manages construction projects from planning to completion.", photo: "" },
+    { name: "Engr. Sani Umar, PhD", role: "Technology Manager", bio: "Digital platform & IT support. Manages the MBPP digital platform and technical infrastructure.", photo: "" },
+    { name: "Ahmad Abubakar Ali", role: "Media Manager", bio: "Corporate promotion & communications. Handles social media, marketing content, and public communications.", photo: "" },
+  ];
+
+  let teamMembers: TeamMember[] = defaultTeamMembers;
+  try {
+    const raw = getSetting("team_members");
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        // Build photo lookup with flexible name matching
+        const photosByCore: Record<string, string> = {};
+        const firstNameCount: Record<string, number> = {};
+        for (const m of parsed) {
+          if (!m.photo) continue;
+          const core = m.name
+            .replace(/^(Engr\.|Dr\.|Barr\.|Prof\.|Alh\.|Mallam)\s*/i, "")
+            .replace(/\s*\(.*?\)\s*/g, "")
+            .replace(/\s*(PhD|Ph\.D|LLB|B\.L|LLM|MSc|BSc|MBA)\s*/gi, "")
+            .replace(/,\s*/g, "")
+            .trim();
+          const parts = core.split(/\s+/);
+          photosByCore[core.toLowerCase()] = m.photo;
+          if (parts.length >= 2) {
+            photosByCore[`${parts[0]} ${parts[parts.length - 1]}`.toLowerCase()] = m.photo;
+            photosByCore[`${parts[0]} ${parts[1]}`.toLowerCase()] = m.photo;
+          }
+          firstNameCount[parts[0].toLowerCase()] = (firstNameCount[parts[0].toLowerCase()] || 0) + 1;
+        }
+        teamMembers = defaultTeamMembers.map(m => {
+          if (m.photo) return m;
+          const core = m.name
+            .replace(/^(Engr\.|Dr\.|Barr\.|Prof\.|Alh\.|Mallam)\s*/i, "")
+            .replace(/\s*\(.*?\)\s*/g, "")
+            .replace(/\s*(PhD|Ph\.D|LLB|B\.L|LLM|MSc|BSc|MBA)\s*/gi, "")
+            .replace(/,\s*/g, "")
+            .trim();
+          const parts = core.split(/\s+/);
+          let photo = photosByCore[core.toLowerCase()]
+            || (parts.length >= 2 ? photosByCore[`${parts[0]} ${parts[parts.length - 1]}`.toLowerCase()] : "")
+            || (parts.length >= 2 ? photosByCore[`${parts[0]} ${parts[1]}`.toLowerCase()] : "")
+            || "";
+          if (!photo && parts.length > 0 && firstNameCount[parts[0].toLowerCase()] === 1) {
+            photo = photosByCore[parts[0].toLowerCase()] || "";
+          }
+          return { ...m, photo };
+        });
+      }
+    }
+  } catch {}
 
   let completedProjects: CarouselItem[] = [];
   try { const raw = getSetting("completed_projects"); if (raw) completedProjects = JSON.parse(raw); } catch {}
