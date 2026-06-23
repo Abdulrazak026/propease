@@ -12,9 +12,6 @@ const MENU_LINKS = [
   { label: "Sell", href: "/sell" },
   { label: "About", href: "/about" },
   { label: "Contact", href: "/contact" },
-  { label: "News", href: "/news" },
-  { label: "Careers", href: "/careers" },
-  { label: "Get Help", href: "/help" },
   { label: "Apply as Agent", href: "/apply-as-agent" },
 ];
 
@@ -138,60 +135,55 @@ export default function Navbar() {
             </div>
           )}
           <div ref={menuRef} className="relative">
-            {!isAuthenticated && (
-              <Link href="/login" className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-white bg-brand-blue rounded-full mr-1.5">
-                Sign In
-              </Link>
-            )}
             <button onClick={() => setMenuOpen(!menuOpen)} className="inline-flex items-center gap-2 px-4 py-2.5 border-2 border-gray-200 hover:border-brand-blue rounded-full transition font-semibold text-sm text-slate-700 min-h-[44px]">
               <svg className="w-5 h-5 text-brand-blue" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" /></svg>
               <span>Menu</span>
             </button>
             {menuOpen && (
-              <div className="absolute top-full right-0 mt-2 w-64 bg-gray-50 rounded-xl border border-gray-200 shadow-xl p-2 z-50">
-                <p className="text-[11px] font-semibold text-brand-blue uppercase tracking-wider px-1 pb-2">Navigation</p>
-                <div>
-                  {MENU_LINKS.map((item, i) => {
-                    const isBuy = item.href === "/list-property" && !item.href.includes("type=rent");
-                    return (
+              <>
+                <div className="fixed inset-0 z-40" onClick={() => setMenuOpen(false)} />
+                <div className="absolute top-full right-0 mt-2 w-64 bg-gray-50 rounded-xl border border-gray-200 shadow-xl p-2 z-50">
+                  <p className="text-[11px] font-semibold text-brand-blue uppercase tracking-wider px-1 pb-2">Navigation</p>
+                  <div>
+                    {MENU_LINKS.map((item, i) => (
                       <div key={item.href}>
                         {i > 0 && <div className="border-t border-gray-100 mx-2" />}
-                        <Link href={item.href} onClick={() => setMenuOpen(false)} className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 transition-colors text-sm text-gray-700 hover:text-gray-900">
+                        <button onClick={() => { setMenuOpen(false); router.push(item.href); }} className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 transition-colors text-sm text-gray-700 hover:text-gray-900 text-left">
                           <span className="text-brand-blue font-bold text-xs w-4">{item.label[0]}</span>
                           <span>{item.label}</span>
-                        </Link>
+                        </button>
                       </div>
-                    );
-                  })}
-                  {isAuthenticated && (
-                    <>
-                      <div className="border-t border-gray-100 mx-2" />
-                      <Link href={isAdmin ? "/admin" : `/${currentUser?.role}`} onClick={() => setMenuOpen(false)} className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 transition-colors text-sm text-gray-700 hover:text-gray-900">
-                        <span className="text-brand-blue font-bold text-xs w-4">D</span>
-                        <span>Dashboard</span>
-                      </Link>
-                    </>
-                  )}
-                  {!isAuthenticated && (
-                    <>
-                      <div className="border-t border-gray-100 mx-2" />
-                      <Link href="/login" onClick={() => setMenuOpen(false)} className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 transition-colors text-sm text-gray-700 hover:text-gray-900">
-                        <span className="text-brand-blue font-bold text-xs w-4">S</span>
-                        <span>Sign In</span>
-                      </Link>
-                    </>
-                  )}
-                  {isAuthenticated && (
-                    <>
-                      <div className="border-t border-gray-100 mx-2" />
-                      <button onClick={() => { handleLogout(); setMenuOpen(false); }} className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-red-50 transition-colors text-sm text-red-500">
-                        <span className="text-red-400 font-bold text-xs w-4">L</span>
-                        <span>Sign Out</span>
-                      </button>
-                    </>
-                  )}
+                    ))}
+                    {isAuthenticated && (
+                      <>
+                        <div className="border-t border-gray-100 mx-2" />
+                        <button onClick={() => { setMenuOpen(false); router.push(isAdmin ? "/admin" : `/${currentUser?.role}`); }} className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 transition-colors text-sm text-gray-700 hover:text-gray-900 text-left">
+                          <span className="text-brand-blue font-bold text-xs w-4">D</span>
+                          <span>Dashboard</span>
+                        </button>
+                      </>
+                    )}
+                    {!isAuthenticated && (
+                      <>
+                        <div className="border-t border-gray-100 mx-2" />
+                        <button onClick={() => { setMenuOpen(false); router.push("/login"); }} className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 transition-colors text-sm text-gray-700 hover:text-gray-900 text-left">
+                          <span className="text-brand-blue font-bold text-xs w-4">S</span>
+                          <span>Sign In</span>
+                        </button>
+                      </>
+                    )}
+                    {isAuthenticated && (
+                      <>
+                        <div className="border-t border-gray-100 mx-2" />
+                        <button onClick={() => { handleLogout(); setMenuOpen(false); }} className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-red-50 transition-colors text-sm text-red-500 text-left">
+                          <span className="text-red-400 font-bold text-xs w-4">L</span>
+                          <span>Sign Out</span>
+                        </button>
+                      </>
+                    )}
+                  </div>
                 </div>
-              </div>
+              </>
             )}
           </div>
         </div>
@@ -289,47 +281,50 @@ export default function Navbar() {
               <span>Menu</span>
             </button>
             {menuOpen && (
-              <div className="absolute top-full right-0 mt-2 w-72 bg-gray-50 rounded-xl border border-gray-200 shadow-xl p-2 z-50">
-                <p className="text-[11px] font-semibold text-brand-blue uppercase tracking-wider px-1 pb-2">Navigation</p>
-                <div>
-                  {MENU_LINKS.map((item, i) => (
-                    <div key={item.href}>
-                      {i > 0 && <div className="border-t border-gray-100 mx-2" />}
-                      <Link href={item.href} onClick={() => setMenuOpen(false)} className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 transition-colors text-sm text-gray-700 hover:text-gray-900">
-                        <span className="text-brand-blue font-bold text-xs w-4">{item.label[0]}</span>
-                        <span>{item.label}</span>
-                      </Link>
-                    </div>
-                  ))}
-                  {isAuthenticated && (
-                    <>
-                      <div className="border-t border-gray-100 mx-2" />
-                      <Link href={isAdmin ? "/admin" : `/${currentUser?.role}`} onClick={() => setMenuOpen(false)} className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 transition-colors text-sm text-gray-700 hover:text-gray-900">
-                        <span className="text-brand-blue font-bold text-xs w-4">D</span>
-                        <span>Dashboard</span>
-                      </Link>
-                    </>
-                  )}
-                  {!isAuthenticated && (
-                    <>
-                      <div className="border-t border-gray-100 mx-2" />
-                      <Link href="/login" onClick={() => setMenuOpen(false)} className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 transition-colors text-sm text-gray-700 hover:text-gray-900">
-                        <span className="text-brand-blue font-bold text-xs w-4">S</span>
-                        <span>Sign In</span>
-                      </Link>
-                    </>
-                  )}
-                  {isAuthenticated && (
-                    <>
-                      <div className="border-t border-gray-100 mx-2" />
-                      <button onClick={() => { handleLogout(); setMenuOpen(false); }} className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-red-50 transition-colors text-sm text-red-500">
-                        <span className="text-red-400 font-bold text-xs w-4">L</span>
-                        <span>Sign Out</span>
-                      </button>
-                    </>
-                  )}
+              <>
+                <div className="fixed inset-0 z-40" onClick={() => setMenuOpen(false)} />
+                <div className="absolute top-full right-0 mt-2 w-72 bg-gray-50 rounded-xl border border-gray-200 shadow-xl p-2 z-50">
+                  <p className="text-[11px] font-semibold text-brand-blue uppercase tracking-wider px-1 pb-2">Navigation</p>
+                  <div>
+                    {MENU_LINKS.map((item, i) => (
+                      <div key={item.href}>
+                        {i > 0 && <div className="border-t border-gray-100 mx-2" />}
+                        <button onClick={() => { setMenuOpen(false); router.push(item.href); }} className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 transition-colors text-sm text-gray-700 hover:text-gray-900 text-left">
+                          <span className="text-brand-blue font-bold text-xs w-4">{item.label[0]}</span>
+                          <span>{item.label}</span>
+                        </button>
+                      </div>
+                    ))}
+                    {isAuthenticated && (
+                      <>
+                        <div className="border-t border-gray-100 mx-2" />
+                        <button onClick={() => { setMenuOpen(false); router.push(isAdmin ? "/admin" : `/${currentUser?.role}`); }} className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 transition-colors text-sm text-gray-700 hover:text-gray-900 text-left">
+                          <span className="text-brand-blue font-bold text-xs w-4">D</span>
+                          <span>Dashboard</span>
+                        </button>
+                      </>
+                    )}
+                    {!isAuthenticated && (
+                      <>
+                        <div className="border-t border-gray-100 mx-2" />
+                        <button onClick={() => { setMenuOpen(false); router.push("/login"); }} className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 transition-colors text-sm text-gray-700 hover:text-gray-900 text-left">
+                          <span className="text-brand-blue font-bold text-xs w-4">S</span>
+                          <span>Sign In</span>
+                        </button>
+                      </>
+                    )}
+                    {isAuthenticated && (
+                      <>
+                        <div className="border-t border-gray-100 mx-2" />
+                        <button onClick={() => { handleLogout(); setMenuOpen(false); }} className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-red-50 transition-colors text-sm text-red-500 text-left">
+                          <span className="text-red-400 font-bold text-xs w-4">L</span>
+                          <span>Sign Out</span>
+                        </button>
+                      </>
+                    )}
+                  </div>
                 </div>
-              </div>
+              </>
             )}
           </div>
         </div>
