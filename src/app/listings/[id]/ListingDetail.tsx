@@ -225,19 +225,25 @@ export default function ListingDetail() {
                 )}
                 {listing.bedrooms && (
                   <span className="inline-flex items-center gap-1.5 text-xs bg-gray-100 px-3 py-1.5 rounded-md text-gray-700">
-                    <i className="bi bi-bed text-brand-blue"></i>
+                    <svg className="w-3.5 h-3.5 text-brand-blue" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M2 4v16M2 8h18a2 2 0 012 2v10M2 17l.833 1.5h18.334L22 17M6 8v-2a2 2 0 012-2h8a2 2 0 012 2v2" />
+                    </svg>
                     {listing.bedrooms} Bedrooms
                   </span>
                 )}
                 {listing.bathrooms && (
                   <span className="inline-flex items-center gap-1.5 text-xs bg-gray-100 px-3 py-1.5 rounded-md text-gray-700">
-                    <i className="bi bi-bathtub text-brand-blue"></i>
+                    <svg className="w-3.5 h-3.5 text-brand-blue" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M2 12h20M4 12v6a2 2 0 002 2h12a2 2 0 002-2v-6M6 12V6a2 2 0 012-2h2a2 2 0 012 2v6M12 12v-2a2 2 0 012-2h2a2 2 0 012 2v2" />
+                    </svg>
                     {listing.bathrooms} Bathrooms
                   </span>
                 )}
                 {listing.size && (
                   <span className="inline-flex items-center gap-1.5 text-xs bg-gray-100 px-3 py-1.5 rounded-md text-gray-700">
-                    <i className="bi bi-arrows-angle-expand text-brand-blue"></i>
+                    <svg className="w-3.5 h-3.5 text-brand-blue" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M3 3v18h18M3 3l6 6M21 3l-6 6M3 21l6-6M21 21l-6-6" />
+                    </svg>
                     {listing.size}
                   </span>
                 )}
