@@ -31,7 +31,7 @@ export default async function SellPage() {
     <div className="flex flex-col">
       {/* BACK LINK */}
       <div className="max-w-[900px] mx-auto w-full px-5 sm:px-6 lg:px-10 pt-6">
-        <Link href="/" className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-900 transition-colors">
+        <Link href="/" className="inline-flex items-center gap-1.5 text-sm font-medium text-brand-blue bg-brand-blue/10 px-3.5 py-2 rounded-lg hover:bg-brand-blue/20 transition-colors">
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" /></svg>
           Home
         </Link>

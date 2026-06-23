@@ -24,6 +24,7 @@ export default function AboutPage() {
     const parsed = raw ? JSON.parse(raw) : null;
     if (Array.isArray(parsed) && parsed.length > 0) {
       const photosByCore: Record<string, string> = {};
+      const firstNameCount: Record<string, number> = {};
       for (const m of parsed) {
         if (!m.photo) continue;
         const core = m.name
@@ -38,6 +39,7 @@ export default function AboutPage() {
           photosByCore[`${parts[0]} ${parts[parts.length - 1]}`.toLowerCase()] = m.photo;
           photosByCore[`${parts[0]} ${parts[1]}`.toLowerCase()] = m.photo;
         }
+        firstNameCount[parts[0].toLowerCase()] = (firstNameCount[parts[0].toLowerCase()] || 0) + 1;
       }
       team = defaultTeam.map(m => {
         if (m.photo) return m;
@@ -48,10 +50,13 @@ export default function AboutPage() {
           .replace(/,\s*/g, "")
           .trim();
         const parts = core.split(/\s+/);
-        const photo = photosByCore[core.toLowerCase()]
+        let photo = photosByCore[core.toLowerCase()]
           || (parts.length >= 2 ? photosByCore[`${parts[0]} ${parts[parts.length - 1]}`.toLowerCase()] : "")
           || (parts.length >= 2 ? photosByCore[`${parts[0]} ${parts[1]}`.toLowerCase()] : "")
           || "";
+        if (!photo && parts.length > 0 && firstNameCount[parts[0].toLowerCase()] === 1) {
+          photo = photosByCore[parts[0].toLowerCase()] || "";
+        }
         return { ...m, photo };
       });
     } else {
@@ -64,7 +69,7 @@ export default function AboutPage() {
   return (
     <div className="flex flex-col">
       <div className="max-w-[1400px] w-full mx-auto px-5 sm:px-6 lg:px-10 pt-4">
-        <Link href="/" className="inline-flex items-center gap-1.5 text-sm text-white/70 hover:text-white transition-colors">
+        <Link href="/" className="inline-flex items-center gap-1.5 text-sm font-medium text-white/80 bg-white/10 px-3.5 py-2 rounded-lg hover:bg-white/20 transition-colors">
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" /></svg>
           Home
         </Link>

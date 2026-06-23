@@ -148,11 +148,14 @@ export default function Navbar() {
                   <p className="text-[11px] font-semibold text-brand-blue uppercase tracking-wider px-1 pb-2">Navigation</p>
                   <div>
                     {MENU_LINKS.map((item, i) => (
-                      <div key={item.href}>
-                        {i > 0 && <div className="border-t border-gray-100 mx-2" />}
-                        <a href={item.href} onClick={() => setMenuOpen(false)} className="flex items-center gap-3 p-3.5 rounded-lg hover:bg-gray-100 transition-colors text-base text-gray-700 hover:text-gray-900">
-                          <span className="text-brand-blue font-bold text-sm w-5">{item.label[0]}</span>
-                          <span className="font-medium">{item.label}</span>
+                      <div key={item.href} className="px-1 py-0.5">
+                        <a href={item.href} onClick={() => setMenuOpen(false)} className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-colors text-base font-medium ${
+                          item.label === "Buy" ? "bg-brand-blue text-white hover:bg-brand-blue-light" :
+                          item.label === "Partner With Us" ? "bg-brand-gold/10 text-brand-gold border border-brand-gold/30 hover:bg-brand-gold/20" :
+                          "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                        }`}>
+                          <span className="font-bold text-sm w-5">{item.label[0]}</span>
+                          <span>{item.label}</span>
                         </a>
                       </div>
                     ))}
@@ -296,11 +299,14 @@ export default function Navbar() {
                   <p className="text-[11px] font-semibold text-brand-blue uppercase tracking-wider px-1 pb-2">Navigation</p>
                   <div>
                     {MENU_LINKS.map((item, i) => (
-                      <div key={item.href}>
-                        {i > 0 && <div className="border-t border-gray-100 mx-2" />}
-                        <a href={item.href} onClick={() => setMenuOpen(false)} className="flex items-center gap-3 p-3.5 rounded-lg hover:bg-gray-100 transition-colors text-base text-gray-700 hover:text-gray-900">
-                          <span className="text-brand-blue font-bold text-sm w-5">{item.label[0]}</span>
-                          <span className="font-medium">{item.label}</span>
+                      <div key={item.href} className="px-1 py-0.5">
+                        <a href={item.href} onClick={() => setMenuOpen(false)} className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-colors text-base font-medium ${
+                          item.label === "Buy" ? "bg-brand-blue text-white hover:bg-brand-blue-light" :
+                          item.label === "Partner With Us" ? "bg-brand-gold/10 text-brand-gold border border-brand-gold/30 hover:bg-brand-gold/20" :
+                          "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                        }`}>
+                          <span className="font-bold text-sm w-5">{item.label[0]}</span>
+                          <span>{item.label}</span>
                         </a>
                       </div>
                     ))}

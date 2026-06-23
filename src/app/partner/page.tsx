@@ -48,6 +48,7 @@ export default async function PartnerPage() {
       if (Array.isArray(parsed) && parsed.length > 0) {
         // Build photo lookup with multiple matching strategies
         const photosByCore: Record<string, string> = {};
+        const firstNameCount: Record<string, number> = {};
         for (const m of parsed) {
           if (!m.photo) continue;
           const core = m.name
@@ -57,12 +58,13 @@ export default async function PartnerPage() {
             .replace(/,\s*/g, "")
             .trim();
           const parts = core.split(/\s+/);
-          // Store multiple keys for flexible matching
-          photosByCore[core.toLowerCase()] = m.photo; // Full name
+          photosByCore[core.toLowerCase()] = m.photo;
           if (parts.length >= 2) {
-            photosByCore[`${parts[0]} ${parts[parts.length - 1]}`.toLowerCase()] = m.photo; // First + last
-            photosByCore[`${parts[0]} ${parts[1]}`.toLowerCase()] = m.photo; // First + second
+            photosByCore[`${parts[0]} ${parts[parts.length - 1]}`.toLowerCase()] = m.photo;
+            photosByCore[`${parts[0]} ${parts[1]}`.toLowerCase()] = m.photo;
           }
+          // Track first name occurrences for unique matching
+          firstNameCount[parts[0].toLowerCase()] = (firstNameCount[parts[0].toLowerCase()] || 0) + 1;
         }
         teamMembers = defaultTeam.map(m => {
           if (m.photo) return m;
@@ -73,10 +75,14 @@ export default async function PartnerPage() {
             .replace(/,\s*/g, "")
             .trim();
           const parts = core.split(/\s+/);
-          const photo = photosByCore[core.toLowerCase()]
+          let photo = photosByCore[core.toLowerCase()]
             || (parts.length >= 2 ? photosByCore[`${parts[0]} ${parts[parts.length - 1]}`.toLowerCase()] : "")
             || (parts.length >= 2 ? photosByCore[`${parts[0]} ${parts[1]}`.toLowerCase()] : "")
             || "";
+          // Last resort: match by first name only if it's unique in DB
+          if (!photo && parts.length > 0 && firstNameCount[parts[0].toLowerCase()] === 1) {
+            photo = photosByCore[parts[0].toLowerCase()] || "";
+          }
           return { ...m, photo };
         });
       }
@@ -87,7 +93,7 @@ export default async function PartnerPage() {
     <div className="flex flex-col">
       {/* BACK LINK */}
       <div className="max-w-7xl mx-auto w-full px-5 sm:px-6 lg:px-10 pt-6">
-        <Link href="/" className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-900 transition-colors">
+        <Link href="/" className="inline-flex items-center gap-1.5 text-sm font-medium text-brand-blue bg-brand-blue/10 px-3.5 py-2 rounded-lg hover:bg-brand-blue/20 transition-colors">
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" /></svg>
           Home
         </Link>

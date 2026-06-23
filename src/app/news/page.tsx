@@ -19,12 +19,12 @@ export default function NewsPage() {
   if (loading) return (
     <div className="flex-1 py-16 px-4 max-w-5xl mx-auto">
       <div className="mb-6">
-        <Link href="/" className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-900 transition-colors">
+        <Link href="/" className="inline-flex items-center gap-1.5 text-sm font-medium text-brand-blue bg-brand-blue/10 px-3.5 py-2 rounded-lg hover:bg-brand-blue/20 transition-colors">
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" /></svg>
           Home
         </Link>
       </div>
-      <h1 className="text-3xl font-bold text-gray-900 mb-8">News & Insights</h1>
+      <h1 className="text-3xl font-bold text-gray-900 mb-8">News &amp; Insights</h1>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {Array.from({ length: 6 }).map((_, i) => (
           <div key={i} className="bg-white rounded-xl border border-gray-200 overflow-hidden animate-pulse">
@@ -39,12 +39,12 @@ export default function NewsPage() {
   return (
     <div className="flex-1 py-16 px-4 max-w-5xl mx-auto">
       <div className="mb-6">
-        <Link href="/" className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-900 transition-colors">
+        <Link href="/" className="inline-flex items-center gap-1.5 text-sm font-medium text-brand-blue bg-brand-blue/10 px-3.5 py-2 rounded-lg hover:bg-brand-blue/20 transition-colors">
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" /></svg>
           Home
         </Link>
       </div>
-      <h1 className="text-3xl font-bold text-gray-900 mb-2">News & Insights</h1>
+      <h1 className="text-3xl font-bold text-gray-900 mb-2">News &amp; Insights</h1>
       <p className="text-gray-500 mb-8">Latest updates from MBPP</p>
 
       {posts.length === 0 ? (
