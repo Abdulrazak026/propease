@@ -78,7 +78,7 @@ export default function CareersPage() {
             {[
               { v: "9", l: "Team members" },
               { v: "4", l: "Cities served" },
-              { v: "Since 2017", l: "Established" },
+              { v: "Since 2025", l: "Established" },
             ].map(s => (
               <div key={s.l}>
                 <p className="text-xl font-bold text-white">{s.v}</p>

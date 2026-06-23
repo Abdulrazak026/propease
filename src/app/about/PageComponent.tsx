@@ -22,15 +22,23 @@ export default function AboutPage() {
   try {
     const raw = get("team_members");
     const parsed = raw ? JSON.parse(raw) : null;
-    const defaultsByName: Record<string, (typeof defaultTeam)[number]> = {};
-    for (const m of defaultTeam) defaultsByName[m.name] = m;
     if (Array.isArray(parsed) && parsed.length > 0) {
-      team = parsed.map((m: (typeof defaultTeam)[number]) => ({
-        ...m,
-        photo: m.photo || defaultsByName[m.name]?.photo || "",
-        bio: m.bio || defaultsByName[m.name]?.bio || "",
-        role: m.role || defaultsByName[m.name]?.role || "",
-      }));
+      // Check if DB has old data by looking for old name format
+      const hasOldData = parsed.some((m: (typeof defaultTeam)[number]) => m.name === "Ahmad Abubakar");
+      if (hasOldData) {
+        // DB has old seed data - use defaults
+        team = defaultTeam;
+      } else {
+        // DB has updated data - use it with fallbacks
+        const defaultsByName: Record<string, (typeof defaultTeam)[number]> = {};
+        for (const m of defaultTeam) defaultsByName[m.name] = m;
+        team = parsed.map((m: (typeof defaultTeam)[number]) => ({
+          ...m,
+          photo: m.photo || defaultsByName[m.name]?.photo || "",
+          bio: m.bio || defaultsByName[m.name]?.bio || "",
+          role: m.role || defaultsByName[m.name]?.role || "",
+        }));
+      }
     } else {
       team = defaultTeam;
     }
@@ -69,7 +77,7 @@ export default function AboutPage() {
                 );
               })()}
               <div>
-                <p className="text-xs font-semibold text-brand-gold uppercase tracking-[0.15em] mb-2">Since 2017 · Kano &amp; Northern States</p>
+                <p className="text-xs font-semibold text-brand-gold uppercase tracking-[0.15em] mb-2">Since 2025 · Kano &amp; Northern States</p>
                 <h1 className="text-4xl sm:text-5xl lg:text-7xl font-bold text-white leading-[1.02] tracking-tight">
                   MBPP
                 </h1>
@@ -77,7 +85,7 @@ export default function AboutPage() {
               </div>
             </div>
             <p className="text-base sm:text-lg text-white/55 leading-relaxed max-w-xl">
-              We are a Kano-based property company headquartered in Kano, serving clients across Northern Nigeria. We have been doing this since 2017.
+              We are a Kano-based property company headquartered in Kano, serving clients across Northern Nigeria. We have been doing this since 2025.
             </p>
           </div>
         </div>
@@ -86,7 +94,7 @@ export default function AboutPage() {
       <section className="max-w-[1400px] mx-auto w-full px-5 sm:px-6 lg:px-10 -mt-10 sm:-mt-14 relative z-10">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-px bg-gray-200 rounded-2xl overflow-hidden shadow-xl shadow-gray-900/5">
           {[
-            { v: "2017", l: "Founded in Kano" },
+            { v: "2025", l: "Founded in Kano" },
             { v: "120+", l: "Verified agents & staff" },
             { v: "₦38M", l: "Tracked monthly" },
             { v: "4 cities", l: "Across Northern Nigeria" },
@@ -110,7 +118,7 @@ export default function AboutPage() {
               We are MBPP, short for Mutual Benefit Premier Properties. We are a property company headquartered in Kano, serving clients across Northern Nigeria. We help people buy, rent, and sell houses, flats, and land. We also draw up and witness the agreements.
             </p>
             <p>
-              The company was started in 2017 by Ahmad Abubakar. Before MBPP, he had bought and sold a few properties on his own and kept running into the same problems: fake listings, agents who stopped replying after taking a deposit, agreements that did not hold up when there was a dispute. MBPP is the company he wished had existed back then.
+              The company was started in 2025 by Engr. Ahmad Abubakar, PhD. Before MBPP, he had bought and sold a few properties on his own and kept running into the same problems: fake listings, agents who stopped replying after taking a deposit, agreements that did not hold up when there was a dispute. MBPP is the company he wished had existed back then.
             </p>
             <p>
               We are headquartered in Kano. The office is in Kano, the team is in Kano, the agents we work with are in Kano, and the disputes we help resolve are in Kano. We also serve clients across other Northern States through our network of trusted agents and partners.
