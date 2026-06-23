@@ -321,21 +321,23 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* OUR COMPLETED PROJECTS */}
+      {/* PROJECTS: Completed + In Progress — Side by Side on Desktop */}
       <section className="bg-gray-50 py-10 sm:py-16">
-        <div className="max-w-[1400px] mx-auto px-5 sm:px-6 lg:px-10">
-          <h2 className="text-xl sm:text-3xl font-bold text-gray-900 text-center mb-3 sm:mb-4">OUR COMPLETED PROJECTS</h2>
-          <p className="text-xs sm:text-base text-gray-500 text-center mb-6 sm:mb-8 max-w-xl mx-auto">Take a look at some of our delivered projects across Kano &amp; Northern Nigeria</p>
-          <AutoCarousel items={completedProjects.length > 0 ? completedProjects : PLACEHOLDER_PROJECTS} heightClass="h-72 sm:h-96 lg:h-[28rem]" />
-        </div>
-      </section>
-
-      {/* OUR DEVELOPMENTS IN PROGRESS */}
-      <section className="bg-white py-10 sm:py-16">
-        <div className="max-w-[1400px] mx-auto px-5 sm:px-6 lg:px-10">
-          <h2 className="text-xl sm:text-3xl font-bold text-gray-900 text-center mb-3 sm:mb-4">OUR DEVELOPMENTS IN PROGRESS</h2>
-          <p className="text-xs sm:text-base text-gray-500 text-center mb-6 sm:mb-8 max-w-xl mx-auto">Ongoing projects taking shape across prime locations</p>
-          <AutoCarousel items={developmentsProjects.length > 0 ? developmentsProjects : PLACEHOLDER_DEVELOPMENTS} heightClass="h-72 sm:h-96 lg:h-[28rem]" />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {/* Completed Projects */}
+            <div>
+              <h2 className="text-xl sm:text-2xl font-black text-brand-blue mb-2">Completed Projects</h2>
+              <p className="text-xs sm:text-sm text-gray-500 mb-4">Delivered projects across Kano &amp; Northern Nigeria</p>
+              <AutoCarousel items={completedProjects.length > 0 ? completedProjects : PLACEHOLDER_PROJECTS} heightClass="h-56 sm:h-72 lg:h-80" />
+            </div>
+            {/* Developments In Progress */}
+            <div>
+              <h2 className="text-xl sm:text-2xl font-black text-brand-blue mb-2">Developments In Progress</h2>
+              <p className="text-xs sm:text-sm text-gray-500 mb-4">Ongoing projects taking shape across prime locations</p>
+              <AutoCarousel items={developmentsProjects.length > 0 ? developmentsProjects : PLACEHOLDER_DEVELOPMENTS} heightClass="h-56 sm:h-72 lg:h-80" />
+            </div>
+          </div>
         </div>
       </section>
 

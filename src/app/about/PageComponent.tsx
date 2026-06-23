@@ -23,35 +23,34 @@ export default function AboutPage() {
     const raw = get("team_members");
     const parsed = raw ? JSON.parse(raw) : null;
     if (Array.isArray(parsed) && parsed.length > 0) {
-      // Check if DB has old data by looking for old name format
-      const hasOldData = parsed.some((m: (typeof defaultTeam)[number]) => m.name === "Ahmad Abubakar");
-      if (hasOldData) {
-        // DB has old seed data - use defaults but preserve photos from DB
-        const photosByName: Record<string, string> = {};
-        for (const m of parsed) {
-          if (m.photo) {
-            // Also store under old name format for matching
-            photosByName[m.name] = m.photo;
-            // Store under "first last" format for partial matching
-            const parts = m.name.split(" ");
-            if (parts.length >= 2) photosByName[`${parts[0]} ${parts[parts.length - 1]}`] = m.photo;
+      // Build photo lookup by normalized name (strip titles, qualifications)
+      const photosByCore: Record<string, string> = {};
+      for (const m of parsed) {
+        if (m.photo) {
+          const core = m.name
+            .replace(/^(Engr\.|Dr\.|Barr\.|Prof\.|Alh\.|Mallam)\s*/i, "")
+            .replace(/\s*\(.*?\)\s*/g, "")
+            .replace(/\s*(PhD|Ph\.D|LLB|B\.L|LLM|MSc|BSc|MBA)\s*/gi, "")
+            .replace(/,\s*/g, "")
+            .trim();
+          photosByCore[core.toLowerCase()] = m.photo;
+          const parts = core.split(/\s+/);
+          if (parts.length >= 2) {
+            photosByCore[`${parts[0]} ${parts[parts.length - 1]}`.toLowerCase()] = m.photo;
           }
         }
-        team = defaultTeam.map(m => ({
-          ...m,
-          photo: m.photo || photosByName[m.name] || photosByName[m.name.split(" ").slice(0, 2).join(" ")] || "",
-        }));
-      } else {
-        // DB has updated data - use it with fallbacks
-        const defaultsByName: Record<string, (typeof defaultTeam)[number]> = {};
-        for (const m of defaultTeam) defaultsByName[m.name] = m;
-        team = parsed.map((m: (typeof defaultTeam)[number]) => ({
-          ...m,
-          photo: m.photo || defaultsByName[m.name]?.photo || "",
-          bio: m.bio || defaultsByName[m.name]?.bio || "",
-          role: m.role || defaultsByName[m.name]?.role || "",
-        }));
       }
+      team = defaultTeam.map(m => {
+        if (m.photo) return m;
+        const core = m.name
+          .replace(/^(Engr\.|Dr\.|Barr\.|Prof\.|Alh\.|Mallam)\s*/i, "")
+          .replace(/\s*\(.*?\)\s*/g, "")
+          .replace(/\s*(PhD|Ph\.D|LLB|B\.L|LLM|MSc|BSc|MBA)\s*/gi, "")
+          .replace(/,\s*/g, "")
+          .trim();
+        const photo = photosByCore[core.toLowerCase()] || "";
+        return { ...m, photo };
+      });
     } else {
       team = defaultTeam;
     }

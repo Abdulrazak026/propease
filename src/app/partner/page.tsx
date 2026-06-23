@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Footer from "@/components/layout/Footer";
-import PdfFlipbook from "@/components/partner/PdfFlipbook";
+import PdfFlipbookWrapper from "@/components/partner/PdfFlipbookWrapper";
 
 const API = "https://mbpproperties.com";
 
@@ -46,24 +46,37 @@ export default async function PartnerPage() {
     if (raw) {
       const parsed = JSON.parse(raw);
       if (Array.isArray(parsed) && parsed.length > 0) {
-        const hasOldData = parsed.some((m: { name: string }) => m.name === "Ahmad Abubakar");
-        if (hasOldData) {
-          // DB has old data - use defaults but preserve photos
-          const photosByName: Record<string, string> = {};
-          for (const m of parsed) {
-            if (m.photo) {
-              photosByName[m.name] = m.photo;
-              const parts = m.name.split(" ");
-              if (parts.length >= 2) photosByName[`${parts[0]} ${parts[parts.length - 1]}`] = m.photo;
+        // Build photo lookup by normalized name (strip titles, qualifications)
+        const photosByCore: Record<string, string> = {};
+        for (const m of parsed) {
+          if (m.photo) {
+            // Strip common titles and qualifications
+            const core = m.name
+              .replace(/^(Engr\.|Dr\.|Barr\.|Prof\.|Alh\.|Mallam)\s*/i, "")
+              .replace(/\s*\(.*?\)\s*/g, "")
+              .replace(/\s*(PhD|Ph\.D|LLB|B\.L|LLM|MSc|BSc|MBA)\s*/gi, "")
+              .replace(/,\s*/g, "")
+              .trim();
+            photosByCore[core.toLowerCase()] = m.photo;
+            // Also store first + last name
+            const parts = core.split(/\s+/);
+            if (parts.length >= 2) {
+              photosByCore[`${parts[0]} ${parts[parts.length - 1]}`.toLowerCase()] = m.photo;
             }
           }
-          teamMembers = defaultTeam.map(m => ({
-            ...m,
-            photo: m.photo || photosByName[m.name] || photosByName[m.name.split(" ").slice(0, 2).join(" ")] || "",
-          }));
-        } else {
-          teamMembers = parsed;
         }
+        teamMembers = defaultTeam.map(m => {
+          if (m.photo) return m; // Already has photo
+          // Normalize default name
+          const core = m.name
+            .replace(/^(Engr\.|Dr\.|Barr\.|Prof\.|Alh\.|Mallam)\s*/i, "")
+            .replace(/\s*\(.*?\)\s*/g, "")
+            .replace(/\s*(PhD|Ph\.D|LLB|B\.L|LLM|MSc|BSc|MBA)\s*/gi, "")
+            .replace(/,\s*/g, "")
+            .trim();
+          const photo = photosByCore[core.toLowerCase()] || "";
+          return { ...m, photo };
+        });
       }
     }
   } catch {}
@@ -267,7 +280,7 @@ export default async function PartnerPage() {
       {pdfUrl && (
         <section className="max-w-4xl mx-auto w-full px-5 sm:px-6 lg:px-10 pb-10 sm:pb-14">
           <h2 className="text-xl sm:text-2xl font-black text-brand-blue mb-6 text-center">Full Investment Proposal</h2>
-          <PdfFlipbook url={pdfUrl} />
+          <PdfFlipbookWrapper url={pdfUrl} />
         </section>
       )}
 
