@@ -342,6 +342,7 @@ export default function AdminSettings() {
           <MediaPicker label="Site Logo" current={s("site_logo")} onSelect={(url) => set("site_logo", url)} />
           <MediaPicker label="Favicon" current={s("site_favicon")} onSelect={(url) => set("site_favicon", url)} />
           <MediaPicker label="Flyer Image (homepage)" current={s("flyer_image")} onSelect={(url) => set("flyer_image", url)} />
+          <MediaPicker label="Partner Proposal PDF" current={s("partner_proposal_pdf")} onSelect={(url) => set("partner_proposal_pdf", url)} />
           <div className="grid grid-cols-2 gap-3">
             <div><label className="block text-xs font-medium text-gray-700 mb-1">Custom CSS</label><textarea value={s("custom_css")} onChange={(e) => set("custom_css", e.target.value)} rows={3} className="w-full rounded-lg border border-gray-200 px-3 py-2 text-xs font-mono focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20" /></div>
             <div><label className="block text-xs font-medium text-gray-700 mb-1">Custom JS</label><textarea value={s("custom_js")} onChange={(e) => set("custom_js", e.target.value)} rows={3} className="w-full rounded-lg border border-gray-200 px-3 py-2 text-xs font-mono focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20" /></div>
@@ -710,8 +711,19 @@ function MediaPicker({ label, current, onSelect }: { label: string; current: str
         <button type="button" onClick={() => fileRef.current?.click()} disabled={uploading} className="px-3 py-2 rounded-lg border border-gray-200 text-xs text-gray-600 hover:bg-gray-50">{uploading ? "..." : "Upload"}</button>
         {current && <button type="button" onClick={() => onSelect("")} className="px-2 py-2 text-xs text-red-500 hover:text-red-700" title="Remove">x</button>}
       </div>
-      <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleUpload} />
-      {previewUrl && <img src={previewUrl} alt="" className="h-10 mt-1 rounded border border-gray-200 object-contain" />}
+      <input ref={fileRef} type="file" accept="image/*,.pdf,video/*" className="hidden" onChange={handleUpload} />
+      {previewUrl && (
+        current?.endsWith('.pdf') ? (
+          <div className="flex items-center gap-2 mt-1 p-2 bg-gray-50 rounded border border-gray-200">
+            <svg className="w-5 h-5 text-red-500" fill="currentColor" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6zm-1 2l5 5h-5V4zM8 18V10h2v8H8zm4 0V10h2v8h-2z"/></svg>
+            <span className="text-xs text-gray-600">PDF document</span>
+          </div>
+        ) : current?.match(/\.(mp4|webm|ogg|mov)$/i) ? (
+          <video src={previewUrl} className="h-16 mt-1 rounded border border-gray-200" controls />
+        ) : (
+          <img src={previewUrl} alt="" className="h-10 mt-1 rounded border border-gray-200 object-contain" />
+        )
+      )}
 
       {open && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={() => setOpen(false)}>
@@ -733,7 +745,17 @@ function MediaPicker({ label, current, onSelect }: { label: string; current: str
                       onClick={() => { onSelect(resolveImageUrl(img.url) || img.url); setOpen(false); }}
                       className={`border-2 rounded-lg overflow-hidden hover:border-[var(--color-primary)] transition-colors ${current === img.url ? "border-[var(--color-primary)]" : "border-gray-200"}`}
                     >
-                      <img src={resolveImageUrl(img.url) || ""} alt={img.filename} className="w-full h-24 object-cover" />
+                      {img.filename?.match(/\.(pdf)$/i) ? (
+                        <div className="w-full h-24 flex items-center justify-center bg-gray-50">
+                          <svg className="w-8 h-8 text-red-500" fill="currentColor" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6zm-1 2l5 5h-5V4zM8 18V10h2v8H8zm4 0V10h2v8h-2z"/></svg>
+                        </div>
+                      ) : img.filename?.match(/\.(mp4|webm|ogg|mov)$/i) ? (
+                        <div className="w-full h-24 flex items-center justify-center bg-gray-50">
+                          <svg className="w-8 h-8 text-blue-500" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                        </div>
+                      ) : (
+                        <img src={resolveImageUrl(img.url) || ""} alt={img.filename} className="w-full h-24 object-cover" />
+                      )}
                       <p className="text-[10px] text-gray-500 p-1 truncate">{img.filename}</p>
                     </button>
                   ))}

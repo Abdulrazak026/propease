@@ -10,6 +10,7 @@ const MENU_LINKS = [
   { label: "Buy", href: "/list-property" },
   { label: "Rent", href: "/list-property?type=rent" },
   { label: "Sell", href: "/sell" },
+  { label: "Partner With Us", href: "/partner" },
   { label: "About", href: "/about" },
   { label: "Contact", href: "/contact" },
   { label: "Apply as Agent", href: "/apply-as-agent" },
