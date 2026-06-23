@@ -184,7 +184,7 @@ export default function HomePage() {
         </div>
       </div>
 
-      <div className="bg-white border-b border-gray-200 shadow-sm sticky top-14 z-40" data-filter-search>
+      <div className="bg-white border-b border-gray-200 shadow-sm sticky top-14 z-50" data-filter-search>
         <div className="max-w-[1400px] mx-auto px-5 sm:px-6 lg:px-10 py-4">
           <PropertyFilters onFilterChange={handleFilterChange} />
         </div>

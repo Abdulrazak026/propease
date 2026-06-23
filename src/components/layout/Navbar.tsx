@@ -18,7 +18,7 @@ const MENU_LINKS = [
 export default function Navbar() {
   const router = useRouter();
   const pathname = usePathname();
-  const { currentUser, setCurrentUser, isAuthenticated, loading } = useRole();
+  const { currentUser, setCurrentUser, isAuthenticated, loading, logout } = useRole();
   const { get: getSetting } = useSettings();
   const [mounted, setMounted] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -37,7 +37,7 @@ export default function Navbar() {
 
   if (pathname.startsWith("/admin") || pathname.startsWith("/agent") || pathname.startsWith("/ambassador") || pathname === "/wallet") return null;
 
-  const handleLogout = () => { setCurrentUser(null); router.push("/"); };
+  const handleLogout = async () => { await logout(); router.push("/"); };
 
   const fetchNotifs = useCallback(async () => {
     if (!isAuthenticated) return;
