@@ -35,7 +35,7 @@ export default function AutoCarousel({ items, interval = 4000, className = "", h
 
   return (
     <div
-      className={`relative overflow-hidden rounded-2xl group ${className}`}
+      className={`relative overflow-hidden rounded-2xl group max-w-4xl mx-auto ${className}`}
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >
@@ -45,7 +45,7 @@ export default function AutoCarousel({ items, interval = 4000, className = "", h
       >
         {items.map((item, i) => (
           <div key={i} className={`min-w-full relative ${heightClass} bg-gray-200`}>
-            <img src={item.image} alt={item.title || ""} className="w-full h-full" style={{ objectFit: imageFit }} loading="lazy" />
+            <img src={item.image} alt={item.title || ""} className="w-full h-full object-cover" loading="lazy" />
             {showOverlay && <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />}
             {!showOverlay && (item.title || item.subtitle) && <div className="absolute bottom-0 left-0 right-0 h-36 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />}
             {(item.title || item.subtitle) && (

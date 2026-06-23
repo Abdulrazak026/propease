@@ -45,7 +45,26 @@ export default async function PartnerPage() {
     const raw = s.team_members;
     if (raw) {
       const parsed = JSON.parse(raw);
-      if (Array.isArray(parsed) && parsed.length > 0) teamMembers = parsed;
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        const hasOldData = parsed.some((m: { name: string }) => m.name === "Ahmad Abubakar");
+        if (hasOldData) {
+          // DB has old data - use defaults but preserve photos
+          const photosByName: Record<string, string> = {};
+          for (const m of parsed) {
+            if (m.photo) {
+              photosByName[m.name] = m.photo;
+              const parts = m.name.split(" ");
+              if (parts.length >= 2) photosByName[`${parts[0]} ${parts[parts.length - 1]}`] = m.photo;
+            }
+          }
+          teamMembers = defaultTeam.map(m => ({
+            ...m,
+            photo: m.photo || photosByName[m.name] || photosByName[m.name.split(" ").slice(0, 2).join(" ")] || "",
+          }));
+        } else {
+          teamMembers = parsed;
+        }
+      }
     }
   } catch {}
 

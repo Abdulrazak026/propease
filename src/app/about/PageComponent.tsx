@@ -26,8 +26,21 @@ export default function AboutPage() {
       // Check if DB has old data by looking for old name format
       const hasOldData = parsed.some((m: (typeof defaultTeam)[number]) => m.name === "Ahmad Abubakar");
       if (hasOldData) {
-        // DB has old seed data - use defaults
-        team = defaultTeam;
+        // DB has old seed data - use defaults but preserve photos from DB
+        const photosByName: Record<string, string> = {};
+        for (const m of parsed) {
+          if (m.photo) {
+            // Also store under old name format for matching
+            photosByName[m.name] = m.photo;
+            // Store under "first last" format for partial matching
+            const parts = m.name.split(" ");
+            if (parts.length >= 2) photosByName[`${parts[0]} ${parts[parts.length - 1]}`] = m.photo;
+          }
+        }
+        team = defaultTeam.map(m => ({
+          ...m,
+          photo: m.photo || photosByName[m.name] || photosByName[m.name.split(" ").slice(0, 2).join(" ")] || "",
+        }));
       } else {
         // DB has updated data - use it with fallbacks
         const defaultsByName: Record<string, (typeof defaultTeam)[number]> = {};

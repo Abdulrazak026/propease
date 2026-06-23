@@ -14,7 +14,7 @@ const PUBLIC_KEYS = [
   "agent_dir_visible", "maintenance_mode",
   "facebook_url", "instagram_url", "linkedin_url", "youtube_url", "twitter_url", "tiktok_url",
   "site_logo", "site_favicon",
-  "available_cities", "about_hero_image", "flyer_image",
+  "available_cities", "about_hero_image", "flyer_image", "partner_proposal_pdf",
   "completed_projects", "developments_in_progress",
   "team_members", "research_reports",
   "seo_canonical_url", "seo_geo_region", "seo_geo_placename", "seo_geo_position", "seo_icbm",

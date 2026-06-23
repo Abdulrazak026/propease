@@ -337,9 +337,14 @@ export default function ListingDetail() {
                   </Button>
                 )}
 
-                {listing.reservationCount > 0 && (
+                {(listing.reservationCount ?? 0) > 0 && (
                   <p className="text-xs text-gray-500 text-center">
-                    {listing.reservationCount} {listing.reservationCount === 1 ? "other also reserved" : "others also reserved"}
+                    {listing.reservationCount} {listing.reservationCount === 1 ? "person has" : "people have"} reserved this property
+                  </p>
+                )}
+                {(listing.reservationCount ?? 0) === 0 && listing.status === "available" && (
+                  <p className="text-xs text-gray-400 text-center">
+                    Be the first to reserve this property
                   </p>
                 )}
 
