@@ -99,6 +99,7 @@ export default function HomePage() {
         // Manual name mapping for known DB name mismatches
         const nameMapping: Record<string, string> = {
           "salisu muhammad": "engr. salisu mohd nuhu",
+          "umar nuhu": "umar nuhu umar",
         };
         const photosByName: Record<string, string> = {};
         for (const m of parsed) {
