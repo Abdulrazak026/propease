@@ -57,7 +57,7 @@ export default function ListPropertyPage() {
           Home
         </Link>
       </div>
-      <div className="bg-white border-b border-gray-200">
+      <div className="bg-white border-b border-gray-200 sticky top-14 z-40">
         <PropertyFilters onFilterChange={handleFilterChange} />
       </div>
       <div className="max-w-[1400px] w-full mx-auto px-5 sm:px-6 lg:px-10 py-6">
