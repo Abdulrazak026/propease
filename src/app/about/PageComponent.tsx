@@ -23,21 +23,20 @@ export default function AboutPage() {
     const raw = get("team_members");
     const parsed = raw ? JSON.parse(raw) : null;
     if (Array.isArray(parsed) && parsed.length > 0) {
-      // Build photo lookup by normalized name (strip titles, qualifications)
       const photosByCore: Record<string, string> = {};
       for (const m of parsed) {
-        if (m.photo) {
-          const core = m.name
-            .replace(/^(Engr\.|Dr\.|Barr\.|Prof\.|Alh\.|Mallam)\s*/i, "")
-            .replace(/\s*\(.*?\)\s*/g, "")
-            .replace(/\s*(PhD|Ph\.D|LLB|B\.L|LLM|MSc|BSc|MBA)\s*/gi, "")
-            .replace(/,\s*/g, "")
-            .trim();
-          photosByCore[core.toLowerCase()] = m.photo;
-          const parts = core.split(/\s+/);
-          if (parts.length >= 2) {
-            photosByCore[`${parts[0]} ${parts[parts.length - 1]}`.toLowerCase()] = m.photo;
-          }
+        if (!m.photo) continue;
+        const core = m.name
+          .replace(/^(Engr\.|Dr\.|Barr\.|Prof\.|Alh\.|Mallam)\s*/i, "")
+          .replace(/\s*\(.*?\)\s*/g, "")
+          .replace(/\s*(PhD|Ph\.D|LLB|B\.L|LLM|MSc|BSc|MBA)\s*/gi, "")
+          .replace(/,\s*/g, "")
+          .trim();
+        const parts = core.split(/\s+/);
+        photosByCore[core.toLowerCase()] = m.photo;
+        if (parts.length >= 2) {
+          photosByCore[`${parts[0]} ${parts[parts.length - 1]}`.toLowerCase()] = m.photo;
+          photosByCore[`${parts[0]} ${parts[1]}`.toLowerCase()] = m.photo;
         }
       }
       team = defaultTeam.map(m => {
@@ -48,7 +47,11 @@ export default function AboutPage() {
           .replace(/\s*(PhD|Ph\.D|LLB|B\.L|LLM|MSc|BSc|MBA)\s*/gi, "")
           .replace(/,\s*/g, "")
           .trim();
-        const photo = photosByCore[core.toLowerCase()] || "";
+        const parts = core.split(/\s+/);
+        const photo = photosByCore[core.toLowerCase()]
+          || (parts.length >= 2 ? photosByCore[`${parts[0]} ${parts[parts.length - 1]}`.toLowerCase()] : "")
+          || (parts.length >= 2 ? photosByCore[`${parts[0]} ${parts[1]}`.toLowerCase()] : "")
+          || "";
         return { ...m, photo };
       });
     } else {

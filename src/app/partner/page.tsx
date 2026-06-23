@@ -46,35 +46,37 @@ export default async function PartnerPage() {
     if (raw) {
       const parsed = JSON.parse(raw);
       if (Array.isArray(parsed) && parsed.length > 0) {
-        // Build photo lookup by normalized name (strip titles, qualifications)
+        // Build photo lookup with multiple matching strategies
         const photosByCore: Record<string, string> = {};
         for (const m of parsed) {
-          if (m.photo) {
-            // Strip common titles and qualifications
-            const core = m.name
-              .replace(/^(Engr\.|Dr\.|Barr\.|Prof\.|Alh\.|Mallam)\s*/i, "")
-              .replace(/\s*\(.*?\)\s*/g, "")
-              .replace(/\s*(PhD|Ph\.D|LLB|B\.L|LLM|MSc|BSc|MBA)\s*/gi, "")
-              .replace(/,\s*/g, "")
-              .trim();
-            photosByCore[core.toLowerCase()] = m.photo;
-            // Also store first + last name
-            const parts = core.split(/\s+/);
-            if (parts.length >= 2) {
-              photosByCore[`${parts[0]} ${parts[parts.length - 1]}`.toLowerCase()] = m.photo;
-            }
-          }
-        }
-        teamMembers = defaultTeam.map(m => {
-          if (m.photo) return m; // Already has photo
-          // Normalize default name
+          if (!m.photo) continue;
           const core = m.name
             .replace(/^(Engr\.|Dr\.|Barr\.|Prof\.|Alh\.|Mallam)\s*/i, "")
             .replace(/\s*\(.*?\)\s*/g, "")
             .replace(/\s*(PhD|Ph\.D|LLB|B\.L|LLM|MSc|BSc|MBA)\s*/gi, "")
             .replace(/,\s*/g, "")
             .trim();
-          const photo = photosByCore[core.toLowerCase()] || "";
+          const parts = core.split(/\s+/);
+          // Store multiple keys for flexible matching
+          photosByCore[core.toLowerCase()] = m.photo; // Full name
+          if (parts.length >= 2) {
+            photosByCore[`${parts[0]} ${parts[parts.length - 1]}`.toLowerCase()] = m.photo; // First + last
+            photosByCore[`${parts[0]} ${parts[1]}`.toLowerCase()] = m.photo; // First + second
+          }
+        }
+        teamMembers = defaultTeam.map(m => {
+          if (m.photo) return m;
+          const core = m.name
+            .replace(/^(Engr\.|Dr\.|Barr\.|Prof\.|Alh\.|Mallam)\s*/i, "")
+            .replace(/\s*\(.*?\)\s*/g, "")
+            .replace(/\s*(PhD|Ph\.D|LLB|B\.L|LLM|MSc|BSc|MBA)\s*/gi, "")
+            .replace(/,\s*/g, "")
+            .trim();
+          const parts = core.split(/\s+/);
+          const photo = photosByCore[core.toLowerCase()]
+            || (parts.length >= 2 ? photosByCore[`${parts[0]} ${parts[parts.length - 1]}`.toLowerCase()] : "")
+            || (parts.length >= 2 ? photosByCore[`${parts[0]} ${parts[1]}`.toLowerCase()] : "")
+            || "";
           return { ...m, photo };
         });
       }

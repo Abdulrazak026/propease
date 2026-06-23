@@ -1,10 +1,10 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Document, Page, pdfjs } from "react-pdf";
 import "react-pdf/dist/Page/AnnotationLayer.css";
 import "react-pdf/dist/Page/TextLayer.css";
 
-pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
+pdfjs.GlobalWorkerOptions.workerSrc = `https://cdn.jsdelivr.net/npm/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
 
 interface PdfFlipbookProps {
   url: string;
@@ -16,12 +16,21 @@ export default function PdfFlipbook({ url }: PdfFlipbookProps) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
 
+  useEffect(() => {
+    // Pre-check if URL is accessible
+    if (!url) {
+      setError(true);
+      setLoading(false);
+    }
+  }, [url]);
+
   const onDocumentLoadSuccess = ({ numPages: total }: { numPages: number }) => {
     setNumPages(total);
     setLoading(false);
   };
 
-  const onDocumentLoadError = () => {
+  const onDocumentLoadError = (err: Error) => {
+    console.error("PDF load error:", err);
     setError(true);
     setLoading(false);
   };
@@ -29,13 +38,15 @@ export default function PdfFlipbook({ url }: PdfFlipbookProps) {
   const goToPrev = () => setCurrentPage((p) => Math.max(1, p - 1));
   const goToNext = () => setCurrentPage((p) => Math.min(numPages, p + 1));
 
-  if (error) {
+  if (error || !url) {
     return (
       <div className="bg-gray-50 border border-gray-200 rounded-2xl p-8 text-center">
-        <p className="text-gray-500 text-sm">Unable to load PDF preview.</p>
-        <a href={url} target="_blank" rel="noopener noreferrer" className="text-brand-blue text-sm font-medium hover:underline mt-2 inline-block">
-          Download PDF instead
-        </a>
+        <p className="text-gray-500 text-sm">PDF preview is not available.</p>
+        {url && (
+          <a href={url} target="_blank" rel="noopener noreferrer" className="text-brand-blue text-sm font-medium hover:underline mt-2 inline-block">
+            Download PDF instead
+          </a>
+        )}
       </div>
     );
   }
@@ -45,18 +56,17 @@ export default function PdfFlipbook({ url }: PdfFlipbookProps) {
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200">
         <span className="text-sm font-semibold text-gray-900">Investment Proposal</span>
-        <div className="flex items-center gap-2">
-          <a href={url} target="_blank" rel="noopener noreferrer" className="text-xs text-brand-blue font-medium hover:underline">
-            Download PDF
-          </a>
-        </div>
+        <a href={url} target="_blank" rel="noopener noreferrer" className="text-xs text-brand-blue font-medium hover:underline">
+          Download PDF
+        </a>
       </div>
 
       {/* PDF Viewer */}
       <div className="relative flex items-center justify-center min-h-[400px] sm:min-h-[500px] lg:min-h-[600px] bg-white">
         {loading && (
-          <div className="absolute inset-0 flex items-center justify-center">
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-3">
             <div className="w-8 h-8 border-2 border-brand-blue border-t-transparent rounded-full animate-spin" />
+            <p className="text-xs text-gray-400">Loading PDF...</p>
           </div>
         )}
 

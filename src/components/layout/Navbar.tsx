@@ -199,11 +199,11 @@ export default function Navbar() {
           <img src={siteLogo || `https://mbpproperties.com/api/upload/file/7ea15ec8-11b2-4c34-a855-1469d56656a5.png`} alt={siteName} className="h-full w-auto object-contain object-left" />
         </Link>
 
-        <nav className="flex items-center gap-1">
-          <a href="/list-property" className="px-4 py-2 text-sm font-semibold text-gray-700 hover:text-brand-blue hover:bg-gray-50 rounded-lg transition-colors">Buy</a>
-          <a href="/list-property?type=rent" className="px-4 py-2 text-sm font-semibold text-gray-700 hover:text-brand-blue hover:bg-gray-50 rounded-lg transition-colors">Rent</a>
-          <a href="/sell" className="px-4 py-2 text-sm font-semibold text-gray-700 hover:text-brand-blue hover:bg-gray-50 rounded-lg transition-colors">Sell</a>
-          <a href="/partner" className="px-4 py-2 text-sm font-semibold text-gray-700 hover:text-brand-blue hover:bg-gray-50 rounded-lg transition-colors">Partner</a>
+        <nav className="flex items-center gap-1.5">
+          <a href="/list-property" className="px-4 py-2 text-sm font-semibold text-white bg-brand-blue rounded-full hover:bg-brand-blue-light transition-colors">Buy</a>
+          <a href="/list-property?type=rent" className="px-4 py-2 text-sm font-semibold text-brand-blue border-2 border-brand-blue rounded-full hover:bg-brand-blue hover:text-white transition-colors">Rent</a>
+          <a href="/sell" className="px-4 py-2 text-sm font-semibold text-brand-blue border-2 border-brand-blue rounded-full hover:bg-brand-blue hover:text-white transition-colors">Sell</a>
+          <a href="/partner" className="px-4 py-2 text-sm font-semibold text-brand-gold border-2 border-brand-gold rounded-full hover:bg-brand-gold hover:text-white transition-colors">Partner</a>
         </nav>
 
         <div className="flex items-center gap-3">
