@@ -31,7 +31,7 @@ export default function AboutPage() {
         .trim()
         .toLowerCase();
       const nameMapping: Record<string, string> = {
-        "salisu muhammad": "engr. salisu mohd nuhu",
+        "salisu muhammad": "salisu mohd nuhu",
         "umar nuhu": "umar nuhu umar",
       };
       const photosByName: Record<string, string> = {};
