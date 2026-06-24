@@ -22,7 +22,7 @@ export default async function DisclaimerPage() {
   const brand = await getSiteName();
 
   return (
-    <div className="flex-1 bg-white">
+    <div className="flex-1 bg-white pb-20 lg:pb-0">
       <section className="bg-gray-50 py-12 sm:py-16 px-4 border-b border-gray-200">
         <div className="max-w-3xl mx-auto text-center">
           <span className="text-xs font-medium text-brand-gold uppercase tracking-wider">Legal</span>
