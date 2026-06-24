@@ -1,5 +1,6 @@
 import { Router, Response } from "express";
 import multer from "multer";
+import sharp from "sharp";
 import { v4 as uuidv4 } from "uuid";
 import path from "path";
 import fs from "fs";
@@ -34,6 +35,46 @@ const upload = multer({
     }
   },
 });
+
+// Optimize image with sharp: resize + convert to WebP at best quality
+async function optimizeImage(filePath: string): Promise<{ path: string; filename: string; mimeType: string; size: number } | null> {
+  try {
+    const image = sharp(filePath);
+    const metadata = await image.metadata();
+
+    // Skip non-image files (PDFs, videos)
+    if (!metadata.width || !metadata.height) return null;
+
+    // Only resize if wider than 1600px
+    let pipeline = image;
+    if (metadata.width > 1600) {
+      pipeline = pipeline.resize(1600, undefined, { withoutEnlargement: true });
+    }
+
+    // Convert to WebP at 90% quality (visually lossless)
+    const webpBuffer = await pipeline.webp({ quality: 90 }).toBuffer();
+
+    // Generate new filename
+    const newFilename = `${uuidv4()}.webp`;
+    const newPath = path.join(uploadsDir, newFilename);
+
+    // Write optimized file
+    await fs.promises.writeFile(newPath, webpBuffer);
+
+    // Delete original file
+    await fs.promises.unlink(filePath);
+
+    return {
+      path: newPath,
+      filename: newFilename,
+      mimeType: "image/webp",
+      size: webpBuffer.length,
+    };
+  } catch (err) {
+    logger.error({ err }, "Image optimization failed");
+    return null;
+  }
+}
 
 async function uploadToR2(filePath: string, fileName: string, mimeType: string): Promise<string | null> {
   const accountId = process.env.R2_ACCOUNT_ID;
@@ -84,18 +125,35 @@ router.post("/", authenticate, authorize("head", "ambassador", "agent"), upload.
   try {
     if (!req.file) return res.status(400).json({ error: "No file provided" });
 
-    let url = `/api/upload/file/${req.file.filename}`;
+    let filePath = req.file.path;
+    let filename = req.file.filename;
+    let mimeType = req.file.mimetype;
+    let fileSize = req.file.size;
 
-    const r2Url = await uploadToR2(req.file.path, req.file.filename, req.file.mimetype);
+    // Optimize images (not videos or PDFs)
+    if (mimeType.startsWith("image/") && mimeType !== "image/gif") {
+      const optimized = await optimizeImage(filePath);
+      if (optimized) {
+        filePath = optimized.path;
+        filename = optimized.filename;
+        mimeType = optimized.mimeType;
+        fileSize = optimized.size;
+        logger.info({ original: req.file.size, optimized: fileSize, reduction: `${Math.round((1 - fileSize / req.file.size) * 100)}%` }, "Image optimized");
+      }
+    }
+
+    let url = `/api/upload/file/${filename}`;
+
+    const r2Url = await uploadToR2(filePath, filename, mimeType);
     if (r2Url) url = r2Url;
 
     await prisma.mediaFile.create({
       data: {
-        key: req.file.filename,
+        key: filename,
         url,
         filename: req.file.originalname,
-        mimeType: req.file.mimetype,
-        size: req.file.size,
+        mimeType,
+        size: fileSize,
         uploadedBy: req.user!.id,
       },
     });
