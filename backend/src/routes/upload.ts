@@ -1,6 +1,5 @@
 import { Router, Response } from "express";
 import multer from "multer";
-import sharp from "sharp";
 import { v4 as uuidv4 } from "uuid";
 import path from "path";
 import fs from "fs";
@@ -8,6 +7,15 @@ import prisma from "../lib/prisma";
 import { authenticate, AuthRequest } from "../middleware/auth";
 import { authorize, requirePermission } from "../middleware/rbac";
 import { logger } from "../lib/logger";
+
+// Lazy-load sharp (may not be available on all platforms)
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let sharpModule: any = null;
+try {
+  sharpModule = require("sharp");
+} catch {
+  logger.warn("sharp not available — image optimization disabled");
+}
 
 const router = Router();
 
@@ -38,8 +46,9 @@ const upload = multer({
 
 // Optimize image with sharp: resize + convert to WebP at best quality
 async function optimizeImage(filePath: string): Promise<{ path: string; filename: string; mimeType: string; size: number } | null> {
+  if (!sharpModule) return null;
   try {
-    const image = sharp(filePath);
+    const image = sharpModule(filePath);
     const metadata = await image.metadata();
 
     // Skip non-image files (PDFs, videos)
@@ -71,7 +80,7 @@ async function optimizeImage(filePath: string): Promise<{ path: string; filename
       size: webpBuffer.length,
     };
   } catch (err) {
-    logger.error({ err }, "Image optimization failed");
+    logger.error({ err }, "Image optimization failed — serving original");
     return null;
   }
 }
