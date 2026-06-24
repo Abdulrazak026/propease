@@ -23,10 +23,10 @@ export default async function DisclaimerPage() {
 
   return (
     <div className="flex-1 bg-white">
-      <section className="bg-gray-50 py-16 px-4 border-b border-gray-200">
+      <section className="bg-gray-50 py-12 sm:py-16 px-4 border-b border-gray-200">
         <div className="max-w-3xl mx-auto text-center">
-          <span className="text-xs font-medium text-[var(--color-primary)] uppercase tracking-wider">Legal</span>
-          <h1 className="text-3xl font-bold text-gray-900 mt-2">Disclaimer</h1>
+          <span className="text-xs font-medium text-brand-gold uppercase tracking-wider">Legal</span>
+          <h1 className="text-2xl sm:text-3xl font-black text-brand-blue mt-2">Disclaimer</h1>
           <p className="text-sm text-gray-500 mt-2">Last updated: June 2026</p>
         </div>
       </section>

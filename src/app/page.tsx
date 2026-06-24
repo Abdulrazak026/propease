@@ -174,7 +174,7 @@ export default function HomePage() {
   const facebookUrl = getSetting("facebook_url");
   const instagramUrl = getSetting("instagram_url");
   const tiktokUrl = getSetting("tiktok_url");
-  const whatsappUrl = getSetting("whatsapp_url");
+  const whatsappUrl = getSetting("whatsapp_url") || "https://wa.me/2347074222284";
 
   const staffItems = (teamMembers.length > 0 ? teamMembers : [
     { name: "Aisha Bello", role: "CEO / Lead Consultant", photo: "" },
