@@ -42,7 +42,7 @@ export default function Footer() {
   const whatsappMsg = encodeURIComponent("Hi! I have a question about MBPP properties.");
 
   return (
-    <footer className="bg-gray-950 text-gray-400 pb-16 lg:pb-0">
+    <footer className="bg-gray-950 text-gray-400 pb-16 md:pb-0">
       <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-10 pt-10 pb-6">
         <div className="grid grid-cols-2 lg:grid-cols-12 gap-6 lg:gap-8">
           <div className="col-span-2 lg:col-span-4 space-y-4">

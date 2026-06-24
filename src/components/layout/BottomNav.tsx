@@ -48,7 +48,7 @@ export default function BottomNav() {
 
   // Show skeleton while loading
   if (loading) return (
-    <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-200 pb-safe">
+    <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-200 pb-safe">
       <div className="flex items-center justify-around h-16">
         {[1,2,3,4].map(i => (
           <div key={i} className="flex flex-col items-center gap-1 px-4">
@@ -76,7 +76,7 @@ export default function BottomNav() {
 
   return (
     <>
-      <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-200 pb-safe">
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-200 pb-safe">
         <div className="flex items-center justify-around h-16">
           {tabs.map((tab) => {
             const active = pathname === tab.href;
