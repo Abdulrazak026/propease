@@ -56,7 +56,7 @@ export default function LayoutShell({ children }: { children: React.ReactNode })
 
   // Homepage + public pages: Navbar on top + BottomNav at bottom
   return (
-    <div className="flex flex-col min-h-full">
+    <div className="flex flex-col min-h-full overflow-x-hidden">
       <Navbar />
       <main className="flex-1">{children}</main>
       <BottomNav />

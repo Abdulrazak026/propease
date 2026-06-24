@@ -231,7 +231,7 @@ export default function HomePage() {
       </div>
 
       <div className="bg-white border-b border-gray-200 shadow-sm" data-filter-search>
-        <div className="max-w-[1400px] mx-auto px-5 sm:px-6 lg:px-10 py-4">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <PropertyFilters onFilterChange={handleFilterChange} />
         </div>
       </div>
@@ -317,52 +317,53 @@ export default function HomePage() {
 
       <SoldPropertiesGallery />
 
-      {/* VERIFIED PROPERTIES + OUR PROMISE TO YOU */}
+      {/* VERIFIED + WHAT WE OFFER — 2 columns on desktop */}
       <section className="bg-white py-8 sm:py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-            <div className="flex items-start gap-3 sm:gap-4 p-4 sm:p-5 rounded-xl bg-gray-50 border border-gray-100">
-              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-brand-blue text-brand-gold rounded-xl flex items-center justify-center shrink-0">
-                <i className="bi bi-shield-fill-check text-lg sm:text-xl"></i>
-              </div>
-              <div>
-                <h3 className="text-sm sm:text-base font-bold text-brand-blue">VERIFIED PROPERTIES</h3>
-                <p className="text-xs sm:text-sm text-gray-600 mt-0.5">Every property we sell is 100% verified through due diligence and transparency.</p>
-              </div>
-            </div>
-            <div className="flex items-start gap-3 sm:gap-4 p-4 sm:p-5 rounded-xl bg-gray-50 border border-gray-100">
-              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-brand-blue text-brand-gold rounded-xl flex items-center justify-center shrink-0">
-                <i className="bi bi-shield-check text-lg sm:text-xl"></i>
-              </div>
-              <div>
-                <h3 className="text-sm sm:text-base font-bold text-brand-blue">OUR PROMISE TO YOU</h3>
-                <p className="text-xs sm:text-sm text-gray-600 mt-0.5">For any issue related to purchased properties, MBPP takes 100% responsibility. Your peace of mind is our commitment.</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* WHAT WE OFFER */}
-      <section className="bg-gray-50 py-8 sm:py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-lg sm:text-xl font-bold text-brand-blue text-center mb-4 sm:mb-5">WHAT WE OFFER</h2>
-          <div className="max-w-2xl mx-auto bg-white rounded-xl border border-gray-100 p-4 sm:p-5 divide-y divide-gray-100">
-            {[
-              { icon: "bi-map-fill", title: "WE SELL LANDS", desc: "Genuine plots in prime locations with secure titles" },
-              { icon: "bi-house-fill", title: "WE BUILD HOUSES", desc: "From foundation to finishing, we build quality homes tailored to your needs" },
-              { icon: "bi-buildings-fill", title: "WE SELL COMPLETED HOUSES", desc: "Move-in ready homes with modern finishing and quality construction" },
-            ].map((item, i) => (
-              <div key={i} className="flex items-start gap-3 py-3 sm:py-3.5 first:pt-0 last:pb-0">
-                <div className="w-9 h-9 bg-brand-blue text-brand-gold rounded-lg flex items-center justify-center shrink-0">
-                  <i className={`bi ${item.icon} text-sm`}></i>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Left: Verified + Promise */}
+            <div className="space-y-4">
+              <div className="flex items-start gap-3 sm:gap-4 p-4 sm:p-5 rounded-xl bg-gray-50 border border-gray-100">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-brand-blue text-brand-gold rounded-xl flex items-center justify-center shrink-0">
+                  <i className="bi bi-shield-fill-check text-lg sm:text-xl"></i>
                 </div>
                 <div>
-                  <p className="text-sm font-semibold text-brand-blue">{item.title}</p>
-                  <p className="text-xs text-gray-600 mt-0.5">{item.desc}</p>
+                  <h3 className="text-sm sm:text-base font-bold text-brand-blue">VERIFIED PROPERTIES</h3>
+                  <p className="text-xs sm:text-sm text-gray-600 mt-0.5">Every property we sell is 100% verified through due diligence and transparency.</p>
                 </div>
               </div>
-            ))}
+              <div className="flex items-start gap-3 sm:gap-4 p-4 sm:p-5 rounded-xl bg-gray-50 border border-gray-100">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-brand-blue text-brand-gold rounded-xl flex items-center justify-center shrink-0">
+                  <i className="bi bi-shield-check text-lg sm:text-xl"></i>
+                </div>
+                <div>
+                  <h3 className="text-sm sm:text-base font-bold text-brand-blue">OUR PROMISE TO YOU</h3>
+                  <p className="text-xs sm:text-sm text-gray-600 mt-0.5">For any issue related to purchased properties, MBPP takes 100% responsibility. Your peace of mind is our commitment.</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Right: What We Offer */}
+            <div>
+              <h3 className="text-sm sm:text-base font-bold text-brand-blue mb-4">WHAT WE OFFER</h3>
+              <div className="bg-gray-50 rounded-xl border border-gray-100 p-4 sm:p-5 divide-y divide-gray-100">
+                {[
+                  { icon: "bi-map-fill", title: "WE SELL LANDS", desc: "Genuine plots in prime locations with secure titles" },
+                  { icon: "bi-house-fill", title: "WE BUILD HOUSES", desc: "From foundation to finishing, we build quality homes tailored to your needs" },
+                  { icon: "bi-buildings-fill", title: "WE SELL COMPLETED HOUSES", desc: "Move-in ready homes with modern finishing and quality construction" },
+                ].map((item, i) => (
+                  <div key={i} className="flex items-start gap-3 py-3 sm:py-3.5 first:pt-0 last:pb-0">
+                    <div className="w-9 h-9 bg-brand-blue text-brand-gold rounded-lg flex items-center justify-center shrink-0">
+                      <i className={`bi ${item.icon} text-sm`}></i>
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold text-brand-blue">{item.title}</p>
+                      <p className="text-xs text-gray-600 mt-0.5">{item.desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -375,13 +376,13 @@ export default function HomePage() {
             <div>
               <h2 className="text-xl sm:text-2xl font-black text-brand-blue mb-2">Completed Projects</h2>
               <p className="text-xs sm:text-sm text-gray-500 mb-4">Delivered projects across Kano &amp; Northern Nigeria</p>
-              <AutoCarousel items={completedProjects.length > 0 ? completedProjects : PLACEHOLDER_PROJECTS} heightClass="h-56 sm:h-72 lg:h-80" />
+              <AutoCarousel items={completedProjects.length > 0 ? completedProjects : PLACEHOLDER_PROJECTS} heightClass="h-64 sm:h-80 lg:h-96" />
             </div>
             {/* Developments In Progress */}
             <div>
               <h2 className="text-xl sm:text-2xl font-black text-brand-blue mb-2">Developments In Progress</h2>
               <p className="text-xs sm:text-sm text-gray-500 mb-4">Ongoing projects taking shape across prime locations</p>
-              <AutoCarousel items={developmentsProjects.length > 0 ? developmentsProjects : PLACEHOLDER_DEVELOPMENTS} heightClass="h-56 sm:h-72 lg:h-80" />
+              <AutoCarousel items={developmentsProjects.length > 0 ? developmentsProjects : PLACEHOLDER_DEVELOPMENTS} heightClass="h-64 sm:h-80 lg:h-96" />
             </div>
           </div>
         </div>
@@ -394,17 +395,16 @@ export default function HomePage() {
 
           {/* Left Side: Why Buy from MBPP? + Flyer Carousel */}
           <div className="lg:col-span-5 flex flex-col">
-            <div className="mb-4">
-              <h3 className="text-2xl font-black text-brand-blue mb-2 tracking-tight">WHY BUY FROM MBPP?</h3>
-              <p className="text-sm text-slate-500">We offer the most comprehensive real estate solution structures in Northern Nigeria.</p>
-            </div>
-
             {/* Auto-advancing carousel: features + flyer */}
             <div className="relative flex-1">
-              <div className="relative overflow-hidden rounded-2xl border border-gray-200 bg-white">
+              <div className="relative overflow-hidden rounded-2xl border border-gray-200 bg-white" style={{ minHeight: "480px" }}>
                 {/* Slide 1: Features */}
-                <div className={`transition-opacity duration-500 ${currentSlide === 0 ? "opacity-100" : "opacity-0 absolute inset-0 pointer-events-none"}`}>
+                <div className={`transition-opacity duration-500 ${currentSlide === 0 ? "opacity-100 relative" : "opacity-0 absolute inset-0 pointer-events-none"}`}>
                   <div className="p-6 space-y-5">
+                    <div className="mb-4">
+                      <h3 className="text-2xl font-black text-brand-blue mb-2 tracking-tight">WHY BUY FROM MBPP?</h3>
+                      <p className="text-sm text-slate-500">We offer the most comprehensive real estate solution structures in Northern Nigeria.</p>
+                    </div>
                     {[
                       { icon: "bi-shield-fill-check", title: "Verified & Genuine Properties", desc: "Absolute assurance with fully documented ownership papers and title deeds." },
                       { icon: "bi-geo-alt-fill", title: "Prime Locations in Kano", desc: "Strategically situated within high capital appreciation corridors." },
@@ -427,8 +427,8 @@ export default function HomePage() {
 
                 {/* Slide 2: Flyer */}
                 {getSetting("flyer_image") && (
-                  <div className={`transition-opacity duration-500 ${currentSlide === 1 ? "opacity-100" : "opacity-0 absolute inset-0 pointer-events-none"}`}>
-                    <div className="p-4 flex flex-col items-center justify-center min-h-[400px]">
+                  <div className={`transition-opacity duration-500 ${currentSlide === 1 ? "opacity-100 relative" : "opacity-0 absolute inset-0 pointer-events-none"}`}>
+                    <div className="p-6 flex flex-col items-center justify-center" style={{ minHeight: "480px" }}>
                       <p className="text-xs font-semibold text-brand-gold uppercase tracking-widest mb-3">Promotional Flyer</p>
                       <div className="cursor-pointer w-full" onClick={() => setFlyerOpen(true)}>
                         <img src={getSetting("flyer_image")} alt="Promotional Flyer" className="w-full h-auto rounded-xl shadow-md hover:shadow-lg transition-shadow" />
